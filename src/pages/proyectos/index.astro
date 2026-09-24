@@ -19,7 +19,7 @@ const schema = {
   isPartOf: { "@id": `${site.domain}/#organizacion` },
 };
 ---
-<Base title={title} description={description} image={proyectos[0].portada.img} schema={schema}>
+<Base title={title} description={description} image={proyectos[0]?.portada.img} schema={schema}>
   <PageHero
     image="/img/proyectos-hero.jpg"
     alt="Sala de espera corporativa con sofá, sillones y mesa de centro instalados por Neucast"
@@ -38,6 +38,11 @@ const schema = {
 
     <!-- ============ CUADRÍCULA ============ -->
     <div class="container">
+      {/* Sin proyectos cargados la página existe igual, con su H1 y su aviso.
+          Es el estado en el que arranca la migración. */}
+      {proyectos.length === 0 && (
+        <p class="py-vacio">Todavía no hay proyectos publicados.</p>
+      )}
       <div class="py-grid">
         {proyectos.map((p, i) => (
           <a class="py-card" href={`/proyectos/${p.slug}/`}>
@@ -72,6 +77,8 @@ const schema = {
     .py-intro span{display:block;}
     .py-intro-b{color:var(--ink-40);}
     @media (min-width:760px){.py-intro{max-width:88ch;}}
+
+    .py-vacio{color:var(--ink-40);font-size:var(--fs-body-lg);}
 
     /* Cuadrícula editorial, no de producto: la foto manda y el texto va debajo. */
     .py-grid{display:grid;gap:clamp(32px,4vw,56px);}

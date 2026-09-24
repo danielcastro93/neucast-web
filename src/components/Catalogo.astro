@@ -116,9 +116,15 @@ const bloquesVisibles = bloquesPara(catActiva, piezas.length);
         ))}
       </div>
 
+      {/* Dos mensajes distintos: no es lo mismo que los filtros dejen fuera
+          todo que que todavía no haya nada cargado. El segundo se va a ver
+          mientras se llena el catálogo desde el CMS. */}
       <p class="mb-vacio" id="vacio" hidden>
-        Ninguna pieza coincide con esos filtros.
-        <button type="button" class="mb-vacio-btn" id="limpiarVacio">Quitar los filtros</button>
+        <span data-vacio-filtros>
+          Ninguna pieza coincide con esos filtros.
+          <button type="button" class="mb-vacio-btn" id="limpiarVacio">Quitar los filtros</button>
+        </span>
+        <span data-vacio-total hidden>Todavía no hay piezas en esta sección.</span>
       </p>
 
       <div class="mb-mas" id="zonaMas">
@@ -567,6 +573,9 @@ const bloquesVisibles = bloquesPara(catActiva, piezas.length);
       elActivos.textContent = nActivos;
 
       vacio.hidden = total > 0;
+      // si no hay ni una pieza, el problema no son los filtros
+      vacio.querySelector("[data-vacio-filtros]").hidden = tarjetas.length === 0;
+      vacio.querySelector("[data-vacio-total]").hidden = tarjetas.length > 0;
       zonaMas.hidden = total === 0;
       btnMas.hidden = mostradas >= total;
 

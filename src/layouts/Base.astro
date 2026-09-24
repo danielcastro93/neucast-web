@@ -122,7 +122,10 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
             ))}
           </div>
 
-          <!-- Bloque de apoyo: el menú también puede llevar a otra cosa -->
+          <!-- Bloque de apoyo: el menú también puede llevar a otra cosa.
+               Sin proyectos cargados no se pinta, en vez de tumbar el menú
+               entero, que es el estado en el que arranca la migración. -->
+          {proyectoDestacado && (
           <a class="hd-promo" href="/proyectos/">
             <span class="hd-promo-media">
               <img src={proyectoDestacado.portada.img} alt="" loading="lazy" />
@@ -138,6 +141,7 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
               </svg>
             </span>
           </a>
+          )}
         </div>
       </div>
     </header>

@@ -13,7 +13,7 @@ import CierreCta from "../components/CierreCta.astro";
 import { buscarPieza } from "../data/catalogo.js";
 
 const piezasDestacadas = destacados.map(buscarPieza).filter(Boolean);
-const escenaHome = escenaDeHome(proyectoDestacado);
+const escenaHome = proyectoDestacado ? escenaDeHome(proyectoDestacado) : null;
 const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 ---
 <Base overlayHeader={true}>
@@ -36,6 +36,10 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
   </section>
 
   <!-- ============ CATEGORÍAS ============ -->
+  {/* Las secciones que se alimentan de una lista desaparecen si la lista está
+      vacía, en vez de enseñar una cabecera con nada debajo. Importa mientras se
+      carga el catálogo desde el CMS: el home se ve bien desde el primer día. */}
+  {categories.length > 0 && (
   <section class="cats" id="muebles">
     <div class="container reveal">
       <SectionHead title="¿Qué estás buscando?" rail="catRail" />
@@ -44,8 +48,10 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
       {categories.map((c) => <CategoryCard category={c} />)}
     </div>
   </section>
+  )}
 
   <!-- ============ PIEZAS DESTACADAS ============ -->
+  {piezasDestacadas.length > 0 && (
   <section class="prods">
     <div class="container reveal">
       <SectionHead title="Piezas destacadas" rail="prodRail" />
@@ -54,8 +60,10 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
       {piezasDestacadas.map((p) => <PiezaCard pieza={p} ancho="min(64vw,300px)" />)}
     </div>
   </section>
+  )}
 
   <!-- ============ PROYECTO DESTACADO + HOTSPOTS ============ -->
+  {proyectoDestacado && (
   <section class="proj" id="proyectos">
     <div class="container">
       <div class="reveal">
@@ -78,6 +86,7 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
       </figure>
     </div>
   </section>
+  )}
 
   <!-- ============ EDITORIAL / NOSOTROS ============ -->
   <section class="edit" id="nosotros">
