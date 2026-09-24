@@ -1,0 +1,123 @@
+---
+import Base from "../layouts/Base.astro";
+import Icon from "../components/Icon.astro";
+
+// Página de agradecimiento del formulario de contacto.
+// Va con noindex: es el final de un flujo, no un destino de búsqueda. Además,
+// al ser una URL propia, sirve de objetivo de conversión cuando se conecte la
+// analítica: se mide "visitas a /gracias/" y listo.
+//
+// Sin footer y a pantalla completa, igual que la 404: aquí solo hay una cosa
+// que decir y dos salidas, así que nada más debe competir.
+const title = "Solicitud enviada | Neucast";
+const description = "Recibimos tu solicitud de cotización. Te respondemos en horario laboral.";
+---
+<Base
+  title={title}
+  description={description}
+  noindex={true}
+  overlayHeader={true}
+  hideFooter={true}
+>
+  <section class="gr" data-hides-fab>
+    <img
+      class="gr-bg"
+      src="/img/gracias-tela.jpg"
+      alt=""
+      aria-hidden="true"
+      fetchpriority="high"
+    />
+    <div class="gr-shade" aria-hidden="true"></div>
+
+    <div class="container gr-inner">
+      <span class="gr-palomita" aria-hidden="true">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path class="gr-trazo" d="M4 12.5l5 5L20 6.5" stroke="currentColor" stroke-width="2.4"
+            stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </span>
+
+      <h1 class="display t-h1 gr-title">
+        <span class="paint-line" style="--i:0">Recibimos tu solicitud</span>
+      </h1>
+      <p class="gr-texto fade-in" style="--delay:.6s">
+        Gracias por contactarnos. Nuestro equipo revisará tu información y se pondrá
+        en contacto contigo lo antes posible.
+      </p>
+
+      <div class="gr-ctas fade-in" style="--delay:.75s">
+        <a class="pill" href="/muebles/">
+          Sigue viendo el catálogo
+          <Icon name="arrow" size={14} />
+        </a>
+        <a class="pill pill--glass" href="/">Volver al inicio</a>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .gr{
+      position:relative;overflow:hidden;
+      min-height:100svh;
+      display:flex;align-items:center;
+      --play:running;
+    }
+    .gr-bg{
+      position:absolute;inset:0;width:100%;height:100%;
+      object-fit:cover;object-position:center;
+    }
+    /* el texto va al centro, así que el velo tiene que dar contraste ahí */
+    .gr-shade{
+      position:absolute;inset:0;
+      background:
+        radial-gradient(ellipse at center, rgba(10,9,8,.72) 0%, rgba(10,9,8,.56) 55%, rgba(10,9,8,.44) 100%),
+        rgba(10,9,8,.2);
+    }
+    .gr-inner{
+      position:relative;z-index:2;color:#fff;text-align:center;
+      max-width:calc(880px + var(--gutter) * 2);
+      padding-block:calc(var(--header-h) + 40px) 48px;
+      text-shadow:0 2px 26px rgba(0,0,0,.4);
+    }
+
+    /* la palomita entra: primero el círculo, luego el trazo se dibuja */
+    .gr-palomita{
+      display:inline-flex;align-items:center;justify-content:center;
+      width:62px;height:62px;border-radius:50%;
+      background:var(--olive);color:var(--white);
+      margin-bottom:28px;
+      box-shadow:0 10px 34px rgba(10,9,8,.35);
+      animation:circuloEntra .45s var(--ease) both;
+    }
+    @keyframes circuloEntra{
+      from{opacity:0;transform:scale(.5)}
+      60%{transform:scale(1.08)}
+      to{opacity:1;transform:scale(1)}
+    }
+    .gr-trazo{
+      stroke-dasharray:30;stroke-dashoffset:30;
+      animation:dibujaTrazo .5s var(--ease) .32s forwards;
+    }
+    @keyframes dibujaTrazo{to{stroke-dashoffset:0}}
+
+    .gr-title{margin:0 0 18px;}
+    /* el título va centrado: se centra también la caja del pintado */
+    .gr-title .paint-line{margin-inline:auto;}
+
+    .gr-texto{
+      color:rgba(255,255,255,.9);font-size:var(--fs-body-lg);
+      max-width:min(820px,100%);margin-inline:auto;text-wrap:balance;
+    }
+    .gr-ctas{
+      display:flex;flex-wrap:wrap;justify-content:center;gap:12px;
+      margin-top:34px;
+    }
+    .gr .pill--glass{color:#fff;background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.35);}
+    .gr .pill--glass:hover{background:rgba(255,255,255,.24);}
+
+    @media (prefers-reduced-motion:reduce){
+      .gr-palomita{animation:none;}
+      .gr-trazo{animation:none;stroke-dashoffset:0;}
+    }
+  </style>
+</Base>

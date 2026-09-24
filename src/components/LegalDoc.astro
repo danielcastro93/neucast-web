@@ -1,0 +1,176 @@
+---
+// Documento legal: índice lateral y secciones numeradas en columna de lectura.
+// Lo comparten el aviso de privacidad y los términos y condiciones para que
+// cualquier documento nuevo salga igual sin repetir estilos.
+//
+// secciones: [{ id, titulo, cuerpo }] donde cuerpo es HTML.
+const { titulo, entradilla, actualizado, secciones = [] } = Astro.props;
+---
+<section class="lg-head">
+  <div class="container lg-col">
+    <h1 class="display t-h1 lg-title">{titulo}</h1>
+    {entradilla && <p class="lg-entradilla">{entradilla}</p>}
+    <p class="lg-fecha">Última actualización: {actualizado}</p>
+  </div>
+</section>
+
+<section class="lg-cuerpo">
+  <div class="container lg-grid">
+    <details class="lg-indice" aria-label="Contenido del documento" open>
+      <summary class="lg-indice-cab">
+        <span class="overline">Contenido</span>
+        <span class="lg-indice-chevron" aria-hidden="true"></span>
+      </summary>
+      <ol class="lg-indice-caja">
+        {secciones.map((s, i) => (
+          <li>
+            <a href={`#${s.id}`}>
+              <span class="lg-indice-n">{i + 1}</span>
+              {s.titulo}
+            </a>
+          </li>
+        ))}
+      </ol>
+    </details>
+
+    <div class="lg-texto">
+      {secciones.map((s, i) => (
+        <article class="lg-seccion" id={s.id}>
+          <h2 class="display t-h4 lg-seccion-titulo">
+            <span class="lg-seccion-n">{i + 1}</span>
+            {s.titulo}
+          </h2>
+          <div class="lg-seccion-cuerpo" set:html={s.cuerpo} />
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .lg-head{margin-top:calc(var(--header-h) + clamp(40px,7vw,88px));}
+  .lg-col{max-width:calc(720px + var(--gutter) * 2);}
+  .lg-title{margin-bottom:18px;}
+  .lg-entradilla{color:var(--ink-60);font-size:var(--fs-body-lg);max-width:60ch;}
+  .lg-fecha{
+    margin-top:22px;padding-top:18px;border-top:1px solid var(--line);
+    font-size:var(--fs-sm);color:var(--ink-40);
+  }
+
+  .lg-cuerpo{margin-top:clamp(40px,6vw,72px);}
+  .lg-grid{display:grid;gap:clamp(32px,5vw,64px);align-items:start;}
+  @media (min-width:1000px){
+    .lg-grid{grid-template-columns:240px minmax(0,720px);}
+  }
+
+  /* Índice. En móvil se pliega: doce títulos ocupan media pantalla antes de
+     llegar al documento, así que el usuario decide si lo abre. */
+  .lg-indice-cab{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:14px 0;cursor:pointer;list-style:none;
+    border-bottom:1px solid var(--line);
+  }
+  .lg-indice-cab::-webkit-details-marker{display:none;}
+  .lg-indice-chevron{
+    flex:none;width:10px;height:10px;
+    border-right:1.6px solid var(--ink-40);
+    border-bottom:1.6px solid var(--ink-40);
+    transform:rotate(45deg);margin-top:-4px;
+    transition:transform .3s var(--ease);
+  }
+  .lg-indice[open] .lg-indice-chevron{transform:rotate(-135deg);margin-top:2px;}
+  .lg-indice-caja{overflow:hidden;}
+  .lg-indice ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;}
+  .lg-indice a{
+    display:flex;gap:10px;padding:9px 0;
+    font-size:var(--fs-sm);color:var(--ink-60);
+    border-bottom:1px solid var(--line);
+    transition:color .2s;
+  }
+  .lg-indice a:hover{color:var(--olive-deep);}
+  .lg-indice-n{color:var(--ink-40);font-variant-numeric:tabular-nums;flex:none;}
+  @media (min-width:1000px){
+    .lg-indice{position:sticky;top:calc(var(--header-h) + 24px);}
+    /* en escritorio el índice siempre está a la vista: la cabecera es un
+       rótulo, no un control */
+    .lg-indice-cab{
+      cursor:default;pointer-events:none;
+      padding:0 0 14px;border-bottom:0;
+    }
+    .lg-indice-chevron{display:none;}
+  }
+
+  .lg-texto{display:flex;flex-direction:column;gap:clamp(30px,4vw,44px);}
+  .lg-seccion{scroll-margin-top:calc(var(--header-h) + 24px);}
+  .lg-seccion-titulo{
+    display:flex;gap:12px;align-items:baseline;
+    margin-bottom:12px;
+  }
+  .lg-seccion-n{color:var(--olive);font-variant-numeric:tabular-nums;flex:none;}
+
+  /* el cuerpo llega marcado desde la página, así que se estiliza por etiqueta */
+  .lg-seccion-cuerpo :global(p){color:var(--ink-60);margin-bottom:14px;}
+  .lg-seccion-cuerpo :global(p:last-child){margin-bottom:0;}
+  .lg-seccion-cuerpo :global(ul),
+  .lg-seccion-cuerpo :global(ol){
+    margin:0 0 14px;padding-left:0;list-style:none;
+    display:flex;flex-direction:column;gap:9px;
+  }
+  .lg-seccion-cuerpo :global(li){
+    position:relative;padding-left:20px;color:var(--ink-60);
+  }
+  .lg-seccion-cuerpo :global(li)::before{
+    content:"";position:absolute;left:2px;top:.62em;
+    width:5px;height:5px;border-radius:50%;background:var(--olive);
+  }
+  .lg-seccion-cuerpo :global(strong){color:var(--ink);font-weight:600;}
+  .lg-seccion-cuerpo :global(a){
+    color:var(--ink);font-weight:600;
+    border-bottom:1px solid var(--line);
+    transition:color .2s,border-color .2s;
+  }
+  .lg-seccion-cuerpo :global(a:hover){color:var(--olive-deep);border-color:var(--olive);}
+  /* los datos que el cliente todavía debe llenar saltan a la vista */
+  .lg-seccion-cuerpo :global(.pendiente){
+    background:#FFF3C4;color:#6b5a00;
+    padding:1px 6px;border-radius:4px;font-weight:600;
+  }
+</style>
+
+<script>
+  const CURVA = { duration: 360, easing: "cubic-bezier(.22,.61,.36,1)" };
+  const quieto = matchMedia("(prefers-reduced-motion: reduce)");
+  // el mismo punto en el que el índice deja de ir al costado
+  const esMovil = () => !matchMedia("(min-width: 1000px)").matches;
+
+  const indice = document.querySelector(".lg-indice");
+
+  if (indice) {
+    const caja = indice.querySelector(".lg-indice-caja");
+
+    // en móvil llega plegado; se hace después del render para que los enlaces
+    // estén siempre en el HTML y funcione sin JavaScript
+    if (esMovil()) indice.open = false;
+
+    indice.querySelector("summary").addEventListener("click", (e) => {
+      if (!esMovil()) return;
+      e.preventDefault();
+      const abriendo = !indice.open;
+      caja.getAnimations().forEach((a) => a.cancel());
+      if (quieto.matches) { indice.open = abriendo; return; }
+      if (abriendo) {
+        indice.open = true;
+        caja.animate(
+          [{ height: "0px", opacity: 0 }, { height: caja.scrollHeight + "px", opacity: 1 }],
+          CURVA
+        );
+      } else {
+        const anim = caja.animate(
+          [{ height: caja.scrollHeight + "px", opacity: 1 }, { height: "0px", opacity: 0 }],
+          CURVA
+        );
+        anim.onfinish = () => { indice.open = false; };
+      }
+    });
+  }
+</script>

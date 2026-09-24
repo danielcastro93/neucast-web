@@ -1,0 +1,521 @@
+---
+import Base from "../../layouts/Base.astro";
+import EscenasCarrusel from "../../components/EscenasCarrusel.astro";
+import VisorGaleria from "../../components/VisorGaleria.astro";
+import CursorAmpliar from "../../components/CursorAmpliar.astro";
+import CierreCta from "../../components/CierreCta.astro";
+import PiezaCard from "../../components/PiezaCard.astro";
+import SectionHead from "../../components/SectionHead.astro";
+import { site } from "../../data/site.js";
+import { buscarPieza } from "../../data/catalogo.js";
+import { proyectos, mediosDe, imagenesDe } from "../../data/proyectos.js";
+
+export async function getStaticPaths() {
+  const { proyectos } = await import("../../data/proyectos.js");
+  return proyectos.map((p) => ({ params: { proyecto: p.slug }, props: { proyecto: p } }));
+}
+
+const { proyecto } = Astro.props;
+
+const piezas = proyecto.piezas.map(buscarPieza).filter(Boolean);
+// Siempre tres: con menos la fila queda coja y con más se vuelve otro listado.
+const otros = proyectos.filter((p) => p.slug !== proyecto.slug).slice(0, 3);
+
+// El visor enseña el material en el mismo orden en que aparece en la página,
+// así que el índice se calcula de la misma lista que se pinta.
+const medios = mediosDe(proyecto);
+const indiceDe = (m) => medios.indexOf(m);
+
+// La ficha se ve completa: no hay nada que esconder detrás de un "ver más".
+//
+// Solo van los datos con los que alguien decide si hacemos lo suyo: dónde,
+// cuándo, para quién, de qué tipo y de qué tamaño. "Estado: instalado" sobraba
+// (la sección entera son proyectos instalados) y "Entrega" y "Servicios" son
+// cosas que se hablan en la cotización, no en la portada del caso.
+const ficha = [
+  { etiqueta: "Ubicación", valor: proyecto.ciudad },
+  { etiqueta: "Año", valor: proyecto.anio },
+  { etiqueta: "Espacio", valor: proyecto.espacio },
+  { etiqueta: "Cliente", valor: proyecto.cliente || proyecto.sector },
+  { etiqueta: "Superficie", valor: proyecto.superficie },
+  { etiqueta: "Capacidad", valor: proyecto.escala },
+  ...proyecto.ficha,
+].filter((d) => d.valor);
+
+const title = `${proyecto.espacio} en ${proyecto.ciudad} | Proyectos | Neucast`;
+const description = `${proyecto.nombre}. ${proyecto.resumen}`.slice(0, 158);
+const url = `${site.domain}/proyectos/${proyecto.slug}`;
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: proyecto.nombre,
+  description: proyecto.resumen,
+  image: imagenesDe(proyecto).map((m) => new URL(m.img, site.domain).href),
+  url,
+  inLanguage: "es-MX",
+  author: { "@id": `${site.domain}/#organizacion` },
+  publisher: { "@id": `${site.domain}/#organizacion` },
+  about: `${proyecto.espacio}, ${proyecto.ciudad}`,
+};
+
+const waMensaje = `Hola, vi el proyecto de ${proyecto.espacio.toLowerCase()} en ${proyecto.ciudad} y quiero algo parecido.`;
+---
+<Base title={title} description={description} image={proyecto.portada.img} schema={schema}>
+  <article class="pr">
+    <!-- ============ APERTURA ============ -->
+    <header class="container pr-head">
+      <p class="overline pr-eyebrow">
+        <a href="/proyectos/">Proyectos</a>
+        <span aria-hidden="true">·</span>
+        {proyecto.ciudad}
+      </p>
+      <h1 class="display t-h1 pr-titulo">{proyecto.nombre}</h1>
+      <p class="pr-bajada">{proyecto.resumen}</p>
+      <div class="pr-meta">
+        <span>{proyecto.anio}</span>
+        <span>{proyecto.espacio} · {proyecto.escala}</span>
+      </div>
+    </header>
+
+    <!-- La imagen de apertura va sola y a sangre: es la que vende el proyecto.
+         No se amplía ni se mueve; es portada, no galería. -->
+    <figure class="pr-sangre pr-portada">
+      <img src={proyecto.portada.img} alt={proyecto.portada.alt} fetchpriority="high" />
+    </figure>
+
+    <!-- ============ INTRODUCCIÓN + FICHA ============ -->
+    <section class="container pr-intro reveal">
+      <p class="serif-eyebrow pr-intro-eyebrow">Introducción</p>
+
+      <div>
+        <div class="pr-texto">
+          <p class="pr-intro-p">{proyecto.intro[0]}</p>
+          {proyecto.intro.length > 1 && (
+            <div class="pr-mas" id="introMas" hidden>
+              {proyecto.intro.slice(1).map((t) => <p class="pr-intro-p">{t}</p>)}
+            </div>
+          )}
+        </div>
+        {proyecto.intro.length > 1 && (
+          <button class="pr-toggle" type="button" data-abre="introMas" aria-controls="introMas" aria-expanded="false">
+            <span class="pr-signo" aria-hidden="true"></span>
+            <span data-etiqueta data-mas="Leer más" data-menos="Leer menos">Leer más</span>
+          </button>
+        )}
+
+        <dl class="pr-ficha">
+          {ficha.map((d) => (
+            <div><dt>{d.etiqueta}</dt><dd>{d.valor}</dd></div>
+          ))}
+        </dl>
+      </div>
+    </section>
+
+    <!-- ============ LOS BLOQUES ============ -->
+    {proyecto.bloques.map((b) => {
+      return (
+        <>
+          {b.tipo === "capitulo" && (
+            <section class="container pr-capitulo reveal">
+              <h2 class="pr-capitulo-ttl">{b.titulo}</h2>
+              <div class="pr-texto">
+                {b.texto.map((t) => <p class="pr-capitulo-p">{t}</p>)}
+              </div>
+            </section>
+          )}
+
+          {b.tipo === "destacado" && (
+            <section class="container pr-destacado" data-pinta>
+              <p class="display">
+                {(Array.isArray(b.texto) ? b.texto : [b.texto]).map((l, i) => (
+                  <span class:list={["paint-line", { "pr-destacado-b": i > 0 }]} style={`--i:${i}`}>{l}</span>
+                ))}
+              </p>
+            </section>
+          )}
+
+          {b.tipo === "imagen" && (
+            <figure class="pr-sangre reveal">
+              <button class="pr-medio-btn" type="button" data-visor={indiceDe(b)} data-ampliar aria-label={`Ampliar: ${b.alt}`}>
+                <img src={b.img} alt={b.alt} loading="lazy" draggable="false" />
+              </button>
+              {b.pie && <figcaption class="container">{b.pie}</figcaption>}
+            </figure>
+          )}
+
+          {b.tipo === "duo" && (
+            <div class="container pr-duo reveal">
+              {b.medios.map((m) => (
+                <figure>
+                  <button class="pr-medio-btn" type="button" data-visor={indiceDe(m)} data-ampliar aria-label={`Ampliar: ${m.alt}`}>
+                    <img src={m.img} alt={m.alt} loading="lazy" draggable="false" />
+                  </button>
+                  {m.pie && <figcaption>{m.pie}</figcaption>}
+                </figure>
+              ))}
+            </div>
+          )}
+
+          {b.tipo === "escenas" && (
+            <div class="container pr-escenas reveal">
+              <EscenasCarrusel escenas={b.escenas} id={`zonas-${indiceDe(b.escenas[0])}`} />
+            </div>
+          )}
+
+          {/* El video no entra al visor: se reproduce donde está. */}
+          {b.tipo === "video" && (
+            <figure class="pr-sangre pr-videowrap reveal" data-video>
+              <button class="pr-video" type="button" data-video-play aria-label={`Ver video: ${b.alt}`}>
+                <img src={b.poster} alt={b.alt} loading="lazy" draggable="false" />
+                <span class="pr-play">
+                  <svg width="15" height="15" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M3 1.5v9l7-4.5z"/></svg>
+                  Ver video
+                </span>
+              </button>
+              <video
+                data-video-el
+                src={b.src}
+                poster={b.poster}
+                controls
+                playsinline
+                preload="none"
+                aria-label={b.alt}
+                hidden
+              ></video>
+            </figure>
+          )}
+        </>
+      );
+    })}
+
+    <!-- ============ PIEZAS DEL PROYECTO ============ -->
+    {piezas.length > 0 && (
+      <section class="pr-piezas reveal">
+        <div class="container">
+          <SectionHead title="Piezas de este proyecto" rail="piezasRail" />
+        </div>
+        <!-- sin rail-both: en teléfono el degradado va solo a la derecha -->
+        <div class="rail rail-mask" id="piezasRail">
+          {piezas.map((p) => <PiezaCard pieza={p} ancho="min(64vw,300px)" />)}
+        </div>
+      </section>
+    )}
+
+    <!-- ============ CIERRE ============ -->
+    <CierreCta
+      eyebrow="¿Tienes algo parecido?"
+      lineas={["Cuéntanos qué espacio", "hay que resolver"]}
+      mensaje={waMensaje}
+    />
+
+    <!-- ============ OTROS PROYECTOS ============ -->
+    {otros.length > 0 && (
+      <section class="container pr-otros reveal">
+        <h2 class="display t-h3 pr-otros-ttl">Otros proyectos</h2>
+        <div class="pr-otros-grid rail rail-mask">
+          {otros.map((o) => (
+            <a class="pr-otro" href={`/proyectos/${o.slug}/`}>
+              <span class="pr-otro-marco">
+                <img src={o.portada.img} alt={o.portada.alt} loading="lazy" />
+              </span>
+              <span class="pr-otro-meta">{o.espacio} <span aria-hidden="true">·</span> {o.ciudad}</span>
+              <span class="pr-otro-nombre">{o.nombre}</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+  </article>
+
+  <CursorAmpliar />
+  <VisorGaleria items={medios} titulo={`${proyecto.espacio} <strong>${proyecto.ciudad}</strong>`} />
+
+  <style>
+    .pr{
+      --pr-col:200px;
+      padding-top:calc(var(--header-h) + clamp(28px,4vw,56px));
+    }
+
+    /* Columna de lectura: el texto arranca a la derecha del antetítulo, como en
+       las páginas de proyecto de arquitectura. */
+    .pr-texto{max-width:66ch;}
+
+    /* ---------- apertura ---------- */
+    .pr-head{margin-bottom:clamp(26px,3.5vw,44px);}
+    .pr-eyebrow{display:flex;flex-wrap:wrap;align-items:center;gap:7px;}
+    .pr-eyebrow a{color:var(--olive-deep);transition:color .2s;}
+    .pr-eyebrow a:hover{color:var(--ink);}
+    .pr-eyebrow span{color:var(--ink-40);}
+    /* El H1 siempre a dos renglones: la medida se ensancha lo necesario para
+       que quepa la segunda mitad, no para que entre todo en uno. */
+    .pr-titulo{margin:10px 0;max-width:26ch;text-wrap:balance;}
+    /* La bajada, siempre a tres renglones. La medida está calibrada para un
+       resumen de entre 105 y 125 caracteres: ese es el largo que pide el campo
+       en los cuatro proyectos. */
+    .pr-bajada{font-size:var(--fs-h4);color:var(--ink-40);max-width:40ch;line-height:1.4;}
+    .pr-meta{
+      display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px 24px;
+      margin-top:clamp(22px,3vw,34px);padding-top:14px;
+      border-top:1px solid var(--line);
+      font-size:var(--fs-xs);color:var(--ink-60);
+    }
+
+    /* ---------- imágenes a sangre ---------- */
+    .pr-sangre{margin:0;}
+    .pr-sangre + .pr-sangre{margin-top:clamp(10px,1.4vw,18px);}
+    .pr-sangre figcaption{
+      display:block;margin-top:12px;
+      font-size:var(--fs-2xs);color:var(--ink-40);
+    }
+    .pr-medio-btn{
+      position:relative;display:block;width:100%;padding:0;border:0;
+      background:var(--paper-soft);cursor:zoom-in;overflow:hidden;
+    }
+    .pr-medio-btn img{
+      width:100%;display:block;aspect-ratio:4/3;object-fit:cover;
+      transition:transform 1.2s var(--ease);-webkit-user-drag:none;
+    }
+    @media (min-width:760px){.pr-medio-btn img{aspect-ratio:2/1;}}
+    @media (hover:hover){.pr-medio-btn:hover img{transform:scale(1.03);}}
+
+    /* La portada no se amplía ni se acerca: es la foto que vende el proyecto. */
+    .pr-portada img{
+      width:100%;display:block;aspect-ratio:4/3;object-fit:cover;
+    }
+    @media (min-width:760px){.pr-portada img{aspect-ratio:2/1;}}
+
+    /* ---------- video ---------- */
+    .pr-videowrap{position:relative;background:var(--ink);}
+    .pr-video{
+      position:relative;display:block;width:100%;padding:0;border:0;
+      background:var(--paper-soft);overflow:hidden;cursor:pointer;
+    }
+    .pr-video img{
+      width:100%;display:block;aspect-ratio:4/3;object-fit:cover;
+      -webkit-user-drag:none;
+    }
+    @media (min-width:760px){.pr-video img{aspect-ratio:2/1;}}
+    .pr-video .pr-play{
+      position:absolute;inset:50% auto auto 50%;translate:-50% -50%;
+      display:inline-flex;align-items:center;gap:9px;
+      height:46px;padding:0 20px;border-radius:999px;
+      background:rgba(255,255,255,.9);color:var(--ink);
+      -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+      font-size:var(--fs-xs);font-weight:600;
+      transition:background .2s,transform .25s var(--ease);
+    }
+    .pr-video:hover .pr-play{background:#fff;transform:scale(1.04);}
+    .pr-videowrap video{
+      width:100%;display:block;aspect-ratio:4/3;object-fit:cover;background:var(--ink);
+    }
+    @media (min-width:760px){.pr-videowrap video{aspect-ratio:2/1;}}
+    .pr-videowrap video[hidden],
+    .pr-video[hidden]{display:none !important;}
+
+    /* ---------- introducción + ficha ---------- */
+    .pr-intro{margin-top:var(--section-y);}
+    .pr-intro-eyebrow{color:var(--olive-deep);margin-bottom:14px;}
+    @media (min-width:900px){
+      .pr-intro{
+        display:grid;grid-template-columns:var(--pr-col) minmax(0,1fr);
+        gap:clamp(24px,3vw,48px);align-items:start;
+      }
+      .pr-intro-eyebrow{margin-bottom:0;}
+    }
+    .pr-intro-p{font-size:var(--fs-h4);line-height:1.5;text-wrap:pretty;}
+    .pr-intro-p + .pr-intro-p{margin-top:1em;}
+
+    /* Etiqueta chica arriba y dato debajo, sin recuadros: se lee de un barrido. */
+    .pr-ficha{
+      display:grid;grid-template-columns:repeat(2,1fr);
+      gap:clamp(30px,4.5vw,46px) 24px;
+      margin-top:clamp(28px,4vw,44px);padding-top:20px;
+      border-top:1px solid var(--line);
+    }
+    @media (min-width:760px){.pr-ficha{grid-template-columns:repeat(4,1fr);}}
+    .pr-ficha dt{
+      font-size:var(--fs-2xs);letter-spacing:var(--track-label);
+      text-transform:uppercase;color:var(--ink-40);
+    }
+    /* dd trae sangría del navegador: sin esto el dato no cuadra con su etiqueta */
+    .pr-ficha dd{
+      margin:6px 0 0;font-size:var(--fs-sm);font-weight:600;
+      text-align:left;text-wrap:pretty;
+    }
+
+    /* Desplegables: mismo signo que el acordeón de filtros. */
+    .pr-toggle{
+      display:inline-flex;align-items:center;gap:11px;margin-top:18px;
+      font-size:var(--fs-xs);font-weight:600;color:var(--ink-60);
+      transition:color .2s;
+    }
+    .pr-toggle:hover{color:var(--ink);}
+    .pr-signo{position:relative;flex:none;width:13px;height:13px;}
+    .pr-signo::before,.pr-signo::after{
+      content:"";position:absolute;inset:50% 0 auto 0;
+      height:1.5px;background:currentColor;border-radius:2px;
+      transition:transform .3s var(--ease);
+    }
+    .pr-signo::after{transform:rotate(90deg);}
+    .pr-toggle[aria-expanded="true"] .pr-signo::after{transform:rotate(0);}
+    .pr-mas{overflow:hidden;}
+    .pr-mas[hidden]{display:none;}
+
+    /* ---------- capítulos ----------
+       Sin numerar: el número suelto en la columna de la izquierda no aportaba
+       nada y sí pesaba. El título hace de marca de capítulo por sí solo. */
+    .pr-capitulo{margin-top:var(--section-y);}
+    .pr-capitulo-ttl{
+      margin-bottom:16px;
+      font-size:var(--fs-h3);font-weight:700;letter-spacing:-.015em;
+      text-wrap:pretty;
+    }
+    @media (min-width:900px){
+      .pr-capitulo{
+        display:grid;grid-template-columns:var(--pr-col) minmax(0,1fr);
+        gap:clamp(24px,3vw,48px);align-items:start;
+      }
+      /* La columna da para dos renglones y ahí se quedan todos los títulos: el
+         ritmo se rompe si uno cae en uno y el de abajo en tres. */
+      .pr-capitulo-ttl{margin-bottom:0;font-size:var(--fs-h4);color:var(--ink-60);}
+    }
+    .pr-capitulo-p{color:var(--ink-60);text-wrap:pretty;}
+    .pr-capitulo-p + .pr-capitulo-p{margin-top:1em;}
+
+    /* ---------- destacado ----------
+       Centrado y a dos tonos, como la entradilla del listado: es la frase que
+       corta el relato, no un párrafo más. */
+    .pr-destacado{margin-top:var(--section-y);text-align:center;}
+    .pr-destacado p{
+      max-width:22ch;margin-inline:auto;
+      font-size:clamp(28px,4.2vw,46px);line-height:var(--lh-heading);
+      letter-spacing:-.015em;text-wrap:balance;
+    }
+    .pr-destacado span{display:block;margin-inline:auto;}
+    /* Se pinta al entrar en pantalla, como el hero del home. El fantasma es la
+       misma línea del sitio, para que en claro no se lea como texto apagado. */
+    .pr-destacado .paint-line{--paint-fill:var(--ink);--paint-ghost:var(--line);}
+    .pr-destacado .pr-destacado-b{--paint-fill:var(--ink-40);color:var(--ink-40);}
+    .pr-destacado{--play:paused;}
+    .pr-destacado.pintando{--play:running;}
+
+    /* ---------- pares y escenas ---------- */
+    .pr-duo{
+      display:grid;gap:clamp(12px,1.6vw,20px);
+      margin-top:clamp(28px,4vw,52px);
+    }
+    @media (min-width:700px){.pr-duo{grid-template-columns:1fr 1fr;}}
+    .pr-duo figure{margin:0;}
+    .pr-duo .pr-medio-btn{border-radius:var(--radius);}
+    .pr-duo .pr-medio-btn img{aspect-ratio:4/5;}
+    .pr-duo figcaption{margin-top:10px;font-size:var(--fs-2xs);color:var(--ink-40);}
+
+    .pr-escenas{margin-top:clamp(28px,4vw,52px);}
+
+    /* la primera imagen a sangre viene pegada a la cabecera, sin aire extra */
+    .pr-sangre{margin-top:clamp(28px,4vw,52px);}
+    .pr-head + .pr-sangre{margin-top:0;}
+
+    /* ---------- piezas ---------- */
+    .pr-piezas{margin-top:var(--section-y);}
+
+    /* ---------- otros ---------- */
+    .pr-otros{margin-top:var(--section-y);}
+    .pr-otros-ttl{margin-bottom:var(--block-y);}
+    /* En teléfono son un carrusel: tres tarjetas apiladas obligan a recorrer
+       media pantalla por proyecto. */
+    .pr-otros-grid{display:flex;gap:14px;margin-inline:calc(var(--gutter) * -1);}
+    .pr-otro{display:flex;flex-direction:column;color:var(--ink);flex:none;width:min(72vw,300px);}
+    /* De orilla a orilla, como las fotos del relato: al quedarse en la medida
+       del contenedor era lo único metido hacia dentro en toda la página. */
+    @media (min-width:640px){
+      .pr-otros-grid{
+        display:grid;grid-template-columns:repeat(3,1fr);
+        gap:clamp(20px,3vw,32px);overflow:visible;
+        /* el relleno lo pone .rail para el carrusel de teléfono; en rejilla
+           sobra, y era lo que metía las tarjetas un gutter hacia dentro */
+        padding-inline:0;margin-inline:0;
+        mask-image:none;-webkit-mask-image:none;
+      }
+      .pr-otro{width:auto;}
+    }
+    .pr-otro-marco{
+      display:block;overflow:hidden;border-radius:var(--radius);
+      background:var(--paper);aspect-ratio:4/3;
+    }
+    .pr-otro-marco img{
+      width:100%;height:100%;object-fit:cover;display:block;
+      transition:transform 1.1s var(--ease);
+    }
+    @media (hover:hover){.pr-otro:hover .pr-otro-marco img{transform:scale(1.04);}}
+    .pr-otro-meta{
+      margin-top:14px;font-size:11px;letter-spacing:var(--track-label);
+      text-transform:uppercase;color:var(--olive-deep);
+    }
+    .pr-otro-meta span{color:var(--ink-40);}
+    .pr-otro-nombre{margin-top:6px;font-size:var(--fs-sm);font-weight:600;transition:color .2s;}
+    .pr-otro:hover .pr-otro-nombre{color:var(--olive-deep);}
+  </style>
+
+  <script>
+    // Los destacados se pintan al entrar en pantalla, con el mismo mecanismo de
+    // --play que el hero del home.
+    const ioPinta = new IntersectionObserver(
+      (entradas) =>
+        entradas.forEach((e) => {
+          if (!e.isIntersecting) return;
+          e.target.classList.add("pintando");
+          ioPinta.unobserve(e.target);
+        }),
+      { threshold: 0.4 }
+    );
+    document.querySelectorAll("[data-pinta]").forEach((d) => ioPinta.observe(d));
+
+    // "Leer más" de la introducción. Misma animación de alto que el acordeón de
+    // filtros, para que el sitio se mueva siempre igual.
+    const CURVA = { duration: 320, easing: "cubic-bezier(.22,.61,.36,1)" };
+    const quieto = matchMedia("(prefers-reduced-motion: reduce)");
+
+    // El video se queda en su sitio: al tocar el cartel se cambia por el
+    // reproductor y arranca. Nunca abre el visor.
+    document.querySelectorAll("[data-video]").forEach((caja) => {
+      const cartel = caja.querySelector("[data-video-play]");
+      const video = caja.querySelector("[data-video-el]");
+      if (!cartel || !video) return;
+      cartel.addEventListener("click", () => {
+        cartel.hidden = true;
+        video.hidden = false;
+        video.play().catch(() => {});
+      });
+    });
+
+    document.querySelectorAll("[data-abre]").forEach((boton) => {
+      const caja = document.getElementById(boton.dataset.abre);
+      const etiqueta = boton.querySelector("[data-etiqueta]");
+      if (!caja) return;
+
+      boton.addEventListener("click", () => {
+        const abierto = boton.getAttribute("aria-expanded") === "true";
+        boton.setAttribute("aria-expanded", String(!abierto));
+        etiqueta.textContent = abierto ? etiqueta.dataset.mas : etiqueta.dataset.menos;
+
+        if (abierto) {
+          if (quieto.matches) { caja.hidden = true; return; }
+          const anim = caja.animate(
+            [{ height: caja.scrollHeight + "px", opacity: 1 }, { height: "0px", opacity: 0 }],
+            CURVA
+          );
+          anim.onfinish = () => { caja.hidden = true; };
+        } else {
+          caja.hidden = false;
+          if (quieto.matches) return;
+          caja.animate(
+            [{ height: "0px", opacity: 0 }, { height: caja.scrollHeight + "px", opacity: 1 }],
+            CURVA
+          );
+        }
+      });
+    });
+  </script>
+</Base>

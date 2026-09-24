@@ -1,0 +1,24 @@
+---
+// Botón de cotización por WhatsApp. Centraliza el link y el mensaje precargado
+// para que todas las páginas usen el mismo formato.
+import Icon from "./Icon.astro";
+import { waLink } from "../data/site.js";
+
+const {
+  message = "Hola, me gustaría cotizar mobiliario para mi empresa.",
+  label = "Cotiza por WhatsApp",
+  variant = "wa", // wa | primary | ghost | glass | plain
+  class: className = "",
+} = Astro.props;
+
+const variantClass = variant === "plain" ? "" : `pill--${variant}`;
+---
+<a
+  class:list={["pill", variantClass, className]}
+  href={waLink(message)}
+  target="_blank"
+  rel="noopener"
+>
+  <Icon name="whatsapp" size={17} />
+  {label}
+</a>

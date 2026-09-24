@@ -1,0 +1,256 @@
+---
+import Base from "../layouts/Base.astro";
+import Icon from "../components/Icon.astro";
+import WaButton from "../components/WaButton.astro";
+import VideoFrame from "../components/VideoFrame.astro";
+import PageHero from "../components/PageHero.astro";
+import { site, descripcionMarca } from "../data/site.js";
+
+const title = "Quiénes somos | Neucast, mobiliario de oficina en México";
+// Google corta la descripción alrededor de los 160 caracteres, así que la frase
+// completa tiene que caber antes de ese límite.
+const description =
+  "Marca mexicana de mobiliario corporativo y muebles para oficina de diseño. Equipamos oficinas, salas de juntas, recepciones y cafeterías en todo México.";
+
+// La tarjeta de la marca la emite el layout en todas las páginas: aquí solo se
+// cita, porque el sujeto de esta página es la propia marca.
+const schema = [
+  {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    name: "Quiénes somos",
+    url: `${site.domain}/nosotros`,
+    description: descripcionMarca,
+    inLanguage: "es-MX",
+    // el sujeto de la página es la propia marca
+    about: { "@id": `${site.domain}/#organizacion` },
+    publisher: { "@id": `${site.domain}/#organizacion` },
+  }
+];
+
+const pilares = [
+  {
+    img: "/img/nosotros/pilar-forma.jpg",
+    alt: "Silla tapizada de líneas limpias y unión cuidada sobre fondo neutro",
+    titulo: "Forma",
+    texto:
+      "Cuidamos cada detalle hasta la última unión. Líneas limpias y proporciones justas que envejecen bien y no se agotan con las modas.",
+  },
+  {
+    img: "/img/nosotros/pilar-material.jpg",
+    alt: "Trama abierta de un textil de tapicería en tono arena",
+    titulo: "Material",
+    texto:
+      "Textiles, maderas y metales elegidos por cómo se comportan con el tiempo. Materiales que sostienen la jornada completa y conservan su acabado.",
+  },
+  {
+    img: "/img/nosotros/pilar-proposito.jpg",
+    alt: "Sala de juntas con mesa de madera maciza y sillería de trabajo",
+    titulo: "Propósito",
+    texto:
+      "Nada es decorativo por accidente. Cada pieza responde a una función concreta dentro de la oficina, la sala de juntas o la recepción donde se instala.",
+  },
+];
+
+---
+<Base
+  title={title}
+  description={description}
+  image="/img/nosotros/hero-lobby.jpg"
+  overlayHeader={false}
+  schema={schema}
+>
+  <!-- ============ HERO ============ -->
+  <PageHero
+    image="/img/nosotros/hero-lobby.jpg"
+    alt="Lobby corporativo amueblado con sillones de piel, sofá modular y mesas de diseño"
+    eyebrow="Quiénes somos"
+    titulo={["Somos Neucast"]}
+  />
+
+  <!-- ============ MANIFIESTO ============ -->
+  <section class="ns-manifiesto">
+    <div class="container ns-centro reveal">
+      <p class="ns-lead">
+        Creamos espacios corporativos que mejoran la manera
+        en que las empresas trabajan, se reúnen y reciben.
+      </p>
+      <p class="ns-texto">
+        Nuestro mobiliario de oficina se distingue por su diseño atemporal, su resistencia y
+        una calidad sin concesiones. Cada pieza está pensada para sostener la exigencia diaria
+        de una empresa sin perder presencia con los años.
+      </p>
+      <p class="ns-texto">
+        Con ese criterio equipamos oficinas, salas de juntas, recepciones, cafeterías, áreas
+        comunes y cualquier otro espacio que una empresa necesite resolver, en todo México.
+        Porque un lugar bien amueblado cambia la forma en que se trabaja dentro de él.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ PILARES ============ -->
+  <section class="ns-pilares">
+    <div class="container">
+      <div class="ns-centro reveal">
+        <h2 class="display t-h2">El ADN de nuestro mobiliario</h2>
+        <p class="ns-texto ns-texto--sub">
+          Cada pieza Neucast responde a estos tres valores.
+        </p>
+      </div>
+      <div class="ns-grid reveal reveal-d1">
+        {pilares.map((p) => (
+          <article class="ns-pilar">
+            <div class="ns-pilar-media media">
+              <img src={p.img} alt={p.alt} loading="lazy" />
+            </div>
+            <h3 class="display t-h4 ns-pilar-titulo">{p.titulo}</h3>
+            <p class="ns-pilar-texto">{p.texto}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ LO QUE NOS DEFINE (video a un lado, texto al otro) ============ -->
+  <section class="ns-define">
+    <div class="container ns-define-grid">
+      <div class="ns-define-intro reveal reveal-d1">
+        <h2 class="display t-h2 ns-define-title">Una marca que responde por lo que entrega</h2>
+        <p class="ns-define-texto">
+          Ninguna empresa trabaja igual que otra y nuestros muebles para oficina se adaptan a lo que cada
+          espacio pide, no al contrario. Acompañamos cada proyecto de principio a fin, desde la
+          elección de las piezas hasta la entrega y la instalación, y respondemos por cada una
+          de ellas. Lo que lleva nuestro nombre lo sostenemos nosotros.
+        </p>
+        <a class="ns-define-link" href="/muebles/">
+          Explora el catálogo
+          <Icon name="arrow" size={14} />
+        </a>
+      </div>
+
+      <div class="ns-define-video reveal">
+        <VideoFrame
+          src="/video/oficina-neucast.mp4"
+          poster="/video/oficina-neucast-poster.jpg"
+          alt="Recorrido por una oficina amueblada con mobiliario Neucast"
+          ratio="1/1"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CIERRE ============ -->
+  <section class="ns-cierre" data-hides-fab>
+    <img class="ns-cierre-bg" src="/img/nosotros/cierre-material.jpg" alt="" aria-hidden="true" loading="lazy" />
+    <div class="ns-cierre-shade" aria-hidden="true"></div>
+    <div class="container ns-cierre-inner">
+      <p class="serif-eyebrow"><span class="rise" style="--delay:1s">Empecemos</span></p>
+      <h2 class="display t-h1 ns-cierre-title">
+        <span class="paint-line" style="--i:0">Dinos qué espacio</span>{' '}
+        <span class="paint-line" style="--i:1">quieres resolver</span>
+      </h2>
+      <div class="ns-cierre-ctas fade-in" style="--delay:1.15s">
+        <WaButton
+          label="Escríbenos por WhatsApp"
+          message="Hola, quiero cotizar mobiliario para mi empresa."
+        />
+        <a class="pill pill--glass" href="/contacto/">O mándanos tu solicitud</a>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    section{margin-top:var(--section-y);}
+
+    /* ---------- Bloques centrados ---------- */
+    /* en móvil el texto va alineado a la izquierda (más legible en columna
+       angosta); el centrado estilo editorial entra a partir de tablet */
+    .ns-centro{max-width:880px;margin-inline:auto;text-align:left;}
+    @media (min-width:700px){.ns-centro{text-align:center;}}
+    .ns-lead{
+      font-family:var(--serif);
+      font-size:clamp(19px,2.4vw,27px);
+      line-height:1.4;margin-bottom:26px;text-wrap:balance;
+    }
+    /* el cuerpo usa el ancho completo del bloque: así cada párrafo
+       cabe en tres renglones */
+    /* balance reparte las palabras de forma pareja entre los renglones,
+       en vez de dejar la última línea con dos o tres palabras sueltas */
+    .ns-texto{
+      color:var(--ink-60);margin-bottom:18px;
+      max-width:none;text-wrap:balance;
+    }
+    /* el subtítulo llena el renglón y solo salta cuando se acaba:
+       'balance' lo partía en dos líneas cortas antes de tiempo */
+    .ns-texto--sub{margin-top:12px;text-wrap:wrap;}
+
+    /* ---------- Pilares ---------- */
+    .ns-grid{
+      display:grid;gap:clamp(24px,3vw,32px);
+      grid-template-columns:1fr;
+      margin-top:var(--block-y);
+    }
+    @media (min-width:700px){.ns-grid{grid-template-columns:repeat(3,1fr);}}
+    .ns-pilar-media{aspect-ratio:4/5;}
+    .ns-pilar-titulo{margin:16px 0 8px;}
+    .ns-pilar-texto{color:var(--ink-60);font-size:var(--fs-sm);}
+
+    /* ---------- Lo que nos define ----------
+       Video cuadrado en la mitad izquierda y el texto centrado verticalmente
+       contra él. En móvil el texto va primero y el video debajo. */
+    .ns-define-title{margin:0 0 16px;max-width:min(640px,100%);}
+    .ns-define-texto{color:var(--ink-60);max-width:min(620px,100%);text-wrap:pretty;}
+    .ns-define-link{
+      display:inline-flex;align-items:center;gap:8px;margin-top:22px;
+      font-size:var(--fs-sm);font-weight:600;color:var(--ink);
+      border-bottom:1px solid var(--line);padding-bottom:4px;
+      transition:color .25s var(--ease),border-color .25s var(--ease),gap .25s var(--ease);
+    }
+    .ns-define-link:hover{color:var(--olive-deep);border-color:var(--olive);gap:12px;}
+
+    .ns-define-grid{display:grid;gap:clamp(28px,5vw,40px);}
+    @media (min-width:900px){
+      .ns-define-grid{
+        grid-template-columns:repeat(12,1fr);
+        column-gap:clamp(24px,3vw,48px);
+        align-items:center;
+      }
+      /* el video ocupa la mitad izquierda y el texto se centra contra él */
+      .ns-define-video{grid-column:1 / span 6;grid-row:1;}
+      .ns-define-intro{grid-column:8 / span 5;grid-row:1;}
+    }
+
+    /* ---------- Cierre ---------- */
+    .ns-cierre{
+      position:relative;overflow:hidden;
+      border-radius:var(--radius);margin-inline:var(--gutter);
+      --play:paused;
+    }
+    .ns-cierre.in-view{--play:running;}
+    @media (min-width:1500px){
+      .ns-cierre{margin-inline:auto;max-width:calc(var(--container) - var(--gutter)*2);}
+    }
+    .ns-cierre-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+    .ns-cierre-shade{position:absolute;inset:0;background:rgba(12,11,9,.58);}
+    .ns-cierre-inner{
+      position:relative;color:#fff;
+      padding-block:clamp(64px,10vw,130px);
+    }
+    .ns-cierre-title{margin:10px 0 26px;}
+    .ns-cierre-ctas{display:flex;flex-wrap:wrap;gap:12px;}
+    .ns-cierre .pill--glass{color:#fff;background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.35);}
+    .ns-cierre .pill--glass:hover{background:rgba(255,255,255,.24);}
+  </style>
+
+  <script>
+    // el bloque de cierre anima al entrar en pantalla
+    const cierre = document.querySelector(".ns-cierre");
+    if (cierre) {
+      new IntersectionObserver((entries, obs) => {
+        entries.forEach((en) => {
+          if (en.isIntersecting) { en.target.classList.add("in-view"); obs.unobserve(en.target); }
+        });
+      }, { threshold: 0.3 }).observe(cierre);
+    }
+  </script>
+</Base>

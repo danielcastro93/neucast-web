@@ -1,0 +1,115 @@
+---
+// Panel que entra por la derecha, con el fondo difuminado.
+//
+// Es el mismo gesto que el panel de filtros del listado: la información larga
+// no ensucia la página, se pide cuando se necesita. Se abre desde cualquier
+// botón con data-abre="{id}".
+const { id, titulo } = Astro.props;
+---
+<div class="pl-velo" data-velo={id} hidden></div>
+
+<aside class="pl" id={id} role="dialog" aria-modal="true" aria-label={titulo} hidden>
+  <header class="pl-head">
+    <p class="pl-titulo">{titulo}</p>
+    <button class="pl-x" type="button" data-cierra={id} aria-label="Cerrar">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </header>
+  <div class="pl-cuerpo"><slot /></div>
+</aside>
+
+<style>
+  .pl-velo[hidden],
+  .pl[hidden]{display:none !important;}
+
+  .pl-velo{
+    position:fixed;inset:0;z-index:60;
+    background:rgba(20,19,17,.4);
+    -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+    animation:plVelo .3s var(--ease);
+  }
+  @keyframes plVelo{from{opacity:0}to{opacity:1}}
+
+  .pl{
+    --pad:20px;
+    position:fixed;top:0;right:0;bottom:0;z-index:61;
+    width:min(440px,100%);
+    background:var(--white);
+    display:flex;flex-direction:column;
+    animation:plEntra .34s var(--ease);
+  }
+  @keyframes plEntra{from{transform:translateX(100%)}to{transform:none}}
+
+  .pl-head{
+    flex:none;display:flex;align-items:center;justify-content:space-between;
+    padding:13px var(--pad);border-bottom:1px solid var(--line);
+  }
+  .pl-titulo{font-size:var(--fs-body-lg);font-weight:700;letter-spacing:-.01em;}
+  .pl-x{
+    width:32px;height:32px;margin-right:-6px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--ink);transition:background .2s;
+  }
+  .pl-x:hover{background:var(--paper);}
+  .pl-cuerpo{flex:1;overflow-y:auto;padding:var(--pad) var(--pad) 40px;}
+
+  @media (prefers-reduced-motion:reduce){
+    .pl-velo,.pl{animation:none;}
+  }
+</style>
+
+<script>
+  // Un solo cableado para todos los paneles de la página.
+  const abrir = (id) => {
+    const panel = document.getElementById(id);
+    const velo = document.querySelector(`[data-velo="${id}"]`);
+    if (!panel || !velo) return;
+    panel.classList.remove("panel-cerrando");
+    velo.classList.remove("velo-cerrando");
+    panel.hidden = false;
+    velo.hidden = false;
+    document.body.style.overflow = "hidden";
+    panel.querySelector(`[data-cierra="${id}"]`)?.focus();
+  };
+
+  const quieto = matchMedia("(prefers-reduced-motion: reduce)");
+
+  const cerrar = (id) => {
+    const panel = document.getElementById(id);
+    const velo = document.querySelector(`[data-velo="${id}"]`);
+    if (!panel || panel.hidden) return;
+    document.body.style.overflow = "";
+
+    // Se oculta al terminar la animación de salida, no al dispararla: si no, el
+    // panel desaparece antes de haberse ido.
+    let listo = false;
+    const guardar = () => {
+      if (listo) return;
+      listo = true;
+      panel.hidden = true;
+      panel.classList.remove("panel-cerrando");
+      if (velo) { velo.hidden = true; velo.classList.remove("velo-cerrando"); }
+    };
+    if (quieto.matches) return guardar();
+    panel.classList.add("panel-cerrando");
+    if (velo) velo.classList.add("velo-cerrando");
+    panel.addEventListener("animationend", guardar, { once: true });
+    setTimeout(guardar, 400); // red de seguridad si la animación no dispara
+  };
+
+  document.querySelectorAll("[data-abre]").forEach((b) =>
+    b.addEventListener("click", () => abrir(b.dataset.abre))
+  );
+  document.querySelectorAll("[data-cierra]").forEach((b) =>
+    b.addEventListener("click", () => cerrar(b.dataset.cierra))
+  );
+  document.querySelectorAll("[data-velo]").forEach((v) =>
+    v.addEventListener("click", () => cerrar(v.dataset.velo))
+  );
+  addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    document.querySelectorAll(".pl:not([hidden])").forEach((p) => cerrar(p.id));
+  });
+</script>

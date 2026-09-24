@@ -1,0 +1,225 @@
+---
+import Base from "../layouts/Base.astro";
+import LegalDoc from "../components/LegalDoc.astro";
+import { site } from "../data/site.js";
+
+// ============================================================================
+// DATOS QUE EL CLIENTE DEBE LLENAR ANTES DE PUBLICAR
+// Mientras haya corchetes, la página sale marcada en amarillo y con noindex.
+// ============================================================================
+const resp = {
+  razonSocial: "[RAZÓN SOCIAL COMPLETA, S.A. DE C.V.]",
+  nombreComercial: "Neucast",
+  rfc: "[RFC]",
+  domicilio: "[CALLE Y NÚMERO, COLONIA, ALCALDÍA O MUNICIPIO, C.P., ESTADO, MÉXICO]",
+  correo: site.email,
+  telefono: "[TELÉFONO DE CONTACTO]",
+};
+
+const p = (t) => `<span class="pendiente">${t}</span>`;
+const dato = (v) => (v.startsWith("[") ? p(v) : v);
+
+const actualizado = "23 de septiembre de 2026";
+const hayPendientes = Object.values(resp).some((v) => v.startsWith("["));
+
+const title = "Aviso de privacidad | Neucast";
+const description =
+  "Aviso de privacidad integral de Neucast: qué datos personales tratamos, con qué finalidades, a quién los transferimos y cómo ejercer tus derechos ARCO.";
+
+const secciones = [
+  {
+    id: "responsable",
+    titulo: "Quién es responsable de tus datos",
+    cuerpo: `
+      <p>${dato(resp.razonSocial)}, que opera comercialmente como <strong>${resp.nombreComercial}</strong>,
+      con Registro Federal de Contribuyentes ${dato(resp.rfc)} y domicilio en ${dato(resp.domicilio)},
+      es la responsable del tratamiento de tus datos personales.</p>
+      <p>Puedes contactarnos en <a href="mailto:${resp.correo}">${resp.correo}</a>
+      o en el teléfono ${dato(resp.telefono)}.</p>
+      <p>Este aviso se emite en cumplimiento de la Ley Federal de Protección de Datos
+      Personales en Posesión de los Particulares y su normativa aplicable.</p>`,
+  },
+  {
+    id: "datos",
+    titulo: "Qué datos personales tratamos",
+    cuerpo: `
+      <p><strong>Navegar el sitio y ver el catálogo no requiere que nos des ningún dato.</strong>
+      Los datos personales que tratamos son únicamente los que tú decides enviarnos
+      cuando nos contactas.</p>
+      <p><strong>Datos que nos das en el formulario de contacto</strong>, en la página de
+      <a href="/contacto/">contacto</a>:</p>
+      <ul>
+        <li>Nombre y apellido.</li>
+        <li>Correo electrónico y teléfono.</li>
+        <li>Ciudad y estado donde está el espacio que quieres amueblar.</li>
+        <li>El asunto de tu mensaje y el texto que escribas en él.</li>
+        <li>Empresa, que es opcional: solo la tratamos si decides dárnosla.</li>
+      </ul>
+      <p><strong>Datos que nos das por otros canales</strong>, al escribirnos por WhatsApp o
+      por correo electrónico: los mismos de arriba, más la información del proyecto que
+      nos compartas, como medidas, planos o fotografías del espacio, y el domicilio de
+      entrega o instalación cuando el pedido avanza.</p>
+      <p><strong>Datos fiscales</strong>, solo si nos pides factura: razón social, RFC,
+      régimen fiscal, uso de CFDI y domicilio fiscal.</p>
+      <p><strong>Datos que se generan automáticamente</strong> al visitar el sitio: dirección
+      IP, tipo de navegador, dispositivo, idioma y páginas consultadas. Nuestro proveedor
+      de alojamiento los registra por seguridad y para mantener el servicio disponible.</p>
+      <p>No tratamos datos personales sensibles, ni datos patrimoniales o financieros
+      distintos de los fiscales señalados, ni datos de menores de edad.</p>`,
+  },
+  {
+    id: "finalidades",
+    titulo: "Para qué los usamos",
+    cuerpo: `
+      <p><strong>Finalidades primarias.</strong> Son necesarias para atenderte y no requieren
+      tu consentimiento adicional:</p>
+      <ul>
+        <li>Responder tus mensajes y elaborar la cotización que nos pides.</li>
+        <li>Dar seguimiento al pedido: confirmación, calendario de entrega,
+        coordinación de maniobras e instalación.</li>
+        <li>Emitir la factura y cumplir las obligaciones fiscales y contables.</li>
+        <li>Atender garantías, aclaraciones y servicio posterior a la venta.</li>
+      </ul>
+      <p><strong>Finalidades secundarias.</strong> No son necesarias para atenderte y
+      <strong>puedes negarte sin que eso afecte tu cotización ni tu pedido</strong>:</p>
+      <ul>
+        <li>Enviarte novedades del catálogo o promociones.</li>
+        <li>Invitarte a encuestas de satisfacción.</li>
+        <li>Usar fotografías del espacio ya amueblado como referencia de proyecto,
+        siempre sin identificar a personas.</li>
+      </ul>
+      <p>Para negarte a las finalidades secundarias basta con que nos lo digas en el
+      mismo canal por el que nos escribiste, o que mandes un correo a
+      <a href="mailto:${resp.correo}">${resp.correo}</a>.</p>`,
+  },
+  {
+    id: "transferencias",
+    titulo: "Con quién compartimos tus datos",
+    cuerpo: `
+      <p>No vendemos ni rentamos tus datos personales. Los compartimos únicamente con
+      quienes hacen falta para entregarte lo que pediste:</p>
+      <ul>
+        <li><strong>Transportistas y personal de instalación</strong>, que necesitan tu
+        domicilio y un teléfono de contacto para poder entregar.</li>
+        <li><strong>Terceros que participan en el surtido del pedido</strong>, cuando
+        la entrega se hace directamente en tu domicilio.</li>
+        <li><strong>Autoridades fiscales y administrativas</strong>, cuando una ley nos
+        obligue a ello.</li>
+      </ul>
+      <p>Estas transferencias son necesarias para cumplir la relación comercial contigo,
+      por lo que no requieren tu consentimiento adicional. Cualquier otra transferencia
+      te la solicitaríamos expresamente.</p>
+      <p>Además, al comunicarte con nosotros por <strong>WhatsApp</strong> tu mensaje se
+      procesa en la plataforma de Meta Platforms, Inc., sujeta a sus propias políticas.
+      Si prefieres no usar ese canal, escríbenos por correo electrónico.</p>`,
+  },
+  {
+    id: "cookies",
+    titulo: "Cookies y tecnologías de rastreo",
+    cuerpo: `
+      <p><strong>Este sitio no instala cookies propias ni utiliza herramientas de analítica,
+      publicidad o perfilamiento.</strong> No hay píxeles de redes sociales ni identificadores
+      con los que podamos seguirte entre sitios.</p>
+      <p>Sí cargamos <strong>tipografías desde Google Fonts</strong>, un servicio de Google LLC.
+      Para servir esos archivos, Google recibe tu dirección IP y datos técnicos de tu
+      navegador. Es la única conexión a un tercero que ocurre al abrir la página.</p>
+      <p>Los enlaces a WhatsApp, Instagram y Facebook te llevan fuera de este sitio. A
+      partir de ese momento aplican las políticas de privacidad de esas plataformas, no la
+      nuestra.</p>
+      <p>El formulario de contacto tampoco instala cookies: los datos que escribes viajan
+      directamente a nosotros y no se usan para seguirte.</p>
+      <p>Si en el futuro incorporamos analítica o publicidad, actualizaremos este aviso y
+      te pediremos tu consentimiento antes de activar esas tecnologías.</p>`,
+  },
+  {
+    id: "derechos",
+    titulo: "Tus derechos ARCO y cómo ejercerlos",
+    cuerpo: `
+      <p>Tienes derecho a <strong>acceder</strong> a tus datos personales, a
+      <strong>rectificarlos</strong> si son inexactos, a <strong>cancelarlos</strong> cuando
+      consideres que no los necesitamos y a <strong>oponerte</strong> a que los usemos para
+      fines determinados. También puedes <strong>revocar tu consentimiento</strong> en
+      cualquier momento y <strong>limitar el uso o divulgación</strong> de tus datos.</p>
+      <p>Para ejercerlos, manda un correo a
+      <a href="mailto:${resp.correo}">${resp.correo}</a> con el asunto "Derechos ARCO" e
+      incluye:</p>
+      <ul>
+        <li>Tu nombre y un medio para contactarte con la respuesta.</li>
+        <li>Copia de una identificación oficial que acredite tu identidad, o el poder
+        correspondiente si actúas en representación de alguien más.</li>
+        <li>La descripción clara de los datos sobre los que quieres ejercer el derecho y
+        qué derecho quieres ejercer.</li>
+        <li>Cualquier documento que ayude a localizar tus datos.</li>
+      </ul>
+      <p>Te responderemos en un plazo máximo de veinte días hábiles y, si la solicitud
+      procede, la haremos efectiva dentro de los quince días hábiles siguientes. El
+      trámite es gratuito; solo podríamos cobrarte los gastos de envío o de reproducción
+      en copias.</p>
+      <p>Ten en cuenta que hay datos que debemos conservar aunque pidas su cancelación,
+      por ejemplo los comprobantes fiscales durante el plazo que marca la legislación
+      fiscal.</p>`,
+  },
+  {
+    id: "conservacion",
+    titulo: "Cuánto tiempo conservamos tus datos",
+    cuerpo: `
+      <p>Conservamos tus datos mientras exista una relación comercial contigo y, después,
+      durante los plazos en que podamos tener responsabilidades derivadas de ella: la
+      vigencia de la garantía de las piezas y los plazos de conservación contable y
+      fiscal que exige la ley.</p>
+      <p>Si solo nos pediste una cotización y no se concretó, conservamos la conversación
+      durante un periodo razonable para darle seguimiento y luego la eliminamos.</p>`,
+  },
+  {
+    id: "seguridad",
+    titulo: "Cómo protegemos tus datos",
+    cuerpo: `
+      <p>Aplicamos medidas administrativas, técnicas y físicas razonables para proteger tus
+      datos contra daño, pérdida, alteración, destrucción o uso no autorizado. El sitio se
+      sirve por conexión cifrada (HTTPS) y el acceso a la información de clientes está
+      limitado al personal que la necesita para su trabajo.</p>
+      <p>Ninguna medida de seguridad es infalible. Si ocurriera una vulneración que afecte
+      de forma significativa tus derechos, te lo informaríamos para que puedas tomar
+      medidas.</p>`,
+  },
+  {
+    id: "cambios",
+    titulo: "Cambios a este aviso",
+    cuerpo: `
+      <p>Podemos actualizar este aviso cuando cambien nuestros servicios, nuestras
+      prácticas o la legislación aplicable. La versión vigente siempre estará publicada en
+      <a href="${site.domain}/aviso-de-privacidad">esta página</a>, con la fecha de su
+      última actualización al inicio.</p>
+      <p>Si el cambio es relevante y tenemos un medio para contactarte, te avisaremos.</p>`,
+  },
+  {
+    id: "autoridad",
+    titulo: "Si no estás conforme",
+    cuerpo: `
+      <p>Si consideras que tu derecho a la protección de datos personales ha sido
+      vulnerado, puedes acudir ante la autoridad competente en materia de protección de
+      datos personales en México para presentar tu inconformidad.</p>
+      <p>Antes de eso, te agradeceremos que nos escribas a
+      <a href="mailto:${resp.correo}">${resp.correo}</a>: en la mayoría de los casos
+      podemos resolverlo directamente.</p>`,
+  },
+];
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: "Aviso de privacidad",
+  url: `${site.domain}/aviso-de-privacidad`,
+  description,
+  inLanguage: "es-MX",
+  isPartOf: { "@id": `${site.domain}/#organizacion` },
+};
+---
+<Base title={title} description={description} schema={schema} noindex={hayPendientes}>
+  <LegalDoc
+    titulo="Aviso de privacidad"
+    entradilla="Qué datos personales tratamos, para qué los usamos, con quién los compartimos y cómo puedes controlarlos."
+    actualizado={actualizado}
+    secciones={secciones}
+  />
+</Base>

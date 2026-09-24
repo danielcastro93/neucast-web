@@ -1,0 +1,89 @@
+---
+import Base from "../../layouts/Base.astro";
+import Catalogo from "../../components/Catalogo.astro";
+import { site, categories } from "../../data/site.js";
+import { piezas } from "../../data/catalogo.js";
+
+// Cada categoría tiene su propia URL indexable con su title, su description y
+// su H1. Ahí es donde viven las keywords de categoría de la estrategia: una
+// sola página no puede posicionar por todas.
+const textos = {
+  "sillas-ejecutivas": {
+    h1: "Sillas ejecutivas",
+    title: "Sillas ejecutivas y de dirección para oficina | Neucast",
+    desc: "Sillas ejecutivas y de dirección con respaldo de malla o tapizado, soporte lumbar y descansabrazos ajustables. Envío e instalación en todo México.",
+    intro: "Respaldo alto o con cabecera, soporte lumbar y mecanismos para la jornada completa.",
+  },
+  "sillas-operativas": {
+    h1: "Sillas operativas y ergonómicas",
+    title: "Sillas operativas y ergonómicas de oficina | Neucast",
+    desc: "Sillería operativa y ergonómica para jornada completa: respaldo de malla, altura y descansabrazos regulables. Envío e instalación en todo México.",
+    intro: "Ergonomía real y materiales que resisten la rotación diaria de un piso de trabajo.",
+  },
+  "salas-de-juntas": {
+    h1: "Mesas para sala de juntas",
+    title: "Mesas para sala de juntas y consejo | Neucast",
+    desc: "Mesas de juntas y de consejo en madera, cristal o cubierta técnica, con medidas a la escala de tu sala. Envío e instalación en todo México.",
+    intro: "Medidas que se ajustan a la sala, no al revés, y acabados que envejecen bien.",
+  },
+  escritorios: {
+    h1: "Escritorios de oficina",
+    title: "Escritorios ejecutivos y operativos de oficina | Neucast",
+    desc: "Escritorios ejecutivos, operativos, en L y bench de trabajo, con paso de cables y credenzas a juego. Envío e instalación en todo México.",
+    intro: "Rectos, en L o bench, con paso de cables resuelto y credenzas que combinan.",
+  },
+  cafeterias: {
+    h1: "Mobiliario para cafetería corporativa",
+    title: "Mobiliario para cafetería y comedor de oficina | Neucast",
+    desc: "Sillas apilables, bancos altos y mesas para cafeterías y comedores corporativos. Materiales que aguantan la rotación diaria.",
+    intro: "Piezas apilables y superficies que aguantan la rotación y la limpieza diaria.",
+  },
+  "lounge-y-areas-comunes": {
+    h1: "Lounge y áreas comunes",
+    title: "Sofás y mobiliario para áreas comunes de oficina | Neucast",
+    desc: "Sofás, sillones, bancas de espera y mesas de centro para áreas lounge y recepciones corporativas. Envío e instalación en todo México.",
+    intro: "Sofás de una a cuatro plazas, sillones y mesas de apoyo para esperar y conversar.",
+  },
+  almacenamiento: {
+    h1: "Almacenamiento y guardado",
+    title: "Libreros, credenzas y archiveros de oficina | Neucast",
+    desc: "Libreros, credenzas y archiveros para oficina, modulares y a juego con el resto del mobiliario. Envío e instalación en todo México.",
+    intro: "Libreros, credenzas y archiveros modulares que combinan con tus escritorios.",
+  },
+  exteriores: {
+    h1: "Mobiliario de exterior",
+    title: "Mobiliario de exterior para terrazas corporativas | Neucast",
+    desc: "Bancas y mesas de exterior para terrazas y patios corporativos, con materiales resistentes a la intemperie.",
+    intro: "Materiales pensados para el sol y la lluvia, con el mismo diseño de adentro.",
+  },
+};
+
+export async function getStaticPaths() {
+  const { categories } = await import("../../data/site.js");
+  return categories.map((c) => ({ params: { categoria: c.slug }, props: { cat: c } }));
+}
+
+const { cat } = Astro.props;
+const t = textos[cat.slug];
+const deLaCategoria = piezas.filter((p) => p.cat === cat.slug);
+
+const schema = [
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: t.h1,
+    url: `${site.domain}/muebles/${cat.slug}`,
+    description: t.desc,
+    inLanguage: "es-MX",
+    isPartOf: { "@id": `${site.domain}/#organizacion` },
+  }
+];
+---
+<Base title={t.title} description={t.desc} image={cat.photo} schema={schema}>
+  <Catalogo
+    titulo={t.h1}
+    intro={t.intro}
+    piezas={deLaCategoria}
+    catActiva={cat.slug}
+  />
+</Base>

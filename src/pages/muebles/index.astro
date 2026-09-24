@@ -1,0 +1,29 @@
+---
+import Base from "../../layouts/Base.astro";
+import Catalogo from "../../components/Catalogo.astro";
+import { site } from "../../data/site.js";
+import { piezas } from "../../data/catalogo.js";
+
+const title = "Catálogo de muebles para oficina | Neucast";
+const description =
+  "Sillas ejecutivas y operativas, escritorios, mesas de juntas, cafeterías y áreas comunes. Mobiliario corporativo con envío e instalación en todo México.";
+
+const schema = [
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Catálogo de muebles para oficina",
+    url: `${site.domain}/muebles`,
+    description,
+    inLanguage: "es-MX",
+    isPartOf: { "@id": `${site.domain}/#organizacion` },
+  }
+];
+---
+<Base title={title} description={description} schema={schema}>
+  <Catalogo
+    titulo="Muebles de oficina"
+    intro="Desde una silla suelta hasta el equipamiento completo de un piso de oficinas."
+    piezas={piezas}
+  />
+</Base>

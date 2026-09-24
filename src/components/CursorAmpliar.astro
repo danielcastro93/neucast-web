@@ -1,0 +1,57 @@
+---
+// Cursor propio sobre las fotos que abren la galería, en lugar de la lupa del
+// navegador.
+//
+// Nació en la ficha de producto y salió a componente cuando la página de
+// proyecto pidió lo mismo: si dos páginas enseñan fotos ampliables, la señal
+// tiene que ser idéntica en las dos.
+//
+// Se engancha a cualquier elemento con data-ampliar. Es opt-in a propósito: no
+// todo lo que abre el visor es una foto (el chip de "ver toda la galería"
+// también lo hace y ahí el cursor sobraría).
+const { texto = "Ampliar" } = Astro.props;
+---
+<span class="cu" data-cursor-ampliar aria-hidden="true">
+  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+    <path d="M6 2H2v4M10 14h4v-4M14 6V2h-4M2 10v4h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  {texto}
+</span>
+
+<style is:global>
+  .cu{display:none;}
+  @media (hover:hover) and (pointer:fine){
+    /* Las páginas dejan cursor:zoom-in como respaldo y sus estilos con ámbito
+       pesan más que este global, así que aquí hay que insistir. */
+    [data-ampliar]{cursor:none !important;}
+    .cu{
+      position:fixed;top:0;left:0;z-index:40;
+      display:inline-flex;align-items:center;gap:7px;
+      height:34px;padding:0 14px;border-radius:999px;
+      background:var(--ink);color:var(--white);
+      font-size:var(--fs-2xs);font-weight:600;letter-spacing:.01em;
+      pointer-events:none;white-space:nowrap;
+      opacity:0;scale:.7;
+      transition:opacity .2s var(--ease),scale .2s var(--ease);
+    }
+    .cu.on{opacity:1;scale:1;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .cu{transition:none;}
+  }
+</style>
+
+<script>
+  const pastilla = document.querySelector("[data-cursor-ampliar]");
+  const finos = matchMedia("(hover:hover) and (pointer:fine)");
+  if (pastilla && finos.matches) {
+    const seguir = (e) => {
+      pastilla.style.translate = `${e.clientX + 16}px ${e.clientY - 17}px`;
+    };
+    document.querySelectorAll("[data-ampliar]").forEach((f) => {
+      f.addEventListener("pointerenter", () => pastilla.classList.add("on"));
+      f.addEventListener("pointerleave", () => pastilla.classList.remove("on"));
+      f.addEventListener("pointermove", seguir);
+    });
+  }
+</script>

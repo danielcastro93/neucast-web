@@ -1,0 +1,18 @@
+---
+// Card de categoría: foto de ambiente a sangre + nombre.
+const { category, width = "min(46vw,240px)" } = Astro.props;
+const alt = category.alt || `${category.name} para oficina`;
+---
+<a class="cat-card" href={`/muebles/${category.slug}/`} style={`--card-w:${width}`}>
+  <div class="cat-media zoom-frame">
+    <img src={category.photo} alt={alt} loading="lazy" />
+  </div>
+  <span class="label cat-name">{category.name}</span>
+</a>
+
+<style>
+  .cat-card{width:var(--card-w);display:flex;flex-direction:column;gap:12px;}
+  .cat-media{aspect-ratio:1;background:var(--paper);}
+  .cat-media img{width:100%;height:100%;object-fit:cover;}
+  .cat-name{display:block;}
+</style>

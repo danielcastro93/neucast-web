@@ -1,0 +1,74 @@
+---
+import Base from "../layouts/Base.astro";
+import Icon from "../components/Icon.astro";
+---
+<Base
+  title="Página no encontrada | Neucast"
+  description="La página que buscas no existe o cambió de lugar. Vuelve al inicio para seguir explorando el mobiliario de oficina de Neucast."
+  overlayHeader={true}
+  hideFooter={true}
+ noindex>
+  <!-- data-hides-fab: esta página tiene un solo CTA, así que la burbuja no compite -->
+  <section class="nf" data-hides-fab>
+    <img
+      class="nf-bg"
+      src="/img/404-muro-luz.jpg"
+      alt=""
+      aria-hidden="true"
+      fetchpriority="high"
+    />
+    <div class="nf-shade" aria-hidden="true"></div>
+
+    <div class="container nf-inner">
+      <p class="overline nf-eyebrow"><span class="rise" style="--delay:.85s">Error 404</span></p>
+      <h1 class="display t-h1 nf-title">
+        <span class="paint-line" style="--i:0">Esta página</span>{' '}
+        <span class="paint-line" style="--i:1">se quedó sin amueblar</span>
+      </h1>
+      <p class="nf-text fade-in" style="--delay:1s">
+        La dirección que buscas no existe o cambió de lugar.
+      </p>
+      <div class="nf-cta fade-in" style="--delay:1.12s">
+        <a class="pill" href="/">Volver al inicio <Icon name="arrow" size={15} /></a>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .nf{
+      position:relative;overflow:hidden;
+      min-height:100svh;
+      display:flex;align-items:flex-end;
+      --play:running;
+    }
+    .nf-bg{
+      position:absolute;inset:0;width:100%;height:100%;
+      object-fit:cover;object-position:center 62%;
+    }
+    .nf-shade{
+      position:absolute;inset:0;
+      background:
+        linear-gradient(to top,rgba(10,9,8,.86) 0%,rgba(10,9,8,.5) 42%,rgba(10,9,8,.15) 72%),
+        linear-gradient(to bottom,rgba(10,9,8,.4),rgba(10,9,8,0) 26%);
+    }
+    .nf-inner{
+      position:relative;z-index:2;color:#fff;
+      width:100%;max-width:none;
+      padding-bottom:clamp(48px,9vh,110px);
+      padding-top:calc(var(--header-h) + 40px);
+      text-shadow:0 1px 22px rgba(0,0,0,.32);
+    }
+    /* el antetítulo va en blanco: el oliva del token no contrasta sobre la foto */
+    .nf-eyebrow{color:rgba(255,255,255,.72);}
+    .nf-title{margin:12px 0 16px;}
+    .nf-text{
+      color:rgba(255,255,255,.9);
+      font-size:var(--fs-body-lg);
+      max-width:54ch;
+    }
+    .nf-cta{margin-top:28px;text-shadow:none;}
+    @media (max-width:639px){
+      .nf-cta .pill{width:100%;}
+    }
+  </style>
+</Base>

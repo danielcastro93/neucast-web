@@ -1,0 +1,243 @@
+---
+// Visor de galería a pantalla completa.
+//
+// Nació dentro de la ficha de producto y salió a componente cuando la página de
+// proyecto pidió lo mismo. Acepta fotos y video: un proyecto real llega con las
+// dos cosas.
+//
+// Se abre desde cualquier elemento con data-visor="{índice}".
+const { items = [], titulo = "", id = "visor" } = Astro.props;
+---
+<div class="vs" id={id} role="dialog" aria-modal="true" aria-label={`Galería de ${titulo}`} hidden>
+  <header class="vs-barra">
+    <p class="vs-pieza" set:html={titulo}></p>
+    <button class="vs-x" type="button" data-visor-cierra={id} aria-label="Cerrar la galería">
+      <svg width="17" height="17" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </header>
+
+  <div class="vs-escena">
+    <button class="vs-flecha vs-flecha--prev" type="button" data-visor-prev={id} aria-label="Anterior">
+      <svg width="17" height="17" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M10 3 5.5 8 10 13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <div class="vs-tira" data-visor-tira>
+      {items.map((m, i) => (
+        <figure class:list={["vs-slide", { "vs-slide--recorte": m.recorte }]}>
+          {m.tipo === "video" ? (
+            <video src={m.src} poster={m.poster} controls playsinline preload="none" aria-label={m.alt}></video>
+          ) : (
+            <img src={m.img} alt={m.alt} loading={i === 0 ? "eager" : "lazy"} draggable="false" />
+          )}
+        </figure>
+      ))}
+    </div>
+
+    <button class="vs-flecha vs-flecha--next" type="button" data-visor-next={id} aria-label="Siguiente">
+      <svg width="17" height="17" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M6 3l4.5 5L6 13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <footer class="vs-pie">
+    <div class="vs-minis rail rail-mask" data-visor-minis>
+      {items.map((m, i) => (
+        <button
+          class:list={["vs-mini", { on: i === 0, "vs-mini--recorte": m.recorte }]}
+          type="button"
+          data-mini={i}
+          aria-label={`Ver ${i + 1}`}
+        >
+          <img src={m.tipo === "video" ? m.poster : m.img} alt="" loading="lazy" />
+          {m.tipo === "video" && (
+            <span class="vs-mini-play" aria-hidden="true">
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="currentColor"><path d="M3 1.5v9l7-4.5z"/></svg>
+            </span>
+          )}
+        </button>
+      ))}
+    </div>
+    <p class="vs-cuenta"><span data-visor-n>1</span> / {items.length}</p>
+  </footer>
+</div>
+
+<style>
+  .vs[hidden]{display:none !important;}
+  .vs{
+    position:fixed;inset:0;z-index:70;
+    display:flex;flex-direction:column;
+    background:rgba(255,255,255,.95);
+    -webkit-backdrop-filter:blur(22px) saturate(1.4);
+    backdrop-filter:blur(22px) saturate(1.4);
+    animation:vsEntra .26s var(--ease);
+  }
+  @keyframes vsEntra{from{opacity:0}to{opacity:1}}
+
+  .vs-barra{
+    flex:none;display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:13px var(--gutter);
+  }
+  .vs-pieza{font-size:var(--fs-xs);color:var(--ink-60);}
+  .vs-pieza :global(strong){color:var(--ink);font-weight:600;}
+  .vs-x{
+    width:36px;height:36px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    border:1px solid var(--line);background:var(--white);color:var(--ink);
+    transition:border-color .2s,background .2s;
+  }
+  .vs-x:hover{border-color:var(--ink-40);background:var(--paper-soft);}
+
+  .vs-escena{flex:1;min-height:0;position:relative;}
+  /* Se pasa con el dedo, no solo con las miniaturas. */
+  .vs-tira{
+    height:100%;display:flex;
+    overflow-x:auto;scroll-snap-type:x mandatory;
+    scrollbar-width:none;-webkit-overflow-scrolling:touch;
+    overscroll-behavior-x:contain;
+  }
+  .vs-tira::-webkit-scrollbar{display:none;}
+  .vs-slide{
+    flex:none;width:100%;height:100%;margin:0;scroll-snap-align:center;
+    display:flex;align-items:center;justify-content:center;
+    padding:0 var(--gutter);
+  }
+  .vs-slide img,
+  .vs-slide video{
+    max-width:100%;max-height:100%;object-fit:contain;
+    -webkit-user-drag:none;
+  }
+  .vs-slide--recorte img{padding:clamp(8px,2vw,24px);}
+
+  .vs-flecha{
+    position:absolute;top:50%;translate:0 -50%;z-index:2;
+    width:44px;height:44px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    border:1px solid var(--line);background:var(--white);color:var(--ink);
+    transition:border-color .2s,background .2s,opacity .2s;
+  }
+  .vs-flecha:hover{border-color:var(--ink-40);background:var(--paper-soft);}
+  .vs-flecha[disabled]{opacity:.3;pointer-events:none;}
+  .vs-flecha--prev{left:calc(var(--gutter) / 2);}
+  .vs-flecha--next{right:calc(var(--gutter) / 2);}
+
+  .vs-pie{
+    flex:none;display:flex;flex-direction:column;align-items:center;gap:10px;
+    padding:16px 0 clamp(18px,3vw,28px);
+  }
+  .vs-minis{--rail-pad:var(--gutter);gap:8px;max-width:100%;}
+  .vs-mini{
+    position:relative;flex:none;width:58px;height:58px;padding:0;
+    border-radius:var(--radius-sm);overflow:hidden;
+    border:1px solid var(--line);background:var(--paper-soft);
+    transition:border-color .2s;
+  }
+  .vs-mini img{width:100%;height:100%;object-fit:cover;display:block;}
+  /* la foto de producto es un recorte: cortada a la caja pierde el mueble */
+  .vs-mini--recorte img{object-fit:contain;padding:7px;}
+  .vs-mini.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);}
+  .vs-mini-play{
+    position:absolute;inset:auto 4px 4px auto;
+    width:18px;height:18px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(20,19,17,.72);color:#fff;
+  }
+  .vs-cuenta{font-size:var(--fs-2xs);color:var(--ink-60);font-variant-numeric:tabular-nums;}
+
+  @media (max-width:639px){
+    .vs-flecha{display:none;}
+    .vs-slide{padding:0 12px;}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    .vs{animation:none;}
+  }
+</style>
+
+<script>
+  document.querySelectorAll(".vs").forEach((visor) => {
+    const id = visor.id;
+    const tira = visor.querySelector("[data-visor-tira]");
+    const cuenta = visor.querySelector("[data-visor-n]");
+    const minis = [...visor.querySelectorAll(".vs-mini")];
+    const prev = visor.querySelector(`[data-visor-prev="${id}"]`);
+    const next = visor.querySelector(`[data-visor-next="${id}"]`);
+    const total = minis.length;
+    if (!tira || !total) return;
+
+    const dondeVa = () => Math.round(tira.scrollLeft / tira.clientWidth);
+
+    const pintar = () => {
+      const i = Math.max(0, Math.min(dondeVa(), total - 1));
+      cuenta.textContent = i + 1;
+      minis.forEach((m, n) => m.classList.toggle("on", n === i));
+      minis[i]?.scrollIntoView({ block: "nearest", inline: "nearest" });
+      prev.disabled = i <= 0;
+      next.disabled = i >= total - 1;
+      // el video que se queda atrás se pausa solo
+      visor.querySelectorAll("video").forEach((v, n) => { if (n !== i) v.pause(); });
+    };
+
+    const ir = (i, suave = true) => {
+      const destino = Math.max(0, Math.min(i, total - 1)) * tira.clientWidth;
+      tira.scrollTo({ left: destino, behavior: suave ? "smooth" : "auto" });
+    };
+
+    const abrir = (i) => {
+      visor.classList.remove("velo-cerrando");
+      visor.hidden = false;
+      document.body.style.overflow = "hidden";
+      // el ancho solo existe cuando ya se pintó: hasta aquí medía cero
+      void tira.offsetWidth;
+      ir(i, false);
+      pintar();
+      visor.querySelector(`[data-visor-cierra="${id}"]`)?.focus();
+    };
+
+    const cerrar = () => {
+      if (visor.hidden) return;
+      document.body.style.overflow = "";
+      visor.querySelectorAll("video").forEach((v) => v.pause());
+      let listo = false;
+      const guardar = () => {
+        if (listo) return;
+        listo = true;
+        visor.hidden = true;
+        visor.classList.remove("velo-cerrando");
+      };
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) return guardar();
+      visor.classList.add("velo-cerrando");
+      visor.addEventListener("animationend", guardar, { once: true });
+      setTimeout(guardar, 400);
+    };
+
+    // Una arrastrada sobre una miniatura de la página no es un clic.
+    let x0 = 0;
+    let arrastro = false;
+    document.querySelectorAll(`[data-visor]`).forEach((b) => {
+      b.addEventListener("pointerdown", (e) => { x0 = e.clientX; arrastro = false; });
+      b.addEventListener("pointermove", (e) => {
+        if (e.buttons && Math.abs(e.clientX - x0) > 8) arrastro = true;
+      });
+      b.addEventListener("click", () => { if (!arrastro) abrir(Number(b.dataset.visor)); });
+    });
+
+    tira.addEventListener("scroll", pintar, { passive: true });
+    minis.forEach((m) => m.addEventListener("click", () => ir(Number(m.dataset.mini))));
+    prev.addEventListener("click", () => ir(dondeVa() - 1));
+    next.addEventListener("click", () => ir(dondeVa() + 1));
+    visor.querySelector(`[data-visor-cierra="${id}"]`).addEventListener("click", cerrar);
+    addEventListener("resize", () => { if (!visor.hidden) ir(dondeVa(), false); });
+
+    addEventListener("keydown", (e) => {
+      if (visor.hidden) return;
+      if (e.key === "Escape") cerrar();
+      if (e.key === "ArrowLeft") ir(dondeVa() - 1);
+      if (e.key === "ArrowRight") ir(dondeVa() + 1);
+    });
+  });
+</script>

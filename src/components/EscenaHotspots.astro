@@ -1,0 +1,196 @@
+---
+// Foto de un espacio instalado con puntos sobre las piezas que se pueden ver.
+//
+// Vivía dentro del home. Salió a componente cuando la página de proyecto pidió
+// varias escenas en la misma página, así que el script trabaja sobre todas las
+// que encuentre y no sobre un id.
+import Icon from "./Icon.astro";
+import { buscarPieza, rutaPieza } from "../data/catalogo.js";
+
+const {
+  img,
+  alt,
+  hotspots = [],
+  ratio = "4/3",        // móvil
+  ratioAncho = "21/10", // de 900 px para arriba
+} = Astro.props;
+
+// Un punto sin pieza en el catálogo no se pinta: llevaría a una página que no
+// existe. Al conectar WordPress esto va a pasar seguido.
+const puntos = hotspots
+  .map((h) => ({ ...h, pieza: buscarPieza(h.slug) }))
+  .filter((h) => h.pieza);
+---
+<div class="esc" data-escena style={`--esc-ratio:${ratio};--esc-ratio-ancho:${ratioAncho}`}>
+  <img src={img} alt={alt} loading="lazy" />
+
+  {puntos.map((h, i) => (
+    <div class="spot" style={`--dx:${h.x}%;--dy:${h.y}%;--mx:${h.mx ?? h.x}%;--my:${h.my ?? h.y}%`}>
+      <button class="spot-dot" aria-expanded="false" aria-label={`Ver ${h.pieza.nombre}`} data-spot={i}>
+        <span></span>
+      </button>
+      <a class="spot-card" href={rutaPieza(h.pieza)}>
+        <img src={h.pieza.img[0]} alt="" loading="lazy" />
+        <span class="spot-card-txt">
+          <span class="spot-card-cat">{h.pieza.tipo}</span>
+          <span class="spot-card-name label">{h.pieza.nombre}</span>
+          <span class="spot-card-link">Ver la pieza <Icon name="arrow" size={13} /></span>
+        </span>
+      </a>
+    </div>
+  ))}
+</div>
+
+<style>
+  .esc{position:relative;}
+  .esc > img{
+    width:100%;aspect-ratio:var(--esc-ratio);object-fit:cover;display:block;
+  }
+  @media (min-width:900px){
+    .esc > img{aspect-ratio:var(--esc-ratio-ancho);}
+  }
+
+  .spot{position:absolute;left:var(--mx);top:var(--my);transform:translate(-50%,-50%);z-index:3;}
+  /* El abierto sube por encima de los demás: si no, el punto de al lado se
+     dibuja sobre su tarjeta. */
+  .spot.open{z-index:6;}
+  @media (min-width:900px){.spot{left:var(--dx);top:var(--dy);}}
+  .spot-dot{
+    width:34px;height:34px;border-radius:50%;
+    background:rgba(255,255,255,.35);
+    -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+    display:flex;align-items:center;justify-content:center;
+    transition:transform .25s var(--ease),background .25s;
+  }
+  .spot-dot span{
+    width:12px;height:12px;border-radius:50%;background:#fff;
+    box-shadow:0 1px 6px rgba(0,0,0,.35);
+    transition:transform .25s var(--ease);
+  }
+  .spot-dot::after{
+    content:"";position:absolute;inset:0;border-radius:50%;
+    border:1.5px solid rgba(255,255,255,.8);
+    animation:pulse 2.4s var(--ease) infinite;
+  }
+  @keyframes pulse{
+    0%{transform:scale(.8);opacity:.9}
+    70%{transform:scale(1.55);opacity:0}
+    100%{transform:scale(1.55);opacity:0}
+  }
+  @media (prefers-reduced-motion:reduce){.spot-dot::after{animation:none;}}
+  .spot-dot:hover{transform:scale(1.12);}
+  .spot.open .spot-dot{background:var(--white);}
+  .spot.open .spot-dot span{transform:scale(.65);background:var(--olive);}
+  .spot.open .spot-dot::after{animation:none;opacity:0;}
+
+  /* La tarjeta se centra sobre el punto y el script la desplaza con --shift
+     lo necesario para que nunca se salga de la imagen. */
+  .spot-card{
+    position:absolute;left:50%;bottom:calc(100% + 12px);
+    transform:translateX(calc(-50% + var(--shift,0px))) translateY(6px);
+    display:flex;gap:12px;align-items:center;
+    width:min(228px,var(--esc-ancho,74vw));padding:10px;border-radius:14px;
+    background:rgba(255,255,255,.85);
+    -webkit-backdrop-filter:blur(20px) saturate(1.7);backdrop-filter:blur(20px) saturate(1.7);
+    box-shadow:0 12px 40px rgba(0,0,0,.22);
+    opacity:0;pointer-events:none;
+    transition:opacity .3s var(--ease),transform .3s var(--ease);
+  }
+  .spot.open .spot-card{
+    opacity:1;pointer-events:auto;
+    transform:translateX(calc(-50% + var(--shift,0px))) translateY(0);
+  }
+  .spot.flip .spot-card{bottom:auto;top:calc(100% + 12px);}
+  /* puente invisible sobre el hueco entre el punto y la tarjeta:
+     sin él, el cursor "sale" del hotspot al ir hacia el botón y se cierra */
+  .spot-card::before{
+    content:"";position:absolute;left:-8px;right:-8px;
+    top:100%;height:16px;
+  }
+  .spot.flip .spot-card::before{top:auto;bottom:100%;}
+  .spot-card img{width:64px;height:64px;object-fit:contain;background:var(--paper);border-radius:10px;padding:6px;}
+  .spot-card-txt{display:flex;flex-direction:column;gap:1px;color:var(--ink);}
+  .spot-card-cat{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-40);}
+  .spot-card-name{font-size:14px;}
+  .spot-card-link{
+    margin-top:4px;display:inline-flex;align-items:center;gap:5px;
+    font-size:12.5px;font-weight:600;color:var(--olive-deep);
+  }
+</style>
+
+<script>
+  // Una sola vez por página, sobre todas las escenas que haya.
+  const conCursor = matchMedia("(hover:hover) and (min-width:900px)");
+  const altoHeader =
+    parseInt(getComputedStyle(document.documentElement).getPropertyValue("--header-h")) || 64;
+
+  document.querySelectorAll("[data-escena]").forEach((escena) => {
+    const puntos = [...escena.querySelectorAll(".spot")];
+    if (!puntos.length) return;
+    let relojCierre;
+
+    // Coloca la tarjeta dentro de la imagen Y dentro de la zona visible, para
+    // que nunca se corte ni quede debajo del header.
+    const acomodar = (s) => {
+      const tarjeta = s.querySelector(".spot-card");
+      s.classList.remove("flip");
+      tarjeta.style.setProperty("--shift", "0px");
+      const marco = escena.getBoundingClientRect();
+      const m = 10;
+      const izq = Math.max(marco.left, 0) + m;
+      const der = Math.min(marco.right, innerWidth) - m;
+      const arriba = Math.max(marco.top, altoHeader) + m;
+      // Nunca más ancha que la foto: en una escena angosta la tarjeta salía por
+      // los dos lados y correrla no alcanzaba para meterla.
+      escena.style.setProperty("--esc-ancho", `${Math.max(140, der - izq)}px`);
+
+      let r = tarjeta.getBoundingClientRect();
+      let corrimiento = 0;
+      if (r.left < izq) corrimiento = izq - r.left;
+      else if (r.right > der) corrimiento = der - r.right;
+      tarjeta.style.setProperty("--shift", `${Math.round(corrimiento)}px`);
+
+      // si no cabe arriba, se despliega hacia abajo
+      r = tarjeta.getBoundingClientRect();
+      if (r.top < arriba) s.classList.add("flip");
+    };
+
+    const cerrarTodos = () =>
+      puntos.forEach((s) => {
+        s.classList.remove("open");
+        s.querySelector(".spot-dot").setAttribute("aria-expanded", "false");
+      });
+
+    const abrir = (s) => {
+      cerrarTodos();
+      acomodar(s);
+      s.classList.add("open");
+      s.querySelector(".spot-dot").setAttribute("aria-expanded", "true");
+    };
+
+    puntos.forEach((s) => {
+      const punto = s.querySelector(".spot-dot");
+      // escritorio: basta con pasar el cursor, con margen de gracia al salir
+      s.addEventListener("mouseenter", () => {
+        if (!conCursor.matches) return;
+        clearTimeout(relojCierre);
+        abrir(s);
+      });
+      s.addEventListener("mouseleave", () => {
+        if (!conCursor.matches) return;
+        clearTimeout(relojCierre);
+        relojCierre = setTimeout(cerrarTodos, 160);
+      });
+      // táctil y teclado: clic
+      punto.addEventListener("click", (e) => {
+        e.stopPropagation();
+        s.classList.contains("open") ? cerrarTodos() : abrir(s);
+      });
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest(".spot")) cerrarTodos();
+    });
+    addEventListener("resize", cerrarTodos);
+  });
+</script>

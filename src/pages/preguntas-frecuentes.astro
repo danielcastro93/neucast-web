@@ -1,0 +1,446 @@
+---
+import Base from "../layouts/Base.astro";
+import PageHero from "../components/PageHero.astro";
+import { site, waLink } from "../data/site.js";
+
+const title = "Preguntas frecuentes sobre muebles para oficina | Neucast";
+const description =
+  "Dudas al comprar mobiliario de oficina en México: tiempos de entrega, instalación, cotización, envíos a todo el país, garantía y facturación.";
+
+// Cada pregunta está redactada como la buscaría una persona en Google.
+// Agrupadas por tema para que la página se pueda escanear rápido.
+const grupos = [
+  {
+    id: "cotizacion",
+    nombre: "Cotización y compra",
+    tab: "Cotización",
+    preguntas: [
+      {
+        q: "¿Cómo cotizo muebles para oficina con Neucast?",
+        a: "Escríbenos por WhatsApp con el mueble que te interesa o cuéntanos qué espacio quieres resolver. Si ya viste una pieza en el sitio, el botón de cotizar la incluye automáticamente en el mensaje. Te respondemos con precio, tiempo de entrega y opciones de material.",
+      },
+      {
+        q: "¿Qué información necesitan para darme una cotización?",
+        a: "Con saber qué piezas quieres y cuántas, basta para empezar. Si es un proyecto completo, ayuda mucho que nos digas cuántas personas son, qué áreas hay que resolver y en qué ciudad está la oficina; con un plano o unas fotos del espacio afinamos todavía más la propuesta.",
+      },
+      {
+        q: "¿Por qué no aparecen los precios en el sitio?",
+        a: "El precio depende del volumen, los materiales y si el pedido incluye instalación. Un escritorio suelto y cuarenta escritorios para un piso completo no cuestan lo mismo por pieza, así que cotizamos cada caso para darte el precio que de verdad te corresponde.",
+      },
+      {
+        q: "¿Hay una compra mínima?",
+        a: "No. Atendemos desde la silla ejecutiva de una dirección hasta el amueblado completo de un corporativo. En proyectos grandes el precio por pieza mejora.",
+      },
+      {
+        q: "¿Manejan precios por mayoreo o para proyectos grandes?",
+        a: "Sí. A partir de cierto volumen aplicamos precio de proyecto. Cuéntanos cuántas piezas necesitas y te mandamos la cotización con ese esquema.",
+      },
+      {
+        q: "¿Puedo ver los muebles antes de comprar si no tienen tienda?",
+        a: 'No tenemos tienda física, así que trabajamos con información completa: te compartimos fotos, medidas y acabados de cada pieza de <a href="/muebles/">nuestro catálogo</a>, y resolvemos por WhatsApp cualquier duda de material antes de que decidas.',
+      },
+      {
+        q: "¿Con qué tipo de empresas trabajan?",
+        a: 'Con corporativos, oficinas pequeñas, despachos y áreas comerciales, en toda la República. Lo mismo equipamos un piso completo que reponemos la sillería de un departamento. Puedes leer cómo trabajamos en <a href="/nosotros/">quiénes somos</a>.',
+      },
+    ],
+  },
+  {
+    id: "entrega",
+    nombre: "Entrega e instalación",
+    tab: "Entrega",
+    preguntas: [
+      {
+        q: "¿Hacen envíos de muebles de oficina a todo México?",
+        a: "Sí, enviamos a todo el país. No tenemos tienda física: trabajamos por proyecto y coordinamos la entrega hasta la dirección de tu empresa, sea en la Ciudad de México, Monterrey, Guadalajara o cualquier otro estado.",
+      },
+      {
+        q: "¿Cuánto tarda la entrega del mobiliario?",
+        a: "Depende de la pieza. El mobiliario de línea suele entregarse en dos a tres semanas; las piezas con tapicería o medidas especiales pueden tomar de cuatro a ocho semanas. Siempre te confirmamos el plazo por escrito antes de que apartes el pedido.",
+      },
+      {
+        q: "¿Cuánto cuesta el envío?",
+        a: "Va según el destino y el volumen del pedido, y siempre viene desglosado en la cotización: nunca aparece como un cargo sorpresa al final. En proyectos grandes el envío suele pesar muy poco sobre el total.",
+      },
+      {
+        q: "¿El servicio incluye instalación y armado?",
+        a: "Sí. Llegamos, armamos y dejamos el mobiliario en su lugar, con el espacio limpio y listo para usarse. Coordinamos maniobras en horarios que no frenen tu operación, incluidos fines de semana cuando el edificio lo permite.",
+      },
+      {
+        q: "¿Qué pasa si el edificio tiene restricciones de acceso o de horario?",
+        a: "Es lo normal en un corporativo y lo resolvemos antes de llegar. Cuéntanos qué pide la administración del inmueble, si hay elevador de carga y en qué horarios se permiten maniobras, y programamos la entrega para ese momento.",
+      },
+      {
+        q: "¿Pueden entregar el pedido por etapas?",
+        a: "Sí. En proyectos por fases entregamos por piso o por área conforme avanza la obra, para que tu equipo pueda ocupar lo que ya está listo. El calendario se define junto con la cotización.",
+      },
+      {
+        q: "¿Retiran el mobiliario viejo?",
+        a: "Podemos coordinar el retiro como parte del proyecto. Dinos qué hay que sacar y lo incluimos en la cotización.",
+      },
+    ],
+  },
+  {
+    id: "producto",
+    nombre: "Productos y espacios",
+    tab: "Productos",
+    preguntas: [
+      {
+        q: "¿Qué tipo de mobiliario corporativo manejan?",
+        a: 'Sillas ejecutivas y operativas, escritorios, mesas para salas de juntas, módulos de recepción, mobiliario para cafeterías, sofás y mesas para áreas lounge, almacenamiento y mobiliario de exterior para terrazas corporativas. Puedes recorrerlo todo en <a href="/muebles/">el catálogo</a>.',
+      },
+      {
+        q: "¿Manejan sillas ergonómicas para jornada completa?",
+        a: "Sí. Manejamos sillería operativa y ejecutiva con respaldo de malla o tapizado, soporte lumbar, altura y descansabrazos regulables. Al cotizar te decimos qué modelo conviene según las horas que se pasan sentado y la complexión de tu equipo.",
+      },
+      {
+        q: "¿Puedo elegir el color y el material de la tapicería?",
+        a: "En la mayoría de las piezas, sí. Manejamos distintos textiles, pieles y acabados de madera o metal. Te mostramos las opciones disponibles para cada modelo al cotizar.",
+      },
+      {
+        q: "¿Pueden conseguir piezas en medidas distintas a las de catálogo?",
+        a: "En varias líneas sí, sobre todo en mesas de juntas y módulos de recepción, donde la medida depende del espacio. Estas piezas llevan un plazo de entrega más largo que las de línea, y te lo confirmamos antes de que apartes el pedido.",
+      },
+      {
+        q: "¿Los muebles son adecuados para uso intensivo diario?",
+        a: "Es justo el criterio con el que los elegimos. Seleccionamos piezas pensadas para uso corporativo: textiles con resistencia a la abrasión, mecanismos probados para miles de ciclos y estructuras que soportan la rotación de una cafetería o un área común.",
+      },
+      {
+        q: "¿Amueblan también recepciones, cafeterías y áreas comunes?",
+        a: 'Sí, y es buena parte de lo que hacemos. Una recepción, una cafetería o un área lounge piden mobiliario distinto al de un escritorio, y lo resolvemos con el mismo criterio de diseño. Puedes ver <a href="/proyectos/">proyectos que ya instalamos</a> de cada tipo de espacio.',
+      },
+      {
+        q: "¿Ayudan a decidir qué mobiliario necesita mi oficina?",
+        a: "Sí, y sin costo extra. Nos dices cuántas personas son, qué áreas tienes y cómo las usan, y te proponemos el acomodo y las piezas. Ese acompañamiento de diseño va incluido en el proyecto.",
+      },
+      {
+        q: "¿Puedo ver espacios que ya hayan amueblado?",
+        a: 'Sí, tenemos <a href="/proyectos/">proyectos publicados</a> donde se ve el mobiliario ya instalado. Si buscas algo parecido a alguno de ellos, menciónalo al escribirnos y partimos de ahí.',
+      },
+    ],
+  },
+  {
+    id: "garantia",
+    nombre: "Garantía y facturación",
+    tab: "Garantía",
+    preguntas: [
+      {
+        q: "¿Los muebles tienen garantía?",
+        a: "Sí. Toda pieza cuenta con garantía contra defectos de fabricación y te entregamos por escrito el plazo que aplica a tu pedido. Si algo llega con daño de transporte, lo resolvemos nosotros.",
+      },
+      {
+        q: "¿Qué cubre la garantía?",
+        a: "Cubre los defectos de fabricación: mecanismos, estructura, costuras y acabados que fallen por cómo se hizo la pieza. No cubre el desgaste normal por el uso ni los daños por un uso distinto al que la pieza está destinada. El detalle va por escrito en tu cotización.",
+      },
+      {
+        q: "¿Qué hago si una pieza llega dañada?",
+        a: "Avísanos en cuanto la recibas, con fotos del daño. Un golpe de transporte es responsabilidad nuestra y lo resolvemos sin que tengas que tratar con nadie más: nosotros coordinamos el cambio o la reparación.",
+      },
+      {
+        q: "¿Consiguen refacciones más adelante?",
+        a: "Cuando la pieza lo permite, gestionamos el repuesto: ruedas, pistones, descansabrazos o herrajes. Escríbenos con el modelo que compraste y te decimos qué hay disponible.",
+      },
+      {
+        q: "¿Emiten factura?",
+        a: "Sí, facturamos todos los pedidos. Solo necesitamos tus datos fiscales al confirmar la compra.",
+      },
+      {
+        q: "¿Trabajan con el área de compras de una empresa?",
+        a: "Sí. Te entregamos la cotización formal con el desglose que pida tu área, y recibimos orden de compra. Si tu empresa necesita darnos de alta como proveedor, dinos qué documentos piden y los mandamos.",
+      },
+      {
+        q: "¿Qué formas de pago aceptan?",
+        a: "Transferencia bancaria y depósito. En proyectos se trabaja con un anticipo para apartar el pedido y el saldo contra entrega. Te detallamos las condiciones en la cotización.",
+      },
+    ],
+  },
+];
+
+// Las respuestas pueden llevar enlaces, así que para los datos estructurados
+// se manda el texto plano: el schema no debe traer marcado.
+const soloTexto = (html) => html.replace(/<[^>]+>/g, "");
+
+const totalPreguntas = grupos.reduce((n, g) => n + g.preguntas.length, 0);
+
+// FAQPage: es el dato estructurado que permite que las preguntas aparezcan
+// desplegadas directamente en los resultados de Google.
+const schema = [
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    name: "Preguntas frecuentes sobre muebles para oficina",
+    description,
+    url: `${site.domain}/preguntas-frecuentes`,
+    mainEntity: grupos.flatMap((g) =>
+      g.preguntas.map((p) => ({
+        "@type": "Question",
+        name: p.q,
+        acceptedAnswer: { "@type": "Answer", text: soloTexto(p.a) },
+      }))
+    ),
+  }
+];
+---
+<Base title={title} description={description} image="/img/faq-hero.jpg" schema={schema}>
+  <PageHero
+    image="/img/faq-hero.jpg"
+    alt="Vestíbulo corporativo con sillería de diseño junto a un muro acristalado"
+    eyebrow="Preguntas frecuentes"
+    titulo={["Todo lo que preguntan", "antes de amueblar"]}
+    size="h1"
+  />
+
+  <!-- entradilla, centrada como el manifiesto de Nosotros -->
+  <section class="fq-intro">
+    <div class="container">
+      <p class="fq-lead reveal">
+        Tiempos de entrega, instalación, garantía y cómo cotizar mobiliario de oficina
+        en México. Si tu duda no está aquí, escríbenos por WhatsApp.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ PREGUNTAS (tabs) ============ -->
+  <section class="fq-cuerpo">
+    <div class="fq-tabs-wrap">
+      <div class="fq-tabs rail rail-mask" role="tablist" aria-label="Temas">
+          {grupos.map((g, i) => (
+            <button
+              class:list={["tab", "label", { active: i === 0 }]}
+              role="tab"
+              aria-selected={i === 0 ? "true" : "false"}
+              aria-controls={`panel-${g.id}`}
+              id={`tab-${g.id}`}
+              data-tab={g.id}
+            >
+              {g.tab}
+              <span class="fq-tab-n">{g.preguntas.length}</span>
+            </button>
+        ))}
+      </div>
+    </div>
+
+    <div class="container fq-col">
+      {grupos.map((g, gi) => (
+        <div
+          class:list={["fq-panel", { active: gi === 0 }]}
+          role="tabpanel"
+          id={`panel-${g.id}`}
+          aria-labelledby={`tab-${g.id}`}
+          data-panel={g.id}
+        >
+          <div class="fq-lista">
+            {g.preguntas.map((pr, i) => (
+              <details class="fq-item" style={`--i:${i}`} open={gi === 0 && i === 0}>
+                <summary class="fq-q">
+                  <h2>{pr.q}</h2>
+                  <span class="fq-signo" aria-hidden="true"></span>
+                </summary>
+                <div class="fq-a"><p set:html={pr.a}></p></div>
+              </details>
+            ))}
+          </div>
+        </div>
+      ))}
+
+    </div>
+  </section>
+
+  <style>
+    section{margin-top:var(--section-y);}
+    /* la entradilla acompaña al hero, no es una sección aparte: va pegada */
+    .fq-intro{margin-top:clamp(28px,4vw,48px);}
+    .fq-cuerpo{margin-top:clamp(36px,5vw,64px);}
+
+    /* la entradilla va centrada, en el mismo registro editorial que el
+       manifiesto de Nosotros; en móvil se alinea a la izquierda */
+    .fq-lead{
+      color:var(--ink-60);font-size:var(--fs-body-lg);
+      max-width:62ch;margin-inline:auto;text-wrap:pretty;
+    }
+    @media (min-width:700px){.fq-lead{text-align:center;}}
+
+    /* ---------- Tabs de temas ----------
+       Mismo componente visual que los tabs de espacios del home. Cada tema es
+       un panel: así solo se ve un bloque de preguntas y el scroll no se alarga. */
+    /* Columna de lectura: el texto de la respuesta llega hasta el signo de la
+       pregunta, y el aire sobrante se reparte parejo a los dos lados. */
+    .fq-col{max-width:calc(640px + var(--gutter) * 2);}
+
+    /* ---------- Tabs de temas ----------
+       Van centrados y a ancho completo para que quepan los cuatro sin
+       recortarse; si no caben, bajan de renglón en vez de esconderse. */
+    .fq-tabs-wrap{margin-bottom:clamp(22px,3vw,34px);}
+    /* En móvil es un carrusel: va a sangre para que --rail-pad alinee el primer
+       chip con el margen de la página, y el degradado de la derecha avisa de
+       que hay más. En escritorio caben todos, así que se centran y el carrusel
+       se desactiva. */
+    .fq-tabs{gap:8px;padding-block:6px;}
+    @media (min-width:900px){
+      .fq-tabs{
+        flex-wrap:wrap;justify-content:center;
+        overflow:visible;scroll-snap-type:none;
+        mask-image:none;-webkit-mask-image:none;
+      }
+    }
+    .tab{
+      height:42px;padding:0 18px;border-radius:999px;
+      display:inline-flex;align-items:center;gap:8px;white-space:nowrap;
+      color:var(--ink-60);background:var(--white);
+      border:1px solid var(--line);
+      transition:color .25s var(--ease),background .25s var(--ease),
+                 border-color .25s var(--ease),transform .25s var(--ease);
+    }
+    .tab:hover{color:var(--ink);border-color:var(--ink-40);}
+    .tab:active{transform:scale(.97);}
+    .tab.active{
+      color:var(--white);background:var(--ink);border-color:var(--ink);
+    }
+    /* en móvil se aprietan para que entren dos por renglón en vez de cuatro */
+    @media (max-width:560px){
+      .fq-tabs{gap:6px;}
+      .tab{height:40px;padding:0 13px;gap:6px;}
+    }
+    .fq-tab-n{
+      font-size:var(--fs-2xs);color:var(--ink-40);
+      font-variant-numeric:tabular-nums;
+    }
+    .tab.active .fq-tab-n{color:rgba(255,255,255,.6);}
+
+    .fq-panel{display:none;}
+    .fq-panel.active{display:block;}
+    /* al cambiar de tema las preguntas entran escalonadas */
+    .fq-panel.active .fq-item{
+      animation:itemIn .5s var(--ease) backwards;
+      animation-delay:calc(var(--i) * 55ms);
+    }
+    @keyframes itemIn{
+      from{opacity:0;transform:translateY(12px)}
+      to{opacity:1;transform:none}
+    }
+
+    /* ---------- Preguntas ---------- */
+    .fq-lista{display:flex;flex-direction:column;}
+    .fq-item{border-bottom:1px solid var(--line);}
+    .fq-q{
+      display:flex;align-items:flex-start;gap:20px;
+      padding:20px 0;cursor:pointer;list-style:none;
+    }
+    .fq-q::-webkit-details-marker{display:none;}
+    /* la pregunta ocupa el renglón hasta el signo */
+    .fq-q h2{
+      flex:1;min-width:0;
+      font-size:var(--fs-body-lg);font-weight:600;
+      letter-spacing:-.01em;transition:color .2s;
+    }
+    .fq-item[open] .fq-q h2,
+    .fq-q:hover h2{color:var(--olive-deep);}
+
+    /* signo + / - dibujado con dos barras para poder animarlo */
+    .fq-signo{
+      position:relative;flex:none;width:16px;height:16px;margin-top:6px;
+    }
+    .fq-signo::before,
+    .fq-signo::after{
+      content:"";position:absolute;inset:50% 0 auto 0;
+      height:1.6px;background:var(--ink-40);border-radius:2px;
+      transition:transform .35s var(--ease),background .2s;
+    }
+    .fq-signo::after{transform:rotate(90deg);}
+    .fq-item[open] .fq-signo::after{transform:rotate(0deg);}
+    .fq-item[open] .fq-signo::before,
+    .fq-item[open] .fq-signo::after{background:var(--olive-deep);}
+
+    /* el alto lo anima el script, así que hay que recortar el desbordamiento;
+       el respiro de abajo vive en el párrafo para que no quede colgando
+       cuando la caja llega a cero */
+    .fq-a{overflow:hidden;}
+    .fq-a p{color:var(--ink-60);padding-bottom:22px;}
+    /* los enlaces de las respuestas llevan a otras secciones del sitio */
+    .fq-a a{
+      color:var(--ink);font-weight:600;
+      border-bottom:1px solid var(--line);
+      transition:color .2s,border-color .2s;
+    }
+    .fq-a a:hover{color:var(--olive-deep);border-color:var(--olive);}
+
+    @media (prefers-reduced-motion:reduce){
+      .fq-signo::before,.fq-signo::after{transition:none;}
+      .fq-panel.active .fq-item{animation:none;}
+    }
+  </style>
+
+  <script>
+    const CURVA = { duration: 380, easing: "cubic-bezier(.22,.61,.36,1)" };
+    const quieto = matchMedia("(prefers-reduced-motion: reduce)");
+
+    // <details> no anima su alto por sí solo: se abre y se cierra de golpe.
+    // Aquí se toma el control del clic para animar la caja de la respuesta
+    // entre 0 y su alto real.
+    const abrir = (item) => {
+      const cuerpo = item.querySelector(".fq-a");
+      item.open = true;
+      if (quieto.matches) return;
+      cuerpo.getAnimations().forEach((a) => a.cancel());
+      cuerpo.animate(
+        [{ height: "0px", opacity: 0 }, { height: cuerpo.scrollHeight + "px", opacity: 1 }],
+        CURVA
+      );
+    };
+
+    const cerrar = (item) => {
+      const cuerpo = item.querySelector(".fq-a");
+      if (quieto.matches) { item.open = false; return; }
+      cuerpo.getAnimations().forEach((a) => a.cancel());
+      const anim = cuerpo.animate(
+        [{ height: cuerpo.scrollHeight + "px", opacity: 1 }, { height: "0px", opacity: 0 }],
+        CURVA
+      );
+      // el details sigue abierto mientras dura la animación, si no el
+      // contenido desaparecería antes de encogerse
+      anim.onfinish = () => { item.open = false; };
+    };
+
+    document.querySelectorAll(".fq-item").forEach((item) => {
+      item.querySelector("summary").addEventListener("click", (e) => {
+        e.preventDefault();
+        if (item.open) { cerrar(item); return; }
+        // solo una pregunta abierta a la vez dentro del tema
+        item.closest(".fq-lista").querySelectorAll("details[open]").forEach((otro) => {
+          if (otro !== item) cerrar(otro);
+        });
+        abrir(item);
+      });
+    });
+
+    // Tabs de temas
+    const tabs = [...document.querySelectorAll(".fq-tabs .tab")];
+    const paneles = [...document.querySelectorAll(".fq-panel")];
+
+    const activar = (tab) => {
+      if (tab.classList.contains("active")) return;
+      tabs.forEach((x) => { x.classList.remove("active"); x.setAttribute("aria-selected", "false"); });
+      tab.classList.add("active");
+      tab.setAttribute("aria-selected", "true");
+      paneles.forEach((p) => {
+        const toca = p.dataset.panel === tab.dataset.tab;
+        // al volver a un tema, sus preguntas arrancan cerradas y la
+        // animación escalonada se reinicia
+        if (toca) p.querySelectorAll("details[open]").forEach((d) => { d.open = false; });
+        p.classList.toggle("active", toca);
+      });
+    };
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener("click", () => activar(tab));
+      tab.addEventListener("keydown", (e) => {
+        const paso = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+        if (!paso) return;
+        e.preventDefault();
+        const siguiente = tabs[(i + paso + tabs.length) % tabs.length];
+        activar(siguiente);
+        siguiente.focus();
+      });
+    });
+  </script>
+</Base>

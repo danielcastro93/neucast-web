@@ -1,0 +1,76 @@
+---
+// Cabecera de sección: título + (opcional) subtítulo, link o controles de carrusel.
+// Mantiene el mismo ritmo vertical y la misma escala en todas las páginas.
+import Icon from "./Icon.astro";
+
+const {
+  title,
+  sub,
+  linkHref,
+  linkLabel,
+  rail,        // id del carrusel: si viene, pinta los controles ‹ ›
+  id,
+} = Astro.props;
+---
+<div class="sec-head" id={id}>
+  <div class="sec-head-txt">
+    <h2 class="display t-h2">{title}</h2>
+    {sub && <p class="sec-sub">{sub}</p>}
+  </div>
+
+  {rail && (
+    <div class="rail-nav">
+      <button class="rail-btn" data-rail-prev={rail} aria-label="Anterior"><Icon name="chevronLeft" /></button>
+      <button class="rail-btn" data-rail-next={rail} aria-label="Siguiente"><Icon name="chevron" /></button>
+    </div>
+  )}
+
+  {linkHref && (
+    <a class="label sec-link" href={linkHref}>{linkLabel} <Icon name="arrow" size={15} /></a>
+  )}
+</div>
+
+<style>
+  .sec-head{
+    display:flex;align-items:flex-end;justify-content:space-between;gap:20px;
+    margin-bottom:var(--block-y);
+  }
+  .sec-head-txt{min-width:0;}
+  .sec-sub{
+    color:var(--ink-60);font-size:var(--fs-sm);
+    margin-top:8px;white-space:nowrap;
+    max-width:100%;overflow:hidden;text-overflow:ellipsis;
+  }
+  .sec-link{
+    display:none;align-items:center;gap:7px;color:var(--ink-60);
+    transition:color .2s;white-space:nowrap;padding-bottom:4px;
+  }
+  .sec-link:hover{color:var(--ink);}
+  @media (min-width:640px){.sec-link{display:inline-flex;}}
+  .rail-nav{display:none;gap:8px;flex:none;}
+  @media (hover:hover) and (pointer:fine) and (min-width:900px){.rail-nav{display:flex;}}
+  .rail-btn{
+    width:40px;height:40px;border-radius:50%;
+    border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;
+    transition:background .2s,border-color .2s;
+  }
+  .rail-btn:hover{background:var(--paper);border-color:var(--ink-40);}
+</style>
+
+<script>
+  // Vive aquí y no en el home: la cabecera es la que pinta las flechas, y Astro
+  // emite este script una sola vez por más cabeceras que haya en la página.
+  document.querySelectorAll("[data-rail-prev],[data-rail-next]").forEach((b) => {
+    const riel = document.getElementById(b.dataset.railPrev || b.dataset.railNext);
+    if (!riel) return;
+    b.addEventListener("click", () => {
+      // El primer hijo puede ser el <script> que Astro deja junto al primer
+      // componente del riel: mide cero y dejaría el paso en nada.
+      const primera = [...riel.children].find((e) => e.getBoundingClientRect().width > 0);
+      if (!primera) return;
+      const paso = (primera.getBoundingClientRect().width + 14) * 2;
+      riel.scrollBy({ left: b.dataset.railPrev ? -paso : paso, behavior: "smooth" });
+    });
+  });
+</script>

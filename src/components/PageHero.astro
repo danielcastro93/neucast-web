@@ -1,0 +1,73 @@
+---
+// Cabecera de página interior: imagen recuadrada con el título centrado encima.
+// Es el mismo patrón en todas las páginas interiores, así que vive aquí y no
+// repetido en cada una.
+//
+// titulo acepta un arreglo de líneas: cada una se pinta por separado y
+// escalonada con --i, igual que el hero del home.
+const {
+  image,
+  alt = "",
+  eyebrow,
+  titulo = [],
+  size = "display",
+} = Astro.props;
+
+const lineas = Array.isArray(titulo) ? titulo : [titulo];
+---
+<section class="ph">
+  <div class="container">
+    <figure class="ph-media">
+      <img src={image} alt={alt} fetchpriority="high" />
+      <div class="ph-shade" aria-hidden="true"></div>
+      <figcaption class="ph-txt">
+        {eyebrow && (
+          <p class="serif-eyebrow"><span class="rise" style="--delay:.85s">{eyebrow}</span></p>
+        )}
+        <h1 class:list={["display", size === "display" ? "t-display" : "t-h1", "ph-title"]}>
+          {lineas.map((linea, i) => (
+            <Fragment>
+              {i > 0 && <Fragment set:html="&#32;" />}
+              <span class="paint-line" style={`--i:${i}`}>{linea}</span>
+            </Fragment>
+          ))}
+        </h1>
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<style>
+  .ph{margin-top:calc(var(--header-h) + clamp(16px,3vw,32px));}
+  .ph-media{
+    position:relative;margin:0;
+    border-radius:var(--radius);overflow:hidden;background:var(--ink);
+    --play:running;
+  }
+  /* En móvil el recorte es más alto para que el título centrado respire. De ahí
+     para arriba se achata: es una cabecera, no un hero de portada, y con el
+     recorte anterior se comía la pantalla completa antes del contenido. */
+  .ph-media img{
+    width:100%;display:block;
+    aspect-ratio:4/5;object-fit:cover;
+  }
+  @media (min-width:700px){.ph-media img{aspect-ratio:2/1;}}
+  @media (min-width:900px){.ph-media img{aspect-ratio:2.6/1;}}
+  /* velo parejo: el texto va al centro, así que necesita contraste en toda la imagen */
+  .ph-shade{
+    position:absolute;inset:0;
+    background:
+      radial-gradient(ellipse at center, rgba(12,11,9,.62) 0%, rgba(12,11,9,.42) 55%, rgba(12,11,9,.3) 100%),
+      rgba(12,11,9,.18);
+  }
+  .ph-txt{
+    position:absolute;inset:0;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:clamp(24px,4vw,56px);
+    color:#fff;text-align:center;
+    text-shadow:0 2px 30px rgba(0,0,0,.45);
+  }
+  .ph-title{margin-top:8px;}
+  /* el título va centrado: se centra también la caja del pintado */
+  .ph-title .paint-line{margin-inline:auto;}
+</style>

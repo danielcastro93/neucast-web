@@ -1,0 +1,350 @@
+---
+import Base from "../layouts/Base.astro";
+import Icon from "../components/Icon.astro";
+import { site } from "../data/site.js";
+
+const title = "Contacto | Cotiza mobiliario de oficina con Neucast";
+const description =
+  "Cuéntanos qué espacio quieres resolver y te mandamos la cotización. Atendemos por WhatsApp y por correo, con envíos e instalación en todo México.";
+
+const asuntos = [
+  "Cotizar una o varias piezas",
+  "Amueblar un espacio completo",
+  "Precio de proyecto por volumen",
+  "Garantía o servicio de un pedido",
+  "Otro tema",
+];
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "ContactPage",
+  name: "Contacto",
+  url: `${site.domain}/contacto`,
+  description,
+  inLanguage: "es-MX",
+  isPartOf: { "@id": `${site.domain}/#organizacion` },
+};
+---
+<Base title={title} description={description} schema={schema}>
+  <section class="ct-cuerpo">
+    <div class="container ct-col">
+      <div class="ct-cab">
+        <h1 class="display t-h1 ct-titulo">
+          <span class="paint-line" style="--i:0">Cuéntanos qué espacio</span>{' '}
+          <span class="paint-line" style="--i:1">quieres resolver</span>
+        </h1>
+        <p class="ct-intro fade-in" style="--delay:.5s">
+          Déjanos los datos de tu proyecto y te respondemos por correo con precio,
+          tiempo de entrega y las opciones de material que apliquen.
+        </p>
+      </div>
+
+      <form class="ct-form" id="formContacto" novalidate>
+        <!-- trampa para robots: una persona nunca la ve ni la llena -->
+        <div class="ct-trampa" aria-hidden="true">
+          <label for="ct-sitio">No llenes este campo</label>
+          <input type="text" id="ct-sitio" name="sitio_web" tabindex="-1" autocomplete="off" />
+        </div>
+
+        <p class="ct-campo">
+          <label for="ct-asunto">¿Qué quieres resolver? <span class="ct-req" aria-hidden="true">*</span></label>
+          <select id="ct-asunto" name="asunto" required>
+            <option value="">Elige una opción</option>
+            {asuntos.map((a) => <option value={a}>{a}</option>)}
+          </select>
+          <span class="ct-error" data-error-de="ct-asunto"></span>
+        </p>
+
+        <div class="ct-fila">
+          <p class="ct-campo">
+            <label for="ct-nombre">Nombre <span class="ct-req" aria-hidden="true">*</span></label>
+            <input type="text" id="ct-nombre" name="nombre" required autocomplete="given-name" placeholder="Tu nombre" />
+            <span class="ct-error" data-error-de="ct-nombre"></span>
+          </p>
+          <p class="ct-campo">
+            <label for="ct-apellido">Apellido <span class="ct-req" aria-hidden="true">*</span></label>
+            <input type="text" id="ct-apellido" name="apellido" required autocomplete="family-name" placeholder="Tu apellido" />
+            <span class="ct-error" data-error-de="ct-apellido"></span>
+          </p>
+        </div>
+
+        <p class="ct-campo">
+          <label for="ct-empresa">Empresa <span class="ct-opcional">(opcional)</span></label>
+          <input type="text" id="ct-empresa" name="empresa" autocomplete="organization" placeholder="Nombre de tu empresa" />
+        </p>
+
+        <p class="ct-campo">
+          <label for="ct-correo">Correo <span class="ct-req" aria-hidden="true">*</span></label>
+          <input type="email" id="ct-correo" name="correo" required autocomplete="email" placeholder="tucorreo@ejemplo.com" />
+          <span class="ct-error" data-error-de="ct-correo"></span>
+        </p>
+
+        <div class="ct-fila">
+          <p class="ct-campo">
+            <label for="ct-tel">Teléfono <span class="ct-req" aria-hidden="true">*</span></label>
+            <input type="tel" id="ct-tel" name="telefono" required autocomplete="tel" inputmode="tel"
+              placeholder="55 1234 5678" />
+            <span class="ct-error" data-error-de="ct-tel"></span>
+          </p>
+          <p class="ct-campo">
+            <label for="ct-ciudad">Ciudad y estado <span class="ct-req" aria-hidden="true">*</span></label>
+            <input type="text" id="ct-ciudad" name="ciudad" required autocomplete="address-level2"
+              placeholder="Monterrey, Nuevo León" />
+            <span class="ct-error" data-error-de="ct-ciudad"></span>
+          </p>
+        </div>
+
+        <p class="ct-campo">
+          <label for="ct-mensaje">Cuéntanos los detalles <span class="ct-req" aria-hidden="true">*</span></label>
+          <textarea id="ct-mensaje" name="mensaje" rows="5" required
+            placeholder="Qué espacio hay que amueblar, cuántas personas son y si tienes fecha límite"></textarea>
+          <span class="ct-error" data-error-de="ct-mensaje"></span>
+        </p>
+
+        <p class="ct-campo ct-consent">
+          <label class="ct-check">
+            <input type="checkbox" id="ct-aviso" name="aviso" required />
+            <span>
+              He leído y acepto el <a href="/aviso-de-privacidad/">aviso de privacidad</a>.
+              <span class="ct-req" aria-hidden="true">*</span>
+            </span>
+          </label>
+          <span class="ct-error" data-error-de="ct-aviso"></span>
+        </p>
+
+        <button type="submit" class="pill pill--primary ct-boton">
+          <span class="ct-boton-txt">Enviar solicitud</span>
+          <span class="ct-boton-cargando" aria-hidden="true"></span>
+          <Icon name="arrow" size={14} />
+        </button>
+
+        <p class="ct-aviso-envio" role="status" hidden></p>
+
+      </form>
+    </div>
+  </section>
+
+  <style>
+    /* Una sola columna centrada: el formulario es lo único que hay que hacer
+       aquí, así que no compite con una barra lateral. */
+    /* Sin hero: contacto es la única página cuyo trabajo es una tarea, no una
+       lectura, y una foto a pantalla completa solo retrasa el primer campo. */
+    .ct-cuerpo{
+      margin-top:calc(var(--header-h) + clamp(40px,7vw,80px));
+      --play:running;
+    }
+    .ct-col{max-width:calc(620px + var(--gutter) * 2);}
+    .ct-cab{margin-bottom:clamp(30px,4vw,40px);}
+    /* .paint-line pinta en blanco por defecto, para titulares sobre foto */
+    .ct-titulo{
+      margin:8px 0 14px;
+      --paint-ghost:rgba(29,29,27,.2);--paint-fill:var(--ink);
+    }
+    .ct-intro{color:var(--ink-60);font-size:var(--fs-body-lg);}
+
+    .ct-form{display:flex;flex-direction:column;gap:18px;}
+    .ct-trampa{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;}
+    .ct-fila{display:grid;gap:18px;}
+    @media (min-width:560px){.ct-fila{grid-template-columns:1fr 1fr;}}
+
+    .ct-campo{display:flex;flex-direction:column;gap:7px;margin:0;}
+    .ct-campo label{font-size:var(--fs-sm);font-weight:600;color:var(--ink);}
+    .ct-req{color:var(--olive);}
+    .ct-opcional{color:var(--ink-40);font-weight:400;}
+
+    .ct-campo input[type="text"],
+    .ct-campo input[type="email"],
+    .ct-campo input[type="tel"],
+    .ct-campo select,
+    .ct-campo textarea{
+      width:100%;font:inherit;font-size:var(--fs-body);color:var(--ink);
+      background:var(--white);
+      border:1px solid var(--line);border-radius:var(--radius-sm);
+      padding:13px 14px;
+      transition:border-color .2s,box-shadow .2s;
+    }
+    .ct-campo :is(input,textarea)::placeholder{color:var(--ink-40);}
+    .ct-campo textarea{resize:vertical;min-height:130px;}
+    .ct-campo select{
+      appearance:none;cursor:pointer;
+      background-image:linear-gradient(45deg,transparent 50%,var(--ink-40) 50%),
+                       linear-gradient(135deg,var(--ink-40) 50%,transparent 50%);
+      background-position:calc(100% - 21px) 52%,calc(100% - 16px) 52%;
+      background-size:5px 5px,5px 5px;background-repeat:no-repeat;
+      padding-right:42px;
+    }
+    /* el placeholder del select se ve como tal hasta que se elige algo */
+    .ct-campo select:has(option[value=""]:checked){color:var(--ink-40);}
+    .ct-campo :is(input,select,textarea):focus-visible{
+      outline:none;border-color:var(--olive);
+      box-shadow:0 0 0 3px rgba(120,137,74,.16);
+    }
+    .ct-campo :is(input,select,textarea)[aria-invalid="true"]{border-color:#c0392b;}
+    .ct-error{font-size:var(--fs-xs);color:#c0392b;}
+    .ct-error:empty{display:none;}
+
+    .ct-consent{margin-top:2px;}
+    .ct-check{
+      display:flex;gap:11px;align-items:flex-start;
+      font-size:var(--fs-sm);font-weight:400;color:var(--ink-60);cursor:pointer;
+    }
+    .ct-check input{margin-top:2px;flex:none;width:17px;height:17px;accent-color:var(--olive);}
+    .ct-check a{color:var(--ink);font-weight:600;border-bottom:1px solid var(--line);}
+    .ct-check a:hover{color:var(--olive-deep);border-color:var(--olive);}
+
+    .ct-boton{width:100%;height:52px;margin-top:6px;}
+    .ct-boton[disabled]{pointer-events:none;}
+    /* estado de envío: el texto cambia y aparece un giro */
+    .ct-boton-cargando{display:none;width:14px;height:14px;}
+    .ct-boton[data-cargando="true"] .ct-boton-txt{display:none;}
+    .ct-boton[data-cargando="true"]::before{content:"Enviando";}
+    .ct-boton[data-cargando="true"] .ct-boton-cargando{
+      display:inline-block;
+      border:1.8px solid rgba(255,255,255,.35);
+      border-top-color:var(--white);border-radius:50%;
+      animation:giro .7s linear infinite;
+    }
+    .ct-boton[data-cargando="true"] :global(svg){display:none;}
+    @keyframes giro{to{transform:rotate(360deg)}}
+
+    .ct-aviso-envio{
+      padding:14px 16px;border-radius:var(--radius-sm);
+      font-size:var(--fs-sm);line-height:1.5;
+    }
+    .ct-aviso-envio[data-tipo="error"]{background:#FBEAE7;color:#8c2f22;}
+    .ct-aviso-envio :global(a){color:inherit;font-weight:600;text-decoration:underline;}
+
+  </style>
+
+  <script>
+    // =========================================================================
+    // PENDIENTE PARA EL DEV: conectar el envío del formulario
+    // -------------------------------------------------------------------------
+    // SIMULAR_ENVIO está en true para que el prototipo muestre el flujo completo
+    // hasta /gracias/. ANTES DE PUBLICAR hay que ponerlo en false y llenar
+    // ENDPOINT, o el formulario dirá "gracias" sin haber mandado nada.
+    //
+    // Recomendación para este proyecto (Astro estático + WordPress en Hostinger):
+    // usar el propio WordPress como receptor, con una ruta REST en el tema:
+    //
+    //   register_rest_route('neucast/v1', '/contacto', [
+    //     'methods'  => 'POST',
+    //     'callback' => 'neucast_recibir_contacto',
+    //     'permission_callback' => '__return_true',
+    //   ]);
+    //
+    // En el callback: validar, guardar como custom post type (para que el
+    // cliente vea las solicitudes en el panel aunque falle el correo) y mandar
+    // el correo con wp_mail sobre SMTP autenticado del buzón de Hostinger; sin
+    // SMTP el correo se va a spam. Falta también permitir el origen del sitio
+    // por CORS.
+    // =========================================================================
+    const SIMULAR_ENVIO = true;
+    const ENDPOINT = ""; // p. ej. "https://admin.neucast.com.mx/wp-json/neucast/v1/contacto"
+    const GRACIAS = "/gracias/";
+
+    const form = document.getElementById("formContacto");
+    const aviso = form.querySelector(".ct-aviso-envio");
+    const boton = form.querySelector(".ct-boton");
+    const textoBoton = boton.querySelector("span") || boton;
+
+    const MENSAJES = {
+      "ct-asunto": "Elige qué quieres resolver.",
+      "ct-nombre": "Dinos cómo te llamas.",
+      "ct-apellido": "Falta tu apellido.",
+      "ct-correo": "Necesitamos un correo válido para responderte.",
+      "ct-tel": "Déjanos un teléfono por si hay que aclarar algo del proyecto.",
+      "ct-ciudad": "El destino cambia el envío y el plazo de entrega.",
+      "ct-mensaje": "Cuéntanos aunque sea una línea del espacio o la pieza.",
+      "ct-aviso": "Necesitamos tu autorización para poder responderte.",
+    };
+
+    const pintarError = (campo, texto) => {
+      const hueco = form.querySelector(`[data-error-de="${campo.id}"]`);
+      if (hueco) hueco.textContent = texto || "";
+      campo.setAttribute("aria-invalid", texto ? "true" : "false");
+    };
+
+    const validar = () => {
+      let primerFallo = null;
+      Object.keys(MENSAJES).forEach((id) => {
+        const campo = document.getElementById(id);
+        const ok = campo.checkValidity();
+        pintarError(campo, ok ? "" : MENSAJES[id]);
+        if (!ok && !primerFallo) primerFallo = campo;
+      });
+      return primerFallo;
+    };
+
+    // el error se limpia en cuanto la persona corrige
+    Object.keys(MENSAJES).forEach((id) => {
+      const campo = document.getElementById(id);
+      ["input", "change"].forEach((ev) =>
+        campo.addEventListener(ev, () => {
+          if (campo.checkValidity()) pintarError(campo, "");
+        })
+      );
+    });
+
+    const mostrarError = (html) => {
+      aviso.dataset.tipo = "error";
+      aviso.innerHTML = html;
+      aviso.hidden = false;
+      aviso.scrollIntoView({ behavior: "smooth", block: "center" });
+    };
+
+    const cargando = (si) => {
+      boton.disabled = si;
+      boton.dataset.cargando = si ? "true" : "false";
+    };
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      aviso.hidden = true;
+
+      const fallo = validar();
+      if (fallo) {
+        fallo.focus();
+        fallo.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+
+      // si la trampa viene llena es un robot: se corta sin avisar
+      if (form.sitio_web.value) return;
+
+      const datos = Object.fromEntries(new FormData(form).entries());
+      delete datos.sitio_web;
+
+      cargando(true);
+      try {
+        if (SIMULAR_ENVIO) {
+          console.info("SIMULACIÓN. Datos que se enviarían:", datos);
+          await new Promise((r) => setTimeout(r, 900));
+        } else {
+          const r = await fetch(ENDPOINT, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos),
+          });
+          if (!r.ok) throw new Error(r.status);
+        }
+        // se marca como enviado para que /gracias/ sepa que se llegó por el flujo
+        try { sessionStorage.setItem("neucast:solicitud", "1"); } catch (err) {}
+        form.reset();
+        location.assign(GRACIAS);
+      } catch (err) {
+        cargando(false);
+        // El enlace sale de cualquier botón de WhatsApp de la página. Antes
+        // apuntaba a una clase que no existe, así que este catch reventaba y el
+        // formulario se quedaba mudo justo cuando más falta hace la salida.
+        const wa = document.querySelector('a[href*="wa.me"]');
+        mostrarError(
+          "No pudimos enviar tu solicitud. Inténtalo de nuevo" +
+            (wa
+              ? ' o escríbenos por <a href="' + wa.href + '" target="_blank" rel="noopener">WhatsApp</a>.'
+              : ".")
+        );
+      }
+    });
+  </script>
+</Base>

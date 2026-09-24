@@ -1,0 +1,210 @@
+---
+import Base from "../layouts/Base.astro";
+import LegalDoc from "../components/LegalDoc.astro";
+import { site } from "../data/site.js";
+
+// ============================================================================
+// DATOS QUE EL CLIENTE DEBE LLENAR ANTES DE PUBLICAR
+// Mientras haya corchetes, la página sale marcada en amarillo y con noindex.
+// ============================================================================
+const resp = {
+  razonSocial: "[RAZÓN SOCIAL COMPLETA, S.A. DE C.V.]",
+  nombreComercial: "Neucast",
+  rfc: "[RFC]",
+  domicilio: "[CALLE Y NÚMERO, COLONIA, ALCALDÍA O MUNICIPIO, C.P., ESTADO, MÉXICO]",
+  correo: site.email,
+  jurisdiccion: "[CIUDAD Y ESTADO PARA LA JURISDICCIÓN, p. ej. Ciudad de México]",
+};
+
+const p = (t) => `<span class="pendiente">${t}</span>`;
+const dato = (v) => (v.startsWith("[") ? p(v) : v);
+
+const actualizado = "23 de septiembre de 2026";
+const hayPendientes = Object.values(resp).some((v) => v.startsWith("["));
+
+const title = "Términos y condiciones | Neucast";
+const description =
+  "Términos y condiciones de uso del sitio de Neucast: cómo funcionan las cotizaciones, los precios, las entregas y la garantía.";
+
+const secciones = [
+  {
+    id: "quienes",
+    titulo: "A quién pertenece este sitio",
+    cuerpo: `
+      <p>Este sitio es operado por ${dato(resp.razonSocial)}, que opera comercialmente como
+      <strong>${resp.nombreComercial}</strong>, con RFC ${dato(resp.rfc)} y domicilio en
+      ${dato(resp.domicilio)}. Para cualquier tema relacionado con estos términos puedes
+      escribirnos a <a href="mailto:${resp.correo}">${resp.correo}</a>.</p>
+      <p>Al navegar el sitio aceptas estos términos. Si no estás de acuerdo con ellos, te
+      pedimos que no lo utilices.</p>`,
+  },
+  {
+    id: "sitio",
+    titulo: "Qué es y qué no es este sitio",
+    cuerpo: `
+      <p>Este sitio es un <strong>catálogo informativo</strong>. Sirve para que conozcas el
+      mobiliario que manejamos y para que nos contactes y pidas una cotización.</p>
+      <p><strong>No es una tienda en línea.</strong> No puedes comprar ni pagar aquí, no
+      procesamos pagos en el sitio y no te pedimos datos bancarios ni de tarjeta en ningún
+      momento. Si alguna vez recibes una solicitud de pago que parezca venir de este sitio,
+      desconfía y escríbenos a <a href="mailto:${resp.correo}">${resp.correo}</a> para
+      verificarla.</p>
+      <p>Tampoco tenemos tienda física: todo se coordina a distancia y se entrega en el
+      domicilio que nos indiques.</p>`,
+  },
+  {
+    id: "cotizaciones",
+    titulo: "Cotizaciones, precios y pedidos",
+    cuerpo: `
+      <p>La información del catálogo es <strong>referencial y no constituye una oferta</strong>.
+      El acuerdo se forma cuando aceptas por escrito una cotización que te hayamos emitido.</p>
+      <ul>
+        <li>Los precios se entregan por cotización y dependen del volumen, los materiales,
+        los acabados, el destino y si el pedido incluye instalación.</li>
+        <li>Cada cotización indica su <strong>vigencia</strong>. Pasada esa fecha, los
+        precios y los plazos pueden cambiar.</li>
+        <li>Los precios se expresan en <strong>pesos mexicanos</strong> y la cotización
+        señala si incluyen o no el IVA y otros conceptos como flete o maniobras.</li>
+        <li>La disponibilidad está sujeta a existencias. Si una pieza deja de estar
+        disponible, te lo informamos y te proponemos una alternativa antes de continuar.</li>
+      </ul>
+      <p>Las condiciones concretas de cada pedido, incluidos anticipos, plazos y forma de
+      pago, son las que aparezcan en la cotización que aceptes. <strong>Esa cotización
+      prevalece sobre lo aquí descrito</strong> si hubiera alguna diferencia.</p>`,
+  },
+  {
+    id: "entrega",
+    titulo: "Entrega e instalación",
+    cuerpo: `
+      <p>Los tiempos de entrega que indicamos son estimados de buena fe y se confirman por
+      escrito en la cotización. Pueden verse afectados por causas ajenas a nosotros, como
+      retrasos del transporte, restricciones del inmueble o caso fortuito y fuerza mayor.</p>
+      <ul>
+        <li>Para entregar e instalar necesitamos <strong>acceso al inmueble</strong> en la
+        fecha y el horario acordados. Si al llegar no es posible acceder, las maniobras o
+        el reenvío pueden generar un costo adicional que te informaríamos antes.</li>
+        <li>Te pedimos <strong>revisar el mobiliario al recibirlo</strong>. Los daños
+        visibles de transporte deben reportarse de inmediato, con fotografías, para que
+        podamos hacerlos valer.</li>
+        <li>El retiro de mobiliario anterior solo se incluye cuando así lo señale la
+        cotización.</li>
+      </ul>`,
+  },
+  {
+    id: "garantia",
+    titulo: "Garantía, devoluciones y cancelaciones",
+    cuerpo: `
+      <p>Las piezas cuentan con <strong>garantía contra defectos de fabricación</strong>. El
+      plazo y el alcance que aplican a tu pedido se te entregan por escrito junto con la
+      cotización o la factura.</p>
+      <p>La garantía no cubre el desgaste normal por el uso, los daños por un uso distinto
+      a aquel para el que la pieza está destinada, las modificaciones hechas por terceros ni
+      los daños por instalación realizada por personal ajeno a nosotros.</p>
+      <p>Las piezas fabricadas o adaptadas <strong>sobre medida o con acabados elegidos por
+      ti</strong> no admiten devolución por cambio de opinión, salvo que presenten un
+      defecto. Las condiciones de cancelación, y si el anticipo es reembolsable, se
+      establecen en la cotización que aceptes.</p>`,
+  },
+  {
+    id: "contenido",
+    titulo: "Propiedad intelectual del contenido",
+    cuerpo: `
+      <p>La marca <strong>Neucast</strong>, su logotipo, los textos, las fotografías, los
+      videos, el diseño y el código de este sitio están protegidos por la legislación de
+      propiedad intelectual e industrial. Son propiedad de ${dato(resp.razonSocial)} o se
+      usan con la licencia correspondiente.</p>
+      <p>Puedes consultar y compartir el contenido con fines personales o informativos,
+      citando la fuente. <strong>No está permitido</strong> reproducirlo, modificarlo,
+      distribuirlo o explotarlo comercialmente sin nuestra autorización previa por escrito.</p>
+      <p>Las imágenes son ilustrativas: los acabados, colores y proporciones pueden variar
+      respecto a la pieza física por motivos de fotografía, iluminación o calibración de tu
+      pantalla. Los colores y materiales definitivos se confirman al cotizar.</p>`,
+  },
+  {
+    id: "uso",
+    titulo: "Uso aceptable del sitio",
+    cuerpo: `
+      <p>Al usar este sitio te comprometes a no:</p>
+      <ul>
+        <li>Intentar vulnerar su seguridad, acceder a áreas no públicas o interferir con su
+        funcionamiento.</li>
+        <li>Extraer el contenido de forma automatizada y masiva.</li>
+        <li>Suplantar a Neucast o hacer creer a terceros que existe una relación comercial
+        o de representación que no existe.</li>
+        <li>Usar el sitio para cualquier fin ilícito.</li>
+      </ul>
+      <p>Podemos suspender el acceso a quien incumpla estas condiciones.</p>`,
+  },
+  {
+    id: "enlaces",
+    titulo: "Enlaces a otros sitios",
+    cuerpo: `
+      <p>El sitio contiene enlaces a plataformas de terceros, como WhatsApp, Instagram y
+      Facebook. No controlamos esos servicios ni respondemos por su contenido, su
+      disponibilidad ni sus prácticas de privacidad. Al salir de este sitio aplican los
+      términos y las políticas de cada plataforma.</p>`,
+  },
+  {
+    id: "responsabilidad",
+    titulo: "Disponibilidad y responsabilidad",
+    cuerpo: `
+      <p>Procuramos que el sitio esté disponible y que su información sea correcta y esté
+      actualizada, pero no podemos garantizar que funcione sin interrupciones ni que esté
+      libre de errores. Podemos modificar, suspender o descontinuar cualquier parte del
+      sitio en cualquier momento.</p>
+      <p>Salvo por lo que la ley no permita limitar, no respondemos por daños indirectos o
+      lucro cesante derivados del uso del sitio. <strong>Nada en estos términos limita los
+      derechos que la legislación de protección al consumidor te reconoce</strong> respecto
+      de los bienes y servicios que contrates con nosotros.</p>`,
+  },
+  {
+    id: "privacidad",
+    titulo: "Datos personales",
+    cuerpo: `
+      <p>El tratamiento de tus datos personales se rige por nuestro
+      <a href="/aviso-de-privacidad">aviso de privacidad</a>, que forma parte integral de
+      estos términos.</p>
+      <p>Este sitio no tiene formularios ni instala cookies de rastreo: los datos que
+      tratamos son los que tú nos envías al contactarnos.</p>`,
+  },
+  {
+    id: "cambios",
+    titulo: "Cambios a estos términos",
+    cuerpo: `
+      <p>Podemos actualizar estos términos cuando cambien nuestros servicios o la
+      legislación aplicable. La versión vigente es siempre la publicada en esta página, con
+      su fecha de última actualización.</p>
+      <p>Los cambios no afectan los pedidos ya confirmados, que se rigen por las
+      condiciones aceptadas en su momento.</p>`,
+  },
+  {
+    id: "ley",
+    titulo: "Ley aplicable y jurisdicción",
+    cuerpo: `
+      <p>Estos términos se rigen por las leyes de los Estados Unidos Mexicanos. Para
+      cualquier controversia, las partes se someten a los tribunales competentes de
+      ${dato(resp.jurisdiccion)}, renunciando a cualquier otro fuero que pudiera
+      corresponderles por su domicilio presente o futuro.</p>
+      <p>Si eres consumidor, conservas el derecho de acudir a la Procuraduría Federal del
+      Consumidor en los términos que marca la ley.</p>`,
+  },
+];
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: "Términos y condiciones",
+  url: `${site.domain}/terminos-y-condiciones`,
+  description,
+  inLanguage: "es-MX",
+  isPartOf: { "@id": `${site.domain}/#organizacion` },
+};
+---
+<Base title={title} description={description} schema={schema} noindex={hayPendientes}>
+  <LegalDoc
+    titulo="Términos y condiciones"
+    entradilla="Cómo funciona este sitio, cómo se forman las cotizaciones y qué reglas aplican al contenido y a los pedidos."
+    actualizado={actualizado}
+    secciones={secciones}
+  />
+</Base>

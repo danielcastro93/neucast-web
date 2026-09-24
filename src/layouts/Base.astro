@@ -1,0 +1,747 @@
+---
+import "../styles/global.css";
+import Logo from "../components/Logo.astro";
+import { site, organizacion, waLink, categories, todosLosMuebles } from "../data/site.js";
+import { proyectoDestacado } from "../data/proyectos.js";
+
+const {
+  title = "Muebles para oficina y mobiliario corporativo de diseño | Neucast",
+  description = "Muebles para oficina y mobiliario corporativo de diseño: sillas ejecutivas, escritorios, salas de juntas y cafeterías. Envío e instalación en todo México.",
+  overlayHeader = false,
+  // páginas a pantalla completa (404) no llevan footer: el menú del header
+  // ya da toda la navegación y así no se rompe la composición
+  hideFooter = false,
+  // SEO por página
+  image = "/img/hero-oficina.jpg",   // imagen para redes sociales
+  noindex = false,                   // true en páginas que no deben indexarse
+  schema = null,                     // objeto o arreglo JSON-LD
+} = Astro.props;
+
+// URL canónica: evita que la misma página se indexe con variantes de dirección.
+// Lleva diagonal final porque así se publica y así enlaza todo el sitio; si la
+// canónica apuntara a la versión sin diagonal estaría nombrando una dirección
+// distinta de la que se sirve.
+const ruta = Astro.url.pathname;
+const canonical = new URL(ruta.endsWith("/") ? ruta : `${ruta}/`, site.domain).href;
+const ogImage = new URL(image, site.domain).href;
+const schemas = schema ? (Array.isArray(schema) ? schema : [schema]) : [];
+
+const nav = [
+  { href: "/muebles/", label: "Muebles" },
+  { href: "/proyectos/", label: "Proyectos" },
+  { href: "/nosotros/", label: "Nosotros" },
+  { href: "/contacto/", label: "Contacto" },
+];
+const waGeneral = waLink("Hola, me gustaría cotizar mobiliario para mi empresa.");
+const waIcon = `<svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a9.9 9.9 0 0 0-8.5 15.1L2 22l5-1.4A10 10 0 1 0 12 2Zm5.5 14.1c-.2.7-1.3 1.3-1.9 1.4-.5.1-1.1.1-1.8-.1-.4-.1-.9-.3-1.6-.6-2.9-1.2-4.7-4.1-4.9-4.3-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5s.8 1.9.8 2c.1.1.1.3 0 .4l-.3.5-.4.5c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.7-.1l1-1.2c.2-.3.4-.2.7-.1l2 1c.3.1.5.2.5.3.1.1.1.6-.1 1.1Z"/></svg>`;
+const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+---
+<!doctype html>
+<html lang="es-MX">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/img/logo-neucast.png" />
+    <meta name="theme-color" content="#ffffff" />
+    {/* Explícito en las dos direcciones: así nadie tiene que deducir qué se
+        indexa. `follow` también en las que no se indexan, para que el robot
+        siga saliendo de ellas hacia el resto del sitio. */}
+    <meta name="robots" content={noindex ? "noindex, follow" : "index, follow"} />
+
+    <meta property="og:site_name" content="Neucast" />
+    <meta property="og:locale" content="es_MX" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- quién publica el sitio: va en todas las páginas, con una sola matrícula -->
+    <script type="application/ld+json" set:html={JSON.stringify(organizacion)} />
+    {schemas.map((s) => (
+      <script type="application/ld+json" set:html={JSON.stringify(s)} />
+    ))}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Libre+Baskerville:ital@0;1&display=swap" />
+  </head>
+  <body>
+    <header class:list={["hd", { overlay: overlayHeader }]} id="hd">
+      <div class="hd-inner container">
+        <button class="hd-burger" id="menuBtn" aria-label="Abrir menú" aria-expanded="false" aria-controls="drawer">
+          <span></span><span></span>
+        </button>
+        <a href="/" class="hd-logo" aria-label="Neucast, ir al inicio">
+          <Logo height={24} />
+        </a>
+        <nav class="hd-nav" aria-label="Principal">
+          <div class="hd-item">
+            <a class="label hd-muebles" href="/muebles/" id="hdMuebles" aria-expanded="false" aria-controls="megaMuebles">
+              Muebles
+              <svg class="hd-chevron" width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M3.5 6l4.5 4.5L12.5 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </a>
+          </div>
+          {nav.slice(1).map((n) => <a class="label" href={n.href}>{n.label}</a>)}
+        </nav>
+        <div class="hd-actions">
+          <a class="hd-wa label" href={waGeneral} target="_blank" rel="noopener">
+            <Fragment set:html={waIcon} />
+            <span>Cotiza</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Panel de categorías. Misma estructura que el menú móvil, para que las
+           dos versiones se lean como el mismo menú y no como dos distintos. -->
+      <div class="hd-velo" id="veloMega" hidden></div>
+      <div class="hd-mega" id="megaMuebles" hidden>
+        <div class="container hd-mega-inner">
+          <div class="hd-mega-cats">
+            <a class="hd-mega-cat" href="/muebles/">
+              <span class="hd-mega-thumb">
+                <img src={todosLosMuebles.photo} alt="" loading="lazy" />
+              </span>
+              <span class="hd-mega-nombre">Todos los muebles</span>
+            </a>
+            {categories.map((c) => (
+              <a class="hd-mega-cat" href={`/muebles/${c.slug}/`}>
+                <span class="hd-mega-thumb"><img src={c.photo} alt="" loading="lazy" /></span>
+                <span class="hd-mega-nombre">{c.name}</span>
+              </a>
+            ))}
+          </div>
+
+          <!-- Bloque de apoyo: el menú también puede llevar a otra cosa -->
+          <a class="hd-promo" href="/proyectos/">
+            <span class="hd-promo-media">
+              <img src={proyectoDestacado.portada.img} alt="" loading="lazy" />
+            </span>
+            <span class="hd-promo-ttl">Proyectos ya instalados</span>
+            <span class="hd-promo-txt">
+              Recorre espacios que amueblamos completos y mira cómo se ven las piezas en uso.
+            </span>
+            <span class="hd-promo-cta">
+              Ver los proyectos
+              <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Drawer móvil: sidebar izquierda con drill-down -->
+    <div class="drawer" id="drawer" hidden>
+      <div class="scrim" id="drawerScrim"></div>
+      <aside class="drawer-panel" role="dialog" aria-modal="true" aria-label="Menú">
+        <div class="drawer-top">
+          <button class="drawer-back" id="backMain" tabindex="-1">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 3 5 8l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Atrás
+          </button>
+          <button class="drawer-x" id="drawerClose" aria-label="Cerrar menú">
+            <span></span><span></span>
+          </button>
+        </div>
+        <div class="drawer-track" id="drawerTrack">
+          <!-- Vista principal -->
+          <div class="drawer-view">
+            <nav class="drawer-nav" aria-label="Menú principal">
+              <button class="drow" id="gotoMuebles">
+                <span class="drow-name">Muebles</span>
+                <Fragment set:html={chevron} />
+              </button>
+                <a href="/proyectos/" class="drow"><span class="drow-name">Proyectos</span></a>
+              <a href="/nosotros/" class="drow"><span class="drow-name">Nosotros</span></a>
+              <a href="/preguntas-frecuentes/" class="drow"><span class="drow-name">Preguntas frecuentes</span></a>
+              <a href="/contacto/" class="drow"><span class="drow-name">Contacto</span></a>
+            </nav>
+            <div class="drawer-foot">
+              <a class="pill pill--wa" href={waGeneral} target="_blank" rel="noopener"><Fragment set:html={waIcon} /> Cotiza por WhatsApp</a>
+              <p class="drawer-note">Envíos e instalación en todo México</p>
+            </div>
+          </div>
+          <!-- Vista Muebles -->
+          <div class="drawer-view">
+            <p class="drawer-ttl display">Muebles</p>
+            <nav class="drawer-cats" aria-label="Categorías de muebles">
+              <a href="/muebles/" class="crow">
+                <span class="crow-thumb"><img src={todosLosMuebles.photo} alt="" loading="lazy" /></span>
+                <span class="drow-name">Todos los muebles</span>
+              </a>
+              {categories.map((c) => (
+                <a href={`/muebles/${c.slug}/`} class="crow">
+                  <span class="crow-thumb"><img src={c.photo} alt="" loading="lazy" /></span>
+                  <span class="drow-name">{c.name}</span>
+                </a>
+              ))}
+            </nav>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <main><slot /></main>
+
+    {!hideFooter && (
+    <footer class="ft" id="contacto" data-hides-fab>
+      <div class="container">
+        <div class="ft-cta">
+          <p class="ft-tag display t-h1">Espacios que trabajan bien<br /><em class="ft-tag-serif">y se ven mejor.</em></p>
+          <a class="pill pill--wa ft-cta-pill" href={waGeneral} target="_blank" rel="noopener"><Fragment set:html={waIcon} /> Cotiza tu proyecto</a>
+        </div>
+        <div class="ft-cols">
+          <div>
+            <p class="overline">Muebles</p>
+            <a href="/muebles/sillas-ejecutivas/">Sillas ejecutivas</a>
+            <a href="/muebles/salas-de-juntas/">Salas de juntas</a>
+            <a href="/muebles/escritorios/">Escritorios</a>
+            <a href="/muebles/">Ver todo el catálogo</a>
+          </div>
+          <div>
+            <p class="overline">Neucast</p>
+            <a href="/proyectos/">Proyectos</a>
+            <a href="/nosotros/">Nosotros</a>
+            <a href="/preguntas-frecuentes/">Preguntas frecuentes</a>
+          </div>
+          <div>
+            <p class="overline">Contacto</p>
+            <a href={waGeneral} target="_blank" rel="noopener">WhatsApp</a>
+            <a href="/contacto/">Contacto</a>
+            <a href={`mailto:${site.email}`} class="ft-mail">contacto.ventas@<wbr />neucast.com.mx</a>
+          </div>
+          <div>
+            <p class="overline">Síguenos</p>
+            <div class="ft-social">
+              <a href={site.social.instagram} target="_blank" rel="noopener" aria-label="Neucast en Instagram">
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg>
+              </a>
+              <a href={site.social.facebook} target="_blank" rel="noopener" aria-label="Neucast en Facebook">
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-7h2.4l.4-2.8h-2.8V9.4c0-.8.3-1.4 1.5-1.4h1.4V5.5c-.2 0-1.1-.1-2.1-.1-2.1 0-3.5 1.3-3.5 3.6v2.2H8.4V14h2.4v7h2.7Z"/></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="container ft-bottom">
+        <p>© {new Date().getFullYear()} Neucast · Envíos e instalación en todo México</p>
+        <nav class="ft-legal" aria-label="Avisos legales">
+          <a href="/aviso-de-privacidad/">Aviso de privacidad</a>
+          <a href="/terminos-y-condiciones/">Términos y condiciones</a>
+        </nav>
+      </div>
+    </footer>
+    )}
+
+    <!-- Burbuja WhatsApp (se oculta cuando el CTA grande o el footer están en pantalla) -->
+    <div class="fab-wrap fab-hidden" id="fabWrap">
+      <div class="fab-tip" aria-hidden="true">
+        <span class="fab-tip-txt"><strong>¿Cotizamos tu proyecto?</strong><br />Respondemos hoy mismo</span>
+      </div>
+      <a class="fab" href={waGeneral} target="_blank" rel="noopener" aria-label="Cotizar por WhatsApp">
+        <span class="fab-ring" aria-hidden="true"></span>
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a9.9 9.9 0 0 0-8.5 15.1L2 22l5-1.4A10 10 0 1 0 12 2Zm5.5 14.1c-.2.7-1.3 1.3-1.9 1.4-.5.1-1.1.1-1.8-.1-.4-.1-.9-.3-1.6-.6-2.9-1.2-4.7-4.1-4.9-4.3-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5s.8 1.9.8 2c.1.1.1.3 0 .4l-.3.5-.4.5c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.7-.1l1-1.2c.2-.3.4-.2.7-.1l2 1c.3.1.5.2.5.3.1.1.1.6-.1 1.1Z"/></svg>
+      </a>
+    </div>
+
+    <style>
+      /* ---------- Header ---------- */
+      .hd{
+        position:fixed;inset:0 0 auto 0;z-index:50;
+        transition:background .35s var(--ease), box-shadow .35s, color .35s;
+      }
+      /* blanco sólido, no cristal esmerilado: la línea basta para separar */
+      .hd.scrolled,
+      .hd.mega-abierto{
+        background:var(--white);
+        box-shadow:0 1px 0 var(--line);
+      }
+      /* con el panel abierto el header deja de ser transparente sobre el hero,
+         si no queda un hueco por el que se ve la foto */
+
+      .hd.overlay:not(.scrolled):not(.mega-abierto){
+        color:#fff;
+        --logo-sym:#fff;
+        --logo-txt:#fff;
+      }
+      .hd.overlay:not(.scrolled):not(.mega-abierto) .hd-burger span{background:#fff;}
+      .hd-inner{height:var(--header-h);display:flex;align-items:center;gap:20px;}
+      .hd-logo{display:flex;align-items:center;flex:none;}
+      /* en móvil el logo se centra en la barra (patrón BoConcept) y baja de tamaño,
+         así deja de verse apretado entre el menú y el botón */
+      /* en móvil el logo va a la izquierda, junto al menú, y baja de tamaño */
+      @media (max-width:639px){
+        .hd-inner{gap:10px;}
+        .hd-logo :global(svg){height:clamp(17px,4.8vw,21px);width:auto;}
+        .hd-wa{padding:0 13px;gap:6px;}
+      }
+      /* más aire entre el logotipo y la navegación */
+      .hd-nav{display:none;gap:32px;flex:1;margin-left:26px;}
+      /* subrayado animado de izquierda a derecha */
+      .hd-nav a{
+        position:relative;padding:6px 0;opacity:.85;transition:opacity .2s;
+      }
+      .hd-nav a::after{
+        content:"";position:absolute;left:0;right:0;bottom:2px;height:1.5px;
+        background:currentColor;border-radius:2px;
+        transform:scaleX(0);transform-origin:left center;
+        transition:transform .35s var(--ease);
+      }
+      .hd-nav a:hover{opacity:1;}
+      .hd-nav a:hover::after{transform:scaleX(1);}
+      .hd-item{position:relative;}
+      .hd-muebles{display:inline-flex;align-items:center;gap:5px;}
+      .hd-chevron{transition:transform .3s var(--ease);}
+      .hd-muebles[aria-expanded="true"] .hd-chevron{transform:rotate(180deg);}
+
+      .hd-actions{margin-left:auto;display:flex;align-items:center;}
+
+      .hd-wa{
+        display:inline-flex;align-items:center;gap:7px;
+        height:38px;padding:0 16px;border-radius:999px;
+        background:var(--wa);color:#fff;border:1px solid transparent;
+        transition:transform .2s var(--ease),background .35s,border-color .35s,color .35s;
+      }
+      .hd-wa:hover{background:#169654;}
+      .hd-wa:active{transform:scale(.96);}
+      .hd.overlay:not(.scrolled):not(.mega-abierto) .hd-wa{
+        background:rgba(255,255,255,.16);
+        border-color:rgba(255,255,255,.35);
+        -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+      }
+      .hd.overlay:not(.scrolled):not(.mega-abierto) .hd-wa:hover{background:rgba(255,255,255,.28);}
+
+      /* ---------- Panel de categorías del header ---------- */
+    /* mismo velo difuminado que el panel de filtros */
+    .hd-velo{
+      position:fixed;inset:var(--header-h) 0 0 0;z-index:-1;
+      background:rgba(20,19,17,.34);
+      -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+      animation:velo .3s var(--ease);
+    }
+    .hd-velo[hidden]{display:none;}
+    @keyframes velo{from{opacity:0}to{opacity:1}}
+
+    /* El panel no va a sangre: es una tarjeta contenida bajo la navegación,
+       como en la referencia. A ancho completo quedaba un vacío enorme a la
+       derecha del bloque de apoyo. */
+    .hd-mega{
+      position:absolute;top:100%;left:0;right:0;
+      /* separación del header: la tarjeta tiene esquinas redondeadas y pegada
+         a la barra se ve mal. El hueco lo cubre este envoltorio, así que el
+         cursor puede cruzarlo sin que el panel se cierre. */
+      padding:16px var(--gutter) 0;
+      animation:megaEntra .26s var(--ease);
+    }
+    .hd-mega[hidden]{display:none;}
+    @keyframes megaEntra{
+      from{opacity:0;transform:translateY(-8px)}
+      to{opacity:1;transform:none}
+    }
+    .hd-mega-inner{
+      display:grid;gap:clamp(24px,3vw,40px);
+      grid-template-columns:minmax(0,1fr) 296px;
+      align-items:start;
+      max-width:1040px;margin-inline:auto;
+      padding:clamp(20px,2.4vw,28px);
+      background:var(--white);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:0 22px 48px rgba(20,19,17,.13);
+    }
+    /* dos columnas de cuatro: cada fila es miniatura y nombre, igual que las
+       filas del menú móvil, para que las dos versiones se lean iguales */
+    .hd-mega-cats{
+      display:grid;grid-template-columns:1fr 1fr;
+      gap:6px clamp(16px,2vw,32px);
+      align-content:start;
+    }
+    .hd-mega-cat{
+      display:flex;align-items:center;gap:13px;
+      padding:7px;border-radius:var(--radius-sm);
+      transition:background .2s var(--ease);
+    }
+    .hd-mega-cat:hover{background:var(--paper);}
+    .hd-mega-thumb{
+      flex:none;width:52px;height:52px;
+      border-radius:var(--radius-sm);overflow:hidden;background:var(--paper);
+    }
+    .hd-mega-thumb img{width:100%;height:100%;object-fit:cover;}
+    .hd-mega-nombre{
+      font-size:var(--fs-sm);font-weight:600;color:var(--ink);
+      letter-spacing:0;
+    }
+    .hd-mega-cat:hover .hd-mega-nombre{color:var(--olive-deep);}
+
+    /* bloque de apoyo a la derecha */
+    .hd-promo{
+      grid-column:2;
+      display:flex;flex-direction:column;
+      padding:14px;border-radius:var(--radius);
+      background:var(--paper);color:var(--ink);
+    }
+    .hd-promo-media{
+      display:block;aspect-ratio:16/10;border-radius:var(--radius-sm);
+      overflow:hidden;background:var(--paper-soft);
+    }
+    .hd-promo-media img{width:100%;height:100%;object-fit:cover;}
+    .hd-promo-ttl{
+      display:block;margin-top:12px;
+      font-size:var(--fs-sm);font-weight:600;letter-spacing:0;
+    }
+    .hd-promo-txt{
+      display:block;margin-top:5px;
+      font-size:var(--fs-xs);font-weight:400;color:var(--ink-60);
+      letter-spacing:0;line-height:1.5;
+    }
+    .hd-promo-cta{
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      margin-top:14px;height:40px;border-radius:999px;
+      background:var(--ink);color:var(--white);
+      font-size:var(--fs-xs);font-weight:600;
+      transition:background .25s var(--ease);
+    }
+    .hd-promo:hover .hd-promo-cta{background:#000;}
+    .hd-promo-cta svg{transition:transform .25s var(--ease);}
+    .hd-promo:hover .hd-promo-cta svg{transform:translateX(3px);}
+    /* sobre el hero el header es transparente, pero el panel nunca lo es */
+    .hd.overlay:not(.scrolled):not(.mega-abierto) .hd-mega{color:var(--ink);}
+
+    .hd-burger{
+        width:40px;height:40px;margin-left:-10px;flex:none;
+        display:flex;flex-direction:column;justify-content:center;gap:5px;align-items:center;
+      }
+      .hd-burger span{
+        width:20px;height:1.7px;background:var(--ink);border-radius:2px;
+        transition:transform .4s var(--ease),background .35s;
+      }
+      .hd.menu-open .hd-burger span:first-child{transform:translateY(3.4px) rotate(45deg);}
+      .hd.menu-open .hd-burger span:last-child{transform:translateY(-3.4px) rotate(-45deg);}
+      @media (min-width:900px){
+        .hd-burger{display:none;}
+        .hd-nav{display:flex;}
+      }
+
+      /* ---------- Drawer móvil ---------- */
+      .drawer{position:fixed;inset:0;z-index:70;}
+      .drawer[hidden]{display:none;}
+      .drawer-panel{
+        position:absolute;top:0;bottom:0;left:0;
+        width:min(400px,88vw);
+        background:var(--white);
+        display:flex;flex-direction:column;
+        /* sin esto, la vista de categorías se asoma fuera del panel */
+        overflow:hidden;
+        transform:translateX(-102%);
+        transition:transform .45s var(--ease);
+        box-shadow:0 0 60px rgba(0,0,0,.18);
+      }
+      .drawer.open .drawer-panel{transform:none;}
+      .drawer-top{
+        height:var(--header-h);flex:none;
+        display:flex;align-items:center;justify-content:space-between;
+        padding:0 20px;
+      }
+      /* "Atrás" solo existe en la vista de categorías */
+      .drawer-back{
+        display:inline-flex;align-items:center;gap:6px;
+        font-size:15px;font-weight:500;color:var(--ink);
+        opacity:0;transform:translateX(-6px);pointer-events:none;
+        transition:opacity .3s var(--ease),transform .3s var(--ease);
+      }
+      .drawer.sub .drawer-back{opacity:1;transform:none;pointer-events:auto;}
+      .drawer-x{
+        position:relative;width:40px;height:40px;margin-right:-10px;margin-left:auto;
+        color:var(--ink);
+      }
+      .drawer-x span{
+        position:absolute;left:11px;top:19px;width:18px;height:1.6px;
+        background:currentColor;border-radius:2px;
+        transform:scaleX(0);transition:transform .4s var(--ease);
+      }
+      .drawer-x span:first-child{transform:rotate(45deg) scaleX(0);}
+      .drawer-x span:last-child{transform:rotate(-45deg) scaleX(0);}
+      .drawer.open .drawer-x span:first-child{transform:rotate(45deg) scaleX(1);transition-delay:.16s;}
+      .drawer.open .drawer-x span:last-child{transform:rotate(-45deg) scaleX(1);transition-delay:.24s;}
+      .drawer-track{
+        flex:1;display:flex;width:200%;min-height:0;
+        transition:transform .45s var(--ease);
+      }
+      .drawer.sub .drawer-track{transform:translateX(-50%);}
+      .drawer-view{
+        width:50%;flex:none;overflow-y:auto;
+        display:flex;flex-direction:column;
+        padding:6px 20px calc(24px + env(safe-area-inset-bottom));
+      }
+      .drow{
+        display:flex;align-items:center;justify-content:space-between;gap:12px;
+        width:100%;text-align:left;
+        padding:13px 0;
+        font-size:21px;font-weight:600;letter-spacing:var(--track-tight);
+      }
+      .drow :global(svg){color:var(--ink-40);flex:none;}
+      .drawer-foot{margin-top:auto;padding-top:30px;display:flex;flex-direction:column;gap:12px;}
+      .drawer-note{font-size:var(--text-sm);color:var(--ink-60);text-align:center;}
+      .drawer-ttl{font-size:27px;margin:0 0 21px;}
+      .crow{
+        display:flex;align-items:center;gap:16px;
+        padding:11px 0;
+        font-size:16px;font-weight:500;
+      }
+      .crow-thumb{
+        width:52px;height:52px;border-radius:11px;overflow:hidden;flex:none;background:var(--paper);
+      }
+      .crow-thumb img{width:100%;height:100%;object-fit:cover;}
+      body.no-scroll{overflow:hidden;}
+      @media (min-width:900px){.drawer{display:none;}}
+      @media (prefers-reduced-motion:reduce){
+        .drawer-x span{transition:none;}
+      }
+
+      /* ---------- Footer ---------- */
+      .ft{
+        background:var(--paper);
+        margin-top:clamp(72px,10vw,130px);
+        overflow:hidden;
+      }
+      .ft-cta{
+        display:flex;flex-direction:column;gap:26px;align-items:flex-start;
+        padding:clamp(52px,7vw,92px) 0 clamp(36px,5vw,60px);
+        border-bottom:1px solid var(--line);
+      }
+      .ft-tag{text-wrap:nowrap;}
+      .ft-tag-serif{font-family:var(--serif);font-weight:400;font-style:italic;color:var(--olive-deep);}
+      .ft-cta-pill{flex:none;}
+      @media (min-width:900px){
+        .ft-cta{flex-direction:row;justify-content:space-between;align-items:center;}
+      }
+      /* En el teléfono va en una sola columna: dos columnas de enlaces cortos
+         obligan a leer en zigzag y los bloques quedan descuadrados. */
+      .ft-cols{
+        display:grid;grid-template-columns:1fr;gap:34px;
+        padding:clamp(36px,5vw,56px) 0 clamp(28px,4vw,44px);
+      }
+      @media (min-width:640px){
+        .ft-cols{grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:32px;}
+      }
+      .ft-cols .overline{margin-bottom:14px;}
+      .ft-cols a{
+        display:block;padding:6px 0;font-size:15px;color:var(--ink-60);
+        overflow-wrap:break-word;transition:color .2s;
+      }
+      /* el <wbr> hace que el correo corte después de la arroba, no a media palabra */
+      .ft-mail{font-size:14px;}
+      .ft-cols a:hover{color:var(--ink);}
+      .ft-bottom{
+        border-top:1px solid var(--line);
+        padding-top:20px;
+        /* espacio a la derecha para que la burbuja de WhatsApp no tape el texto */
+        padding-bottom:calc(30px + env(safe-area-inset-bottom));
+        font-size:var(--text-xs);color:var(--ink-60);
+        display:flex;flex-direction:column;gap:12px;
+      }
+      .ft-legal{display:flex;flex-direction:column;gap:10px;}
+      .ft-legal a{color:var(--ink-60);transition:color .2s;}
+      .ft-legal a:hover{color:var(--ink);}
+      @media (min-width:640px){
+        .ft-bottom{
+          flex-direction:row;align-items:baseline;justify-content:space-between;gap:24px;
+        }
+        .ft-legal{flex-direction:row;gap:24px;}
+      }
+      /* El nombre de la red sobra: el icono ya lo dice. En círculo se leen
+         como un par de botones y se tocan mejor que dos renglones de texto. */
+      .ft-social{display:flex;gap:10px;}
+      .ft-social a{
+        display:flex;align-items:center;justify-content:center;
+        width:46px;height:46px;border-radius:50%;
+        border:1px solid var(--line);color:var(--ink);
+        transition:color .2s,border-color .2s,background .2s;
+      }
+      .ft-social a svg{flex:none;}
+      .ft-social a:hover{
+        color:var(--olive-deep);border-color:var(--olive);background:var(--white);
+      }
+
+      /* ---------- Burbuja WhatsApp ---------- */
+      .fab-wrap{
+        position:fixed;z-index:40;
+        right:22px;bottom:calc(20px + env(safe-area-inset-bottom));
+        display:flex;align-items:center;gap:12px;
+        transition:opacity .4s var(--ease),transform .4s var(--ease);
+      }
+      .fab-wrap.fab-hidden{opacity:0;transform:translateY(16px) scale(.9);pointer-events:none;}
+      .fab{
+        position:relative;
+        width:58px;height:58px;border-radius:50%;
+        display:flex;align-items:center;justify-content:center;
+        background:linear-gradient(135deg,#2BC46E,#169654);
+        color:#fff;
+        box-shadow:0 10px 30px rgba(22,150,84,.4),inset 0 1px 0 rgba(255,255,255,.35);
+        transition:transform .3s var(--ease),box-shadow .3s;
+      }
+      .fab:hover{transform:scale(1.08) rotate(-4deg);box-shadow:0 14px 36px rgba(22,150,84,.5),inset 0 1px 0 rgba(255,255,255,.35);}
+      .fab:active{transform:scale(.94);}
+      .fab-ring{
+        position:absolute;inset:0;border-radius:50%;
+        border:2px solid rgba(43,196,110,.7);
+        animation:fabPing 3.6s var(--ease) infinite;
+      }
+      /* el tope de escala se queda dentro del margen para no generar scroll horizontal */
+      @keyframes fabPing{
+        0%,55%{transform:scale(1);opacity:0}
+        60%{transform:scale(1);opacity:.9}
+        100%{transform:scale(1.5);opacity:0}
+      }
+      .fab-tip{
+        display:none;
+        background:rgba(255,255,255,.9);
+        -webkit-backdrop-filter:blur(16px) saturate(1.6);backdrop-filter:blur(16px) saturate(1.6);
+        border:1px solid rgba(29,29,27,.06);
+        border-radius:16px 16px 4px 16px;
+        padding:10px 16px;
+        box-shadow:0 10px 34px rgba(0,0,0,.14);
+        font-size:13px;line-height:1.45;color:var(--ink);
+        opacity:0;transform:translateX(10px) scale(.96);transform-origin:right center;
+        transition:opacity .3s var(--ease),transform .3s var(--ease);
+        pointer-events:none;white-space:nowrap;
+      }
+      .fab-tip strong{font-weight:650;}
+      @media (hover:hover) and (min-width:900px){
+        .fab-tip{display:block;}
+        .fab-wrap:hover .fab-tip{opacity:1;transform:none;}
+      }
+      @media (prefers-reduced-motion:reduce){
+        .fab-ring{animation:none;}
+        .fab:hover{transform:none;}
+        .drawer-panel,.drawer-track,.scrim{transition:none;}
+      }
+    </style>
+
+    <script>
+      const hd = document.getElementById("hd");
+      const onScroll = () => hd.classList.toggle("scrolled", window.scrollY > 8);
+      onScroll();
+      addEventListener("scroll", onScroll, { passive: true });
+
+      // Drawer móvil
+      const drawer = document.getElementById("drawer");
+      const menuBtn = document.getElementById("menuBtn");
+      const openDrawer = () => {
+        drawer.hidden = false;
+        requestAnimationFrame(() => requestAnimationFrame(() => drawer.classList.add("open")));
+        hd.classList.add("menu-open");
+        menuBtn.setAttribute("aria-expanded", "true");
+        document.body.classList.add("no-scroll");
+      };
+      const closeDrawer = () => {
+        drawer.classList.remove("open");
+        hd.classList.remove("menu-open");
+        menuBtn.setAttribute("aria-expanded", "false");
+        document.body.classList.remove("no-scroll");
+        setTimeout(() => { drawer.hidden = true; drawer.classList.remove("sub"); }, 460);
+      };
+      menuBtn.addEventListener("click", openDrawer);
+      document.getElementById("drawerClose").addEventListener("click", closeDrawer);
+      document.getElementById("drawerScrim").addEventListener("click", closeDrawer);
+      document.getElementById("gotoMuebles").addEventListener("click", () => drawer.classList.add("sub"));
+      document.getElementById("backMain").addEventListener("click", () => drawer.classList.remove("sub"));
+      drawer.addEventListener("click", (e) => { if (e.target.closest("a")) closeDrawer(); });
+      // Escape cierra, como en el resto de las capas del sitio (visor, filtros
+      // y paneles de ficha). Sin esto el menú era la única que no lo hacía.
+      addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && !drawer.hidden) {
+          closeDrawer();
+          menuBtn.focus();
+        }
+      });
+
+      // Panel de categorías del header. Se abre al pasar el cursor y también
+      // al hacer clic, para que funcione con teclado y en pantallas táctiles
+      // grandes, donde no hay hover.
+      const btnMuebles = document.getElementById("hdMuebles");
+      const mega = document.getElementById("megaMuebles");
+      if (btnMuebles && mega) {
+        let cerrar;
+        const velo = document.getElementById("veloMega");
+        const cabecera = document.querySelector(".hd");
+        const abrir = () => {
+          clearTimeout(cerrar);
+          mega.hidden = false;
+          velo.hidden = false;
+          cabecera.classList.add("mega-abierto");
+          btnMuebles.setAttribute("aria-expanded", "true");
+        };
+        const cerrarYa = () => {
+          mega.hidden = true;
+          velo.hidden = true;
+          cabecera.classList.remove("mega-abierto");
+          btnMuebles.setAttribute("aria-expanded", "false");
+        };
+        // un respiro al salir, para que el cursor pueda cruzar el hueco
+        const cerrarConRetraso = () => { cerrar = setTimeout(cerrarYa, 180); };
+
+        const zona = btnMuebles.closest(".hd-item");
+        [zona, mega].forEach((el) => {
+          el.addEventListener("mouseenter", abrir);
+          el.addEventListener("mouseleave", cerrarConRetraso);
+        });
+        btnMuebles.addEventListener("click", (e) => {
+          // en táctil el primer toque abre el panel en vez de navegar
+          if (!matchMedia("(hover:hover)").matches && mega.hidden) {
+            e.preventDefault();
+            abrir();
+          }
+        });
+        btnMuebles.addEventListener("focus", abrir);
+        addEventListener("keydown", (e) => { if (e.key === "Escape") cerrarYa(); });
+        // si el foco sale del header, el panel sobra
+        document.querySelector(".hd").addEventListener("focusout", (e) => {
+          if (!e.currentTarget.contains(e.relatedTarget)) cerrarYa();
+        });
+      }
+
+      // Degradado izquierdo de los carruseles solo cuando hay scroll
+      document.querySelectorAll(".rail-mask").forEach((r) => {
+        const upd = () => r.classList.toggle("rail-scrolled", r.scrollLeft > 6);
+        upd();
+        r.addEventListener("scroll", upd, { passive: true });
+      });
+
+      // Reveal on scroll
+      const io = new IntersectionObserver(
+        (entries) => entries.forEach((en) => en.isIntersecting && (en.target.classList.add("in"), io.unobserve(en.target))),
+        { rootMargin: "0px 0px -8% 0px", threshold: 0.08 }
+      );
+      document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+
+      // La burbuja se esconde mientras haya un CTA grande de cotización en pantalla
+      // (hero, bloque final y footer), para no repetir el mismo botón tres veces.
+      const fabWrap = document.getElementById("fabWrap");
+      const ctaTargets = document.querySelectorAll("[data-hides-fab]");
+      if (fabWrap) {
+        if (!ctaTargets.length) fabWrap.classList.remove("fab-hidden");
+        else {
+          const visible = new Set();
+          const fabIO = new IntersectionObserver((entries) => {
+            entries.forEach((en) => en.isIntersecting ? visible.add(en.target) : visible.delete(en.target));
+            fabWrap.classList.toggle("fab-hidden", visible.size > 0);
+          }, { threshold: 0.12 });
+          ctaTargets.forEach((t) => fabIO.observe(t));
+        }
+      }
+    </script>
+  </body>
+</html>

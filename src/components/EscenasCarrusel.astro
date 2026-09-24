@@ -1,0 +1,155 @@
+---
+// Carrusel de zonas con puntos sobre las piezas.
+//
+// Un proyecto casi nunca es un solo espacio: el mismo piso tiene juntas, café y
+// llegada. En vez de repetir el bloque tres veces, las zonas se pasan de lado y
+// cada una trae su propio pie dentro de la foto, sobre un degradado, para que
+// se lea sin robarle sitio a la imagen.
+import EscenaHotspots from "./EscenaHotspots.astro";
+
+const { escenas = [], id = "escenas" } = Astro.props;
+const varias = escenas.length > 1;
+---
+<div class="ec" data-ec={varias ? id : null} style={`--ec-n:${escenas.length}`}>
+  <div class="ec-tira" data-ec-tira>
+    {escenas.map((e, i) => (
+      <figure class:list={["ec-slide", { "ec-slide--pie": e.pie }]} data-ec-slide={i}>
+        <EscenaHotspots img={e.img} alt={e.alt} hotspots={e.hotspots} ratio="4/5" ratioAncho="16/9" />
+        {e.pie && (
+          <div class="ec-fila">
+            <figcaption class="ec-pie">{e.pie}</figcaption>
+            {varias && <span class="ec-hueco" aria-hidden="true"></span>}
+          </div>
+        )}
+      </figure>
+    ))}
+  </div>
+
+  {varias && (
+    <>
+      <button class="ec-flecha ec-flecha--prev" type="button" data-ec-prev aria-label="Zona anterior" aria-controls={id}>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M10 3 5.5 8 10 13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button class="ec-flecha ec-flecha--next" type="button" data-ec-next aria-label="Zona siguiente" aria-controls={id}>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M6 3l4.5 5L6 13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <div class="ec-puntos" data-ec-puntos>
+        {escenas.map((e, i) => (
+          <button class:list={["ec-punto", { on: i === 0 }]} type="button" data-ec-ir={i} aria-label={`Ver ${e.pie || e.alt}`}></button>
+        ))}
+      </div>
+    </>
+  )}
+</div>
+
+<style>
+  .ec{position:relative;}
+  .ec-tira{
+    display:flex;overflow-x:auto;scroll-snap-type:x mandatory;
+    scrollbar-width:none;-webkit-overflow-scrolling:touch;
+    overscroll-behavior-x:contain;
+    border-radius:var(--radius);
+  }
+  .ec-tira::-webkit-scrollbar{display:none;}
+  .ec-slide{
+    position:relative;flex:none;width:100%;margin:0;scroll-snap-align:start;
+    background:var(--ink);
+  }
+  .ec-slide :global(.esc) > :global(img){display:block;}
+
+  /* El degradado es una capa aparte y a todo el ancho: si viviera en el pie se
+     cortaría donde termina el texto y se vería el escalón. Solo aparece cuando
+     hay pie que leer. */
+  .ec-slide--pie::after{
+    content:"";position:absolute;inset:auto 0 0 0;z-index:1;
+    height:clamp(120px,22%,220px);pointer-events:none;
+    background:linear-gradient(to top,rgba(12,11,10,.82) 0%,rgba(12,11,10,.5) 45%,rgba(12,11,10,0) 100%);
+  }
+  /* El pie vive dentro de la foto, abajo a la izquierda, y los puntos van en la
+     misma fila: separados eran dos capas sueltas que en teléfono se encimaban
+     en cuanto el texto pasaba de un renglón. El hueco reserva su sitio. */
+  .ec-fila{
+    position:absolute;inset:auto 0 0 0;z-index:2;pointer-events:none;
+    display:flex;align-items:flex-end;gap:clamp(14px,3vw,28px);
+    padding:0 clamp(16px,3vw,32px) clamp(16px,2.4vw,26px);
+  }
+  .ec-pie{
+    flex:1;min-width:0;
+    color:#fff;font-size:clamp(15px,1.2vw,18px);font-weight:500;line-height:1.4;
+    text-wrap:pretty;max-width:52ch;
+  }
+  /* Reserva el ancho exacto de la fila de puntos: el punto activo mide 20 px,
+     los demás 7 y entre ellos hay 7 de hueco. */
+  .ec-hueco{flex:none;width:calc(20px + (var(--ec-n,3) - 1) * 14px);}
+
+  /* Misma regla que el resto del sitio: en táctil se pasa con el dedo. */
+  .ec-flecha{display:none;}
+  @media (hover:hover) and (pointer:fine) and (min-width:900px){
+    .ec-flecha{
+      position:absolute;top:50%;translate:0 -50%;z-index:3;
+      display:flex;align-items:center;justify-content:center;
+      width:42px;height:42px;border-radius:50%;
+      border:0;background:rgba(255,255,255,.88);color:var(--ink);
+      -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+      opacity:0;transition:opacity .25s var(--ease),background .2s;
+    }
+    .ec:hover .ec-flecha{opacity:1;}
+    .ec-flecha:focus-visible{opacity:1;}
+    .ec-flecha:hover{background:#fff;}
+    .ec-flecha[disabled]{opacity:0 !important;pointer-events:none;}
+    .ec-flecha--prev{left:14px;}
+    .ec-flecha--next{right:14px;}
+  }
+
+  .ec-puntos{
+    position:absolute;inset:auto clamp(16px,3vw,32px) clamp(16px,2.4vw,26px) auto;
+    z-index:3;display:flex;align-items:center;gap:7px;height:1.4em;
+  }
+  .ec-punto{
+    width:7px;height:7px;padding:0;border:0;border-radius:50%;
+    background:rgba(255,255,255,.45);
+    transition:background .25s,width .25s var(--ease);
+  }
+  .ec-punto.on{width:20px;border-radius:999px;background:#fff;}
+
+  @media (prefers-reduced-motion:reduce){
+    .ec-punto{transition:none;}
+  }
+</style>
+
+<script>
+  document.querySelectorAll("[data-ec]").forEach((ec) => {
+    const tira = ec.querySelector("[data-ec-tira]");
+    const puntos = [...ec.querySelectorAll("[data-ec-ir]")];
+    const prev = ec.querySelector("[data-ec-prev]");
+    const next = ec.querySelector("[data-ec-next]");
+    const total = puntos.length;
+    if (!tira || total < 2) return;
+
+    const dondeVa = () => Math.round(tira.scrollLeft / tira.clientWidth);
+
+    const pintar = () => {
+      const i = Math.max(0, Math.min(dondeVa(), total - 1));
+      puntos.forEach((b, n) => b.classList.toggle("on", n === i));
+      prev.disabled = i <= 0;
+      next.disabled = i >= total - 1;
+    };
+
+    const ir = (i) =>
+      tira.scrollTo({
+        left: Math.max(0, Math.min(i, total - 1)) * tira.clientWidth,
+        behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+      });
+
+    tira.addEventListener("scroll", pintar, { passive: true });
+    puntos.forEach((b) => b.addEventListener("click", () => ir(Number(b.dataset.ecIr))));
+    prev.addEventListener("click", () => ir(dondeVa() - 1));
+    next.addEventListener("click", () => ir(dondeVa() + 1));
+    pintar();
+  });
+</script>

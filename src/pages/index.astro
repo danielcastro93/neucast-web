@@ -1,0 +1,192 @@
+---
+import Base from "../layouts/Base.astro";
+import SectionHead from "../components/SectionHead.astro";
+import PiezaCard from "../components/PiezaCard.astro";
+import CategoryCard from "../components/CategoryCard.astro";
+import WaButton from "../components/WaButton.astro";
+import Icon from "../components/Icon.astro";
+import VideoFrame from "../components/VideoFrame.astro";
+import { categories, destacados, waLink } from "../data/site.js";
+import { proyectoDestacado } from "../data/proyectos.js";
+import EscenaHotspots from "../components/EscenaHotspots.astro";
+import CierreCta from "../components/CierreCta.astro";
+import { buscarPieza } from "../data/catalogo.js";
+
+const piezasDestacadas = destacados.map(buscarPieza).filter(Boolean);
+const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+---
+<Base overlayHeader={true}>
+  <!-- ============ HERO ============ -->
+  <section class="hero" data-hides-fab>
+    <img class="hero-img" src="/img/hero-oficina.jpg" alt="Oficina corporativa amueblada por Neucast con escritorios y sillería de diseño" fetchpriority="high" />
+    <div class="hero-shade" aria-hidden="true"></div>
+    <div class="hero-content container">
+      <p class="serif-eyebrow hero-eyebrow"><span class="rise" style="--delay:.85s">Mobiliario corporativo de diseño</span></p>
+      <h1 class="display t-display hero-title">
+        <span class="paint-line" style="--i:0">Espacios de trabajo</span>{' '}
+        <span class="paint-line" style="--i:1">que la gente disfruta</span>
+      </h1>
+      <p class="hero-sub fade-in" style="--delay:1s">Mobiliario de oficina de diseño para recepciones, salas de juntas, cafeterías y áreas comunes. Envíos a todo México.</p>
+      <div class="hero-ctas fade-in" style="--delay:1.12s">
+        <a class="pill" href="/muebles/">Explora el catálogo <Fragment set:html={arrow} /></a>
+        <a class="pill pill--glass" href={waLink("Hola, quiero cotizar un proyecto de mobiliario.")} target="_blank" rel="noopener">Cotiza tu proyecto</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CATEGORÍAS ============ -->
+  <section class="cats" id="muebles">
+    <div class="container reveal">
+      <SectionHead title="¿Qué estás buscando?" rail="catRail" />
+    </div>
+    <div class="rail rail-mask reveal reveal-d1" id="catRail">
+      {categories.map((c) => <CategoryCard category={c} />)}
+    </div>
+  </section>
+
+  <!-- ============ PIEZAS DESTACADAS ============ -->
+  <section class="prods">
+    <div class="container reveal">
+      <SectionHead title="Piezas destacadas" rail="prodRail" />
+    </div>
+    <div class="rail rail-mask reveal reveal-d1" id="prodRail">
+      {piezasDestacadas.map((p) => <PiezaCard pieza={p} ancho="min(64vw,300px)" />)}
+    </div>
+  </section>
+
+  <!-- ============ PROYECTO DESTACADO + HOTSPOTS ============ -->
+  <section class="proj" id="proyectos">
+    <div class="container">
+      <div class="reveal">
+        <SectionHead title="Proyectos reales" linkHref="/proyectos/" linkLabel="Ver todos los proyectos" />
+      </div>
+      <figure class="proj-stage reveal reveal-d1">
+        <EscenaHotspots
+          img={proyectoDestacado.portada.img}
+          alt={proyectoDestacado.portada.alt}
+          hotspots={proyectoDestacado.portada.hotspots}
+        />
+        <figcaption class="proj-caption">
+          <p class="serif-eyebrow">{proyectoDestacado.espacio} · {proyectoDestacado.ciudad}</p>
+          <h3 class="display t-h3 proj-name">{proyectoDestacado.nombre}</h3>
+          <p class="proj-intro">{proyectoDestacado.resumen}</p>
+          <a class="proj-link label" href={`/proyectos/${proyectoDestacado.slug}/`}>
+            Recorrer el proyecto <Fragment set:html={arrow} />
+          </a>
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============ EDITORIAL / NOSOTROS ============ -->
+  <section class="edit" id="nosotros">
+    <div class="container edit-grid">
+      <div class="edit-media reveal">
+        <VideoFrame
+          src="/video/editorial-neucast.mp4"
+          poster="/video/editorial-neucast-poster.jpg"
+          alt="Detalle de la costura y el canto de un sillón de piel"
+          ratio="4/3"
+        />
+      </div>
+      <div class="edit-copy reveal reveal-d1">
+        <p class="serif-eyebrow">La idea es simple</p>
+        <h2 class="display t-h2 edit-title">El mobiliario correcto cambia cómo trabaja tu equipo</h2>
+        <p class="edit-text">
+          En Neucast seleccionamos muebles para oficina que resisten el uso corporativo
+          diario y los convertimos en espacios completos: desde una sala de juntas hasta
+          la cafetería entera. Tú nos cuentas cómo trabaja tu equipo; nosotros lo amueblamos.
+        </p>
+        <ul class="edit-points">
+          <li>Envíos e instalación en todo México</li>
+          <li>Acompañamiento de diseño sin costo</li>
+          <li>Cotización directa por WhatsApp</li>
+        </ul>
+        <a class="pill pill--ghost" href="/nosotros/">Conoce Neucast <Fragment set:html={arrow} /></a>
+      </div>
+    </div>
+  </section>
+
+  <CierreCta />
+
+  <style>
+    /* cabeceras, cards y controles viven en sus componentes */
+    section{margin-top:var(--section-y);}
+
+    /* ---------- Hero ---------- */
+    .hero{
+      position:relative;margin-top:0;
+      height:min(100svh,900px);min-height:540px;
+      display:flex;align-items:flex-end;
+    }
+    .hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+    .hero-shade{
+      position:absolute;inset:0;
+      background:
+        linear-gradient(to top,rgba(15,15,12,.82) 0%,rgba(15,15,12,.46) 40%,rgba(15,15,12,.14) 72%),
+        linear-gradient(to bottom,rgba(15,15,12,.34),rgba(15,15,12,0) 26%),
+        rgba(15,15,12,.16);
+    }
+    .hero-content{
+      position:relative;width:100%;color:#fff;
+      padding-bottom:clamp(36px,7vh,84px);
+      text-shadow:0 1px 22px rgba(0,0,0,.28);
+    }
+    .hero-ctas{text-shadow:none;}
+    .hero-content h1{margin:10px 0 14px;}
+    /* el hero anima al cargar, sin esperar scroll */
+    .hero-content{--play:running;}
+    /* el matiz va en el color, no en opacity, para no pelear con la animación de entrada */
+    /* ancho pensado para que el texto caiga en dos renglones en escritorio */
+    .hero-sub{font-size:var(--fs-body-lg);color:rgba(255,255,255,.92);max-width:60ch;}
+    .hero-ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px;}
+    .hero .pill--glass{color:#fff;background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.35);}
+    .hero .pill--glass:hover{background:rgba(255,255,255,.26);}
+
+    /* ---------- Proyecto + hotspots ---------- */
+    .proj-stage{position:relative;margin:0;border-radius:var(--radius);overflow:hidden;background:var(--ink);}
+    .proj-caption{
+      position:relative;color:#fff;padding:22px 20px 24px;
+      background:linear-gradient(to top,rgba(15,15,12,.95),rgba(15,15,12,.7));
+      margin-top:-1px;
+    }
+    @media (min-width:900px){
+      .proj-caption{
+        position:absolute;left:0;right:0;bottom:0;padding:110px 44px 36px;
+        background:linear-gradient(to top,rgba(15,15,12,.92) 0%,rgba(15,15,12,.62) 48%,rgba(15,15,12,0) 100%);
+        /* el overlay no debe bloquear los clics a los hotspots */
+        pointer-events:none;
+      }
+    }
+    .proj-name{margin:6px 0 8px;}
+    .proj-intro{max-width:52ch;font-size:14.5px;opacity:.9;}
+    .proj-link{
+      display:inline-flex;align-items:center;gap:8px;margin-top:16px;
+      color:#fff;opacity:.9;transition:gap .25s var(--ease),opacity .2s;
+    }
+    .proj-link:hover{gap:12px;opacity:1;}
+    .proj-hint-dot{
+      width:9px;height:9px;border-radius:50%;background:#fff;flex:none;
+      box-shadow:0 0 0 3px rgba(255,255,255,.25);
+    }
+
+
+    /* ---------- Editorial ---------- */
+    .edit{background:var(--paper);padding-block:clamp(56px,8vw,110px);}
+    .edit-grid{display:grid;grid-template-columns:1fr;gap:clamp(28px,5vw,72px);align-items:center;}
+    .edit-copy{order:1;}
+    .edit-media{order:2;}
+    @media (min-width:900px){.edit-grid{grid-template-columns:1fr 1fr;}}
+    
+    .edit-title{margin:10px 0 16px;}
+    .edit-text{color:var(--ink-60);max-width:52ch;}
+    .edit-points{list-style:none;padding:0;margin:22px 0 28px;display:flex;flex-direction:column;gap:10px;}
+    .edit-points li{display:flex;align-items:center;gap:12px;font-size:15px;}
+    .edit-points li::before{
+      content:"";width:6px;height:6px;border-radius:50%;background:var(--olive);flex:none;
+    }
+    .edit .pill--ghost:hover{background:var(--white);}
+
+  </style>
+
+</Base>

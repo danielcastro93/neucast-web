@@ -1,0 +1,84 @@
+---
+// Bloque de cierre con foto de fondo.
+//
+// Vivía en el home. Salió a componente cuando la página de proyecto pidió el
+// mismo remate: el final de una lectura larga tiene que verse igual en todo el
+// sitio, con el mismo tamaño de letra y la misma entrada.
+import { waLink } from "../data/site.js";
+
+const {
+  eyebrow = "Cuéntanos tu proyecto",
+  lineas = ["Tu oficina nueva", "empieza con un mensaje"],
+  img = "/img/cta-sillones.jpg",
+  mensaje = "Hola, quiero cotizar un proyecto de mobiliario para mi empresa.",
+} = Astro.props;
+---
+<section class="cta" data-hides-fab>
+  <img class="cta-bg" src={img} alt="" loading="lazy" aria-hidden="true" />
+  <div class="cta-shade" aria-hidden="true"></div>
+  <div class="container cta-inner" data-cta>
+    <p class="serif-eyebrow"><span class="rise" style="--delay:1s">{eyebrow}</span></p>
+    <h2 class="display t-h1 cta-title">
+      {lineas.map((l, i) => (
+        <>
+          <span class="paint-line" style={`--i:${i}`}>{l}</span>{" "}
+        </>
+      ))}
+    </h2>
+    <div class="cta-acciones fade-in" style="--delay:1.15s">
+      <a class="pill pill--wa" href={waLink(mensaje)} target="_blank" rel="noopener">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a9.9 9.9 0 0 0-8.5 15.1L2 22l5-1.4A10 10 0 1 0 12 2Zm5.5 14.1c-.2.7-1.3 1.3-1.9 1.4-.5.1-1.1.1-1.8-.1-.4-.1-.9-.3-1.6-.6-2.9-1.2-4.7-4.1-4.9-4.3-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5s.8 1.9.8 2c.1.1.1.3 0 .4l-.3.5-.4.5c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.7-.1l1-1.2c.2-.3.4-.2.7-.1l2 1c.3.1.5.2.5.3.1.1.1.6-.1 1.1Z"/></svg>
+        Escríbenos por WhatsApp
+      </a>
+      <a class="pill pill--glass" href="/contacto/">O mándanos tu solicitud</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta{
+    position:relative;overflow:hidden;border-radius:var(--radius);
+    margin:var(--section-y) var(--gutter) 0;
+  }
+  @media (min-width:1500px){
+    .cta{margin-inline:auto;max-width:calc(var(--container) - var(--gutter) * 2);}
+  }
+  .cta-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 72%;}
+  /* en móvil el encuadre se corre para que los sillones queden bajo los botones */
+  @media (max-width:899px){
+    .cta-bg{object-position:57% 88%;}
+    /* la sección ya tiene margen propio: el interior no repite el gutter completo */
+    .cta .cta-inner{padding-bottom:210px;padding-inline:var(--space-4);}
+  }
+  .cta-shade{position:absolute;inset:0;background:rgba(15,15,12,.55);}
+  .cta-inner{
+    position:relative;color:#fff;text-align:left;
+    padding-block:clamp(64px,10vw,130px);
+  }
+  .cta-title{margin:10px 0 26px;}
+  /* Con clase propia y no la del hero: la del hero vive en el ámbito del home y
+     aquí los botones quedaban pegados. */
+  .cta-acciones{display:flex;flex-wrap:wrap;gap:16px;}
+
+  /* el bloque final espera a estar en pantalla para animar */
+  .cta-inner{--play:paused;}
+  .cta-inner.in-view{--play:running;}
+  .cta :global(.pill--glass){color:#fff;background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.35);}
+  .cta :global(.pill--glass:hover){background:rgba(255,255,255,.24);}
+</style>
+
+<script>
+  document.querySelectorAll("[data-cta]").forEach((bloque) => {
+    new IntersectionObserver(
+      (entradas, obs) => {
+        entradas.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("in-view");
+            obs.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.35 }
+    ).observe(bloque);
+  });
+</script>
