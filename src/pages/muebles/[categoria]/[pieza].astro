@@ -581,11 +581,15 @@ const waPieza = waLink(`Hola, me interesa ${pieza.tipo} ${pieza.nombre} que vi e
     }
     .pd-clave-fila dt{font-size:var(--fs-xs);color:var(--ink-60);}
     .pd-clave-fila dd{font-size:var(--fs-sm);font-weight:600;text-align:right;}
+    /* Zona de toque de 44 px en teléfono sin mover el texto de sitio: no es un
+       enlace dentro de un párrafo, es un dato de la tabla y se toca solo. */
     .pd-clave-fila dd a{
+      display:inline-flex;align-items:center;min-height:44px;
       color:var(--olive-deep);text-decoration:underline;
       text-underline-offset:3px;text-decoration-thickness:1px;
       transition:color .2s;
     }
+    @media (min-width:900px){.pd-clave-fila dd a{min-height:0;}}
     @media (hover:hover){.pd-clave-fila dd a:hover{color:var(--ink);}}
 
     /* ---------- acciones ---------- */
@@ -669,7 +673,9 @@ const waPieza = waLink(`Hola, me interesa ${pieza.tipo} ${pieza.nombre} que vi e
     .pd-rel-link{
       display:inline-flex;align-items:center;gap:7px;color:var(--ink-60);
       white-space:nowrap;transition:color .2s,gap .2s var(--ease);
+      min-height:44px;
     }
+    @media (min-width:900px){.pd-rel-link{min-height:0;}}
     @media (hover:hover){.pd-rel-link:hover{color:var(--ink);gap:11px;}}
 
     /* ---------- contenido de los paneles ---------- */

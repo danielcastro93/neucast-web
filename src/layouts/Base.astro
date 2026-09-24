@@ -282,7 +282,9 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
       }
       .hd.overlay:not(.scrolled):not(.mega-abierto) .hd-burger span{background:#fff;}
       .hd-inner{height:var(--header-h);display:flex;align-items:center;gap:20px;}
-      .hd-logo{display:flex;align-items:center;flex:none;}
+      /* El logo mide 18 px de alto, pero el enlace tiene que dar los 44 que
+         pide un dedo: se estira sin mover el dibujo. */
+      .hd-logo{display:flex;align-items:center;flex:none;min-height:44px;}
       /* en móvil el logo se centra en la barra (patrón BoConcept) y baja de tamaño,
          así deja de verse apretado entre el menú y el botón */
       /* en móvil el logo va a la izquierda, junto al menú, y baja de tamaño */
@@ -618,6 +620,10 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
         position:absolute;inset:0;border-radius:50%;
         border:2px solid rgba(43,196,110,.7);
         animation:fabPing 3.6s var(--ease) infinite;
+        /* El anillo crece a 1.5 y, al ser hijo del enlace, se llevaba los
+           toques de lo que hubiera alrededor de la burbuja, pero solo en la
+           parte del pulso en la que estaba grande. Es decoración: no recibe. */
+        pointer-events:none;
       }
       /* el tope de escala se queda dentro del margen para no generar scroll horizontal */
       @keyframes fabPing{

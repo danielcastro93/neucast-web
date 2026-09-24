@@ -244,7 +244,12 @@ const waMensaje = `Hola, vi el proyecto de ${proyecto.espacio.toLowerCase()} en 
     /* ---------- apertura ---------- */
     .pr-head{margin-bottom:clamp(26px,3.5vw,44px);}
     .pr-eyebrow{display:flex;flex-wrap:wrap;align-items:center;gap:7px;}
-    .pr-eyebrow a{color:var(--olive-deep);transition:color .2s;}
+    /* zona de toque de 44 px sin cambiar dónde se ve el texto */
+    .pr-eyebrow a{
+      display:inline-flex;align-items:center;min-height:44px;
+      color:var(--olive-deep);transition:color .2s;
+    }
+    @media (min-width:900px){.pr-eyebrow a{min-height:0;}}
     @media (hover:hover){.pr-eyebrow a:hover{color:var(--ink);}}
     .pr-eyebrow span{color:var(--ink-40);}
     /* El H1 siempre a dos renglones: la medida se ensancha lo necesario para
