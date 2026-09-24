@@ -96,28 +96,6 @@ const datos = {
   .pz[hidden]{display:none;}
   .pz--rail{width:var(--pz-w);}
 
-  /* Dentro de un carrusel horizontal, el carrusel de fotos competiría con el
-     del riel: el dedo no puede mandar a los dos. En táctil se queda la foto
-     principal y el gesto mueve el riel; con cursor fino sí hay flechas.
-
-     Esconder el desbordamiento no basta: la tira sigue siendo desplazable por
-     dentro y cualquier cosa que mueva el scroll la deja corrida. En táctil las
-     demás fotos no se pintan, así que no hay nada que desplazar. */
-  .pz--rail .pz-fotos{overflow-x:hidden;}
-  @media (hover:hover) and (pointer:fine){
-    .pz--rail .pz-fotos{overflow-x:auto;}
-  }
-  @media not all and (pointer:fine){
-    /* Sin touch-action: declarar pan-y aquí le decía al navegador que en esta
-       foto solo valen los gestos verticales, así que el swipe horizontal que
-       tenía que mover el riel entero moría sobre la imagen. Como las demás
-       fotos no se pintan, aquí dentro no hay nada que desplazar y el gesto
-       llega solo al riel. */
-    .pz--rail .pz-fotos{scroll-snap-type:none;}
-    .pz--rail .pz-fotos img:not(:first-child){display:none;}
-    .pz--rail .pz-puntos{display:none;}
-  }
-
   .pz-marco{
     position:relative;overflow:hidden;
     border-radius:var(--radius);background:var(--paper-soft);
@@ -156,6 +134,26 @@ const datos = {
   /* la segunda foto es de ambiente: esa sí llena el marco */
   .pz-fotos img:not(:first-child){object-fit:cover;padding:0;}
 
+  /* En táctil la tarjeta enseña solo la foto principal, esté donde esté.
+     La tira es un contenedor que se desplaza en horizontal, y en la cuadrícula
+     del catálogo hay veinte llenando la pantalla. En el teléfono, un
+     deslizamiento vertical que empieza sobre una foto se engancha a ese
+     carrusel y la página no baja: hay que levantar el dedo y repetir. Entre
+     pasar fotos y poder recorrer la página, manda la página.
+
+     Esconder el desbordamiento no basta, porque la tira sigue siendo
+     desplazable por dentro. Si las demás fotos no se pintan, no hay nada que
+     desplazar y no hay gesto que robar.
+
+     Las fotos completas siguen estando en la ficha de la pieza, que es donde
+     alguien las busca de verdad. Con cursor fino no hay conflicto y se quedan
+     el carrusel, sus flechas y sus puntos. */
+  @media not all and (pointer:fine){
+    .pz-fotos{overflow-x:hidden;scroll-snap-type:none;}
+    .pz-fotos img:not(:first-child){display:none;}
+  }
+
+
   /* flechas: sobre la foto, a los lados, solo con cursor fino y al acercarse */
   .pz-flecha{
     position:absolute;top:50%;translate:0 -50%;z-index:2;
@@ -182,10 +180,14 @@ const datos = {
     .pz-marco:hover .pz-fotos img:first-child{transform:scale(1.03);}
   }
 
-  /* puntos: la única señal en táctil de que hay más fotos */
+  /* Puntos: la señal de que hay más fotos. En táctil no hay más fotos, así que
+     no hay nada que señalar. */
   .pz-puntos{
     position:absolute;bottom:12px;left:50%;translate:-50% 0;z-index:2;
     display:flex;gap:5px;
+  }
+  @media not all and (pointer:fine){
+    .pz-puntos{display:none;}
   }
   .pz-punto{
     width:5px;height:5px;border-radius:50%;

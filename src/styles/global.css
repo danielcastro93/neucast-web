@@ -194,7 +194,11 @@ h1,h2,h3,h4,p{margin:0;}
   padding-inline:var(--rail-pad);
   scroll-padding-left:var(--rail-pad);
   scrollbar-width:none;
-  -webkit-overflow-scrolling:touch;
+  /* El desplazamiento horizontal no se encadena al de fuera: sin esto, al
+     llegar al final el gesto se va al contenedor de al lado o al gesto de
+     "atrás" del sistema, y el dedo se siente enganchado. La vertical se queda
+     en auto, que es la que tiene que llegar a la página. */
+  overscroll-behavior-x:contain;
 }
 .rail::-webkit-scrollbar{display:none;}
 .rail > *{scroll-snap-align:start;flex:none;}

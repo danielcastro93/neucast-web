@@ -166,9 +166,16 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
        porque las tarjetas de los puntos se salen de la imagen */
     .proj-stage :global(.esc) > :global(img){border-radius:var(--radius-sm);}
     .proj-caption{
+      position:relative;
       display:flex;flex-direction:column;
       padding:14px 4px 4px;color:var(--ink);
     }
+    /* Todo el bloque de texto lleva al proyecto, no solo la pastilla: en una
+       tarjeta la gente toca el título o la descripción. El enlace estira una
+       capa invisible sobre el pie, que en teléfono va debajo de la foto y no
+       pisa los puntos. De 900 para arriba el pie se monta sobre la imagen, así
+       que ahí la capa no va: taparía los puntos. */
+    .proj-link::after{content:"";position:absolute;inset:0;}
     .proj-caption :global(.serif-eyebrow){color:var(--olive-deep);}
     .proj-name{margin:6px 0 8px;}
     .proj-intro{font-size:14.5px;color:var(--ink-60);}
@@ -200,6 +207,7 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
         background:none;color:#fff;opacity:.9;
         transition:gap .25s var(--ease),opacity .2s;
       }
+      .proj-link::after{content:none;}
       @media (hover:hover){.proj-link:hover{background:none;gap:12px;opacity:1;}}
     }
     .proj-hint-dot{

@@ -602,9 +602,14 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
         position:fixed;z-index:40;
         right:22px;bottom:calc(20px + env(safe-area-inset-bottom));
         display:flex;align-items:center;gap:12px;
-        transition:opacity .4s var(--ease),transform .4s var(--ease);
+        /* Solo se desvanece, no se mueve. Antes entraba subiendo y creciendo,
+           y si el dedo caía sobre ella mientras terminaba de entrar, el
+           navegador descartaba ese toque por moverse el destino: había que
+           tocar dos veces. Aparece muchas veces al recorrer la página, así
+           que pasaba seguido. */
+        transition:opacity .4s var(--ease);
       }
-      .fab-wrap.fab-hidden{opacity:0;transform:translateY(16px) scale(.9);pointer-events:none;}
+      .fab-wrap.fab-hidden{opacity:0;pointer-events:none;}
       .fab{
         position:relative;
         width:58px;height:58px;border-radius:50%;
