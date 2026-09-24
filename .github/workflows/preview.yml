@@ -1,0 +1,50 @@
+# Publica la vista previa del sitio en GitHub Pages.
+#
+# Es una copia para revisar, no el sitio de producción. Va con noindex y con un
+# robots.txt que cierra todo, para que no compita con neucast.com.mx.
+#
+# El sitio real se publica en Hostinger subiendo la carpeta dist/ tal cual sale
+# de `npm run build`, sin el paso de preview.
+name: Vista previa
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  compilar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm run revisar
+      - name: Ajustar para la subcarpeta de Pages
+        run: node scripts/preparar-preview.mjs "/${{ github.event.repository.name }}"
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  publicar:
+    needs: compilar
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

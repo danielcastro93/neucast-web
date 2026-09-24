@@ -7,12 +7,13 @@ import WaButton from "../components/WaButton.astro";
 import Icon from "../components/Icon.astro";
 import VideoFrame from "../components/VideoFrame.astro";
 import { categories, destacados, waLink } from "../data/site.js";
-import { proyectoDestacado } from "../data/proyectos.js";
+import { proyectoDestacado, escenaDeHome } from "../data/proyectos.js";
 import EscenaHotspots from "../components/EscenaHotspots.astro";
 import CierreCta from "../components/CierreCta.astro";
 import { buscarPieza } from "../data/catalogo.js";
 
 const piezasDestacadas = destacados.map(buscarPieza).filter(Boolean);
+const escenaHome = escenaDeHome(proyectoDestacado);
 const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 ---
 <Base overlayHeader={true}>
@@ -62,9 +63,9 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
       </div>
       <figure class="proj-stage reveal reveal-d1">
         <EscenaHotspots
-          img={proyectoDestacado.portada.img}
-          alt={proyectoDestacado.portada.alt}
-          hotspots={proyectoDestacado.portada.hotspots}
+          img={escenaHome.img}
+          alt={escenaHome.alt}
+          hotspots={escenaHome.hotspots}
         />
         <figcaption class="proj-caption">
           <p class="serif-eyebrow">{proyectoDestacado.espacio} · {proyectoDestacado.ciudad}</p>

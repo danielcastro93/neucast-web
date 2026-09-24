@@ -699,3 +699,12 @@ export const proyectoPorSlug = (slug) => proyectos.find((x) => x.slug === slug);
 // El home enseña uno. Es el primero de la lista para no tener dos fuentes: si
 // mañana se reordena, el home sigue solo.
 export const proyectoDestacado = proyectos[0];
+
+// La escena con puntos que enseña el home. La portada dejó de llevar puntos
+// cuando se rehizo la página de proyecto, así que el home toma la primera zona
+// del carrusel, que sí los trae. Si un proyecto no tuviera zonas, cae en la
+// portada y se enseña sin puntos, que es lo que hacía antes.
+export const escenaDeHome = (proyecto) => {
+  const zonas = proyecto.bloques.find((b) => b.tipo === "escenas");
+  return zonas ? zonas.escenas[0] : proyecto.portada;
+};

@@ -26,3 +26,9 @@ pnpm-debug.log*
 # notas internas: no se publican
 .interno/
 NOTAS-INTERNAS.md
+
+# la documentación va aparte, no en el repositorio público
+docs/
+AGENTS.md
+CLAUDE.md
+.claude/
