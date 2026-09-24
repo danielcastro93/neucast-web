@@ -329,8 +329,7 @@ páginas legales. Son los últimos huecos antes de publicar.
 - [ ] **Para `LocalBusiness`:** domicilio completo, teléfono fijo y horario de
       atención. Sin esos tres no se puede declarar.
 - [ ] **Para los legales:** razón social, RFC, domicilio fiscal y jurisdicción.
-- [ ] **Logo en tamaño grande.** El que hay mide 112 px, que es el mínimo. Con
-      uno de 512 px se ve mejor donde Google lo use.
+- [x] Logo cuadrado de 512 px para el esquema `Organization`. Resuelto.
 
 ## Proyectos: los cuatro casos son de maqueta
 
