@@ -190,7 +190,7 @@ const schema = {
     }
     .ct-check input{margin-top:2px;flex:none;width:17px;height:17px;accent-color:var(--olive);}
     .ct-check a{color:var(--ink);font-weight:600;border-bottom:1px solid var(--line);}
-    .ct-check a:hover{color:var(--olive-deep);border-color:var(--olive);}
+    @media (hover:hover){.ct-check a:hover{color:var(--olive-deep);border-color:var(--olive);}}
 
     .ct-boton{width:100%;height:52px;margin-top:6px;}
     .ct-boton[disabled]{pointer-events:none;}

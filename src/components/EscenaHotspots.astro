@@ -78,7 +78,7 @@ const puntos = hotspots
     100%{transform:scale(1.55);opacity:0}
   }
   @media (prefers-reduced-motion:reduce){.spot-dot::after{animation:none;}}
-  .spot-dot:hover{transform:scale(1.12);}
+  @media (hover:hover){.spot-dot:hover{transform:scale(1.12);}}
   .spot.open .spot-dot{background:var(--white);}
   .spot.open .spot-dot span{transform:scale(.65);background:var(--olive);}
   .spot.open .spot-dot::after{animation:none;opacity:0;}

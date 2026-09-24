@@ -303,8 +303,8 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
         transform:scaleX(0);transform-origin:left center;
         transition:transform .35s var(--ease);
       }
-      .hd-nav a:hover{opacity:1;}
-      .hd-nav a:hover::after{transform:scaleX(1);}
+      @media (hover:hover){.hd-nav a:hover{opacity:1;}}      
+      @media (hover:hover){.hd-nav a:hover::after{transform:scaleX(1);}}
       .hd-item{position:relative;}
       .hd-muebles{display:inline-flex;align-items:center;gap:5px;}
       .hd-chevron{transition:transform .3s var(--ease);}
@@ -318,14 +318,14 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
         background:var(--wa);color:#fff;border:1px solid transparent;
         transition:transform .2s var(--ease),background .35s,border-color .35s,color .35s;
       }
-      .hd-wa:hover{background:#169654;}
+      @media (hover:hover){.hd-wa:hover{background:#169654;}}
       .hd-wa:active{transform:scale(.96);}
       .hd.overlay:not(.scrolled):not(.mega-abierto) .hd-wa{
         background:rgba(255,255,255,.16);
         border-color:rgba(255,255,255,.35);
         -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
       }
-      .hd.overlay:not(.scrolled):not(.mega-abierto) .hd-wa:hover{background:rgba(255,255,255,.28);}
+      @media (hover:hover){.hd.overlay:not(.scrolled):not(.mega-abierto) .hd-wa:hover{background:rgba(255,255,255,.28);}}
 
       /* ---------- Panel de categorías del header ---------- */
     /* mismo velo difuminado que el panel de filtros */
@@ -377,7 +377,7 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
       padding:7px;border-radius:var(--radius-sm);
       transition:background .2s var(--ease);
     }
-    .hd-mega-cat:hover{background:var(--paper);}
+    @media (hover:hover){.hd-mega-cat:hover{background:var(--paper);}}
     .hd-mega-thumb{
       flex:none;width:52px;height:52px;
       border-radius:var(--radius-sm);overflow:hidden;background:var(--paper);
@@ -387,7 +387,7 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
       font-size:var(--fs-sm);font-weight:600;color:var(--ink);
       letter-spacing:0;
     }
-    .hd-mega-cat:hover .hd-mega-nombre{color:var(--olive-deep);}
+    @media (hover:hover){.hd-mega-cat:hover .hd-mega-nombre{color:var(--olive-deep);}}
 
     /* bloque de apoyo a la derecha */
     .hd-promo{
@@ -417,9 +417,9 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
       font-size:var(--fs-xs);font-weight:600;
       transition:background .25s var(--ease);
     }
-    .hd-promo:hover .hd-promo-cta{background:#000;}
+    @media (hover:hover){.hd-promo:hover .hd-promo-cta{background:#000;}}
     .hd-promo-cta svg{transition:transform .25s var(--ease);}
-    .hd-promo:hover .hd-promo-cta svg{transform:translateX(3px);}
+    @media (hover:hover){.hd-promo:hover .hd-promo-cta svg{transform:translateX(3px);}}
     /* sobre el hero el header es transparente, pero el panel nunca lo es */
     .hd.overlay:not(.scrolled):not(.mega-abierto) .hd-mega{color:var(--ink);}
 
@@ -488,6 +488,12 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
         width:50%;flex:none;overflow-y:auto;
         display:flex;flex-direction:column;
         padding:6px 20px calc(24px + env(safe-area-inset-bottom));
+        /* solo se mueve en vertical, y al llegar al final no arrastra la
+           página de atrás: las dos cosas juntas son lo que hacía que el
+           scroll del menú se sintiera trabado en el teléfono */
+        touch-action:pan-y;
+        overscroll-behavior:contain;
+        -webkit-overflow-scrolling:touch;
       }
       .drow{
         display:flex;align-items:center;justify-content:space-between;gap:12px;
@@ -508,7 +514,10 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
         width:52px;height:52px;border-radius:11px;overflow:hidden;flex:none;background:var(--paper);
       }
       .crow-thumb img{width:100%;height:100%;object-fit:cover;}
-      body.no-scroll{overflow:hidden;}
+      /* Fijar el body, no solo esconder su scroll: en iOS `overflow:hidden`
+         deja que la página de atrás se siga moviendo y el dedo se pelea entre
+         las dos. La posición la guarda y la devuelve src/scripts/bloqueo-scroll.js */
+      body.no-scroll{position:fixed;left:0;right:0;width:100%;overflow:hidden;}
       @media (min-width:900px){.drawer{display:none;}}
       @media (prefers-reduced-motion:reduce){
         .drawer-x span{transition:none;}
@@ -547,7 +556,7 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
       }
       /* el <wbr> hace que el correo corte después de la arroba, no a media palabra */
       .ft-mail{font-size:14px;}
-      .ft-cols a:hover{color:var(--ink);}
+      @media (hover:hover){.ft-cols a:hover{color:var(--ink);}}
       .ft-bottom{
         border-top:1px solid var(--line);
         padding-top:20px;
@@ -556,14 +565,21 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
         font-size:var(--text-xs);color:var(--ink-60);
         display:flex;flex-direction:column;gap:12px;
       }
-      .ft-legal{display:flex;flex-direction:column;gap:10px;}
-      .ft-legal a{color:var(--ink-60);transition:color .2s;}
-      .ft-legal a:hover{color:var(--ink);}
+      /* En teléfono van uno debajo del otro y el texto es chico, así que cada
+         enlace se lleva su propia zona de toque de 44 px de alto. Con solo
+         separarlos seguiría siendo fácil darle al de al lado. */
+      .ft-legal{display:flex;flex-direction:column;gap:6px;margin-block:-10px;}
+      .ft-legal a{
+        display:inline-flex;align-items:center;min-height:44px;
+        color:var(--ink-60);transition:color .2s;
+      }
+      @media (hover:hover){.ft-legal a:hover{color:var(--ink);}}
       @media (min-width:640px){
         .ft-bottom{
           flex-direction:row;align-items:baseline;justify-content:space-between;gap:24px;
         }
-        .ft-legal{flex-direction:row;gap:24px;}
+        .ft-legal{flex-direction:row;gap:24px;margin-block:0;}
+        .ft-legal a{min-height:0;}
       }
       /* El nombre de la red sobra: el icono ya lo dice. En círculo se leen
          como un par de botones y se tocan mejor que dos renglones de texto. */
@@ -575,9 +591,9 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
         transition:color .2s,border-color .2s,background .2s;
       }
       .ft-social a svg{flex:none;}
-      .ft-social a:hover{
+      @media (hover:hover){.ft-social a:hover{
         color:var(--olive-deep);border-color:var(--olive);background:var(--white);
-      }
+      }}
 
       /* ---------- Burbuja WhatsApp ---------- */
       .fab-wrap{
@@ -596,7 +612,7 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
         box-shadow:0 10px 30px rgba(22,150,84,.4),inset 0 1px 0 rgba(255,255,255,.35);
         transition:transform .3s var(--ease),box-shadow .3s;
       }
-      .fab:hover{transform:scale(1.08) rotate(-4deg);box-shadow:0 14px 36px rgba(22,150,84,.5),inset 0 1px 0 rgba(255,255,255,.35);}
+      @media (hover:hover){.fab:hover{transform:scale(1.08) rotate(-4deg);box-shadow:0 14px 36px rgba(22,150,84,.5),inset 0 1px 0 rgba(255,255,255,.35);}}
       .fab:active{transform:scale(.94);}
       .fab-ring{
         position:absolute;inset:0;border-radius:50%;
@@ -629,12 +645,13 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
       }
       @media (prefers-reduced-motion:reduce){
         .fab-ring{animation:none;}
-        .fab:hover{transform:none;}
+        @media (hover:hover){.fab:hover{transform:none;}}
         .drawer-panel,.drawer-track,.scrim{transition:none;}
       }
     </style>
 
     <script>
+      import { bloquear, soltar } from "../scripts/bloqueo-scroll.js";
       const hd = document.getElementById("hd");
       const onScroll = () => hd.classList.toggle("scrolled", window.scrollY > 8);
       onScroll();
@@ -648,13 +665,13 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
         requestAnimationFrame(() => requestAnimationFrame(() => drawer.classList.add("open")));
         hd.classList.add("menu-open");
         menuBtn.setAttribute("aria-expanded", "true");
-        document.body.classList.add("no-scroll");
+        bloquear();
       };
       const closeDrawer = () => {
         drawer.classList.remove("open");
         hd.classList.remove("menu-open");
         menuBtn.setAttribute("aria-expanded", "false");
-        document.body.classList.remove("no-scroll");
+        soltar();
         setTimeout(() => { drawer.hidden = true; drawer.classList.remove("sub"); }, 460);
       };
       menuBtn.addEventListener("click", openDrawer);
@@ -717,11 +734,17 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
         });
       }
 
-      // Degradado izquierdo de los carruseles solo cuando hay scroll
+      // Los degradados de los carruseles avisan de que hay más a un lado. El de
+      // la izquierda aparece cuando ya se movió, y los dos desaparecen al
+      // llegar al final, donde ya no hay nada que avisar.
       document.querySelectorAll(".rail-mask").forEach((r) => {
-        const upd = () => r.classList.toggle("rail-scrolled", r.scrollLeft > 6);
+        const upd = () => {
+          r.classList.toggle("rail-scrolled", r.scrollLeft > 6);
+          r.classList.toggle("rail-fin", r.scrollLeft >= r.scrollWidth - r.clientWidth - 2);
+        };
         upd();
         r.addEventListener("scroll", upd, { passive: true });
+        addEventListener("resize", upd);
       });
 
       // Reveal on scroll

@@ -45,7 +45,7 @@ const {
     display:none;align-items:center;gap:7px;color:var(--ink-60);
     transition:color .2s;white-space:nowrap;padding-bottom:4px;
   }
-  .sec-link:hover{color:var(--ink);}
+  @media (hover:hover){.sec-link:hover{color:var(--ink);}}
   @media (min-width:640px){.sec-link{display:inline-flex;}}
   .rail-nav{display:none;gap:8px;flex:none;}
   @media (hover:hover) and (pointer:fine) and (min-width:900px){.rail-nav{display:flex;}}
@@ -55,7 +55,7 @@ const {
     display:flex;align-items:center;justify-content:center;
     transition:background .2s,border-color .2s;
   }
-  .rail-btn:hover{background:var(--paper);border-color:var(--ink-40);}
+  @media (hover:hover){.rail-btn:hover{background:var(--paper);border-color:var(--ink-40);}}
 </style>
 
 <script>

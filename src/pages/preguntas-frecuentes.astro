@@ -291,7 +291,7 @@ const schema = [
       transition:color .25s var(--ease),background .25s var(--ease),
                  border-color .25s var(--ease),transform .25s var(--ease);
     }
-    .tab:hover{color:var(--ink);border-color:var(--ink-40);}
+    @media (hover:hover){.tab:hover{color:var(--ink);border-color:var(--ink-40);}}
     .tab:active{transform:scale(.97);}
     .tab.active{
       color:var(--white);background:var(--ink);border-color:var(--ink);
@@ -334,7 +334,7 @@ const schema = [
       letter-spacing:-.01em;transition:color .2s;
     }
     .fq-item[open] .fq-q h2,
-    .fq-q:hover h2{color:var(--olive-deep);}
+    @media (hover:hover){.fq-q:hover h2{color:var(--olive-deep);}}
 
     /* signo + / - dibujado con dos barras para poder animarlo */
     .fq-signo{
@@ -362,7 +362,7 @@ const schema = [
       border-bottom:1px solid var(--line);
       transition:color .2s,border-color .2s;
     }
-    .fq-a a:hover{color:var(--olive-deep);border-color:var(--olive);}
+    @media (hover:hover){.fq-a a:hover{color:var(--olive-deep);border-color:var(--olive);}}
 
     @media (prefers-reduced-motion:reduce){
       .fq-signo::before,.fq-signo::after{transition:none;}

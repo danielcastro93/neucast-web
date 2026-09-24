@@ -64,7 +64,7 @@ const {
   .cta-inner{--play:paused;}
   .cta-inner.in-view{--play:running;}
   .cta :global(.pill--glass){color:#fff;background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.35);}
-  .cta :global(.pill--glass:hover){background:rgba(255,255,255,.24);}
+  @media (hover:hover){.cta :global(.pill--glass:hover){background:rgba(255,255,255,.24);}}
 </style>
 
 <script>

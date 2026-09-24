@@ -486,7 +486,7 @@ const waPieza = waLink(`Hola, me interesa ${pieza.tipo} ${pieza.nombre} que vi e
       font-size:var(--fs-2xs);font-weight:600;color:var(--ink);
       transition:background .2s,box-shadow .2s;
     }
-    .pd-ver:hover{background:#fff;box-shadow:0 10px 26px rgba(20,19,17,.18);}
+    @media (hover:hover){.pd-ver:hover{background:#fff;box-shadow:0 10px 26px rgba(20,19,17,.18);}}
     .pd-ver-n{
       display:inline-flex;align-items:center;justify-content:center;
       min-width:22px;height:22px;padding:0 6px;border-radius:999px;
@@ -522,7 +522,7 @@ const waPieza = waLink(`Hola, me interesa ${pieza.tipo} ${pieza.nombre} que vi e
         position:static;height:34px;padding:0 6px 0 13px;
         background:var(--white);border-color:var(--line);box-shadow:none;
       }
-      .pd-ver:hover{background:var(--paper-soft);box-shadow:none;}
+      @media (hover:hover){.pd-ver:hover{background:var(--paper-soft);box-shadow:none;}}
       .pd-ver-n{min-width:20px;height:20px;}
     }
     @media (min-width:900px){
@@ -586,7 +586,7 @@ const waPieza = waLink(`Hola, me interesa ${pieza.tipo} ${pieza.nombre} que vi e
       text-underline-offset:3px;text-decoration-thickness:1px;
       transition:color .2s;
     }
-    .pd-clave-fila dd a:hover{color:var(--ink);}
+    @media (hover:hover){.pd-clave-fila dd a:hover{color:var(--ink);}}
 
     /* ---------- acciones ---------- */
     .pd-ctas{display:flex;flex-direction:column;gap:9px;margin-top:22px;}
@@ -603,8 +603,8 @@ const waPieza = waLink(`Hola, me interesa ${pieza.tipo} ${pieza.nombre} que vi e
     .pd-aperturas button :global(svg){
       color:var(--ink-40);transition:transform .25s var(--ease),color .2s;
     }
-    .pd-aperturas button:hover{color:var(--olive-deep);}
-    .pd-aperturas button:hover :global(svg){transform:translateX(3px);color:var(--olive-deep);}
+    @media (hover:hover){.pd-aperturas button:hover{color:var(--olive-deep);}}    
+    @media (hover:hover){.pd-aperturas button:hover :global(svg){transform:translateX(3px);color:var(--olive-deep);}}
 
     /* ---------- lo que la distingue ---------- */
     .pd-destacados{margin-top:var(--section-y);}
@@ -670,7 +670,7 @@ const waPieza = waLink(`Hola, me interesa ${pieza.tipo} ${pieza.nombre} que vi e
       display:inline-flex;align-items:center;gap:7px;color:var(--ink-60);
       white-space:nowrap;transition:color .2s,gap .2s var(--ease);
     }
-    .pd-rel-link:hover{color:var(--ink);gap:11px;}
+    @media (hover:hover){.pd-rel-link:hover{color:var(--ink);gap:11px;}}
 
     /* ---------- contenido de los paneles ---------- */
     .pl-parrafo{font-size:var(--fs-sm);color:var(--ink-60);}
@@ -730,7 +730,7 @@ const waPieza = waLink(`Hola, me interesa ${pieza.tipo} ${pieza.nombre} que vi e
       border:1px solid var(--line);background:var(--paper-soft);
       color:var(--ink);transition:border-color .2s,background .2s;
     }
-    .pl-descarga:hover{border-color:var(--ink);background:var(--paper);}
+    @media (hover:hover){.pl-descarga:hover{border-color:var(--ink);background:var(--paper);}}
     .pl-descarga-icono{
       flex:none;display:flex;align-items:center;justify-content:center;
       width:44px;height:44px;border-radius:10px;
@@ -746,7 +746,7 @@ const waPieza = waLink(`Hola, me interesa ${pieza.tipo} ${pieza.nombre} que vi e
       background:var(--ink);color:var(--white);
       transition:transform .25s var(--ease);
     }
-    .pl-descarga:hover .pl-descarga-flecha{transform:translateY(2px);}
+    @media (hover:hover){.pl-descarga:hover .pl-descarga-flecha{transform:translateY(2px);}}
   </style>
 
   <script>

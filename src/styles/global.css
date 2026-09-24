@@ -150,10 +150,10 @@ h1,h2,h3,h4,p{margin:0;}
   white-space:nowrap;
 }
 .pill svg{transition:transform .25s var(--ease);}
-.pill:hover svg{transform:translateX(3px);}
+@media (hover:hover){.pill:hover svg{transform:translateX(3px);}}
 .pill:active{transform:scale(.97);}
 .pill--primary{background:var(--ink);color:var(--white);}
-.pill--primary:hover{background:#000;}
+@media (hover:hover){.pill--primary:hover{background:#000;}}
 .pill--ghost{background:transparent;border-color:currentColor;}
 .pill--glass{
   background:rgba(255,255,255,.72);
@@ -162,7 +162,7 @@ h1,h2,h3,h4,p{margin:0;}
   border-color:rgba(255,255,255,.5);
 }
 .pill--wa{background:var(--wa);color:#fff;}
-.pill--wa:hover{background:#169654;}
+@media (hover:hover){.pill--wa:hover{background:#169654;}}
 
 /* ---------- Cierre de paneles ---------- */
 /* Un panel que entra deslizándose y se va de golpe se siente roto. La salida es
@@ -187,7 +187,10 @@ h1,h2,h3,h4,p{margin:0;}
   --rail-pad:max(var(--gutter), calc((100% - var(--container)) / 2 + var(--gutter)));
   display:flex;gap:14px;
   overflow-x:auto;
-  scroll-snap-type:x mandatory;
+  /* proximity y no mandatory: con obligatorio, el punto de anclaje del último
+     elemento cae más allá del final del scroll, así que nunca se alcanza y se
+     queda pegado a la orilla, recortado. Se notaba sobre todo en los chips. */
+  scroll-snap-type:x proximity;
   padding-inline:var(--rail-pad);
   scroll-padding-left:var(--rail-pad);
   scrollbar-width:none;
@@ -211,6 +214,19 @@ h1,h2,h3,h4,p{margin:0;}
   .rail-mask,.rail-mask.rail-scrolled{
     mask-image:linear-gradient(to right,#000 0,#000 calc(100% - 72px),rgba(0,0,0,.22) calc(100% - 18px),transparent);
     -webkit-mask-image:linear-gradient(to right,#000 0,#000 calc(100% - 72px),rgba(0,0,0,.22) calc(100% - 18px),transparent);
+  }
+}
+/* Al llegar al final no queda nada por avisar, y el degradado se comía el
+   último elemento: con chips chicos parecía que estaba cortado y que faltaba
+   jalar un poco más, cuando ya no había a dónde. */
+.rail-mask.rail-fin,
+.rail-mask.rail-fin.rail-scrolled{
+  mask-image:none;-webkit-mask-image:none;
+}
+@media (min-width:900px){
+  .rail-mask.rail-fin.rail-scrolled{
+    mask-image:linear-gradient(to right,transparent,rgba(0,0,0,.25) 24px,#000 90px,#000 100%);
+    -webkit-mask-image:linear-gradient(to right,transparent,rgba(0,0,0,.25) 24px,#000 90px,#000 100%);
   }
 }
 

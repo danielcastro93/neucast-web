@@ -52,7 +52,7 @@ const { id, titulo } = Astro.props;
     display:flex;align-items:center;justify-content:center;
     color:var(--ink);transition:background .2s;
   }
-  .pl-x:hover{background:var(--paper);}
+  @media (hover:hover){.pl-x:hover{background:var(--paper);}}
   .pl-cuerpo{flex:1;overflow-y:auto;padding:var(--pad) var(--pad) 40px;}
 
   @media (prefers-reduced-motion:reduce){
@@ -61,6 +61,7 @@ const { id, titulo } = Astro.props;
 </style>
 
 <script>
+  import { bloquear, soltar } from "../scripts/bloqueo-scroll.js";
   // Un solo cableado para todos los paneles de la página.
   const abrir = (id) => {
     const panel = document.getElementById(id);
@@ -70,7 +71,7 @@ const { id, titulo } = Astro.props;
     velo.classList.remove("velo-cerrando");
     panel.hidden = false;
     velo.hidden = false;
-    document.body.style.overflow = "hidden";
+    bloquear();
     panel.querySelector(`[data-cierra="${id}"]`)?.focus();
   };
 
@@ -80,7 +81,7 @@ const { id, titulo } = Astro.props;
     const panel = document.getElementById(id);
     const velo = document.querySelector(`[data-velo="${id}"]`);
     if (!panel || panel.hidden) return;
-    document.body.style.overflow = "";
+    soltar();
 
     // Se oculta al terminar la animación de salida, no al dispararla: si no, el
     // panel desaparece antes de haberse ido.

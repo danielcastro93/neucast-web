@@ -90,7 +90,7 @@ const { items = [], titulo = "", id = "visor" } = Astro.props;
     border:1px solid var(--line);background:var(--white);color:var(--ink);
     transition:border-color .2s,background .2s;
   }
-  .vs-x:hover{border-color:var(--ink-40);background:var(--paper-soft);}
+  @media (hover:hover){.vs-x:hover{border-color:var(--ink-40);background:var(--paper-soft);}}
 
   .vs-escena{flex:1;min-height:0;position:relative;}
   /* Se pasa con el dedo, no solo con las miniaturas. */
@@ -120,7 +120,7 @@ const { items = [], titulo = "", id = "visor" } = Astro.props;
     border:1px solid var(--line);background:var(--white);color:var(--ink);
     transition:border-color .2s,background .2s,opacity .2s;
   }
-  .vs-flecha:hover{border-color:var(--ink-40);background:var(--paper-soft);}
+  @media (hover:hover){.vs-flecha:hover{border-color:var(--ink-40);background:var(--paper-soft);}}
   .vs-flecha[disabled]{opacity:.3;pointer-events:none;}
   .vs-flecha--prev{left:calc(var(--gutter) / 2);}
   .vs-flecha--next{right:calc(var(--gutter) / 2);}
@@ -159,6 +159,7 @@ const { items = [], titulo = "", id = "visor" } = Astro.props;
 </style>
 
 <script>
+  import { bloquear, soltar } from "../scripts/bloqueo-scroll.js";
   document.querySelectorAll(".vs").forEach((visor) => {
     const id = visor.id;
     const tira = visor.querySelector("[data-visor-tira]");
@@ -190,7 +191,7 @@ const { items = [], titulo = "", id = "visor" } = Astro.props;
     const abrir = (i) => {
       visor.classList.remove("velo-cerrando");
       visor.hidden = false;
-      document.body.style.overflow = "hidden";
+      bloquear();
       // el ancho solo existe cuando ya se pintó: hasta aquí medía cero
       void tira.offsetWidth;
       ir(i, false);
@@ -200,7 +201,7 @@ const { items = [], titulo = "", id = "visor" } = Astro.props;
 
     const cerrar = () => {
       if (visor.hidden) return;
-      document.body.style.overflow = "";
+      soltar();
       visor.querySelectorAll("video").forEach((v) => v.pause());
       let listo = false;
       const guardar = () => {

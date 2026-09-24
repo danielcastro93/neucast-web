@@ -108,7 +108,12 @@ const datos = {
     .pz--rail .pz-fotos{overflow-x:auto;}
   }
   @media not all and (pointer:fine){
-    .pz--rail .pz-fotos{scroll-snap-type:none;touch-action:pan-y;}
+    /* Sin touch-action: declarar pan-y aquí le decía al navegador que en esta
+       foto solo valen los gestos verticales, así que el swipe horizontal que
+       tenía que mover el riel entero moría sobre la imagen. Como las demás
+       fotos no se pintan, aquí dentro no hay nada que desplazar y el gesto
+       llega solo al riel. */
+    .pz--rail .pz-fotos{scroll-snap-type:none;}
     .pz--rail .pz-fotos img:not(:first-child){display:none;}
     .pz--rail .pz-puntos{display:none;}
   }
@@ -164,7 +169,7 @@ const datos = {
   }
   .pz-flecha--prev{left:10px;}
   .pz-flecha--next{right:10px;}
-  .pz-flecha:hover{background:#fff;}
+  @media (hover:hover){.pz-flecha:hover{background:#fff;}}
   .pz-flecha[disabled]{opacity:0 !important;pointer-events:none;}
   /* Las flechas piden cursor y además pantalla grande: en teléfono y tablet
      se pasa con el dedo y ahí solo estorban encima de la foto. */
@@ -194,7 +199,7 @@ const datos = {
 
   .pz-nombre{margin:14px 0 0;font-size:var(--fs-body);font-weight:600;}
   .pz-nombre a{display:block;color:var(--ink);transition:color .2s;}
-  .pz-nombre a:hover{color:var(--olive-deep);}
+  @media (hover:hover){.pz-nombre a:hover{color:var(--olive-deep);}}
   .pz-tipo{
     display:block;margin-bottom:2px;
     font-size:var(--fs-2xs);font-weight:500;color:var(--ink-40);

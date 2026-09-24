@@ -87,7 +87,7 @@ const { titulo, entradilla, actualizado, secciones = [] } = Astro.props;
     border-bottom:1px solid var(--line);
     transition:color .2s;
   }
-  .lg-indice a:hover{color:var(--olive-deep);}
+  @media (hover:hover){.lg-indice a:hover{color:var(--olive-deep);}}
   .lg-indice-n{color:var(--ink-40);font-variant-numeric:tabular-nums;flex:none;}
   @media (min-width:1000px){
     .lg-indice{position:sticky;top:calc(var(--header-h) + 24px);}
@@ -129,7 +129,7 @@ const { titulo, entradilla, actualizado, secciones = [] } = Astro.props;
     border-bottom:1px solid var(--line);
     transition:color .2s,border-color .2s;
   }
-  .lg-seccion-cuerpo :global(a:hover){color:var(--olive-deep);border-color:var(--olive);}
+  @media (hover:hover){.lg-seccion-cuerpo :global(a:hover){color:var(--olive-deep);border-color:var(--olive);}}
   /* los datos que el cliente todavía debe llenar saltan a la vista */
   .lg-seccion-cuerpo :global(.pendiente){
     background:#FFF3C4;color:#6b5a00;

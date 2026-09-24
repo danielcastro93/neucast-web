@@ -206,7 +206,7 @@ const pilares = [
       border-bottom:1px solid var(--line);padding-bottom:4px;
       transition:color .25s var(--ease),border-color .25s var(--ease),gap .25s var(--ease);
     }
-    .ns-define-link:hover{color:var(--olive-deep);border-color:var(--olive);gap:12px;}
+    @media (hover:hover){.ns-define-link:hover{color:var(--olive-deep);border-color:var(--olive);gap:12px;}}
 
     .ns-define-grid{display:grid;gap:clamp(28px,5vw,40px);}
     @media (min-width:900px){
@@ -239,7 +239,7 @@ const pilares = [
     .ns-cierre-title{margin:10px 0 26px;}
     .ns-cierre-ctas{display:flex;flex-wrap:wrap;gap:12px;}
     .ns-cierre .pill--glass{color:#fff;background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.35);}
-    .ns-cierre .pill--glass:hover{background:rgba(255,255,255,.24);}
+    @media (hover:hover){.ns-cierre .pill--glass:hover{background:rgba(255,255,255,.24);}}
   </style>
 
   <script>

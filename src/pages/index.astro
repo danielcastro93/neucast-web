@@ -151,7 +151,7 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
     .hero-sub{font-size:var(--fs-body-lg);color:rgba(255,255,255,.92);max-width:60ch;}
     .hero-ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px;}
     .hero .pill--glass{color:#fff;background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.35);}
-    .hero .pill--glass:hover{background:rgba(255,255,255,.26);}
+    @media (hover:hover){.hero .pill--glass:hover{background:rgba(255,255,255,.26);}}
 
     /* ---------- Proyecto + hotspots ---------- */
     .proj-stage{position:relative;margin:0;border-radius:var(--radius);overflow:hidden;background:var(--ink);}
@@ -174,7 +174,7 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
       display:inline-flex;align-items:center;gap:8px;margin-top:16px;
       color:#fff;opacity:.9;transition:gap .25s var(--ease),opacity .2s;
     }
-    .proj-link:hover{gap:12px;opacity:1;}
+    @media (hover:hover){.proj-link:hover{gap:12px;opacity:1;}}
     .proj-hint-dot{
       width:9px;height:9px;border-radius:50%;background:#fff;flex:none;
       box-shadow:0 0 0 3px rgba(255,255,255,.25);
@@ -195,7 +195,7 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
     .edit-points li::before{
       content:"";width:6px;height:6px;border-radius:50%;background:var(--olive);flex:none;
     }
-    .edit .pill--ghost:hover{background:var(--white);}
+    @media (hover:hover){.edit .pill--ghost:hover{background:var(--white);}}
 
   </style>
 
