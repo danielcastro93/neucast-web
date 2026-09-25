@@ -200,13 +200,18 @@ const pilares = [
        contra él. En móvil el texto va primero y el video debajo. */
     .ns-define-title{margin:0 0 16px;max-width:min(640px,100%);}
     .ns-define-texto{color:var(--ink-60);max-width:min(620px,100%);text-wrap:pretty;}
+    /* Sin raya debajo: la flecha ya dice que lleva a otro sitio, y la raya lo
+       hacía parecer un enlace de texto suelto en vez de un call to action.
+       En teléfono se lleva sus 44 px de alto, que es lo que pide un dedo: con
+       los 22 que medía había que atinarle. */
     .ns-define-link{
       display:inline-flex;align-items:center;gap:8px;margin-top:22px;
+      min-height:44px;
       font-size:var(--fs-sm);font-weight:600;color:var(--ink);
-      border-bottom:1px solid var(--line);padding-bottom:4px;
-      transition:color .25s var(--ease),border-color .25s var(--ease),gap .25s var(--ease);
+      transition:color .25s var(--ease),gap .25s var(--ease);
     }
-    @media (hover:hover){.ns-define-link:hover{color:var(--olive-deep);border-color:var(--olive);gap:12px;}}
+    @media (min-width:900px){.ns-define-link{min-height:0;}}
+    @media (hover:hover){.ns-define-link:hover{color:var(--olive-deep);gap:12px;}}
 
     .ns-define-grid{display:grid;gap:clamp(28px,5vw,40px);}
     @media (min-width:900px){

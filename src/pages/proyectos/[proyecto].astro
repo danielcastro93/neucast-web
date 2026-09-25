@@ -350,11 +350,16 @@ const waMensaje = `Hola, vi el proyecto de ${proyecto.espacio.toLowerCase()} en 
     }
 
     /* Desplegables: mismo signo que el acordeón de filtros. */
+    /* 44 px de alto en teléfono: con los 20 que medía había que atinarle y el
+       primer toque se iba al párrafo de al lado. El texto no se mueve de
+       sitio, solo crece la zona que recibe el dedo. */
     .pr-toggle{
       display:inline-flex;align-items:center;gap:11px;margin-top:18px;
+      min-height:44px;
       font-size:var(--fs-xs);font-weight:600;color:var(--ink-60);
       transition:color .2s;
     }
+    @media (min-width:900px){.pr-toggle{min-height:0;}}
     @media (hover:hover){.pr-toggle:hover{color:var(--ink);}}
     .pr-signo{position:relative;flex:none;width:13px;height:13px;}
     .pr-signo::before,.pr-signo::after{

@@ -275,7 +275,13 @@ const schema = [
        chip con el margen de la página, y el degradado de la derecha avisa de
        que hay más. En escritorio caben todos, así que se centran y el carrusel
        se desactiva. */
-    .fq-tabs{gap:8px;padding-block:6px;}
+    /* Sin anclaje: con cuatro chips el recorrido es de unos pocos píxeles en
+       los teléfonos grandes (17 en uno de 440 de ancho). A esa distancia el
+       anclaje solo puede estorbar, porque al soltar el dedo devuelve la barra
+       al principio del chip más cercano y el último se queda cortado contra la
+       orilla. Sin él, el arrastre se queda donde lo dejas y el último chip
+       llega hasta su margen. */
+    .fq-tabs{gap:8px;padding-block:6px;scroll-snap-type:none;}
     @media (min-width:900px){
       .fq-tabs{
         flex-wrap:wrap;justify-content:center;

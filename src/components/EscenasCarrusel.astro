@@ -111,9 +111,15 @@ const varias = escenas.length > 1;
     z-index:3;display:flex;align-items:center;gap:7px;height:1.4em;
   }
   .ec-punto{
+    position:relative;
     width:7px;height:7px;padding:0;border:0;border-radius:50%;
     background:rgba(255,255,255,.45);
     transition:background .25s,width .25s var(--ease);
+  }
+  /* El punto se ve de 7 px, pero recibe el dedo en una zona mucho mayor. Sin
+     esto había que clavarle el toque a un punto de 7 px. */
+  .ec-punto::after{
+    content:"";position:absolute;inset:-14px -5px;
   }
   .ec-punto.on{width:20px;border-radius:999px;background:#fff;}
 
