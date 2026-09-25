@@ -48,11 +48,14 @@ const { id, titulo } = Astro.props;
   }
   .pl-titulo{font-size:var(--fs-body-lg);font-weight:700;letter-spacing:-.01em;}
   .pl-x{
+    position:relative;
     width:32px;height:32px;margin-right:-6px;border-radius:50%;
     display:flex;align-items:center;justify-content:center;
     color:var(--ink);transition:background .2s;
   }
   @media (hover:hover){.pl-x:hover{background:var(--paper);}}
+  /* Mismo trato que el resto de las cruces: se ve de 32, se toca de 44. */
+  .pl-x::after{content:"";position:absolute;inset:-6px;}
   .pl-cuerpo{flex:1;overflow-y:auto;padding:var(--pad) var(--pad) 40px;}
 
   @media (prefers-reduced-motion:reduce){

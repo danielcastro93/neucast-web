@@ -85,12 +85,16 @@ const { items = [], titulo = "", id = "visor" } = Astro.props;
   .vs-pieza{font-size:var(--fs-xs);color:var(--ink-60);}
   .vs-pieza :global(strong){color:var(--ink);font-weight:600;}
   .vs-x{
+    position:relative;
     width:36px;height:36px;border-radius:50%;
     display:flex;align-items:center;justify-content:center;
     border:1px solid var(--line);background:var(--white);color:var(--ink);
     transition:border-color .2s,background .2s;
   }
   @media (hover:hover){.vs-x:hover{border-color:var(--ink-40);background:var(--paper-soft);}}
+  /* El círculo con borde se queda en 36 px porque es lo que se ve; la zona de
+     toque crece por detrás hasta los 44 que pide el dedo. */
+  .vs-x::after{content:"";position:absolute;inset:-4px;}
 
   .vs-escena{flex:1;min-height:0;position:relative;}
   /* Se pasa con el dedo, no solo con las miniaturas. */

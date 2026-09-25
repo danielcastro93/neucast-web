@@ -368,10 +368,14 @@ const bloquesVisibles = bloquesPara(catActiva, piezas.length);
       font-size:var(--fs-body-lg);font-weight:700;letter-spacing:-.01em;
     }
     .mb-cerrar{
+      position:relative;
       width:32px;height:32px;margin-right:-6px;border-radius:50%;
       display:flex;align-items:center;justify-content:center;
       color:var(--ink);transition:background .2s;
     }
+    /* El círculo se queda en 32 px porque es el que se pinta al pasar el ratón;
+       la zona de toque crece por detrás hasta los 44. */
+    .mb-cerrar::after{content:"";position:absolute;inset:-6px;}
     @media (hover:hover){.mb-cerrar:hover{background:var(--paper);}}
 
     /* el cuerpo no lleva margen: así la línea entre grupos cruza el panel

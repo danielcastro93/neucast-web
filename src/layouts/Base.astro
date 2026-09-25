@@ -469,18 +469,22 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
       }
       /* "Atrás" solo existe en la vista de categorías */
       .drawer-back{
+        position:relative;
         display:inline-flex;align-items:center;gap:6px;
         font-size:15px;font-weight:500;color:var(--ink);
         opacity:0;transform:translateX(-6px);pointer-events:none;
         transition:opacity .3s var(--ease),transform .3s var(--ease);
       }
+      /* El rótulo mide 23 px de alto: la zona de toque se estira por detrás
+         para llegar a 44 sin mover el texto de su sitio. */
+      .drawer-back::after{content:"";position:absolute;inset:-11px -12px;}
       .drawer.sub .drawer-back{opacity:1;transform:none;pointer-events:auto;}
       .drawer-x{
-        position:relative;width:40px;height:40px;margin-right:-10px;margin-left:auto;
+        position:relative;width:44px;height:44px;margin-right:-12px;margin-left:auto;
         color:var(--ink);
       }
       .drawer-x span{
-        position:absolute;left:11px;top:19px;width:18px;height:1.6px;
+        position:absolute;left:13px;top:21px;width:18px;height:1.6px;
         background:currentColor;border-radius:2px;
         transform:scaleX(0);transition:transform .4s var(--ease);
       }

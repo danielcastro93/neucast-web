@@ -708,6 +708,11 @@ const waPieza = waLink(`Hola, me interesa ${pieza.tipo} ${pieza.nombre} que vi e
       margin-top:14px;font-size:var(--fs-2xs);color:var(--ink-40);line-height:1.6;
     }
     .pl-nota a{color:var(--olive-deep);text-decoration:underline;text-underline-offset:2px;}
+    /* El renglón mide 14 px. El relleno vertical de una caja en línea no
+       empuja la línea, pero sí agranda la zona de toque hasta los 44. */
+    @media (pointer:coarse),(max-width:899px){
+      .pl-nota a{padding-block:15px;}
+    }
 
     .pl-muestras{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;}
     .pl-muestras li{
