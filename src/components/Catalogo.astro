@@ -575,9 +575,49 @@ const bloquesVisibles = bloquesPara(catActiva, piezas.length);
         cPrev.disabled = cats.scrollLeft <= 4;
         cNext.disabled = cats.scrollLeft >= fin;
       };
-      const paso = () => cats.clientWidth * 0.8;
-      cPrev.addEventListener("click", () => cats.scrollBy({ left: -paso(), behavior: "smooth" }));
-      cNext.addEventListener("click", () => cats.scrollBy({ left: paso(), behavior: "smooth" }));
+      // El desplazamiento suave del navegador no sirve en un riel con puntos de
+      // anclaje: el motor de anclaje cancela la animación y lo deja donde
+      // estaba, así que las flechas no movían nada. Se anima a mano, poniendo
+      // `scrollLeft` cuadro a cuadro, que sí funciona y además se comporta
+      // igual en todos los navegadores.
+      const quietoAqui = matchMedia("(prefers-reduced-motion: reduce)");
+      const DURACION = 380;
+      let animacion = 0;
+      const deslizar = (destino) => {
+        cancelAnimationFrame(animacion);
+        const inicio = cats.scrollLeft;
+        const tramo = destino - inicio;
+        if (!tramo) return;
+        if (quietoAqui.matches) {
+          cats.scrollLeft = destino;
+          return;
+        }
+        const t0 = performance.now();
+        const cuadro = (ahora) => {
+          const t = Math.min(1, (ahora - t0) / DURACION);
+          cats.scrollLeft = inicio + tramo * (1 - Math.pow(1 - t, 3));
+          if (t < 1) animacion = requestAnimationFrame(cuadro);
+        };
+        animacion = requestAnimationFrame(cuadro);
+      };
+
+      // Una tarjeta por clic, no un puñado. Avanzar el 80% de lo que se ve
+      // movía tres de golpe, y la que acababa a la izquierda caía justo bajo
+      // el degradado, así que ni se alcanzaba a leer. Se salta al inicio de la
+      // tarjeta siguiente, que es exactamente donde está el anclaje del riel.
+      const irA = (dir) => {
+        const x = cats.scrollLeft;
+        const inicios = [...cats.querySelectorAll(".mb-cat")].map((t) => t.offsetLeft);
+        const destino =
+          dir > 0
+            ? inicios.find((v) => v > x + 1)
+            : inicios.filter((v) => v < x - 1).pop();
+        // si ya no hay tarjeta hacia ese lado se va al tope; el navegador
+        // recorta el valor al máximo que exista
+        deslizar(destino === undefined ? (dir > 0 ? cats.scrollWidth : 0) : destino);
+      };
+      cPrev.addEventListener("click", () => irA(-1));
+      cNext.addEventListener("click", () => irA(1));
       cats.addEventListener("scroll", pintarCats, { passive: true });
       addEventListener("resize", pintarCats);
       pintarCats();

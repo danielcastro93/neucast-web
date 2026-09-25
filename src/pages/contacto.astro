@@ -72,14 +72,14 @@ const schema = {
             <label for="ct-nombre">Nombre <span class="ct-req" aria-hidden="true">*</span></label>
             <input type="text" id="ct-nombre" name="nombre" required autocomplete="given-name"
               placeholder="Tu nombre" maxlength="40" data-solo="letras"
-              pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ][A-Za-zÁÉÍÓÚÜÑáéíóúüñ '’-]*" />
+              pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ][A-Za-zÁÉÍÓÚÜÑáéíóúüñ '’\-]*" />
             <span class="ct-error" data-error-de="ct-nombre"></span>
           </p>
           <p class="ct-campo">
             <label for="ct-apellido">Apellido <span class="ct-req" aria-hidden="true">*</span></label>
             <input type="text" id="ct-apellido" name="apellido" required autocomplete="family-name"
               placeholder="Tu apellido" maxlength="40" data-solo="letras"
-              pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ][A-Za-zÁÉÍÓÚÜÑáéíóúüñ '’-]*" />
+              pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ][A-Za-zÁÉÍÓÚÜÑáéíóúüñ '’\-]*" />
             <span class="ct-error" data-error-de="ct-apellido"></span>
           </p>
         </div>
@@ -107,7 +107,7 @@ const schema = {
             <label for="ct-ciudad">Ciudad <span class="ct-req" aria-hidden="true">*</span></label>
             <input type="text" id="ct-ciudad" name="ciudad" required autocomplete="address-level2"
               placeholder="Monterrey" maxlength="60" data-solo="letras"
-              pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ][A-Za-zÁÉÍÓÚÜÑáéíóúüñ '’.-]*" />
+              pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ][A-Za-zÁÉÍÓÚÜÑáéíóúüñ '’.\-]*" />
             <span class="ct-error" data-error-de="ct-ciudad"></span>
           </p>
           <p class="ct-campo">
@@ -274,6 +274,10 @@ const schema = {
     const boton = form.querySelector(".ct-boton");
     const textoBoton = boton.querySelector("span") || boton;
 
+    // El guion va escapado en los `pattern` de arriba. El navegador los compila
+    // con la bandera `v`, donde un `-` suelto dentro de los corchetes es un
+    // error de sintaxis: el patrón se descarta entero y deja de validar en
+    // silencio, solo con un aviso en la consola.
     const MENSAJES = {
       "ct-asunto": "Elige qué quieres resolver.",
       "ct-nombre": "Dinos cómo te llamas.",
