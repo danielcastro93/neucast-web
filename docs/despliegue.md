@@ -29,33 +29,47 @@ Eso tiene tres consecuencias que mandan sobre todo lo demás:
 | --- | --- | --- |
 | Dominio `neucast.com.mx` | Hostinger | Contratado |
 | WordPress (administración) | Hostinger, en un subdominio tipo `admin.neucast.com.mx` | Por montar |
-| El sitio público | **Decisión abierta.** Ver abajo | Por decidir |
+| El sitio público | Hostinger, junto al dominio | Decidido |
 | Código | GitHub | Listo |
 
-### La decisión abierta: dónde se hospeda el sitio público
+### Todo en Hostinger
 
-El plan original era el front en **Vercel o Cloudflare Pages** y WordPress en
-Hostinger. Las dos opciones siguen siendo válidas y la decisión es del
-desarrollador, porque depende de lo que ya tenga contratado y de con qué se
-sienta cómodo operando.
+El sitio público se queda en Hostinger, junto al dominio y a WordPress. Un solo
+proveedor y una sola factura.
 
-**Opción A: todo en Hostinger.** Un solo proveedor, una sola factura, el dominio
-ya está ahí. Hay que resolver cómo se dispara la compilación, porque un hosting
-compartido no siempre trae un proceso de compilación integrado; suele acabar en
-una acción de GitHub que compila y sube `dist/` por FTP o SSH.
+**Funciona sin ningún truco.** El sitio son archivos estáticos: HTML, CSS,
+JavaScript e imágenes. No necesita PHP, ni Node, ni base de datos corriendo del
+lado del servidor. Lo único que hace falta es que alguien sirva esos archivos, y
+eso lo hace cualquier hospedaje.
 
-**Opción B: Vercel o Cloudflare Pages para el sitio, Hostinger para WordPress y
-el dominio.** La compilación automática viene resuelta de fábrica: se conecta el
-repositorio, cada cambio compila solo y el certificado se renueva solo. El
-dominio se sigue administrando en Hostinger, apuntando los registros DNS al
-proveedor. Es lo que recomiendo, y en los planes gratuitos alcanza de sobra para
-un sitio de este tamaño.
+**Lo único que hay que resolver es dónde se compila.** El sitio se compila con
+Node, y un hospedaje compartido no siempre trae ese proceso. La forma limpia, y
+la que ya está medio armada en el repositorio, es que **la compilación ocurra en
+GitHub y lo que suba a Hostinger sea el resultado**:
 
-En cualquiera de las dos, **el repositorio ya trae la compilación automatizada**:
-`.github/workflows/preview.yml` compila, pasa la revisión y publica. Hoy apunta a
-la vista previa; adaptarlo al destino real es cambiar el último paso.
+```
+GitHub Actions
+  npm ci
+  npm run build      → deja dist/
+  npm run revisar    → si falla, no sube nada
+  sube dist/ a Hostinger por FTP o SSH → public_html
+```
 
----
+Hostinger da credenciales de FTP en todos sus planes y acceso SSH en algunos.
+Con cualquiera de los dos funciona; **cuál usar lo confirma quien monte la
+infraestructura según el plan contratado.** Hostinger también tiene integración
+con Git en algunos planes: sirve para traer el repositorio, pero hay que
+comprobar si compila o solo copia archivos, porque lo que se publica es `dist/`
+y no el código.
+
+Ya existe `.github/workflows/preview.yml`, que compila, pasa la revisión y
+publica la vista previa. Para producción es el mismo archivo cambiando el último
+paso: en vez de publicar en GitHub Pages, subir `dist/` a `public_html`. Las
+credenciales van como secretos del repositorio, nunca escritas en el archivo.
+
+**El certificado.** Hostinger da Let's Encrypt gratis y lo renueva solo, tanto
+para el dominio como para el subdominio de WordPress. Hay que activarlo en los
+dos y forzar HTTPS.
 
 ## 3. El ciclo de publicación
 
@@ -75,10 +89,11 @@ saltado o una página fuera del mapa del sitio. Es la red que atrapa lo que el
 cliente escriba mal desde el CMS. Conviene que una compilación que no pase la
 revisión **no llegue a producción**.
 
-**El webhook.** WordPress tiene que avisar cuando se publica algo. Con Vercel o
-Cloudflare es una URL de despliegue que se pega en un plugin o en un `hook` de
-`save_post`. Conviene agrupar los avisos para que guardar cinco veces seguidas no
-dispare cinco compilaciones.
+**El webhook.** WordPress tiene que avisar cuando se publica algo. Como la
+compilación vive en GitHub Actions, el aviso es una llamada a la API de GitHub
+(`repository_dispatch`) desde un `hook` de `save_post`, con un token de acceso
+guardado en WordPress. Conviene agrupar los avisos para que guardar cinco veces
+seguidas no dispare cinco compilaciones.
 
 ---
 

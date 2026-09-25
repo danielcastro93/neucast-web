@@ -7,7 +7,10 @@
 Resumen de decisiones aprobadas/propuestas. Propuesta completa: https://claude.ai/code/artifact/6d27af49-cec4-43fd-8e0f-864ab7e20ed1
 
 ## Stack
-- Frontend: **Astro** (estático) + GSAP/View Transitions. Hosting: Vercel o Cloudflare Pages (gratis), dominio neucast.com.mx.
+- Frontend: **Astro** (estático) + GSAP/View Transitions. Dominio neucast.com.mx.
+- Hosting: se barajó Vercel o Cloudflare Pages y **se decidió Hostinger**, junto
+  al dominio y a WordPress, para no sumar un proveedor más. La compilación vive
+  en GitHub Actions y lo que sube a Hostinger es `dist/`. Ver `despliegue.md`.
 - CMS: **WordPress headless + ACF** en Hostinger (ya pagado), subdominio admin.neucast.com.mx. Webhook → rebuild automático.
 - Contacto: WhatsApp (wa.me con mensaje precargado, conversión principal, evento GA4) + formulario email solo en /contacto/.
 - Sin e-commerce en fase 1; escalable a WooCommerce/Stripe después.
