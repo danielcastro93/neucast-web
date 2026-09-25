@@ -203,7 +203,7 @@ const schema = [
   <!-- ============ PREGUNTAS (tabs) ============ -->
   <section class="fq-cuerpo">
     <div class="fq-tabs-wrap">
-      <div class="fq-tabs" role="tablist" aria-label="Temas">
+      <div class="fq-tabs rail rail-mask" role="tablist" aria-label="Temas">
           {grupos.map((g, i) => (
             <button
               class:list={["tab", "label", { active: i === 0 }]}
@@ -270,27 +270,21 @@ const schema = [
     /* ---------- Tabs de temas ----------
        Van centrados y a ancho completo para que quepan los cuatro sin
        recortarse; si no caben, bajan de renglón en vez de esconderse. */
-    /* Los chips vivían a sangre, colgados del relleno del riel. Sin riel hay
-       que darles el margen de la página a mano, o arrancan pegados al borde. */
-    .fq-tabs-wrap{margin-bottom:clamp(22px,3vw,34px);padding-inline:var(--gutter);}
-    @media (min-width:1500px){
-      .fq-tabs-wrap{max-width:var(--container);margin-inline:auto;}
-    }
-    /* Bajan de renglón, no se recorren de lado.
-       Eran un carrusel y con cuatro chips el recorrido entero era de 17 px en
-       un teléfono de 440 de ancho. A esa distancia no hay gesto que valga: la
-       franja ocupa todo el ancho, así que el deslizamiento arranca cerca de la
-       orilla y el teléfono lo entiende como su gesto de ir atrás o adelante.
-       El último chip se quedaba cortado contra el borde sin manera de traerlo.
+    .fq-tabs-wrap{margin-bottom:clamp(22px,3vw,34px);}
+    /* Carrusel a sangre: el relleno del riel alinea el primer chip con el
+       margen de la página y el degradado de la derecha avisa de que hay más.
+       De 900 para arriba caben los cuatro, se centran y el carrusel se apaga.
 
-       Con cuatro chips, dos renglones ocupan 46 px más y resuelven el caso en
-       cualquier ancho y con cualquier nombre de categoría, que es lo que
-       importa cuando los temas vengan del gestor. */
-    .fq-tabs{
-      display:flex;flex-wrap:wrap;gap:8px;padding-block:6px;
-    }
+       Sin anclaje: el recorrido es corto y al soltar el dedo el anclaje lo
+       devolvía al principio del chip más cercano, dejando el último cortado
+       contra la orilla. */
+    .fq-tabs{gap:8px;padding-block:6px;scroll-snap-type:none;}
     @media (min-width:900px){
-      .fq-tabs{justify-content:center;}
+      .fq-tabs{
+        flex-wrap:wrap;justify-content:center;
+        overflow:visible;scroll-snap-type:none;
+        mask-image:none;-webkit-mask-image:none;
+      }
     }
     .tab{
       height:42px;padding:0 18px;border-radius:999px;
@@ -305,10 +299,13 @@ const schema = [
     .tab.active{
       color:var(--white);background:var(--ink);border-color:var(--ink);
     }
-    /* en móvil se aprietan para que entren dos por renglón en vez de cuatro */
-    @media (max-width:560px){
-      .fq-tabs{gap:6px;}
-      .tab{height:40px;padding:0 13px;gap:6px;}
+    /* En teléfono los chips van holgados a propósito. Apretados dejaban un
+       recorrido de 17 px en una pantalla de 440: tan corto que el gesto no
+       llegaba a cuajar y el último chip se quedaba clavado contra la orilla.
+       Con más aire, el carrusel tiene de sobra que recorrer en cualquier
+       pantalla, y de paso el chip llega a los 44 px de alto que pide un dedo. */
+    @media (max-width:899px){
+      .tab{height:44px;padding:0 20px;}
     }
     .fq-tab-n{
       font-size:var(--fs-2xs);color:var(--ink-40);

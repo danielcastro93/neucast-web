@@ -221,8 +221,10 @@ const { items = [], titulo = "", id = "visor" } = Astro.props;
     let arrastro = false;
     document.querySelectorAll(`[data-visor]`).forEach((b) => {
       b.addEventListener("pointerdown", (e) => { x0 = e.clientX; arrastro = false; });
+      // 14 y no 8: un dedo nunca toca del todo quieto y con el umbral corto un
+      // toque normal se tomaba por arrastre, así que la galería no abría.
       b.addEventListener("pointermove", (e) => {
-        if (e.buttons && Math.abs(e.clientX - x0) > 8) arrastro = true;
+        if (e.buttons && Math.abs(e.clientX - x0) > 14) arrastro = true;
       });
       b.addEventListener("click", () => { if (!arrastro) abrir(Number(b.dataset.visor)); });
     });

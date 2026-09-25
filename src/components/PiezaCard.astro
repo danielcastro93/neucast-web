@@ -243,18 +243,24 @@ const datos = {
 
     // La tira es enlace, así que una arrastrada terminaría navegando. Si el
     // dedo recorrió o el carrusel se movió, el clic no cuenta.
+    // El umbral es generoso a propósito: un dedo nunca toca del todo quieto, y
+    // con 8 px un toque normal se tomaba por arrastre y el enlace no abría. Y
+    // si la tira no se puede desplazar, como pasa en táctil, no hay arrastre
+    // posible y la guarda sobra.
     let x0 = 0;
     let scroll0 = 0;
     let arrastro = false;
+    const puedeArrastrarse = () => tira.scrollWidth > tira.clientWidth;
     tira.addEventListener("pointerdown", (e) => {
       x0 = e.clientX;
       scroll0 = tira.scrollLeft;
       arrastro = false;
     });
     tira.addEventListener("pointermove", (e) => {
-      if (e.buttons && Math.abs(e.clientX - x0) > 8) arrastro = true;
+      if (e.buttons && Math.abs(e.clientX - x0) > 14) arrastro = true;
     });
     tira.addEventListener("click", (e) => {
+      if (!puedeArrastrarse()) return;
       if (arrastro || Math.abs(tira.scrollLeft - scroll0) > 4) e.preventDefault();
     });
 
