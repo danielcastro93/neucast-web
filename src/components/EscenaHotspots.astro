@@ -56,11 +56,17 @@ const puntos = hotspots
   .spot.open{z-index:6;}
   @media (min-width:900px){.spot{left:var(--dx);top:var(--dy);}}
   .spot-dot{
+    position:relative;
     width:34px;height:34px;border-radius:50%;
     background:rgba(255,255,255,.35);
     -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
     display:flex;align-items:center;justify-content:center;
     transition:transform .25s var(--ease),background .25s;
+  }
+  /* El punto se ve de 34 px y recibe el dedo en 44, que es lo que pide. No
+     cambia el dibujo, solo la caja que escucha. */
+  .spot-dot::before{
+    content:"";position:absolute;inset:-5px;border-radius:50%;
   }
   .spot-dot span{
     width:12px;height:12px;border-radius:50%;background:#fff;
@@ -71,6 +77,10 @@ const puntos = hotspots
     content:"";position:absolute;inset:0;border-radius:50%;
     border:1.5px solid rgba(255,255,255,.8);
     animation:pulse 2.4s var(--ease) infinite;
+    /* El anillo crece a 1.55 y, al ser parte del botón, hacía que la zona que
+       recibe el dedo latiera con él: el mismo punto de la pantalla a veces
+       contestaba y a veces no. Es decoración, no recibe. */
+    pointer-events:none;
   }
   @keyframes pulse{
     0%{transform:scale(.8);opacity:.9}
