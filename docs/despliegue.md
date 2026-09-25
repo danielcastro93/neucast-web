@@ -27,10 +27,30 @@ Eso tiene tres consecuencias que mandan sobre todo lo demás:
 
 | Pieza | Dónde | Estado |
 | --- | --- | --- |
+| Plan de Hostinger | Business Web Hosting | Contratado |
 | Dominio `neucast.com.mx` | Hostinger | Contratado |
-| WordPress (administración) | Hostinger, en un subdominio tipo `admin.neucast.com.mx` | Por montar |
-| El sitio público | Hostinger, junto al dominio | Decidido |
+| WordPress (administración) | Hostinger, en un subdominio tipo `admin.neucast.com.mx` | **Hoy está en el dominio raíz. Hay que moverlo.** Ver abajo |
+| El sitio público | Hostinger, en el dominio raíz | Decidido, pendiente de liberar el dominio |
 | Código | GitHub | Listo |
+
+### Antes que nada: WordPress está donde va el sitio
+
+Hoy `neucast.com.mx` aparece en el panel de Hostinger como un sitio de
+WordPress. El esquema que necesitamos es el contrario:
+
+- **`neucast.com.mx`** sirve los archivos estáticos que salen de `npm run build`.
+  Es lo que ve el público y lo que indexa Google.
+- **`admin.neucast.com.mx`** (o el subdominio que se prefiera) tiene WordPress,
+  que solo lo usan el cliente para editar y el proceso de compilación para leer.
+  No tiene cara al público.
+
+Así que el primer paso de la infraestructura es **mover WordPress al subdominio
+y dejar el dominio raíz libre**. Conviene hacerlo antes de cargar contenido:
+mover un WordPress con catálogo dentro obliga a reescribir las direcciones de
+toda la base.
+
+Si en el dominio raíz ya hay algo publicado, hay que revisar qué direcciones
+existen y si alguna está indexada, para redirigirla en vez de dejarla en 404.
 
 ### Todo en Hostinger
 
@@ -55,12 +75,14 @@ GitHub Actions
   sube dist/ a Hostinger por FTP o SSH → public_html
 ```
 
-Hostinger da credenciales de FTP en todos sus planes y acceso SSH en algunos.
-Con cualquiera de los dos funciona; **cuál usar lo confirma quien monte la
-infraestructura según el plan contratado.** Hostinger también tiene integración
-con Git en algunos planes: sirve para traer el repositorio, pero hay que
-comprobar si compila o solo copia archivos, porque lo que se publica es `dist/`
-y no el código.
+**El plan contratado es Business Web Hosting, que incluye acceso SSH**, así que
+la subida va por SSH y no por FTP. Es preferible: se puede sincronizar solo lo
+que cambió, se autentica con llave en vez de contraseña, y la llave se guarda
+como secreto del repositorio.
+
+Hostinger también tiene integración con Git en el panel. Sirve para traer el
+repositorio, pero hay que comprobar si compila o solo copia archivos: lo que se
+publica es `dist/`, no el código. Si solo copia, no sirve para esto.
 
 Ya existe `.github/workflows/preview.yml`, que compila, pasa la revisión y
 publica la vista previa. Para producción es el mismo archivo cambiando el último
@@ -101,8 +123,9 @@ seguidas no dispare cinco compilaciones.
 
 ### Certificado y cifrado
 
-- **Certificado SSL** en el dominio y en el subdominio de WordPress. Let's
-  Encrypt basta y los tres proveedores lo renuevan solos.
+- **Certificado SSL** en el dominio y en el subdominio de WordPress. Hostinger
+  lo da gratis con Let's Encrypt y lo renueva solo; hay que activarlo en los dos
+  y forzar HTTPS.
 - **Todo el tráfico por HTTPS**, con redirección permanente desde HTTP.
 - **HSTS.** El sitio ya declara `strict-transport-security` en la vista previa;
   hay que confirmarlo en producción.
