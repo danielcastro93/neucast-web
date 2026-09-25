@@ -9,8 +9,20 @@ import EscenaHotspots from "./EscenaHotspots.astro";
 
 const { escenas = [], id = "escenas" } = Astro.props;
 const varias = escenas.length > 1;
+
+// Cuántos puntos caben en la fila. Con más zonas que esto, la fila no crece:
+// se convierte en una ventana que se corre, y los puntos de los extremos se
+// encogen para decir que hay más de ese lado. Cinco y no tres porque con tres
+// solo caben vecino, activo y vecino, y no queda sitio para el encogido, que
+// es justo el que avisa de que la fila sigue.
+//
+// La fila mide siempre lo mismo, así que el pie de foto nunca cambia de ancho
+// al pasar de zona ni puede quedar debajo de los puntos: el hueco que se le
+// reserva sale de este mismo número.
+const VENTANA_PUNTOS = 5;
+const ranuras = Math.min(escenas.length, VENTANA_PUNTOS);
 ---
-<div class="ec" data-ec={varias ? id : null} style={`--ec-n:${escenas.length}`}>
+<div class="ec" data-ec={varias ? id : null} style={`--ec-n:${ranuras};--ec-ventana:${VENTANA_PUNTOS}`}>
   <div class="ec-tira" data-ec-tira>
     {escenas.map((e, i) => (
       <figure class:list={["ec-slide", { "ec-slide--pie": e.pie }]} data-ec-slide={i}>
@@ -114,7 +126,7 @@ const varias = escenas.length > 1;
     position:relative;
     width:7px;height:7px;padding:0;border:0;border-radius:50%;
     background:rgba(255,255,255,.45);
-    transition:background .25s,width .25s var(--ease);
+    transition:background .25s,width .25s var(--ease),transform .25s var(--ease),opacity .25s;
   }
   /* El punto se ve de 7 px, pero recibe el dedo en una zona mucho mayor. Sin
      esto había que clavarle el toque a un punto de 7 px. */
@@ -122,6 +134,10 @@ const varias = escenas.length > 1;
     content:"";position:absolute;inset:-14px -5px;
   }
   .ec-punto.on{width:20px;border-radius:999px;background:#fff;}
+  /* El encogido conserva su ranura de 7 px y solo se dibuja más chico, para
+     que la fila mida siempre igual. */
+  .ec-punto--mini{transform:scale(.55);opacity:.8;}
+  .ec-punto[hidden]{display:none;}
 
   @media (prefers-reduced-motion:reduce){
     .ec-punto{transition:none;}
@@ -139,9 +155,27 @@ const varias = escenas.length > 1;
 
     const dondeVa = () => Math.round(tira.scrollLeft / tira.clientWidth);
 
+    // Cuántos puntos caben antes de que la fila se convierta en ventana. Tiene
+    // que coincidir con VENTANA_PUNTOS del bloque de arriba.
+    const VENTANA = Number(getComputedStyle(ec).getPropertyValue("--ec-ventana")) || 5;
+
     const pintar = () => {
       const i = Math.max(0, Math.min(dondeVa(), total - 1));
       puntos.forEach((b, n) => b.classList.toggle("on", n === i));
+
+      if (total > VENTANA) {
+        // la ventana se corre para dejar el activo al centro, y se frena en
+        // los extremos: en la primera zona el activo va a la izquierda
+        const inicio = Math.max(0, Math.min(i - Math.floor(VENTANA / 2), total - VENTANA));
+        const fin = inicio + VENTANA - 1;
+        puntos.forEach((b, n) => {
+          b.hidden = n < inicio || n > fin;
+          // solo se encoge el del borde que todavía tiene zonas más allá
+          const borde = (n === inicio && inicio > 0) || (n === fin && fin < total - 1);
+          b.classList.toggle("ec-punto--mini", borde && n !== i);
+        });
+      }
+
       prev.disabled = i <= 0;
       next.disabled = i >= total - 1;
     };
