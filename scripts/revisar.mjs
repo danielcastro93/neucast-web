@@ -52,6 +52,11 @@ const hayPagina = (h) => {
 
 const fallos = [];
 const indexables = [];
+// Para cazar repetidos: con el contenido en un CMS es el error más fácil de
+// cometer, porque dos piezas parecidas acaban con el mismo título sin que nadie
+// se dé cuenta, y Google se queda con una sola.
+const titulosVistos = new Map();
+const descripcionesVistas = new Map();
 
 for (const f of paginas) {
   const crudo = fs.readFileSync(f, "utf8");
@@ -95,6 +100,12 @@ for (const f of paginas) {
     if (t.length < TITULO[0] || t.length > TITULO[1]) falla(`título de ${t.length} caracteres`);
     if (d.length < DESCRIPCION[0] || d.length > DESCRIPCION[1]) falla(`descripción de ${d.length} caracteres`);
   }
+  if (!noindex) {
+    if (titulosVistos.has(t)) falla(`título repetido con ${titulosVistos.get(t)}`);
+    else titulosVistos.set(t, r);
+    if (descripcionesVistas.has(d)) falla(`descripción repetida con ${descripcionesVistas.get(d)}`);
+    else descripcionesVistas.set(d, r);
+  }
   if (!/<link rel="canonical"/.test(html)) falla("sin canónica");
   if (!/<meta name="robots"/.test(html)) falla("sin etiqueta robots");
   if (!/<html[^>]*lang="es-MX"/.test(html)) falla("sin lang es-MX");
@@ -107,6 +118,25 @@ for (const f of paginas) {
     if (niveles[i] - niveles[i - 1] > 1) {
       falla(`salto de encabezado h${niveles[i - 1]} a h${niveles[i]}`);
       break;
+    }
+  }
+
+  // --- lo que se ve al compartir el enlace ---
+  // La imagen tiene que ser absoluta: WhatsApp y las redes no resuelven rutas
+  // relativas, así que una mal formada se comparte sin foto y no se nota hasta
+  // que alguien manda el enlace.
+  const og = html.match(/<meta property="og:image" content="([^"]*)"/)?.[1];
+  if (!og) falla("sin og:image");
+  else if (!/^https?:\/\//.test(og)) falla(`og:image no es absoluta: ${og}`);
+  if (!/<meta property="og:title"/.test(html)) falla("sin og:title");
+
+  // --- datos estructurados ---
+  // Un JSON roto se lo come el navegador sin decir nada y Google lo descarta.
+  for (const m of crudo.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
+    try {
+      JSON.parse(m[1]);
+    } catch {
+      falla("datos estructurados que no son JSON válido");
     }
   }
 

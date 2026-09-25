@@ -27,8 +27,7 @@ pnpm-debug.log*
 .interno/
 NOTAS-INTERNAS.md
 
-# la documentación va aparte, no en el repositorio público
-docs/
+# notas de trabajo y contexto de las herramientas: no van al repositorio
 AGENTS.md
 CLAUDE.md
 .claude/
