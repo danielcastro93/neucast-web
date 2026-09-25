@@ -203,7 +203,7 @@ const schema = [
   <!-- ============ PREGUNTAS (tabs) ============ -->
   <section class="fq-cuerpo">
     <div class="fq-tabs-wrap">
-      <div class="fq-tabs rail rail-mask" role="tablist" aria-label="Temas">
+      <div class="fq-tabs" role="tablist" aria-label="Temas">
           {grupos.map((g, i) => (
             <button
               class:list={["tab", "label", { active: i === 0 }]}
@@ -270,24 +270,27 @@ const schema = [
     /* ---------- Tabs de temas ----------
        Van centrados y a ancho completo para que quepan los cuatro sin
        recortarse; si no caben, bajan de renglón en vez de esconderse. */
-    .fq-tabs-wrap{margin-bottom:clamp(22px,3vw,34px);}
-    /* En móvil es un carrusel: va a sangre para que --rail-pad alinee el primer
-       chip con el margen de la página, y el degradado de la derecha avisa de
-       que hay más. En escritorio caben todos, así que se centran y el carrusel
-       se desactiva. */
-    /* Sin anclaje: con cuatro chips el recorrido es de unos pocos píxeles en
-       los teléfonos grandes (17 en uno de 440 de ancho). A esa distancia el
-       anclaje solo puede estorbar, porque al soltar el dedo devuelve la barra
-       al principio del chip más cercano y el último se queda cortado contra la
-       orilla. Sin él, el arrastre se queda donde lo dejas y el último chip
-       llega hasta su margen. */
-    .fq-tabs{gap:8px;padding-block:6px;scroll-snap-type:none;}
+    /* Los chips vivían a sangre, colgados del relleno del riel. Sin riel hay
+       que darles el margen de la página a mano, o arrancan pegados al borde. */
+    .fq-tabs-wrap{margin-bottom:clamp(22px,3vw,34px);padding-inline:var(--gutter);}
+    @media (min-width:1500px){
+      .fq-tabs-wrap{max-width:var(--container);margin-inline:auto;}
+    }
+    /* Bajan de renglón, no se recorren de lado.
+       Eran un carrusel y con cuatro chips el recorrido entero era de 17 px en
+       un teléfono de 440 de ancho. A esa distancia no hay gesto que valga: la
+       franja ocupa todo el ancho, así que el deslizamiento arranca cerca de la
+       orilla y el teléfono lo entiende como su gesto de ir atrás o adelante.
+       El último chip se quedaba cortado contra el borde sin manera de traerlo.
+
+       Con cuatro chips, dos renglones ocupan 46 px más y resuelven el caso en
+       cualquier ancho y con cualquier nombre de categoría, que es lo que
+       importa cuando los temas vengan del gestor. */
+    .fq-tabs{
+      display:flex;flex-wrap:wrap;gap:8px;padding-block:6px;
+    }
     @media (min-width:900px){
-      .fq-tabs{
-        flex-wrap:wrap;justify-content:center;
-        overflow:visible;scroll-snap-type:none;
-        mask-image:none;-webkit-mask-image:none;
-      }
+      .fq-tabs{justify-content:center;}
     }
     .tab{
       height:42px;padding:0 18px;border-radius:999px;

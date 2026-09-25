@@ -292,9 +292,18 @@ h1,h2,h3,h4,p{margin:0;}
   .rise,.fade-in{opacity:1;transform:none;animation:none;}
 }
 
-/* ---------- Reveal on scroll ---------- */
-.reveal{opacity:0;transform:translateY(26px);transition:opacity .8s var(--ease),transform .8s var(--ease);}
-.reveal.in{opacity:1;transform:none;}
+/* ---------- Reveal on scroll ----------
+   Los bloques entran apareciendo. Solo SUBEN los que no llevan nada que tocar
+   dentro: si un bloque con un enlace o un botón se desplaza mientras alguien lo
+   toca, el navegador descarta ese toque porque el destino se movió, y hay que
+   tocar dos veces. Pasaba con "explora el catálogo" de nosotros, que seguía
+   moviéndose casi un segundo después de aparecer.
+   Quién puede subir lo decide el script del layout, mirando si el bloque tiene
+   enlaces o botones dentro. Así se mantiene solo cuando cambie el contenido. */
+.reveal{opacity:0;transition:opacity .7s var(--ease);}
+.reveal.in{opacity:1;}
+.reveal--sube{transform:translateY(26px);transition:opacity .7s var(--ease),transform .7s var(--ease);}
+.reveal--sube.in{transform:none;}
 .reveal-d1{transition-delay:.08s;}
 .reveal-d2{transition-delay:.16s;}
 .reveal-d3{transition-delay:.24s;}

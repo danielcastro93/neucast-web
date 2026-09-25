@@ -763,7 +763,13 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
         (entries) => entries.forEach((en) => en.isIntersecting && (en.target.classList.add("in"), io.unobserve(en.target))),
         { rootMargin: "0px 0px -8% 0px", threshold: 0.08 }
       );
-      document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+      document.querySelectorAll(".reveal").forEach((el) => {
+        // Solo suben los bloques sin nada que tocar dentro. Un bloque que se
+        // mueve mientras el dedo está encima se lleva el toque por delante.
+        const tocable = el.matches("a[href],button") || el.querySelector("a[href],button");
+        if (!tocable) el.classList.add("reveal--sube");
+        io.observe(el);
+      });
 
       // La burbuja se esconde mientras haya un CTA grande de cotización en pantalla
       // (hero, bloque final y footer), para no repetir el mismo botón tres veces.
