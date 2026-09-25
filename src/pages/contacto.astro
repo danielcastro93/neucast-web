@@ -7,6 +7,18 @@ const title = "Contacto | Cotiza mobiliario de oficina con Neucast";
 const description =
   "Cuéntanos qué espacio quieres resolver y te mandamos la cotización. Atendemos por WhatsApp y por correo, con envíos e instalación en todo México.";
 
+// Las 32 entidades federativas, escritas como las pide el INEGI. Si esto se
+// conecta a WordPress conviene que siga siendo una lista cerrada: es lo que
+// permite agrupar las solicitudes por estado sin limpiar el dato a mano.
+const estados = [
+  "Aguascalientes", "Baja California", "Baja California Sur", "Campeche",
+  "Chiapas", "Chihuahua", "Ciudad de México", "Coahuila", "Colima", "Durango",
+  "Estado de México", "Guanajuato", "Guerrero", "Hidalgo", "Jalisco",
+  "Michoacán", "Morelos", "Nayarit", "Nuevo León", "Oaxaca", "Puebla",
+  "Querétaro", "Quintana Roo", "San Luis Potosí", "Sinaloa", "Sonora",
+  "Tabasco", "Tamaulipas", "Tlaxcala", "Veracruz", "Yucatán", "Zacatecas",
+];
+
 const asuntos = [
   "Cotizar una o varias piezas",
   "Amueblar un espacio completo",
@@ -58,12 +70,16 @@ const schema = {
         <div class="ct-fila">
           <p class="ct-campo">
             <label for="ct-nombre">Nombre <span class="ct-req" aria-hidden="true">*</span></label>
-            <input type="text" id="ct-nombre" name="nombre" required autocomplete="given-name" placeholder="Tu nombre" />
+            <input type="text" id="ct-nombre" name="nombre" required autocomplete="given-name"
+              placeholder="Tu nombre" maxlength="40" data-solo="letras"
+              pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ][A-Za-zÁÉÍÓÚÜÑáéíóúüñ '’-]*" />
             <span class="ct-error" data-error-de="ct-nombre"></span>
           </p>
           <p class="ct-campo">
             <label for="ct-apellido">Apellido <span class="ct-req" aria-hidden="true">*</span></label>
-            <input type="text" id="ct-apellido" name="apellido" required autocomplete="family-name" placeholder="Tu apellido" />
+            <input type="text" id="ct-apellido" name="apellido" required autocomplete="family-name"
+              placeholder="Tu apellido" maxlength="40" data-solo="letras"
+              pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ][A-Za-zÁÉÍÓÚÜÑáéíóúüñ '’-]*" />
             <span class="ct-error" data-error-de="ct-apellido"></span>
           </p>
         </div>
@@ -79,18 +95,28 @@ const schema = {
           <span class="ct-error" data-error-de="ct-correo"></span>
         </p>
 
+        <p class="ct-campo">
+          <label for="ct-tel">Teléfono <span class="ct-req" aria-hidden="true">*</span></label>
+          <input type="tel" id="ct-tel" name="telefono" required autocomplete="tel" inputmode="numeric"
+            placeholder="55 1234 5678" maxlength="12" data-solo="telefono" pattern="[0-9]{2} [0-9]{4} [0-9]{4}" />
+          <span class="ct-error" data-error-de="ct-tel"></span>
+        </p>
+
         <div class="ct-fila">
           <p class="ct-campo">
-            <label for="ct-tel">Teléfono <span class="ct-req" aria-hidden="true">*</span></label>
-            <input type="tel" id="ct-tel" name="telefono" required autocomplete="tel" inputmode="tel"
-              placeholder="55 1234 5678" />
-            <span class="ct-error" data-error-de="ct-tel"></span>
+            <label for="ct-ciudad">Ciudad <span class="ct-req" aria-hidden="true">*</span></label>
+            <input type="text" id="ct-ciudad" name="ciudad" required autocomplete="address-level2"
+              placeholder="Monterrey" maxlength="60" data-solo="letras"
+              pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ][A-Za-zÁÉÍÓÚÜÑáéíóúüñ '’.-]*" />
+            <span class="ct-error" data-error-de="ct-ciudad"></span>
           </p>
           <p class="ct-campo">
-            <label for="ct-ciudad">Ciudad y estado <span class="ct-req" aria-hidden="true">*</span></label>
-            <input type="text" id="ct-ciudad" name="ciudad" required autocomplete="address-level2"
-              placeholder="Monterrey, Nuevo León" />
-            <span class="ct-error" data-error-de="ct-ciudad"></span>
+            <label for="ct-estado">Estado <span class="ct-req" aria-hidden="true">*</span></label>
+            <select id="ct-estado" name="estado" required autocomplete="address-level1">
+              <option value="">Elige tu estado</option>
+              {estados.map((e) => <option value={e}>{e}</option>)}
+            </select>
+            <span class="ct-error" data-error-de="ct-estado"></span>
           </p>
         </div>
 
@@ -253,8 +279,9 @@ const schema = {
       "ct-nombre": "Dinos cómo te llamas.",
       "ct-apellido": "Falta tu apellido.",
       "ct-correo": "Necesitamos un correo válido para responderte.",
-      "ct-tel": "Déjanos un teléfono por si hay que aclarar algo del proyecto.",
+      "ct-tel": "Déjanos un teléfono de 10 dígitos por si hay que aclarar algo.",
       "ct-ciudad": "El destino cambia el envío y el plazo de entrega.",
+      "ct-estado": "Elige el estado al que va el pedido.",
       "ct-mensaje": "Cuéntanos aunque sea una línea del espacio o la pieza.",
       "ct-aviso": "Necesitamos tu autorización para poder responderte.",
     };
@@ -275,6 +302,50 @@ const schema = {
       });
       return primerFallo;
     };
+
+    // =========================================================================
+    // Filtros de escritura
+    //
+    // El `pattern` de cada campo ya lo valida al enviar, pero esperar al envío
+    // para decir "aquí no van números" se siente a regaño. Estos filtros
+    // descartan la tecla en el momento, así que el campo nunca llega a estar
+    // mal escrito. Se conserva la posición del cursor para poder corregir en
+    // medio de una palabra.
+    // =========================================================================
+    const SOLO = {
+      // nombres de persona y de ciudad: letras con acento, ñ, espacios y los
+      // signos que aparecen en apellidos compuestos
+      letras: (v) => v.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ '’.-]/g, ""),
+      // teléfono nacional: diez dígitos, que se agrupan 2-4-4 al escribir
+      telefono: (v) => {
+        const d = v.replace(/\D/g, "").slice(0, 10);
+        if (d.length <= 2) return d;
+        if (d.length <= 6) return `${d.slice(0, 2)} ${d.slice(2)}`;
+        return `${d.slice(0, 2)} ${d.slice(2, 6)} ${d.slice(6)}`;
+      },
+    };
+
+    form.querySelectorAll("[data-solo]").forEach((campo) => {
+      const filtro = SOLO[campo.dataset.solo];
+      campo.addEventListener("input", () => {
+        const antes = campo.value;
+        const despues = filtro(antes);
+        if (antes === despues) return;
+        // cuántos caracteres válidos había antes del cursor: el cursor vuelve ahí
+        const cursor = campo.selectionStart ?? antes.length;
+        const validosAntes = filtro(antes.slice(0, cursor)).length;
+        campo.value = despues;
+        campo.setSelectionRange(validosAntes, validosAntes);
+      });
+      // al salir del campo se recortan los espacios que deja el filtro cuando
+      // alguien escribe "Monterrey 64000" y los números se van
+      campo.addEventListener("blur", () => {
+        campo.value = campo.value.trim();
+      });
+    });
+
+    // el teléfono viaja en limpio, sin los espacios que solo sirven para leerlo
+    const soloDigitos = (v) => v.replace(/\D/g, "");
 
     // el error se limpia en cuanto la persona corrige
     Object.keys(MENSAJES).forEach((id) => {
@@ -314,6 +385,7 @@ const schema = {
 
       const datos = Object.fromEntries(new FormData(form).entries());
       delete datos.sitio_web;
+      datos.telefono = soloDigitos(datos.telefono);
 
       cargando(true);
       try {
