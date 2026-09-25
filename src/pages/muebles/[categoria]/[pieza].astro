@@ -127,6 +127,12 @@ const schema = [
 ];
 
 const waPieza = waLink(`Hola, me interesa ${pieza.tipo} ${pieza.nombre} que vi en neucast.com.mx`);
+
+// Cuántos puntos llega a enseñar el carrusel de fotos antes de convertirse en
+// una ventana que se corre. Es el mismo número que el carrusel de zonas de los
+// proyectos, para que los dos se lean igual. Tiene que coincidir con el valor
+// que lee el script de abajo.
+const VENTANA_PUNTOS = 5;
 ---
 <Base title={title} description={description} image={pieza.img[0]} schema={schema}>
   <article class="pd">
@@ -157,7 +163,7 @@ const waPieza = waLink(`Hola, me interesa ${pieza.tipo} ${pieza.nombre} que vi e
         </div>
 
         <div class="pd-galeria-pie">
-          <span class="pd-puntos" aria-hidden="true">
+          <span class="pd-puntos" aria-hidden="true" style={`--pd-ventana:${VENTANA_PUNTOS}`}>
             {pieza.img.map((_, i) => <span class:list={["pd-punto", { on: i === 0 }]}></span>)}
             <span class="pd-punto"></span>
           </span>
@@ -264,11 +270,6 @@ const waPieza = waLink(`Hola, me interesa ${pieza.tipo} ${pieza.nombre} que vi e
         <!-- sin rail-both: en teléfono el degradado va solo a la derecha -->
         <div class="rail rail-mask" id="relRail">
           {relacionadas.map((p) => <PiezaCard pieza={p} ancho="min(64vw,300px)" />)}
-        </div>
-        <div class="container pd-rel-pie">
-          <a class="label pd-rel-link" href={`/muebles/${pieza.cat}/`}>
-            Ver {categoria.name.toLowerCase()} <Icon name="arrow" size={14} />
-          </a>
         </div>
       </section>
     )}
@@ -471,9 +472,14 @@ const waPieza = waLink(`Hola, me interesa ${pieza.tipo} ${pieza.nombre} que vi e
     .pd-puntos{display:flex;gap:6px;}
     .pd-punto{
       width:6px;height:6px;border-radius:50%;
-      background:var(--ink-40);opacity:.4;transition:opacity .2s,background .2s;
+      background:var(--ink-40);opacity:.4;
+      transition:opacity .2s,background .2s,transform .25s var(--ease);
     }
     .pd-punto.on{background:var(--ink);opacity:1;}
+    /* El punto del borde se encoge en vez de desaparecer: así se ve que la
+       fila sigue más allá, y conserva su ranura para que la hilera mida
+       siempre lo mismo y el botón de la galería no baile. */
+    .pd-punto--mini{transform:scale(.55);opacity:.25;}
 
     /* El botón de la galería vive sobre la primera foto, no debajo: ahí es
        donde el ojo ya está y no roba un renglón a la composición. */
@@ -671,15 +677,10 @@ const waPieza = waLink(`Hola, me interesa ${pieza.tipo} ${pieza.nombre} que vi e
     }
 
     /* ---------- relacionadas ---------- */
+    /* El riel se cierra en las piezas y ya: el enlace a la categoría de abajo
+       mandaba fuera justo donde se está comparando. Para volver al listado
+       están el menú y la ruta de migas. */
     .pd-rel{margin-top:var(--section-y);margin-bottom:var(--section-y);}
-    .pd-rel-pie{margin-top:clamp(20px,2.5vw,28px);}
-    .pd-rel-link{
-      display:inline-flex;align-items:center;gap:7px;color:var(--ink-60);
-      white-space:nowrap;transition:color .2s,gap .2s var(--ease);
-      min-height:44px;
-    }
-    @media (pointer:fine) and (min-width:900px){.pd-rel-link{min-height:0;}}
-    @media (hover:hover){.pd-rel-link:hover{color:var(--ink);gap:11px;}}
 
     /* ---------- contenido de los paneles ---------- */
     .pl-parrafo{font-size:var(--fs-sm);color:var(--ink-60);}
@@ -765,17 +766,58 @@ const waPieza = waLink(`Hola, me interesa ${pieza.tipo} ${pieza.nombre} que vi e
 
   <script>
     // ---------- puntos del carrusel de móvil ----------
+    // Misma regla que el carrusel de zonas de los proyectos: una pieza con
+    // veinte fotos no pinta veinte puntos. Se enseñan cinco, la ventana se
+    // corre para dejar el activo al centro y se frena en los extremos, de modo
+    // que en la primera foto el activo va a la izquierda y en la última a la
+    // derecha. El punto del borde que todavía tiene fotos más allá se encoge.
+    //
+    // De 900 px para arriba la galería es un mosaico y no hay puntos, así que
+    // esto solo se ve en teléfono y tableta.
     const tira = document.getElementById("pdFotos");
+    const hilera = document.querySelector(".pd-puntos");
     const puntos = [...document.querySelectorAll(".pd-punto")];
-    if (tira && puntos.length) {
-      tira.addEventListener(
-        "scroll",
-        () => {
-          const i = Math.round(tira.scrollLeft / tira.clientWidth);
-          puntos.forEach((p, n) => p.classList.toggle("on", n === i));
-        },
-        { passive: true }
-      );
+    if (tira && hilera && puntos.length) {
+      const total = puntos.length;
+      // tiene que coincidir con VENTANA_PUNTOS del bloque de arriba
+      const VENTANA = Number(getComputedStyle(hilera).getPropertyValue("--pd-ventana")) || 5;
+      const fotos = [...tira.querySelectorAll(".pd-foto")];
+
+      // Cuál está puesta es la foto cuyo borde queda más cerca del borde del
+      // carrusel. Dividir el scroll entre el ancho del carrusel no sirve: la
+      // foto mide menos que él, porque se asoma la siguiente, así que la
+      // cuenta se va desfasando y a partir de la séptima señala otra.
+      const dondeVa = () => {
+        const x = tira.getBoundingClientRect().left;
+        let cual = 0;
+        let cerca = Infinity;
+        fotos.forEach((f, n) => {
+          const d = Math.abs(f.getBoundingClientRect().left - x);
+          if (d < cerca) {
+            cerca = d;
+            cual = n;
+          }
+        });
+        return cual;
+      };
+
+      const pintar = () => {
+        const i = Math.max(0, Math.min(dondeVa(), total - 1));
+        puntos.forEach((p, n) => p.classList.toggle("on", n === i));
+
+        if (total > VENTANA) {
+          const inicio = Math.max(0, Math.min(i - Math.floor(VENTANA / 2), total - VENTANA));
+          const fin = inicio + VENTANA - 1;
+          puntos.forEach((p, n) => {
+            p.hidden = n < inicio || n > fin;
+            const borde = (n === inicio && inicio > 0) || (n === fin && fin < total - 1);
+            p.classList.toggle("pd-punto--mini", borde && n !== i);
+          });
+        }
+      };
+
+      tira.addEventListener("scroll", pintar, { passive: true });
+      pintar();
     }
 
     // ---------- la ficha fija alcanza su último renglón ----------
