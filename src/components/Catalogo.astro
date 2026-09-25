@@ -66,6 +66,84 @@ const bloquesVisibles = bloquesPara(catActiva, piezas.length);
         <button class="mb-cats-flecha mb-cats-flecha--next" type="button" aria-label="Más categorías">
           <Icon name="chevron" size={16} />
         </button>
+
+        <script is:inline>
+          // Coloca el riel de categorías antes de que la página se pinte.
+          //
+          // Cada categoría es una página aparte, así que al entrar el riel nace
+          // en cero y la categoría elegida queda enterrada fuera de pantalla, a
+          // la derecha. Se veía como si el carrusel se reiniciara.
+          //
+          // Con dedo la elegida se alinea al margen izquierdo, que es donde
+          // empieza el título. Con ratón el riel vuelve a donde estaba en el
+          // momento del clic, para que no se mueva solo delante de los ojos: la
+          // tarjeta que se tocó se queda en su sitio, ya en verde.
+          //
+          // Va aquí, suelto y en medio del documento, y no en el módulo del
+          // final: los módulos se aplazan hasta después de pintar, y desde ahí
+          // el riel daría un brinco a la vista. El orden de la lista no se toca
+          // nunca; lo único que cambia es desde dónde se mira.
+          (function () {
+            var LLAVE = "neucast:riel-categorias";
+            var riel = document.querySelector(".mb-cats");
+            if (!riel) return;
+            var activa = riel.querySelector(".mb-cat.activa");
+
+            // La posición guardada se consume de una vez. Si no, al volver con
+            // el botón de atrás desde una ficha se aplicaría una posición que
+            // ya no corresponde a lo que hay en pantalla.
+            var guardado = null;
+            try {
+              guardado = sessionStorage.getItem(LLAVE);
+              sessionStorage.removeItem(LLAVE);
+            } catch (e) {
+              // almacenamiento bloqueado: se sigue sin recordar nada
+            }
+
+            riel.addEventListener("click", function (e) {
+              if (!e.target.closest(".mb-cat")) return;
+              try {
+                sessionStorage.setItem(LLAVE, String(riel.scrollLeft));
+              } catch (err) {}
+            });
+
+            if (!activa) return;
+
+            var margen = parseFloat(getComputedStyle(riel).scrollPaddingLeft) || 0;
+            // dónde cae la tarjeta dentro del contenido del riel, mida lo que
+            // mida el scroll en este momento
+            var posicion = function () {
+              return (
+                riel.scrollLeft +
+                activa.getBoundingClientRect().left -
+                riel.getBoundingClientRect().left
+              );
+            };
+            var alMargen = function () {
+              riel.scrollLeft = posicion() - margen;
+            };
+            // Si ya se ve entera no se toca. Si no, se lleva al margen y no
+            // "lo mínimo necesario": el riel tiene puntos de anclaje en el
+            // inicio de cada tarjeta, así que una posición intermedia se la
+            // devuelve el navegador al anclaje más cercano y el riel se queda
+            // donde estaba. El margen sí es un anclaje.
+            var queSeVea = function () {
+              var rr = riel.getBoundingClientRect();
+              var ra = activa.getBoundingClientRect();
+              if (ra.left >= rr.left - 1 && ra.right <= rr.right + 1) return;
+              alMargen();
+            };
+
+            if (!matchMedia("(pointer:fine)").matches) {
+              alMargen();
+            } else {
+              if (guardado !== null) riel.scrollLeft = Number(guardado) || 0;
+              // se comprueba siempre, aunque se haya restaurado: el dato pudo
+              // quedar viejo, o venir de un enlace directo y no haber dato
+              queSeVea();
+            }
+          })();
+        </script>
       </div>
     </div>
   </section>
