@@ -68,9 +68,35 @@ const croquis = {
 // una mesa redonda dibujada como caja se ve descuidada: lleva su propio croquis
 const esRedonda = Boolean(croquis.diametro && !croquis.ancho);
 
-// En la columna va la primera frase: tres renglones como máximo, para que la
-// ficha completa quepa en pantalla. El texto entero vive en el panel.
-const lead = ficha.resumen.split(". ")[0].replace(/\.$/, "") + ".";
+// El párrafo descriptivo se parte en dos: la primera frase se lee en negro y
+// el resto en gris, como la entrada de la página de proyectos. Antes la primera
+// frase salía además arriba, junto a los botones, y se repetía en la misma
+// página; ahora vive solo aquí.
+const resumenFrases = ficha.resumen.split(". ");
+const relatoFuerte = resumenFrases[0].replace(/\.$/, "") + ".";
+const relatoResto = resumenFrases.slice(1).join(". ").trim();
+
+// Los tres recuadros que acompañan a la foto. Son los mismos en todas las
+// piezas y se llenan con lo que la ficha ya tiene, así que una pieza a medias
+// enseña los que pueda y no deja huecos. No hay texto escrito a mano por pieza.
+const apoyos = [
+  {
+    titulo: "Entrega e instalación",
+    texto: entrega
+      ? `${entrega} desde la confirmación. Montamos en sitio, nivelamos y nos llevamos el empaque. Envío a todo México.`
+      : null,
+  },
+  {
+    titulo: "Materiales",
+    texto: construccion.length
+      ? construccion.slice(0, 2).map((c) => c.valor).join(". ") + "."
+      : null,
+  },
+  {
+    titulo: "Cuidados",
+    texto: ficha.cuidados.length ? ficha.cuidados.slice(0, 2).join(". ") + "." : null,
+  },
+].filter((a) => a.texto);
 
 // Primero las de su categoría y después el resto, hasta llenar el carrusel.
 // Con una categoría de tres piezas un listado de cuatro se ve a medias.
@@ -181,7 +207,6 @@ const VENTANA_PUNTOS = 5;
         <div class="pd-info-sticky">
           <p class="overline pd-tipo">{pieza.tipo}</p>
           <h1 class="display t-h1 pd-nombre">{pieza.nombre}</h1>
-          <p class="pd-resumen">{lead}</p>
 
           {colores.length > 0 && (
             <div class="pd-acabados">
@@ -228,37 +253,38 @@ const VENTANA_PUNTOS = 5;
       </div>
     </div>
 
-    <!-- ============ LO QUE LA DISTINGUE ============ -->
-    {ficha.destacados.length > 0 && (
-      <section class="pd-destacados">
-        <div class="container">
-          <ol class="pd-destacados-lista">
-            {ficha.destacados.map((d, i) => (
-              <li>
-                <span class="pd-destacado-n">{String(i + 1).padStart(2, "0")}</span>
-                <p>{d}</p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-    )}
-
-    <!-- ============ EN CONTEXTO ============ -->
+    <!-- ============ EN CONTEXTO: texto, foto y los tres apoyos ============ -->
+    {/* Antes aquí había una lista numerada 01 02 03 y una foto con el texto
+        encima. Se leía como relleno: tres frases sueltas sin jerarquía y un pie
+        que peleaba con la imagen. Ahora el bloque se lee de corrido, texto,
+        foto limpia y tres apoyos que la rematan. */}
     <section class="pd-contexto">
       <div class="container">
+        <p class="pd-relato display">
+          <span class="pd-relato-a">{relatoFuerte}</span>
+          {relatoResto && <span class="pd-relato-b">{relatoResto}</span>}
+        </p>
+
         <figure class="pd-contexto-marco">
           <img src={ambiente} alt={`${pieza.nombre} instalada en un espacio corporativo`} loading="lazy" />
-          <figcaption>
-            <span class="serif-eyebrow">Entrega e instalación</span>
-            <span class="pd-contexto-ttl">Llega, se arma y queda lista en tu piso</span>
-            <span class="pd-contexto-txt">
-              {entrega} desde la confirmación. Montamos en sitio, nivelamos y nos
-              llevamos el empaque. Envío a todo México.
-            </span>
-          </figcaption>
         </figure>
       </div>
+
+      {apoyos.length > 0 && (
+        /* En teléfono se pasan con el dedo, como el resto de los carruseles del
+           sitio; de 760 para arriba caben los tres de un golpe y el riel se
+           convierte en cuadrícula. */
+        <div class="pd-apoyos rail rail-mask">
+          {apoyos.map((a) => (
+            <article class="pd-apoyo">
+              {/* rótulo, no encabezado: el esquema de la página lo encabeza
+                  el nombre de la pieza y estos son apoyos de un bloque */}
+              <p class="pd-apoyo-ttl">{a.titulo}</p>
+              <p class="pd-apoyo-txt">{a.texto}</p>
+            </article>
+          ))}
+        </div>
+      )}
     </section>
 
     <!-- ============ RELACIONADAS ============ -->
@@ -550,14 +576,6 @@ const VENTANA_PUNTOS = 5;
 
     .pd-tipo{margin-bottom:8px;}
     .pd-nombre{margin-bottom:14px;}
-    /* Sin medida máxima: llena el renglón y baja al siguiente. Tres como tope,
-       que el texto completo está en el panel de detalles. */
-    .pd-resumen{
-      color:var(--ink-60);text-wrap:wrap;
-      display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;
-      overflow:hidden;
-    }
-
     /* ---------- acabados ---------- */
     .pd-acabados{margin-top:26px;}
     .pd-acabados-ttl{
@@ -619,61 +637,58 @@ const VENTANA_PUNTOS = 5;
     @media (hover:hover){.pd-aperturas button:hover{color:var(--olive-deep);}}    
     @media (hover:hover){.pd-aperturas button:hover :global(svg){transform:translateX(3px);color:var(--olive-deep);}}
 
-    /* ---------- lo que la distingue ---------- */
-    .pd-destacados{margin-top:var(--section-y);}
-    .pd-destacados-lista{
-      display:grid;gap:clamp(24px,3vw,40px);list-style:none;padding:0;
-    }
-    @media (min-width:760px){
-      .pd-destacados-lista{grid-template-columns:repeat(3,1fr);}
-    }
-    .pd-destacados-lista li{
-      display:flex;flex-direction:column;gap:12px;
-      padding-top:16px;border-top:2px solid var(--olive);
-    }
-    .pd-destacado-n{
-      font-family:var(--serif);font-size:var(--fs-h3);line-height:1;
-      color:var(--olive-deep);
-    }
-    .pd-destacados-lista p{
-      font-size:var(--fs-body-lg);font-weight:500;color:var(--ink);
-      max-width:30ch;text-wrap:pretty;
-    }
-
     /* ---------- en contexto ---------- */
-    /* En móvil el texto encima de la foto pelea con la foto: hay poco ancho y
-       el velo se come la imagen. Baja fuera del marco y se lee sobre papel. */
     .pd-contexto{margin-top:var(--section-y);}
-    .pd-contexto-marco{position:relative;margin:0;}
+
+    /* Misma voz que la entrada de proyectos: la frase que define la pieza en
+       negro y lo que la matiza en gris, en el mismo párrafo. */
+    .pd-relato{
+      margin:0 0 clamp(28px,4vw,48px);
+      font-size:var(--fs-h4);letter-spacing:-.005em;text-wrap:pretty;
+    }
+    .pd-relato span{display:block;}
+    .pd-relato-b{color:var(--ink-40);margin-top:.5em;}
+    @media (min-width:760px){.pd-relato{max-width:78ch;}}
+
+    /* La foto va limpia: el pie que llevaba encima competía con ella y lo que
+       decía se cuenta mejor en los apoyos de abajo. */
+    .pd-contexto-marco{margin:0;}
     .pd-contexto-marco img{
       display:block;width:100%;aspect-ratio:4/3;object-fit:cover;
       border-radius:var(--radius);background:var(--paper);
     }
-    .pd-contexto-marco figcaption{
-      display:flex;flex-direction:column;gap:3px;
-      margin-top:16px;
-    }
-    .pd-contexto-marco .serif-eyebrow{color:var(--olive-deep);}
-    .pd-contexto-ttl{
-      font-family:var(--serif);font-size:var(--fs-h3);letter-spacing:-.01em;
-      margin-top:2px;color:var(--ink);
-    }
-    .pd-contexto-txt{
-      font-size:var(--fs-sm);max-width:52ch;margin-top:6px;color:var(--ink-60);
-    }
 
+    /* ---------- los tres apoyos ---------- */
+    .pd-apoyos{margin-top:clamp(16px,2vw,24px);align-items:stretch;}
+    .pd-apoyo{
+      flex:none;width:min(76vw,340px);
+      display:flex;flex-direction:column;gap:7px;
+      padding:clamp(20px,2.4vw,26px);
+      /* el mismo arena del bloque de apoyo del menú, no el arena fuerte
+                 de las etiquetas: es un fondo, no un acento */
+      border-radius:var(--radius);background:var(--paper);
+    }
+    .pd-apoyo-ttl{
+      margin:0;font-family:var(--serif);font-size:var(--fs-body-lg);
+      letter-spacing:-.01em;color:var(--ink);
+    }
+    .pd-apoyo-txt{margin:0;color:var(--ink-60);text-wrap:pretty;}
+    /* De aquí para arriba caben los tres, así que el riel deja de serlo: sin
+       desplazamiento y sin degradado. El relleno del riel se queda, porque es
+       justo el que alinea la fila con el margen de la página; anularlo pegaba
+       el primer recuadro a la orilla de la pantalla. */
+    @media (min-width:760px){
+      .pd-apoyos{
+        display:grid;grid-template-columns:repeat(3,1fr);
+        gap:clamp(14px,1.6vw,20px);
+        overflow:visible;mask-image:none;-webkit-mask-image:none;
+      }
+      .pd-apoyo{width:auto;}
+    }
+    /* En pantalla ancha la foto se recuesta: a 4/3 se comía la página entera. */
     @media (min-width:760px){
       .pd-contexto-marco{overflow:hidden;border-radius:var(--radius);}
       .pd-contexto-marco img{aspect-ratio:16/9;border-radius:0;}
-      .pd-contexto-marco figcaption{
-        position:absolute;inset:auto 0 0 0;margin-top:0;color:#fff;
-        padding:clamp(18px,3vw,32px);
-        background:linear-gradient(to top,rgba(10,9,8,.78),rgba(10,9,8,.2) 70%,transparent);
-        text-shadow:0 1px 18px rgba(0,0,0,.35);
-      }
-      .pd-contexto-marco .serif-eyebrow{color:#fff;}
-      .pd-contexto-ttl{color:#fff;}
-      .pd-contexto-txt{color:rgba(255,255,255,.86);}
     }
 
     /* ---------- relacionadas ---------- */
