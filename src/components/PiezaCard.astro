@@ -16,6 +16,18 @@ import { gruposColor, materiales } from "../data/catalogo.js";
 const { pieza, ancho = null, nivel = ancho ? 3 : 2 } = Astro.props;
 const Titulo = `h${nivel}`;
 
+// Tope de fotos en la tarjeta. La galería entera vive en la ficha de la pieza;
+// aquí solo caben la principal y la de ambiente, que es la pareja que hace que
+// la cuadrícula se lea de un vistazo. Una pieza con seis fotos enseña dos, y
+// una con una sola enseña una, sin puntos ni flechas.
+//
+// PARA WORDPRESS: este número manda sobre cuántas fotos traiga el CMS. Si
+// mañana se quieren tres, se cambia aquí y cambia en los cuatro sitios donde
+// se usa la tarjeta: el riel del home, el catálogo, las piezas que combinan de
+// la ficha y las piezas de un proyecto.
+const MAX_FOTOS_CARD = 2;
+const fotos = pieza.img.slice(0, MAX_FOTOS_CARD);
+
 const ruta = `/muebles/${pieza.cat}/${pieza.slug}/`;
 
 const material = materiales.find((m) => m.id === pieza.material);
@@ -43,7 +55,7 @@ const datos = {
     {pieza.nuevo && <span class="pz-nuevo">Nuevo</span>}
 
     <a class="pz-fotos" href={ruta} tabindex="-1" aria-hidden="true">
-      {pieza.img.map((src, i) => (
+      {fotos.map((src, i) => (
         <img
           src={src}
           alt={i === 0 ? pieza.alt : ""}
@@ -54,7 +66,7 @@ const datos = {
       ))}
     </a>
 
-    {pieza.img.length > 1 && (
+    {fotos.length > 1 && (
       <>
         <button class="pz-flecha pz-flecha--prev" type="button" aria-label="Foto anterior">
           <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -67,7 +79,7 @@ const datos = {
           </svg>
         </button>
         <span class="pz-puntos" aria-hidden="true">
-          {pieza.img.map((_, i) => <span class:list={["pz-punto", { on: i === 0 }]}></span>)}
+          {fotos.map((_, i) => <span class:list={["pz-punto", { on: i === 0 }]}></span>)}
         </span>
       </>
     )}
