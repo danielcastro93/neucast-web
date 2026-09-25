@@ -208,8 +208,9 @@ const bloquesVisibles = bloquesPara(catActiva, piezas.length);
       font-size:var(--fs-sm);font-weight:600;color:var(--ink);
     }
     @media (hover:hover){.mb-cat:hover .mb-cat-nombre{color:var(--olive-deep);}}
+    /* La categoría activa se dice con el nombre en verde y nada más: el aro
+       sobre la foto competía con la foto y ensuciaba el riel. */
     .mb-cat.activa .mb-cat-nombre{color:var(--olive-deep);}
-    .mb-cat.activa .mb-cat-media{box-shadow:0 0 0 2px var(--olive);}
     .mb-cats-flecha{
       position:absolute;top:calc(50% - 22px);translate:0 -50%;z-index:2;
       width:38px;height:38px;border-radius:50%;
@@ -414,13 +415,20 @@ const bloquesVisibles = bloquesPara(catActiva, piezas.length);
       border:1px solid var(--line);border-radius:var(--radius-sm);
       background:var(--white);cursor:pointer;
       font-size:var(--fs-xs);color:var(--ink);
-      transition:border-color .2s,box-shadow .2s,opacity .2s;
+      transition:border-color .2s,background .2s,color .2s,opacity .2s;
     }
     .mb-op input{position:absolute;opacity:0;width:1px;height:1px;}
     @media (hover:hover){.mb-op:hover{border-color:var(--ink-40);}}
+    /* Lo elegido se llena, no se contornea. Un filo oscuro alrededor de una
+       muestra de color se peleaba con el filo que ya trae la muestra, y en las
+       tarjetas de color solo se leía la tira de abajo, como si estuviera a
+       medio pintar. Relleno sólido: se ve igual de claro encima de cualquier
+       color y de un vistazo se sabe cuántos filtros hay puestos. */
     .mb-op:has(input:checked){
-      border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);
+      border-color:var(--ink);background:var(--ink);color:var(--white);
     }
+    .mb-op:has(input:checked) .mb-op-n{color:rgba(255,255,255,.6);}
+    @media (hover:hover){.mb-op:has(input:checked):hover{border-color:var(--ink);}}
     .mb-op:has(input:focus-visible){outline:2px solid var(--olive);outline-offset:2px;}
     .mb-op:has(input:disabled){opacity:.38;cursor:default;}
     .mb-op-txt{flex:1;min-width:0;}
@@ -434,11 +442,32 @@ const bloquesVisibles = bloquesPara(catActiva, piezas.length);
       gap:0;padding:0;min-height:0;overflow:hidden;
     }
     .mb-op-punto{
-      grid-column:1 / -1;width:auto;height:56px;
+      position:relative;grid-column:1 / -1;width:auto;height:56px;
       background:var(--c);box-shadow:inset 0 0 0 1px rgba(0,0,0,.10);
     }
+    /* La palomita vive en un disco blanco con su propio filo, así que se lee
+       igual encima de un negro que de un blanco. Es lo único que marca el
+       color elegido: cualquier cosa que toque el borde de la tarjeta vuelve a
+       dibujar un aro alrededor de la muestra. */
+    .mb-op-punto::after{
+      content:"";position:absolute;top:8px;right:8px;width:22px;height:22px;
+      border-radius:50%;background:var(--white) no-repeat center/11px;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%231a1a17' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.4 6.3 4.9 8.8 9.6 3.5'/%3E%3C/svg%3E");
+      box-shadow:0 0 0 1px rgba(0,0,0,.14),0 1px 4px rgba(0,0,0,.22);
+      opacity:0;transform:scale(.55);
+      transition:opacity .18s var(--ease),transform .18s var(--ease);
+    }
+    .mb-op--color:has(input:checked) .mb-op-punto::after{opacity:1;transform:none;}
     .mb-op--color .mb-op-txt{padding:8px 2px 9px 10px;}
     .mb-op--color .mb-op-n{padding:8px 10px 9px 0;}
+    /* Las de color no se llenan como las demás: cuando el color es oscuro la
+       tira se funde con la muestra y la tarjeta pierde su forma. Se quedan
+       como están y habla la palomita. */
+    .mb-op--color:has(input:checked){
+      border-color:var(--line);background:var(--white);color:var(--ink);
+    }
+    .mb-op--color:has(input:checked) .mb-op-txt{font-weight:600;}
+    .mb-op--color:has(input:checked) .mb-op-n{color:var(--ink-40);}
 
     .mb-panel-pie{
       flex:none;display:flex;gap:9px;
@@ -449,7 +478,7 @@ const bloquesVisibles = bloquesPara(catActiva, piezas.length);
 
     @media (prefers-reduced-motion:reduce){
       .mb-scrim,.mb-panel{animation:none;}
-      .mb-bloque img,.mb-signo::before,.mb-signo::after{transition:none;}
+      .mb-bloque img,.mb-signo::before,.mb-signo::after,.mb-op-punto::after{transition:none;}
     }
   </style>
 
