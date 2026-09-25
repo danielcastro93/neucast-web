@@ -522,7 +522,7 @@ const waPieza = waLink(`Hola, me interesa ${pieza.tipo} ${pieza.nombre} que vi e
     }
     @media (max-width:899px){
       .pd-ver{
-        position:static;height:34px;padding:0 6px 0 13px;
+        position:static;height:44px;padding:0 6px 0 13px;
         background:var(--white);border-color:var(--line);box-shadow:none;
       }
       @media (hover:hover){.pd-ver:hover{background:var(--paper-soft);box-shadow:none;}}
@@ -592,7 +592,7 @@ const waPieza = waLink(`Hola, me interesa ${pieza.tipo} ${pieza.nombre} que vi e
       text-underline-offset:3px;text-decoration-thickness:1px;
       transition:color .2s;
     }
-    @media (min-width:900px){.pd-clave-fila dd a{min-height:0;}}
+    @media (pointer:fine) and (min-width:900px){.pd-clave-fila dd a{min-height:0;}}
     @media (hover:hover){.pd-clave-fila dd a:hover{color:var(--ink);}}
 
     /* ---------- acciones ---------- */
@@ -678,7 +678,7 @@ const waPieza = waLink(`Hola, me interesa ${pieza.tipo} ${pieza.nombre} que vi e
       white-space:nowrap;transition:color .2s,gap .2s var(--ease);
       min-height:44px;
     }
-    @media (min-width:900px){.pd-rel-link{min-height:0;}}
+    @media (pointer:fine) and (min-width:900px){.pd-rel-link{min-height:0;}}
     @media (hover:hover){.pd-rel-link:hover{color:var(--ink);gap:11px;}}
 
     /* ---------- contenido de los paneles ---------- */

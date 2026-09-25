@@ -292,24 +292,6 @@ h1,h2,h3,h4,p{margin:0;}
   .rise,.fade-in{opacity:1;transform:none;animation:none;}
 }
 
-/* ---------- Toques ----------
-   Sin esto el navegador aguanta cada toque unos milisegundos por si viene un
-   segundo para hacer zoom, y el primero se siente muerto: tocas y no pasa
-   nada. `manipulation` le dice que en estos elementos no hay doble toque que
-   esperar, así que el clic sale a la primera. Sigue permitiendo desplazar y
-   hacer pinza, así que no estorba a los carruseles. */
-a,
-button,
-summary,
-label,
-input,
-select,
-textarea,
-[role="button"],
-[role="tab"]{
-  touch-action:manipulation;
-}
-
 /* ---------- Reveal on scroll ----------
    Los bloques entran apareciendo. Solo SUBEN los que no llevan nada que tocar
    dentro: si un bloque con un enlace o un botón se desplaza mientras alguien lo

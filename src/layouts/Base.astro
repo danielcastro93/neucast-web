@@ -315,6 +315,7 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
       .hd-actions{margin-left:auto;display:flex;align-items:center;}
 
       .hd-wa{
+        position:relative;
         display:inline-flex;align-items:center;gap:7px;
         height:38px;padding:0 16px;border-radius:999px;
         background:var(--wa);color:#fff;border:1px solid transparent;
@@ -423,10 +424,16 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
     .hd-promo-cta svg{transition:transform .25s var(--ease);}
     @media (hover:hover){.hd-promo:hover .hd-promo-cta svg{transform:translateX(3px);}}
     /* sobre el hero el header es transparente, pero el panel nunca lo es */
+    /* El botón se dibuja de 38 px para no engordar la barra, pero escucha en
+       44, que es lo que pide un dedo. */
+    @media (pointer:coarse),(max-width:899px){
+      .hd-wa::after{content:"";position:absolute;inset:-3px -2px;border-radius:999px;}
+    }
+
     .hd.overlay:not(.scrolled):not(.mega-abierto) .hd-mega{color:var(--ink);}
 
     .hd-burger{
-        width:40px;height:40px;margin-left:-10px;flex:none;
+        width:44px;height:44px;margin-left:-12px;flex:none;
         display:flex;flex-direction:column;justify-content:center;gap:5px;align-items:center;
       }
       .hd-burger span{
@@ -552,9 +559,15 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
         .ft-cols{grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:32px;}
       }
       .ft-cols .overline{margin-bottom:14px;}
+      /* 44 px de alto en teléfono: apilados y con 6 px de relleno quedaban en
+         35 y el dedo tenía que atinarle entre uno y el siguiente. */
       .ft-cols a{
-        display:block;padding:6px 0;font-size:15px;color:var(--ink-60);
+        display:flex;align-items:center;min-height:44px;
+        padding:6px 0;font-size:15px;color:var(--ink-60);
         overflow-wrap:break-word;transition:color .2s;
+      }
+      @media (pointer:fine) and (min-width:900px){
+        .ft-cols a{display:block;min-height:0;}
       }
       /* el <wbr> hace que el correo corte después de la arroba, no a media palabra */
       .ft-mail{font-size:14px;}
@@ -580,7 +593,9 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
         .ft-bottom{
           flex-direction:row;align-items:baseline;justify-content:space-between;gap:24px;
         }
-        .ft-legal{flex-direction:row;gap:24px;margin-block:0;}
+        .ft-legal{flex-direction:row;gap:24px;}
+      }
+      @media (pointer:fine) and (min-width:900px){
         .ft-legal a{min-height:0;}
       }
       /* El nombre de la red sobra: el icono ya lo dice. En círculo se leen

@@ -275,7 +275,12 @@ const bloquesVisibles = bloquesPara(catActiva, piezas.length);
     @media (max-width:699px){
       .mb-rapidos{display:none;}
       .mb-cuenta{margin-left:auto;}
-      .mb-todos{height:38px;}
+    }
+    /* La barra se dibuja compacta para no competir con el encabezado, pero en
+       táctil los controles escuchan en 44 px, que es lo que pide un dedo. Va
+       por puntero y no por ancho: una tablet de 768 es táctil igual. */
+    @media (pointer:coarse),(max-width:899px){
+      .mb-todos,.mb-chip{height:44px;}
     }
 
     /* ---------- Cuadrícula ---------- */
