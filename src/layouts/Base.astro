@@ -81,7 +81,7 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
           <span></span><span></span>
         </button>
         <a href="/" class="hd-logo" aria-label="Neucast, ir al inicio">
-          <Logo height={24} />
+          <Logo height={30} />
         </a>
         <nav class="hd-nav" aria-label="Principal">
           <div class="hd-item">
@@ -282,15 +282,16 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
       }
       .hd.overlay:not(.scrolled):not(.mega-abierto) .hd-burger span{background:#fff;}
       .hd-inner{height:var(--header-h);display:flex;align-items:center;gap:20px;}
-      /* El logo mide 18 px de alto, pero el enlace tiene que dar los 44 que
-         pide un dedo: se estira sin mover el dibujo. */
+      /* El enlace del logo da los 44 que pide un dedo aunque el dibujo mida
+         menos. El logotipo subió de 24 a 30: el cliente lo veía chico y el
+         botón de cotizar pesaba más que la marca. */
       .hd-logo{display:flex;align-items:center;flex:none;min-height:44px;}
       /* en móvil el logo se centra en la barra (patrón BoConcept) y baja de tamaño,
          así deja de verse apretado entre el menú y el botón */
       /* en móvil el logo va a la izquierda, junto al menú, y baja de tamaño */
       @media (max-width:639px){
         .hd-inner{gap:10px;}
-        .hd-logo :global(svg){height:clamp(17px,4.8vw,21px);width:auto;}
+        .hd-logo :global(svg){height:clamp(21px,5.6vw,26px);width:auto;}
         .hd-wa{padding:0 13px;gap:6px;}
       }
       /* más aire entre el logotipo y la navegación */

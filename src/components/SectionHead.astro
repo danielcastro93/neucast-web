@@ -5,6 +5,8 @@ import Icon from "./Icon.astro";
 
 const {
   title,
+  eyebrow,     // rótulo en mayúsculas espaciadas, encima del título
+  punto = true, // el punto verde del logotipo al final del título
   sub,
   linkHref,
   linkLabel,
@@ -14,7 +16,8 @@ const {
 ---
 <div class="sec-head" id={id}>
   <div class="sec-head-txt">
-    <h2 class="display t-h2">{title}</h2>
+    {eyebrow && <p class="rotulo sec-rotulo">{eyebrow}</p>}
+    <h2 class="display t-h2">{title}{punto && <span class="punto" aria-hidden="true">.</span>}</h2>
     {sub && <p class="sec-sub">{sub}</p>}
   </div>
 
@@ -36,6 +39,7 @@ const {
     margin-bottom:var(--block-y);
   }
   .sec-head-txt{min-width:0;}
+  .sec-rotulo{margin-bottom:10px;}
   .sec-sub{
     color:var(--ink-60);font-size:var(--fs-sm);
     margin-top:8px;white-space:nowrap;

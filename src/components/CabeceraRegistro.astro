@@ -1,0 +1,105 @@
+---
+// Cabecera de sección en el registro nuevo: rótulo en mayúsculas espaciadas,
+// titular grande en peso ligero rematado con el punto verde del logotipo,
+// bajada en gris y, si se pide, un botón oscuro.
+//
+// Nació del comentario del cliente de que el sitio se veía "plano": pidió más
+// escala, más aire y textura. Esto es esa respuesta, en una sola pieza que se
+// usa igual en el home y en el listado de proyectos. El punto verde no es
+// adorno ajeno: es el mismo punto de la "n" del logotipo.
+//
+// `nivel` decide la etiqueta del titular: en una página interior es el h1 de
+// la página; dentro del home es un h2. Un solo h1 por página.
+import Icon from "./Icon.astro";
+
+const {
+  rotulo,
+  lineas = [],             // el titular, una entrada por renglón
+  bajada,
+  href,
+  accion,                  // texto del botón; dice la acción concreta
+  nivel = 2,
+  tono = "claro",          // claro (papel) u oscuro (cemento)
+  primera = nivel === 1,   // abre la página: empieza debajo de la barra fija
+  id,
+} = Astro.props;
+
+const Titulo = `h${nivel}`;
+---
+<section class:list={["cr", `cr--${tono}`, "textura", { "cr--primera": primera }]} id={id} data-cr>
+  <div class="container cr-inner">
+    {rotulo && <p class="rotulo cr-rotulo"><span class="rise" style="--delay:.1s">{rotulo}</span></p>}
+    <Titulo class="display display--ligero t-h1 cr-titulo">
+      {lineas.map((l, i) => (
+        <>
+          <span class="paint-line" style={`--i:${i}`}>
+            {l}{i === lineas.length - 1 && <span class="punto" aria-hidden="true">.</span>}
+          </span>{" "}
+        </>
+      ))}
+    </Titulo>
+    {bajada && <p class="cr-bajada fade-in" style="--delay:.55s">{bajada}</p>}
+    {href && accion && (
+      <div class="fade-in" style="--delay:.7s">
+        <a class="pill pill--primary cr-accion" href={href}>{accion} <Icon name="arrow" size={14} /></a>
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .cr{
+    position:relative;
+    padding-block:clamp(56px,9vw,120px);
+    --play:paused;
+  }
+  .cr.in-view{--play:running;}
+  /* Cuando abre la página, el papel corre desde arriba por detrás de la barra
+     fija y el texto empieza donde la barra termina. */
+  .cr--primera{padding-top:calc(var(--header-h) + clamp(48px,8vw,104px));}
+  /* el fantasma previo al pintado es tinta tenue: el blanco de serie no se
+     veía sobre papel y el titular parecía faltar hasta que animaba */
+  .cr--claro{background:var(--paper);color:var(--ink);--paint-fill:var(--ink);--paint-ghost:rgba(29,29,27,.12);}
+  .cr--oscuro{background:var(--cemento);color:var(--white);--paint-fill:#fff;}
+  .cr-inner{position:relative;z-index:1;}
+  .cr-rotulo{margin-bottom:clamp(14px,2vw,22px);}
+  .cr--claro .cr-rotulo{color:var(--ink-60);}
+  .cr--oscuro .cr-rotulo{color:rgba(255,255,255,.72);}
+  /* Renglón por renglón, como el hero: cada entrada de `lineas` es un bloque
+     y baja sola. El titular es la pieza que manda. */
+  .cr-titulo{max-width:1040px;}
+  .cr-bajada{
+    margin-top:clamp(18px,2.6vw,28px);
+    font-size:var(--fs-body-lg);max-width:620px;text-wrap:pretty;
+  }
+  .cr--claro .cr-bajada{color:var(--ink-60);}
+  .cr--oscuro .cr-bajada{color:rgba(255,255,255,.78);}
+  .cr-accion{margin-top:clamp(24px,3.4vw,40px);}
+  .cr--oscuro .cr-accion{background:var(--white);color:var(--ink);}
+  @media (hover:hover){.cr--oscuro .cr-accion:hover{background:var(--paper);}}
+</style>
+
+<script>
+  // La entrada espera a estar en pantalla, igual que el bloque de cierre.
+  // Si el bloque abre la página ya está a la vista cuando corre esto: se
+  // arranca directo, sin depender de que el observador avise a tiempo. En la
+  // primera carga a veces avisaba tarde y el titular se quedaba en fantasma.
+  document.querySelectorAll("[data-cr]").forEach((bloque) => {
+    const r = bloque.getBoundingClientRect();
+    if (r.top < innerHeight * 0.75 && r.bottom > 0) {
+      bloque.classList.add("in-view");
+      return;
+    }
+    new IntersectionObserver(
+      (entradas, obs) => {
+        entradas.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("in-view");
+            obs.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.3 }
+    ).observe(bloque);
+  });
+</script>

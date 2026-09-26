@@ -18,6 +18,9 @@
   --sage:#A1B39D;
   --sand:#D9C7A1;
   --wa:#1DAA61;
+  /* Gris cálido de los bloques con textura. No es la tinta: sobre la tinta
+     el ruido no se ve; sobre este gris se lee como cemento. */
+  --cemento:#2B2A27;
 
   /* Tipografía */
   --sans:"Helvetica Neue","HelveticaNeue",Inter,Roboto,"Segoe UI",Arial,sans-serif;
@@ -95,6 +98,9 @@ a{color:inherit;text-decoration:none;}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;}
 h1,h2,h3,h4,p{margin:0;}
 
+/* En escritorio la barra crece con el logotipo: el cliente lo veía chico. */
+@media (min-width:900px){:root{--header-h:72px;}}
+
 .container{max-width:var(--container);margin-inline:auto;padding-inline:var(--gutter);}
 
 /* ---------- Tipografía ----------
@@ -132,6 +138,33 @@ h1,h2,h3,h4,p{margin:0;}
   text-transform:uppercase;
   color:var(--olive-deep);
 }
+
+/* ---------- Registro nuevo ----------
+   Rótulo en mayúsculas muy espaciadas, titular en peso ligero y el punto verde
+   del logotipo rematando la frase. Pedido del cliente: más escala y más aire.
+   El rótulo ya no lleva serif: el aire entre letras es lo que lo distingue. */
+.rotulo{
+  font-size:var(--fs-2xs);
+  font-weight:500;
+  letter-spacing:.28em;
+  text-transform:uppercase;
+  color:var(--ink-60);
+}
+/* en teléfono el rótulo pierde un poco de aire para caber en un renglón */
+@media (max-width:639px){.rotulo{letter-spacing:.2em;}}
+.display--ligero{font-weight:300;letter-spacing:-.022em;}
+/* el punto es un punto de verdad: se copia como texto y hereda el tamaño */
+.punto{color:var(--olive);}
+
+/* Textura de cemento para los bloques oscuros y de papel. Va en una capa
+   propia que no recibe toques, para no tapar nada de lo que hay encima. */
+.textura{position:relative;isolation:isolate;}
+.textura::before{
+  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:url("/img/textura-cemento.png") repeat;background-size:256px;
+  opacity:.18;mix-blend-mode:overlay;
+}
+.textura > *{position:relative;z-index:1;}
 
 /* ---------- Botones ----------
    Jerarquía:
@@ -272,6 +305,14 @@ h1,h2,h3,h4,p{margin:0;}
   animation:paintFill .8s cubic-bezier(.25,.1,.5,1)
             calc(var(--delay,.15s) + var(--i,0) * .2s) forwards var(--play,paused);
 }
+/* El punto verde va dentro del renglón que se pinta. Su color es opaco, así
+   que no lo pisa el recorte, pero saldría antes de que la palabra termine de
+   pintarse: se le hace esperar el mismo tiempo y entra al final, como remate. */
+.paint-line .punto{
+  opacity:0;
+  animation:fadeIn .3s cubic-bezier(.25,.1,.5,1)
+            calc(var(--delay,.15s) + var(--i,0) * .2s + .7s) forwards var(--play,paused);
+}
 @keyframes paintFill{
   from{background-size:0 100%;}
   to{background-size:100% 100%;}
@@ -289,7 +330,7 @@ h1,h2,h3,h4,p{margin:0;}
 
 @media (prefers-reduced-motion:reduce){
   .paint-line{color:var(--paint-fill,#fff);background:none;animation:none;}
-  .rise,.fade-in{opacity:1;transform:none;animation:none;}
+  .rise,.fade-in,.paint-line .punto{opacity:1;transform:none;animation:none;}
 }
 
 /* ---------- Reveal on scroll ----------
