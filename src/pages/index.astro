@@ -89,7 +89,7 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
   )}
 
   <!-- ============ EDITORIAL / NOSOTROS ============ -->
-  <section class="edit grano" id="nosotros">
+  <section class="edit grano grano--oscuro" id="nosotros">
     <div class="container edit-grid">
       <div class="edit-media reveal">
         <VideoFrame
@@ -220,20 +220,28 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
 
 
     /* ---------- Editorial ---------- */
-    .edit{background:var(--cemento-claro);padding-block:clamp(56px,8vw,110px);}
+    /* cemento oscuro con el texto en blanco: prueba pedida por el cliente
+       a partir de su referencia */
+    .edit{background:var(--cemento-oscuro);color:var(--white);padding-block:clamp(56px,8vw,110px);}
+    .edit :global(.rotulo){color:rgba(255,255,255,.72);}
     .edit-grid{display:grid;grid-template-columns:1fr;gap:clamp(28px,5vw,72px);align-items:center;}
     .edit-copy{order:1;}
     .edit-media{order:2;}
     @media (min-width:900px){.edit-grid{grid-template-columns:1fr 1fr;}}
     
     .edit-title{margin:10px 0 16px;}
-    .edit-text{color:var(--ink-60);max-width:52ch;}
+    .edit-text{color:rgba(255,255,255,.8);max-width:52ch;}
     .edit-points{list-style:none;padding:0;margin:22px 0 28px;display:flex;flex-direction:column;gap:10px;}
     .edit-points li{display:flex;align-items:center;gap:12px;font-size:15px;}
     .edit-points li::before{
       content:"";width:6px;height:6px;border-radius:50%;background:var(--olive);flex:none;
     }
-    @media (hover:hover){.edit .pill--ghost:hover{background:var(--white);}}
+    /* la píldora fantasma hereda el negro de la tinta y sobre el cemento
+       oscuro desaparecía: texto y borde en blanco */
+    .edit .pill--ghost{color:var(--white);border-color:currentColor;}
+    @media (hover:hover){.edit .pill--ghost:hover{background:rgba(255,255,255,.14);}}
+    /* el verde oliva se apaga sobre oscuro; el salvia sí se lee */
+    .edit .edit-points li::before{background:var(--sage);}
 
   </style>
 
