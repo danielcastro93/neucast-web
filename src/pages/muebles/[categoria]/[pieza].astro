@@ -276,7 +276,7 @@ const VENTANA_PUNTOS = 5;
            convierte en cuadrícula. */
         <div class="pd-apoyos rail rail-mask">
           {apoyos.map((a) => (
-            <article class="pd-apoyo">
+            <article class="pd-apoyo grano">
               {/* rótulo, no encabezado: el esquema de la página lo encabeza
                   el nombre de la pieza y estos son apoyos de un bloque */}
               <p class="pd-apoyo-ttl">{a.titulo}</p>
@@ -666,7 +666,8 @@ const VENTANA_PUNTOS = 5;
       padding:clamp(20px,2.4vw,26px);
       /* el mismo arena del bloque de apoyo del menú, no el arena fuerte
                  de las etiquetas: es un fondo, no un acento */
-      border-radius:var(--radius);background:var(--paper);
+      /* gris claro con grano, como la tarjeta de proyectos del home */
+      border-radius:var(--radius);background:var(--cemento-claro);
     }
     .pd-apoyo-ttl{
       margin:0;font-family:var(--serif);font-size:var(--fs-body-lg);

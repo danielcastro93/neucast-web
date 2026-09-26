@@ -69,7 +69,7 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
       <div class="reveal">
         <SectionHead title="Proyectos reales" linkHref="/proyectos/" linkLabel="Ver todos los proyectos" />
       </div>
-      <figure class="proj-stage reveal reveal-d1">
+      <figure class="proj-stage grano reveal reveal-d1">
         <EscenaHotspots
           img={escenaHome.img}
           alt={escenaHome.alt}
@@ -89,7 +89,7 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
   )}
 
   <!-- ============ EDITORIAL / NOSOTROS ============ -->
-  <section class="edit" id="nosotros">
+  <section class="edit grano" id="nosotros">
     <div class="container edit-grid">
       <div class="edit-media reveal">
         <VideoFrame
@@ -158,9 +158,10 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
        para "proyectos ya instalados": fondo arena, la foto dentro con su
        esquina redondeada y el texto debajo. De 900 para arriba el texto se
        monta sobre la foto, y ahí sí pide el velo oscuro. */
+    /* gris claro con grano, no papel liso: es la tarjeta que el cliente señaló */
     .proj-stage{
       position:relative;margin:0;
-      border-radius:var(--radius);background:var(--paper);padding:14px;
+      border-radius:var(--radius);background:var(--cemento-claro);padding:14px;
     }
     /* el radio va en la foto y no en su caja: la caja no puede recortar,
        porque las tarjetas de los puntos se salen de la imagen */
@@ -176,7 +177,7 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
        pisa los puntos. De 900 para arriba el pie se monta sobre la imagen, así
        que ahí la capa no va: taparía los puntos. */
     .proj-link::after{content:"";position:absolute;inset:0;}
-    .proj-caption :global(.rotulo){color:var(--olive-deep);}
+    .proj-caption :global(.rotulo){color:var(--olive-ink);}
     .proj-name{margin:6px 0 8px;}
     .proj-intro{font-size:14.5px;color:var(--ink-60);}
     .proj-link{
@@ -189,6 +190,8 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
 
     @media (min-width:900px){
       .proj-stage{background:var(--ink);padding:0;overflow:hidden;}
+      /* en escritorio la tarjeta es oscura y va sin grano */
+      .proj-stage::before{display:none;}
       .proj-stage :global(.esc) > :global(img){border-radius:0;}
       .proj-caption{
         position:absolute;left:0;right:0;bottom:0;padding:110px 44px 36px;
@@ -217,7 +220,7 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
 
 
     /* ---------- Editorial ---------- */
-    .edit{background:var(--paper);padding-block:clamp(56px,8vw,110px);}
+    .edit{background:var(--cemento-claro);padding-block:clamp(56px,8vw,110px);}
     .edit-grid{display:grid;grid-template-columns:1fr;gap:clamp(28px,5vw,72px);align-items:center;}
     .edit-copy{order:1;}
     .edit-media{order:2;}
