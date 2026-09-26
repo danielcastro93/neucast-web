@@ -659,7 +659,22 @@ const VENTANA_PUNTOS = 5;
     }
 
     /* ---------- los tres apoyos ---------- */
-    .pd-apoyos{margin-top:clamp(16px,2vw,24px);align-items:stretch;}
+    /* Cada gesto deja una tarjeta completa al margen. El riel de serie ancla
+       por proximidad, que solo engancha si el dedo se detiene cerca, y aquí
+       la siguiente se quedaba a la mitad. Obligatorio y de una en una. */
+    .pd-apoyos{
+      margin-top:clamp(16px,2vw,24px);align-items:stretch;
+      scroll-snap-type:x mandatory;
+    }
+    .pd-apoyo{scroll-snap-stop:always;}
+    /* Con anclaje obligatorio la última tarjeta no alcanza a llegar al margen
+       si no sobra recorrido detrás de ella, y rebota. Este espacio al final es
+       ese recorrido: lo que le falta al ancho de la pantalla después de la
+       tarjeta y los dos márgenes. */
+    .pd-apoyos::after{
+      content:"";flex:none;
+      width:calc(100vw - min(76vw,340px) - 2 * var(--rail-pad));
+    }
     .pd-apoyo{
       flex:none;width:min(76vw,340px);
       display:flex;flex-direction:column;gap:7px;
@@ -685,6 +700,8 @@ const VENTANA_PUNTOS = 5;
         overflow:visible;mask-image:none;-webkit-mask-image:none;
       }
       .pd-apoyo{width:auto;}
+      /* en cuadrícula no hay recorrido que completar */
+      .pd-apoyos::after{display:none;}
     }
     /* En pantalla ancha la foto se recuesta: a 4/3 se comía la página entera. */
     @media (min-width:760px){

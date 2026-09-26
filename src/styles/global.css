@@ -22,7 +22,7 @@
   --wa:#1DAA61;
   /* Gris cálido claro para superficies de tarjeta con grano. Va con .grano:
      el cliente quería "cemento" y en claro es esto, no un beige plano. */
-  --cemento-claro:#DFDDD6;
+  --cemento-claro:#E6E4DE;
 
   /* Tipografía */
   --sans:"Helvetica Neue","HelveticaNeue",Inter,Roboto,"Segoe UI",Arial,sans-serif;
