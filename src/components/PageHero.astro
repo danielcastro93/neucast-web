@@ -22,7 +22,7 @@ const lineas = Array.isArray(titulo) ? titulo : [titulo];
       <div class="ph-shade" aria-hidden="true"></div>
       <figcaption class="ph-txt">
         {eyebrow && (
-          <p class="serif-eyebrow"><span class="rise" style="--delay:.85s">{eyebrow}</span></p>
+          <p class="rotulo"><span class="rise" style="--delay:.85s">{eyebrow}</span></p>
         )}
         <h1 class:list={["display", size === "display" ? "t-display" : "t-h1", "ph-title"]}>
           {lineas.map((linea, i) => (

@@ -22,7 +22,7 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
     <img class="hero-img" src="/img/hero-oficina.jpg" alt="Oficina corporativa amueblada por Neucast con escritorios y sillería de diseño" fetchpriority="high" />
     <div class="hero-shade" aria-hidden="true"></div>
     <div class="hero-content container">
-      <p class="serif-eyebrow hero-eyebrow"><span class="rise" style="--delay:.85s">Mobiliario corporativo de diseño</span></p>
+      <p class="rotulo hero-eyebrow"><span class="rise" style="--delay:.85s">Mobiliario corporativo de diseño</span></p>
       <h1 class="display t-display hero-title">
         <span class="paint-line" style="--i:0">Espacios de trabajo</span>{' '}
         <span class="paint-line" style="--i:1">que la gente disfruta</span>
@@ -76,7 +76,7 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
           hotspots={escenaHome.hotspots}
         />
         <figcaption class="proj-caption">
-          <p class="serif-eyebrow">{proyectoDestacado.espacio} · {proyectoDestacado.ciudad}</p>
+          <p class="rotulo">{proyectoDestacado.espacio} · {proyectoDestacado.ciudad}</p>
           <h3 class="display t-h3 proj-name">{proyectoDestacado.nombre}</h3>
           <p class="proj-intro">{proyectoDestacado.resumen}</p>
           <a class="proj-link label" href={`/proyectos/${proyectoDestacado.slug}/`}>
@@ -100,7 +100,7 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
         />
       </div>
       <div class="edit-copy reveal reveal-d1">
-        <p class="serif-eyebrow">La idea es simple</p>
+        <p class="rotulo">La idea es simple</p>
         <h2 class="display t-h2 edit-title">El mobiliario correcto cambia cómo trabaja tu equipo</h2>
         <p class="edit-text">
           En Neucast seleccionamos muebles para oficina que resisten el uso corporativo
@@ -176,7 +176,7 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
        pisa los puntos. De 900 para arriba el pie se monta sobre la imagen, así
        que ahí la capa no va: taparía los puntos. */
     .proj-link::after{content:"";position:absolute;inset:0;}
-    .proj-caption :global(.serif-eyebrow){color:var(--olive-deep);}
+    .proj-caption :global(.rotulo){color:var(--olive-deep);}
     .proj-name{margin:6px 0 8px;}
     .proj-intro{font-size:14.5px;color:var(--ink-60);}
     .proj-link{
@@ -200,7 +200,7 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
         pointer-events:none;
       }
       .proj-caption a{pointer-events:auto;}
-      .proj-caption :global(.serif-eyebrow){color:#fff;}
+      .proj-caption :global(.rotulo){color:#fff;}
       .proj-intro{max-width:52ch;color:rgba(255,255,255,.9);}
       .proj-link{
         display:inline-flex;height:auto;border-radius:0;
