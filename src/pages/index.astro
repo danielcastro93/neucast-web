@@ -22,10 +22,10 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
     <img class="hero-img" src="/img/hero-oficina.jpg" alt="Oficina corporativa amueblada por Neucast con escritorios y sillería de diseño" fetchpriority="high" />
     <div class="hero-shade" aria-hidden="true"></div>
     <div class="hero-content container">
-      <p class="rotulo hero-eyebrow"><span class="rise" style="--delay:.85s">Mobiliario corporativo de diseño</span></p>
-      <h1 class="display display--ligero t-display hero-title">
+      <p class="serif-eyebrow hero-eyebrow"><span class="rise" style="--delay:.85s">Mobiliario corporativo de diseño</span></p>
+      <h1 class="display t-display hero-title">
         <span class="paint-line" style="--i:0">Espacios de trabajo</span>{' '}
-        <span class="paint-line" style="--i:1">que la gente disfruta<span class="punto" aria-hidden="true">.</span></span>
+        <span class="paint-line" style="--i:1">que la gente disfruta</span>
       </h1>
       <p class="hero-sub fade-in" style="--delay:1s">Mobiliario de oficina de diseño para recepciones, salas de juntas, cafeterías y áreas comunes. Envíos a todo México.</p>
       <div class="hero-ctas fade-in" style="--delay:1.12s">
@@ -42,7 +42,7 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
   {categories.length > 0 && (
   <section class="cats" id="muebles">
     <div class="container reveal">
-      <SectionHead eyebrow="Catálogo" title="¿Qué estás buscando?" punto={false} rail="catRail" />
+      <SectionHead title="¿Qué estás buscando?" rail="catRail" />
     </div>
     <div class="rail rail-mask reveal reveal-d1" id="catRail">
       {categories.map((c) => <CategoryCard category={c} />)}
@@ -54,7 +54,7 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
   {piezasDestacadas.length > 0 && (
   <section class="prods">
     <div class="container reveal">
-      <SectionHead eyebrow="Selección" title="Piezas destacadas" rail="prodRail" />
+      <SectionHead title="Piezas destacadas" rail="prodRail" />
     </div>
     <div class="rail rail-mask reveal reveal-d1" id="prodRail">
       {piezasDestacadas.map((p) => <PiezaCard pieza={p} ancho="min(64vw,300px)" />)}
@@ -67,7 +67,7 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
   <section class="proj" id="proyectos">
     <div class="container">
       <div class="reveal">
-        <SectionHead eyebrow="Proyectos Neucast" title="Proyectos reales" linkHref="/proyectos/" linkLabel="Ver todos los proyectos" />
+        <SectionHead title="Proyectos reales" linkHref="/proyectos/" linkLabel="Ver todos los proyectos" />
       </div>
       <figure class="proj-stage reveal reveal-d1">
         <EscenaHotspots
@@ -76,7 +76,7 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
           hotspots={escenaHome.hotspots}
         />
         <figcaption class="proj-caption">
-          <p class="rotulo proj-rotulo">{proyectoDestacado.espacio} · {proyectoDestacado.ciudad}</p>
+          <p class="serif-eyebrow">{proyectoDestacado.espacio} · {proyectoDestacado.ciudad}</p>
           <h3 class="display t-h3 proj-name">{proyectoDestacado.nombre}</h3>
           <p class="proj-intro">{proyectoDestacado.resumen}</p>
           <a class="proj-link label" href={`/proyectos/${proyectoDestacado.slug}/`}>
@@ -100,8 +100,8 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
         />
       </div>
       <div class="edit-copy reveal reveal-d1">
-        <p class="rotulo">La idea es simple</p>
-        <h2 class="display display--ligero t-h2 edit-title">El mobiliario correcto cambia cómo trabaja tu equipo<span class="punto" aria-hidden="true">.</span></h2>
+        <p class="serif-eyebrow">La idea es simple</p>
+        <h2 class="display t-h2 edit-title">El mobiliario correcto cambia cómo trabaja tu equipo</h2>
         <p class="edit-text">
           En Neucast seleccionamos muebles para oficina que resisten el uso corporativo
           diario y los convertimos en espacios completos: desde una sala de juntas hasta
@@ -143,7 +143,6 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
       text-shadow:0 1px 22px rgba(0,0,0,.28);
     }
     .hero-ctas{text-shadow:none;}
-    .hero-eyebrow{color:rgba(255,255,255,.8);}
     .hero-content h1{margin:10px 0 14px;}
     /* el hero anima al cargar, sin esperar scroll */
     .hero-content{--play:running;}
@@ -177,7 +176,7 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
        pisa los puntos. De 900 para arriba el pie se monta sobre la imagen, así
        que ahí la capa no va: taparía los puntos. */
     .proj-link::after{content:"";position:absolute;inset:0;}
-    .proj-rotulo{color:var(--olive-deep);}
+    .proj-caption :global(.serif-eyebrow){color:var(--olive-deep);}
     .proj-name{margin:6px 0 8px;}
     .proj-intro{font-size:14.5px;color:var(--ink-60);}
     .proj-link{
@@ -189,7 +188,7 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
     @media (hover:hover){.proj-link:hover{background:#000;}}
 
     @media (min-width:900px){
-      .proj-stage{background:var(--cemento);padding:0;overflow:hidden;}
+      .proj-stage{background:var(--ink);padding:0;overflow:hidden;}
       .proj-stage :global(.esc) > :global(img){border-radius:0;}
       .proj-caption{
         position:absolute;left:0;right:0;bottom:0;padding:110px 44px 36px;
@@ -201,7 +200,7 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
         pointer-events:none;
       }
       .proj-caption a{pointer-events:auto;}
-      .proj-rotulo{color:rgba(255,255,255,.8);}
+      .proj-caption :global(.serif-eyebrow){color:#fff;}
       .proj-intro{max-width:52ch;color:rgba(255,255,255,.9);}
       .proj-link{
         display:inline-flex;height:auto;border-radius:0;

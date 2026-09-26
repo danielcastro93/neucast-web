@@ -13,17 +13,15 @@ const {
   mensaje = "Hola, quiero cotizar un proyecto de mobiliario para mi empresa.",
 } = Astro.props;
 ---
-<section class="cta textura" data-hides-fab>
+<section class="cta" data-hides-fab>
   <img class="cta-bg" src={img} alt="" loading="lazy" aria-hidden="true" />
   <div class="cta-shade" aria-hidden="true"></div>
   <div class="container cta-inner" data-cta>
-    <p class="rotulo cta-rotulo"><span class="rise" style="--delay:1s">{eyebrow}</span></p>
-    <h2 class="display display--ligero t-h1 cta-title">
+    <p class="serif-eyebrow"><span class="rise" style="--delay:1s">{eyebrow}</span></p>
+    <h2 class="display t-h1 cta-title">
       {lineas.map((l, i) => (
         <>
-          <span class="paint-line" style={`--i:${i}`}>
-            {l}{i === lineas.length - 1 && <span class="punto" aria-hidden="true">.</span>}
-          </span>{" "}
+          <span class="paint-line" style={`--i:${i}`}>{l}</span>{" "}
         </>
       ))}
     </h2>
@@ -52,9 +50,7 @@ const {
     /* la sección ya tiene margen propio: el interior no repite el gutter completo */
     .cta .cta-inner{padding-bottom:210px;padding-inline:var(--space-4);}
   }
-  /* el velo tira a cemento, no a negro: es lo que deja ver la textura */
-  .cta-shade{position:absolute;inset:0;background:rgba(43,42,39,.62);}
-  .cta-rotulo{color:rgba(255,255,255,.78);}
+  .cta-shade{position:absolute;inset:0;background:rgba(15,15,12,.55);}
   .cta-inner{
     position:relative;color:#fff;text-align:left;
     padding-block:clamp(64px,10vw,130px);

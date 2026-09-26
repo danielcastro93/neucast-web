@@ -1,7 +1,7 @@
 ---
 import Base from "../../layouts/Base.astro";
 import Icon from "../../components/Icon.astro";
-import CabeceraRegistro from "../../components/CabeceraRegistro.astro";
+import PageHero from "../../components/PageHero.astro";
 import { site } from "../../data/site.js";
 import { proyectos } from "../../data/proyectos.js";
 
@@ -20,18 +20,21 @@ const schema = {
 };
 ---
 <Base title={title} description={description} image={proyectos[0]?.portada.img} schema={schema}>
-  {/* La cabecera con foto se cambió por el registro nuevo: rótulo, titular
-      ligero con el punto verde y bajada. Es la referencia que mandó el
-      cliente. Sin botón: ya estás en la página a la que llevaría. */}
-  <CabeceraRegistro
-    nivel={1}
-    tono="claro"
-    rotulo="Proyectos Neucast"
-    lineas={["Espacios corporativos", "que ya amueblamos"]}
-    bajada="Oficinas, cafeterías, recepciones y salas de juntas amuebladas en todo México. Aquí está lo que pidió cada cliente, cómo se resolvió y qué piezas quedaron puestas."
+  <PageHero
+    image="/img/proyectos-hero.jpg"
+    alt="Sala de espera corporativa con sofá, sillones y mesa de centro instalados por Neucast"
+    eyebrow="Proyectos"
+    titulo={["Espacios corporativos", "que ya amueblamos"]}
+    size="h1"
   />
 
   <article class="py">
+    <div class="container">
+      <p class="py-intro display">
+        <span class="py-intro-a">Oficinas, cafeterías, recepciones y salas de juntas amuebladas en todo México.</span>
+        <span class="py-intro-b">Aquí está lo que pidió cada cliente, cómo se resolvió y qué piezas quedaron puestas.</span>
+      </p>
+    </div>
 
     <!-- ============ CUADRÍCULA ============ -->
     <div class="container">
@@ -63,7 +66,17 @@ const schema = {
 
   <style>
     /* sin relleno abajo: la separación con el footer la pone el footer */
-    .py{padding-bottom:0;padding-top:var(--section-y);}
+    .py{padding-bottom:0;}
+    /* Entradilla de la página, no pie de la foto: en cuerpo chico y gris se
+       leía como el epígrafe de la imagen de arriba. */
+    .py-intro{
+      margin:clamp(30px,4vw,48px) 0 clamp(68px,9vw,124px);
+      font-size:var(--fs-h4);letter-spacing:-.005em;text-wrap:pretty;
+    }
+    /* Cada frase en su renglón: partida a la mitad se leía como un tropiezo. */
+    .py-intro span{display:block;}
+    .py-intro-b{color:var(--ink-40);}
+    @media (min-width:760px){.py-intro{max-width:88ch;}}
 
     .py-vacio{color:var(--ink-40);font-size:var(--fs-body-lg);}
 
