@@ -200,12 +200,17 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
     <main><slot /></main>
 
     {!hideFooter && (
-    <footer class="ft grano" id="contacto" data-hides-fab>
-      <div class="container">
-        <div class="ft-cta">
+    <footer class="ft" id="contacto" data-hides-fab>
+      <!-- La banda de arriba, con el titular y el botón, va en gris con grano de
+           orilla a orilla; las columnas y el pie van en blanco. Separa lo que
+           es marca de lo que es utilería, como en las referencias del cliente. -->
+      <div class="ft-banda">
+        <div class="container ft-cta">
           <p class="ft-tag display t-h1">Espacios que trabajan bien<br /><em class="ft-tag-serif">y se ven mejor.</em></p>
           <a class="pill pill--wa ft-cta-pill" href={waGeneral} target="_blank" rel="noopener"><Fragment set:html={waIcon} /> Cotiza tu proyecto</a>
         </div>
+      </div>
+      <div class="container">
         <div class="ft-cols">
           <div>
             <p class="overline">Muebles</p>
@@ -540,17 +545,18 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
 
       /* ---------- Footer ---------- */
       .ft{
-        background:var(--cemento-claro);
-        /* las líneas de serie se pierden sobre este gris: un poco más de tinta */
-        --line:rgba(29,29,27,.14);
+        background:var(--white);
         margin-top:clamp(72px,10vw,130px);
         overflow:hidden;
       }
+      /* gris sutil y liso: el cliente vio el gris con grano demasiado fuerte aquí */
+      .ft-banda{background:var(--paper);}
       .ft-cta{
         display:flex;flex-direction:column;gap:26px;align-items:flex-start;
-        padding:clamp(52px,7vw,92px) 0 clamp(36px,5vw,60px);
-        border-bottom:1px solid var(--line);
+        padding-block:clamp(52px,7vw,92px) clamp(44px,6vw,76px);
       }
+      /* las columnas respiran después de la banda */
+      .ft-cols{padding-top:clamp(40px,5vw,64px);}
       .ft-tag{text-wrap:nowrap;}
       .ft-tag-serif{font-family:var(--serif);font-weight:400;font-style:italic;color:var(--olive-deep);}
       .ft-cta-pill{flex:none;}
@@ -566,7 +572,7 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
       @media (min-width:640px){
         .ft-cols{grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:32px;}
       }
-      .ft-cols .overline{margin-bottom:14px;color:var(--olive-ink);}
+      .ft-cols .overline{margin-bottom:14px;}
       /* 44 px de alto en teléfono: apilados y con 6 px de relleno quedaban en
          35 y el dedo tenía que atinarle entre uno y el siguiente. */
       .ft-cols a{

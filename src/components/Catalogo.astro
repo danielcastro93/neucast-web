@@ -581,8 +581,16 @@ const bloquesVisibles = bloquesPara(catActiva, piezas.length);
       // `scrollLeft` cuadro a cuadro, que sí funciona y además se comporta
       // igual en todos los navegadores.
       const quietoAqui = matchMedia("(prefers-reduced-motion: reduce)");
-      const DURACION = 380;
+      // Más largo y con entrada y salida suaves: con 380 ms y solo salida el
+      // cambio se sentía como un golpe. Así arranca despacio, cruza y frena.
+      const DURACION = 650;
+      const suave = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
       let animacion = 0;
+      // El anclaje del riel devuelve al punto más cercano cada posición
+      // intermedia que se le pone, así que animar cuadro a cuadro no animaba
+      // nada: el riel se quedaba quieto y saltaba de golpe al pasar la mitad.
+      // Se apaga mientras dura el deslizamiento y se devuelve al terminar, ya
+      // sobre el punto de anclaje.
       const deslizar = (destino) => {
         cancelAnimationFrame(animacion);
         const inicio = cats.scrollLeft;
@@ -592,11 +600,13 @@ const bloquesVisibles = bloquesPara(catActiva, piezas.length);
           cats.scrollLeft = destino;
           return;
         }
+        cats.style.scrollSnapType = "none";
         const t0 = performance.now();
         const cuadro = (ahora) => {
           const t = Math.min(1, (ahora - t0) / DURACION);
-          cats.scrollLeft = inicio + tramo * (1 - Math.pow(1 - t, 3));
+          cats.scrollLeft = inicio + tramo * suave(t);
           if (t < 1) animacion = requestAnimationFrame(cuadro);
+          else cats.style.scrollSnapType = "";
         };
         animacion = requestAnimationFrame(cuadro);
       };
