@@ -50,8 +50,7 @@ const schema = {
           tiempo de entrega y las opciones de material que apliquen.
         </p>
         <p class="ct-faq fade-in" style="--delay:.6s">
-          Si tu duda es de entregas, garantía o facturación, quizá ya esté respondida
-          en las <a href="/preguntas-frecuentes/">preguntas frecuentes</a>.
+          ¿Tienes dudas? Revisa las <a href="/preguntas-frecuentes/">preguntas frecuentes</a>.
         </p>
       </div>
 
@@ -175,7 +174,9 @@ const schema = {
     /* tamaño de nota al pie, no de párrafo: es un aviso, no parte del texto.
        Se queda en el gris medio: el tenue no llega al contraste mínimo. */
     .ct-faq{margin-top:14px;color:var(--ink-60);font-size:var(--fs-xs);line-height:1.5;text-wrap:pretty;}
-    .ct-faq a{color:var(--olive-deep);text-decoration:underline;text-underline-offset:2px;font-weight:600;}
+    /* Frase corta a propósito: completa cabe en un renglón desde 360 px. El
+       enlace nunca se parte en dos. */
+    .ct-faq a{color:var(--olive-deep);text-decoration:underline;text-underline-offset:2px;font-weight:600;white-space:nowrap;}
     @media (hover:hover){.ct-faq a:hover{color:var(--ink);}}
     /* el renglón es chico: el relleno vertical agranda la zona de toque sin mover la línea */
     @media (pointer:coarse),(max-width:899px){.ct-faq a{padding-block:13px;}}
