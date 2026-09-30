@@ -227,7 +227,13 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
     .edit-grid{display:grid;grid-template-columns:1fr;gap:clamp(28px,5vw,72px);align-items:center;}
     .edit-copy{order:1;}
     .edit-media{order:2;}
-    @media (min-width:900px){.edit-grid{grid-template-columns:1fr 1fr;}}
+    /* en escritorio el video va a la izquierda y el texto a la derecha; en
+       teléfono el texto sigue arriba, que es lo que se lee primero */
+    @media (min-width:900px){
+      .edit-grid{grid-template-columns:1fr 1fr;}
+      .edit-media{order:1;}
+      .edit-copy{order:2;}
+    }
     
     .edit-title{margin:10px 0 16px;}
     .edit-text{color:rgba(255,255,255,.8);max-width:52ch;}
