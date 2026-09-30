@@ -1,4 +1,6 @@
 ---
+import fs from "node:fs";
+import path from "node:path";
 import Base from "../../../layouts/Base.astro";
 import Icon from "../../../components/Icon.astro";
 import PanelLateral from "../../../components/PanelLateral.astro";
@@ -33,6 +35,23 @@ const nombreOpcion = (campo, id) => {
 const material = materiales.find((m) => m.id === pieza.material);
 const colores = pieza.colores.map((id) => gruposColor.find((c) => c.id === id)).filter(Boolean);
 const entrega = nombreOpcion("entrega", pieza.entrega);
+
+// La ficha técnica en PDF, generada con la plantilla de Neucast
+// (`npm run fichas`). Peso y número de hojas se leen del archivo mismo, así
+// que el texto nunca promete algo que el PDF no trae. Si una pieza nueva
+// todavía no tiene su PDF, la opción de descarga no aparece.
+const pdfRuta = `/fichas/neucast-${pieza.slug}.pdf`;
+const pdfArchivo = path.join(process.cwd(), "public", pdfRuta);
+const pdf = fs.existsSync(pdfArchivo)
+  ? (() => {
+      const bytes = fs.readFileSync(pdfArchivo);
+      const hojas = (bytes.toString("latin1").match(/\/Type\s*\/Page(?![s\w])/g) || []).length;
+      const kb = bytes.length / 1024;
+      const peso = kb >= 1024 ? `${(kb / 1024).toFixed(1)} MB` : `${Math.round(kb)} KB`;
+      return { ruta: pdfRuta, hojas, peso };
+    })()
+  : null;
+const conPlano = Boolean(ficha.medidas && Object.keys(ficha.medidas).length);
 
 // Lo que se ve sin abrir nada: cuatro datos que de verdad deciden.
 const clave = [
@@ -268,7 +287,7 @@ const VENTANA_PUNTOS = 5;
             <li><button type="button" data-abre="panelDetalles">Detalles del producto <Icon name="chevron" size={15} /></button></li>
             <li><button type="button" data-abre="panelMedidas">Dimensiones <Icon name="chevron" size={15} /></button></li>
             <li><button type="button" data-abre="panelMateriales">Materiales y cuidados <Icon name="chevron" size={15} /></button></li>
-            <li><button type="button" data-abre="panelDescargas">Descargas <Icon name="chevron" size={15} /></button></li>
+            {pdf && <li><button type="button" data-abre="panelDescargas">Descargas <Icon name="chevron" size={15} /></button></li>}
           </ul>
         </div>
       </div>
@@ -448,13 +467,14 @@ const VENTANA_PUNTOS = 5;
     )}
   </PanelLateral>
 
+  {pdf && (
   <PanelLateral id="panelDescargas" titulo="Descargas">
     <p class="pl-parrafo">
-      La ficha técnica trae el plano acotado, la tabla completa de medidas y las
-      especificaciones de materiales, en una hoja que se puede adjuntar a un
-      expediente de compra.
+      {conPlano
+        ? "La ficha técnica trae el plano acotado, las medidas completas y las especificaciones, lista para adjuntar a una solicitud de compra o compartir con tu equipo."
+        : "La ficha técnica reúne la foto, los acabados y los datos principales de la pieza, lista para adjuntar a una solicitud de compra o compartir con tu equipo."}
     </p>
-    <a class="pl-descarga" href="/fichas/ficha-tecnica-ejemplo.pdf" download>
+    <a class="pl-descarga" href={pdf.ruta} download={`Neucast ${pieza.tipo} ${pieza.nombre}.pdf`}>
       <span class="pl-descarga-icono" aria-hidden="true">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
           <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
@@ -464,7 +484,7 @@ const VENTANA_PUNTOS = 5;
       </span>
       <span class="pl-descarga-txt">
         <span class="pl-descarga-ttl">Ficha técnica de {pieza.nombre}</span>
-        <span class="pl-descarga-meta">PDF · Plano acotado y especificaciones</span>
+        <span class="pl-descarga-meta">PDF · {pdf.hojas === 1 ? "1 hoja" : `${pdf.hojas} hojas`} · {pdf.peso}</span>
       </span>
       <span class="pl-descarga-flecha" aria-hidden="true">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -473,6 +493,7 @@ const VENTANA_PUNTOS = 5;
       </span>
     </a>
   </PanelLateral>
+  )}
 
   <style>
     .pd{padding-top:calc(var(--header-h) + clamp(20px,3vw,32px));}

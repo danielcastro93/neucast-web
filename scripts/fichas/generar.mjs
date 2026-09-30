@@ -5,10 +5,16 @@
 // Sin slugs genera todas las piezas. Imprime con Chrome sin interfaz, así que
 // la tipografía y el diseño salen idénticos a la vista previa en el navegador.
 //
-// Hoy se usa para aprobar la plantilla. Cuando se automatice, esto correrá al
-// publicar y dejará un PDF por pieza en dist/fichas/, más un catálogo por
-// categoría con las mismas hojas. Ver docs/pendientes.md.
+// Plantilla aprobada por Daniel el 30 de septiembre de 2026. Las fichas del
+// sitio se generan con `npm run fichas`, que las deja en public/fichas/ con el
+// nombre neucast-{slug}.pdf; la ficha web enlaza a la suya. Se generan en una
+// Mac a propósito: la plantilla usa Helvetica Neue, que los servidores Linux
+// no tienen. Hacerlo al publicar queda pendiente (docs/pendientes.md).
+//
+// El HTML intermedio va a una carpeta temporal, nunca junto a los PDF: si no,
+// acabaría publicado dentro del sitio.
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { hojasDeFicha, documento } from "./plantilla.mjs";
@@ -29,6 +35,7 @@ if (!salida) {
   process.exit(1);
 }
 fs.mkdirSync(salida, { recursive: true });
+const temporal = fs.mkdtempSync(path.join(os.tmpdir(), "neucast-fichas-"));
 
 const { site, categories } = await import("../../src/data/site.js");
 const { piezas, filtros, materiales, gruposColor } = await import("../../src/data/catalogo.js");
@@ -51,7 +58,7 @@ for (const pieza of elegidas) {
     etiquetasConstruccion,
   };
   const html = documento(hojasDeFicha({ pieza, ficha: fichas[pieza.slug], contexto }), `${pieza.tipo} ${pieza.nombre} · Ficha técnica`);
-  const htmlRuta = path.resolve(salida, `${pieza.slug}.html`);
+  const htmlRuta = path.join(temporal, `${pieza.slug}.html`);
   const pdfRuta = path.resolve(salida, `neucast-${pieza.slug}.pdf`);
   fs.writeFileSync(htmlRuta, html);
   execFileSync(CHROME, [
@@ -62,5 +69,7 @@ for (const pieza of elegidas) {
     `--print-to-pdf=${pdfRuta}`,
     "file://" + htmlRuta,
   ], { stdio: "ignore" });
-  console.log(`✓ ${path.basename(pdfRuta)}`);
+  const kb = Math.round(fs.statSync(pdfRuta).size / 1024);
+  console.log(`✓ ${path.basename(pdfRuta)} · ${kb} KB`);
 }
+fs.rmSync(temporal, { recursive: true, force: true });

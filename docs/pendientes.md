@@ -45,23 +45,33 @@ porqué está en `mapa-de-conexion.md`, apartado 11b.
 
 ## Fichas técnicas y catálogos en PDF
 
-**Plantilla lista, pendiente de aprobación** (30 de septiembre de 2026). Vive
-en `scripts/fichas/`: `plantilla.mjs` arma el HTML de una ficha con los datos
-y `generar.mjs` lo imprime a PDF con Chrome sin interfaz.
+**Plantilla aprobada** por Daniel el 30 de septiembre de 2026 como base para
+todas las fichas. Vive en `scripts/fichas/`: `plantilla.mjs` arma el HTML de
+una ficha con los datos y `generar.mjs` lo imprime a PDF con Chrome sin
+interfaz.
 
 ```bash
-node scripts/fichas/generar.mjs <carpeta> [slug ...]
+npm run fichas                                  # todas, a public/fichas/
+node scripts/fichas/generar.mjs <carpeta> [slug ...]   # solo algunas
 ```
 
 Una o dos hojas por pieza: la primera siempre (foto, nombre, párrafo,
 acabados, datos principales, destacados y foto de ambiente); la segunda solo
 si hay medidas, construcción, mecanismo o cuidados.
 
-**Lo que falta, una vez aprobada:**
+**Ya se descargan desde la ficha** (30 de septiembre). Los PDF están
+versionados en `public/fichas/neucast-{slug}.pdf` y el panel de Descargas de
+cada pieza enlaza al suyo, con el número de hojas y el peso leídos del archivo.
+Si una pieza no tiene PDF, la opción de Descargas no aparece. **Cada vez que
+cambien los datos de una pieza o la plantilla hay que volver a correr
+`npm run fichas` en una Mac y subir los PDF**; si no, el PDF se queda atrás de
+la ficha web.
 
-1. Correrlo al publicar y dejar un PDF por pieza en `dist/fichas/`, y apuntar
-   el botón de Descargas de la ficha a ese archivo. Hoy apunta a un PDF de
-   ejemplo, el mismo para todas.
+**Lo que falta:**
+
+1. Generarlos al publicar en vez de a mano, para que nunca se desfasen. Depende
+   del punto 3 (la letra) y del administrador propio, que es quien sabrá qué
+   pieza cambió.
 2. El catálogo por categoría: las mismas hojas de todas sus piezas con una
    portada y un índice delante, en una página de Recursos.
 3. **Tipografía en el servidor de compilación.** La plantilla usa Helvetica

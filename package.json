@@ -10,7 +10,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "revisar": "node scripts/revisar.mjs"
+    "revisar": "node scripts/revisar.mjs",
+    "fichas": "node scripts/fichas/generar.mjs public/fichas"
   },
   "dependencies": {
     "astro": "^7.3.4"
