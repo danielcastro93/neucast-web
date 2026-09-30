@@ -13,8 +13,8 @@ Un `clamp()` suelto dentro de un componente es un bug, no una decisión.
 | Token | Valor | Uso |
 |---|---|---|
 | `--white` | `#ffffff` | Fondo base del sitio |
-| `--cemento-oscuro` | `#3D3B37` | Bloques de peso con texto en blanco y grano en modo aclarar: "La idea es simple", el card de proyectos del megamenú, los tres apoyos de la ficha |
-| `--cemento-claro` | `#E6E4DE` | Superficies de apoyo con grano: el footer y la tarjeta de proyectos del home en teléfono |
+| `--cemento-oscuro` | `#3D3B37` | El único oscuro de la marca, con texto en blanco. Solo en momentos de marca: "La idea es simple", el card de proyectos del megamenú y la tarjeta de proyectos del home en escritorio. Nunca en información de producto |
+| `--cemento-claro` | `#E6E4DE` | Superficies de apoyo: la tarjeta de proyectos del home en teléfono (con grano) y las tres tarjetas bajo la foto de la ficha (lisas) |
 | `--cemento-suave` | `#EDECE7` | Liso, sin grano, detrás de los recortes de producto en tarjetas y galería de la ficha |
 | `--paper` | `#EDECE7` | Mismo valor que el suave. Conserva el nombre por historia: fondos detrás de fotos, tintes de hover, croquis, miniaturas |
 | `--paper-soft` | `#F2F1ED` | La versión más tenue del anterior |

@@ -279,7 +279,7 @@ const VENTANA_PUNTOS = 5;
            convierte en cuadrícula. */
         <div class="pd-apoyos rail rail-mask">
           {apoyos.map((a) => (
-            <article class="pd-apoyo grano grano--oscuro">
+            <article class="pd-apoyo">
               {/* rótulo, no encabezado: el esquema de la página lo encabeza
                   el nombre de la pieza y estos son apoyos de un bloque */}
               <p class="rotulo pd-apoyo-ttl">{a.titulo}</p>
@@ -685,18 +685,17 @@ const VENTANA_PUNTOS = 5;
       flex:none;width:min(76vw,340px);
       display:flex;flex-direction:column;gap:7px;
       padding:clamp(20px,2.4vw,26px);
-      /* el mismo arena del bloque de apoyo del menú, no el arena fuerte
-                 de las etiquetas: es un fondo, no un acento */
-      /* cemento oscuro con el texto en blanco, como "La idea es simple" */
-      border-radius:var(--radius);background:var(--cemento-oscuro);color:var(--white);
+      /* gris claro liso con texto oscuro: son notas al pie de la ficha y no deben
+         competirle al mueble. El oscuro queda para los momentos de marca. */
+      border-radius:var(--radius);background:var(--cemento-claro);color:var(--ink);
     }
-    /* mismo rótulo que el del hero: mayúsculas espaciadas, en blanco atenuado */
-    .pd-apoyo-ttl{margin:0 0 4px;color:rgba(255,255,255,.72);}
-    .pd-apoyo-txt{margin:0;color:rgba(255,255,255,.8);text-wrap:pretty;}
-    /* enlace de la tarjeta: blanco, con su zona de toque de 44 en táctil */
+    /* mismo rótulo que el del hero: mayúsculas espaciadas, en gris medio */
+    .pd-apoyo-ttl{margin:0 0 4px;color:var(--ink-60);}
+    .pd-apoyo-txt{margin:0;color:var(--ink-60);text-wrap:pretty;}
+    /* enlace de la tarjeta: en tinta, con su zona de toque de 44 en táctil */
     .pd-apoyo-link{
       display:inline-flex;align-items:center;gap:7px;
-      margin-top:10px;font-size:var(--fs-xs);font-weight:600;color:var(--white);
+      margin-top:10px;font-size:var(--fs-xs);font-weight:600;color:var(--ink);
       transition:gap .25s var(--ease),opacity .2s;
     }
     @media (pointer:coarse),(max-width:899px){.pd-apoyo-link{min-height:44px;}}

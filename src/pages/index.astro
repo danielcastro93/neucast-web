@@ -189,7 +189,8 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
     @media (hover:hover){.proj-link:hover{background:#000;}}
 
     @media (min-width:900px){
-      .proj-stage{background:var(--ink);padding:0;overflow:hidden;}
+      /* el mismo oscuro que "La idea es simple": un solo oscuro en todo el home */
+      .proj-stage{background:var(--cemento-oscuro);padding:0;overflow:hidden;}
       /* en escritorio la tarjeta es oscura y va sin grano */
       .proj-stage::before{display:none;}
       .proj-stage :global(.esc) > :global(img){border-radius:0;}
