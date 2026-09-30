@@ -7,8 +7,13 @@
 :root{
   /* Color */
   --white:#ffffff;
-  --paper:#F5F2E7;        /* blanco roto — superficies alternas */
-  --paper-soft:#FAF8F1;
+  /* Antes eran arena (#F5F2E7 y #FAF8F1). El cliente quiso el sitio en grises
+     y el arena quedó huérfano: ahora son el gris suave y su versión más tenue,
+     y todo lo que los usa (fondos detrás de fotos, tintes al pasar el cursor,
+     croquis, miniaturas) sigue solo. El nombre se conserva para no tocar
+     treinta reglas; el único arena que queda es --sand, la etiqueta "Nuevo". */
+  --paper:#EDECE7;
+  --paper-soft:#F2F1ED;
   --ink:#1D1D1B;          /* tinta principal (BoConcept) */
   --ink-60:#5f5e59;
   --ink-40:#95948e;

@@ -200,7 +200,7 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
     <main><slot /></main>
 
     {!hideFooter && (
-    <footer class="ft" id="contacto" data-hides-fab>
+    <footer class="ft grano" id="contacto" data-hides-fab>
       <div class="container">
         <div class="ft-cta">
           <p class="ft-tag display t-h1">Espacios que trabajan bien<br /><em class="ft-tag-serif">y se ven mejor.</em></p>
@@ -540,7 +540,9 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
 
       /* ---------- Footer ---------- */
       .ft{
-        background:var(--paper);
+        background:var(--cemento-claro);
+        /* las líneas de serie se pierden sobre este gris: un poco más de tinta */
+        --line:rgba(29,29,27,.14);
         margin-top:clamp(72px,10vw,130px);
         overflow:hidden;
       }
@@ -564,7 +566,7 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
       @media (min-width:640px){
         .ft-cols{grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:32px;}
       }
-      .ft-cols .overline{margin-bottom:14px;}
+      .ft-cols .overline{margin-bottom:14px;color:var(--olive-ink);}
       /* 44 px de alto en teléfono: apilados y con 6 px de relleno quedaban en
          35 y el dedo tenía que atinarle entre uno y el siguiente. */
       .ft-cols a{
