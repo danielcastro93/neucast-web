@@ -172,7 +172,9 @@ const schema = {
     }
     .ct-intro{color:var(--ink-60);font-size:var(--fs-body-lg);}
     /* desvía al que solo tenía una duda, antes de que llene el formulario */
-    .ct-faq{margin-top:14px;color:var(--ink-60);font-size:var(--fs-sm);text-wrap:pretty;}
+    /* tamaño de nota al pie, no de párrafo: es un aviso, no parte del texto.
+       Se queda en el gris medio: el tenue no llega al contraste mínimo. */
+    .ct-faq{margin-top:14px;color:var(--ink-60);font-size:var(--fs-xs);line-height:1.5;text-wrap:pretty;}
     .ct-faq a{color:var(--olive-deep);text-decoration:underline;text-underline-offset:2px;font-weight:600;}
     @media (hover:hover){.ct-faq a:hover{color:var(--ink);}}
     /* el renglón es chico: el relleno vertical agranda la zona de toque sin mover la línea */
