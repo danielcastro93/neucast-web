@@ -200,16 +200,10 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
     <main><slot /></main>
 
     {!hideFooter && (
-    <footer class="ft" id="contacto" data-hides-fab>
-      <!-- La banda de arriba, con el titular y el botón, va en gris con grano de
-           orilla a orilla; las columnas y el pie van en blanco. Separa lo que
-           es marca de lo que es utilería, como en las referencias del cliente. -->
-      <div class="ft-banda">
-        <div class="container ft-cta">
-          <p class="ft-tag display t-h1">Espacios que trabajan bien<br /><em class="ft-tag-serif">y se ven mejor.</em></p>
-          <a class="pill pill--wa ft-cta-pill" href={waGeneral} target="_blank" rel="noopener"><Fragment set:html={waIcon} /> Cotiza tu proyecto</a>
-        </div>
-      </div>
+    <footer class="ft" id="contacto">
+      <!-- Sin banda de cierre: el bloque de "cotiza" ya vive en el encabezado,
+           en la burbuja y en el cierre con foto. El footer es columnas y pie,
+           separados del contenido por aire y una línea discreta. -->
       <div class="container">
         <div class="ft-cols">
           <div>
@@ -547,23 +541,13 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
       .ft{
         background:var(--white);
         margin-top:clamp(72px,10vw,130px);
+        border-top:1px solid var(--line);
         overflow:hidden;
       }
-      /* gris sutil y liso: el cliente vio el gris con grano demasiado fuerte aquí */
-      .ft-banda{background:var(--paper);}
-      .ft-cta{
-        display:flex;flex-direction:column;gap:26px;align-items:flex-start;
-        padding-block:clamp(52px,7vw,92px) clamp(44px,6vw,76px);
-      }
-      /* las columnas respiran después de la banda */
+      /* las columnas respiran después de la línea */
       .ft-cols{padding-top:clamp(40px,5vw,64px);}
-      .ft-tag{text-wrap:nowrap;}
-      /* Misma letra que el resto, en verde: la cursiva serif era la única del
-         sitio desde que los rótulos pasaron a mayúsculas, y ya no combinaba. */
-      .ft-tag-serif{font-style:normal;color:var(--olive-deep);}
-      .ft-cta-pill{flex:none;}
+
       @media (min-width:900px){
-        .ft-cta{flex-direction:row;justify-content:space-between;align-items:center;}
       }
       /* En el teléfono va en una sola columna: dos columnas de enlaces cortos
          obligan a leer en zigzag y los bloques quedan descuadrados. */
@@ -591,8 +575,9 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
       .ft-bottom{
         border-top:1px solid var(--line);
         padding-top:20px;
-        /* espacio a la derecha para que la burbuja de WhatsApp no tape el texto */
-        padding-bottom:calc(30px + env(safe-area-inset-bottom));
+        /* la burbuja de WhatsApp ya no se esconde en el footer: el pie deja sitio
+           debajo de la última línea para que flote sobre vacío */
+        padding-bottom:calc(104px + env(safe-area-inset-bottom));
         font-size:var(--text-xs);color:var(--ink-60);
         display:flex;flex-direction:column;gap:12px;
       }
@@ -803,7 +788,8 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
       });
 
       // La burbuja se esconde mientras haya un CTA grande de cotización en pantalla
-      // (hero, bloque final y footer), para no repetir el mismo botón tres veces.
+      // (hero y bloque final), para no repetir el mismo botón. En el footer ya no
+      // hay botón, así que ahí se queda a la vista; el pie le deja hueco debajo.
       const fabWrap = document.getElementById("fabWrap");
       const ctaTargets = document.querySelectorAll("[data-hides-fab]");
       if (fabWrap) {
