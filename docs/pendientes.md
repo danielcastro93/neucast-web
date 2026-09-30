@@ -43,6 +43,37 @@ del build y comprobar que cada ruta existe en `dist/`.
 pasar de 500 piezas. Índice propio (`buscar.json`) en vez de Pagefind; el
 porqué está en `mapa-de-conexion.md`, apartado 11b.
 
+## Fichas técnicas y catálogos en PDF
+
+**Plantilla lista, pendiente de aprobación** (30 de septiembre de 2026). Vive
+en `scripts/fichas/`: `plantilla.mjs` arma el HTML de una ficha con los datos
+y `generar.mjs` lo imprime a PDF con Chrome sin interfaz.
+
+```bash
+node scripts/fichas/generar.mjs <carpeta> [slug ...]
+```
+
+Una o dos hojas por pieza: la primera siempre (foto, nombre, párrafo,
+acabados, datos principales, destacados y foto de ambiente); la segunda solo
+si hay medidas, construcción, mecanismo o cuidados.
+
+**Lo que falta, una vez aprobada:**
+
+1. Correrlo al publicar y dejar un PDF por pieza en `dist/fichas/`, y apuntar
+   el botón de Descargas de la ficha a ese archivo. Hoy apunta a un PDF de
+   ejemplo, el mismo para todas.
+2. El catálogo por categoría: las mismas hojas de todas sus piezas con una
+   portada y un índice delante, en una página de Recursos.
+3. **Tipografía en el servidor de compilación.** La plantilla usa Helvetica
+   Neue, que en Mac viene instalada pero en Linux no. Para que el PDF salga
+   igual al compilar en GitHub Actions hay que instalar Inter o empaquetar la
+   fuente.
+4. **Peso.** Un catálogo de 200 piezas con fotos a resolución completa pesa
+   demasiado para bajarlo en un teléfono. Hay que reducir las fotos antes de
+   imprimir. Una ficha de hoy pesa entre 200 y 350 KB.
+5. **Tiempo de publicación.** Con cientos de piezas conviene regenerar solo
+   los PDF de lo que cambió.
+
 ## Origen de las imágenes
 
 Las fotos de **Nosotros** y **Preguntas frecuentes** son de stock de
