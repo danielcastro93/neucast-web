@@ -13,7 +13,10 @@
      croquis, miniaturas) sigue solo. El nombre se conserva para no tocar
      treinta reglas; el único arena que queda es --sand, la etiqueta "Nuevo". */
   --paper:#EDECE7;
-  --paper-soft:#F2F1ED;
+  /* El tenue es apenas un 4% de tinta sobre blanco, como en las referencias
+     del cliente: para tintes al pasar el cursor y el grupo de filtros abierto,
+     que con el gris entero se sentían demasiado fuertes. */
+  --paper-soft:#F6F5F2;
   --ink:#1D1D1B;          /* tinta principal (BoConcept) */
   --ink-60:#5f5e59;
   --ink-40:#95948e;
