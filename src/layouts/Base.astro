@@ -558,7 +558,9 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
       /* las columnas respiran después de la banda */
       .ft-cols{padding-top:clamp(40px,5vw,64px);}
       .ft-tag{text-wrap:nowrap;}
-      .ft-tag-serif{font-family:var(--serif);font-weight:400;font-style:italic;color:var(--olive-deep);}
+      /* Misma letra que el resto, en verde: la cursiva serif era la única del
+         sitio desde que los rótulos pasaron a mayúsculas, y ya no combinaba. */
+      .ft-tag-serif{font-style:normal;color:var(--olive-deep);}
       .ft-cta-pill{flex:none;}
       @media (min-width:900px){
         .ft-cta{flex-direction:row;justify-content:space-between;align-items:center;}
