@@ -241,12 +241,13 @@ const VENTANA_PUNTOS = 5;
             <a class="pill pill--wa" href={waPieza} target="_blank" rel="noopener">
               Cotizar por WhatsApp
             </a>
+            <div class="pd-ctas-par">
             <a class="pill pill--ghost" href="/contacto/">
-              Pedir cotización por correo
+              Cotizar por correo
             </a>
             <!-- suma la pieza a "Mi proyecto"; ya agregada, lleva a la lista -->
             <button
-              class="pd-mp"
+              class="pill pill--ghost pd-mp"
               type="button"
               data-mp-agregar
               data-mp-ficha
@@ -258,8 +259,9 @@ const VENTANA_PUNTOS = 5;
             >
               <span class="pd-mp-ico pd-mp-ico--mas"><Icon name="mas" size={15} /></span>
               <span class="pd-mp-ico pd-mp-ico--ok"><Icon name="check" size={15} /></span>
-              <span data-mp-texto>Agregar a mi proyecto</span>
+              <span data-mp-texto>Agregar al proyecto</span>
             </button>
+            </div>
           </div>
 
           <ul class="pd-aperturas">
@@ -644,19 +646,19 @@ const VENTANA_PUNTOS = 5;
     /* ---------- acciones ---------- */
     .pd-ctas{display:flex;flex-direction:column;gap:9px;margin-top:22px;}
     .pd-ctas .pill{width:100%;}
-    /* "Mi proyecto": más discreto que los dos botones de cotizar, que son el
-       camino principal. Texto con su ícono, centrado y con zona de toque de 44. */
-    .pd-mp{
-      display:inline-flex;align-items:center;justify-content:center;gap:8px;
-      min-height:44px;margin-top:2px;
-      font-size:var(--fs-sm);font-weight:600;color:var(--ink);
-      border-radius:999px;transition:background .2s;
-    }
-    @media (hover:hover){.pd-mp:hover{background:var(--paper-soft);}}
+    /* WhatsApp es el camino principal y va solo; debajo, en un mismo renglón,
+       las dos alternativas: correo y "Mi proyecto". Tres botones apilados se
+       leían como tres decisiones del mismo peso. */
+    .pd-ctas-par{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+    .pd-ctas-par .pill{padding:0 8px;min-width:0;}
+    .pd-mp{gap:7px;}
     .pd-mp-ico{display:flex;}
-    .pd-mp-ico--ok{display:none;color:var(--olive-deep);}
+    .pd-mp-ico--ok{display:none;}
+    .pd-mp.mp-dentro{background:var(--ink);border-color:var(--ink);color:var(--white);}
     .pd-mp.mp-dentro .pd-mp-ico--mas{display:none;}
     .pd-mp.mp-dentro .pd-mp-ico--ok{display:flex;}
+    /* en teléfonos angostos el texto necesita todo el ancho: el más se omite */
+    @media (max-width:399px){.pd-mp:not(.mp-dentro) .pd-mp-ico--mas{display:none;}}
 
     .pd-aperturas{margin-top:26px;padding:0;border-top:1px solid var(--line);list-style:none;}
     .pd-aperturas li{border-bottom:1px solid var(--line);}

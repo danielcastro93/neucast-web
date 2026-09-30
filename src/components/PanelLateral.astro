@@ -18,6 +18,8 @@ const { id, titulo } = Astro.props;
     </button>
   </header>
   <div class="pl-cuerpo"><slot /></div>
+  <!-- pie fijo: fuera de la zona que se desplaza, así nunca deja hueco abajo -->
+  <slot name="pie" />
 </aside>
 
 <style>

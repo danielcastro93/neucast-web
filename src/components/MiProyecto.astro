@@ -16,10 +16,25 @@ import { site } from "../data/site.js";
 ---
 <PanelLateral id="miProyecto" titulo="Mi proyecto">
   <div class="mp" data-mp data-dominio={site.domain} data-whatsapp={site.whatsapp}>
-    <p class="mp-intro" data-mp-intro hidden></p>
+    <!-- resumen arriba, con "Vaciar" a la mano pero sin gritar -->
+    <div class="mp-resumen" data-mp-resumen hidden>
+      <p class="mp-cuenta" data-mp-total></p>
+      <div class="mp-vaciar-zona" data-mp-vaciar-zona>
+        <button class="mp-vaciar" type="button" data-mp-vaciar>
+          <Icon name="basura" size={14} /> Vaciar
+        </button>
+        <div class="mp-confirma" data-mp-confirma hidden>
+          <span>¿Vaciar la lista?</span>
+          <button type="button" class="mp-confirma-no" data-mp-vaciar-no>Cancelar</button>
+          <button type="button" class="mp-confirma-si" data-mp-vaciar-si>Sí, vaciar</button>
+        </div>
+      </div>
+    </div>
+
     <ul class="mp-lista" data-mp-lista></ul>
 
     <div class="mp-vacio" data-mp-vacio>
+      <span class="mp-vacio-ico" aria-hidden="true"><Icon name="proyecto" size={22} /></span>
       <p class="mp-vacio-ttl">Tu proyecto está vacío</p>
       <p class="mp-vacio-txt">
         Mientras recorres el catálogo, agrega las piezas que te interesen y ponles
@@ -27,79 +42,131 @@ import { site } from "../data/site.js";
       </p>
       <a class="pill pill--primary" href="/muebles/">Explorar el catálogo <Icon name="arrow" size={14} /></a>
     </div>
+  </div>
 
-    <div class="mp-pie" data-mp-pie hidden>
-      <!-- nace con el enlace general; el script le pone la lista al pintarse -->
-      <a class="pill pill--wa" data-mp-wa href={`https://wa.me/${site.whatsapp}`} target="_blank" rel="noopener">
-        <Icon name="whatsapp" size={16} /> Enviar por WhatsApp
-      </a>
-      <a class="pill pill--ghost" href="/contacto/?proyecto">Enviar por correo</a>
-      <button class="mp-vaciar" type="button" data-mp-vaciar>Vaciar la lista</button>
-    </div>
+  <!-- anclado al fondo del panel: la lista se desplaza por detrás -->
+  <div class="mp-pie" slot="pie" data-mp-pie hidden>
+    <!-- nace con el enlace general; el script le pone la lista al pintarse -->
+    <a class="pill pill--wa" data-mp-wa href={`https://wa.me/${site.whatsapp}`} target="_blank" rel="noopener">
+      <Icon name="whatsapp" size={16} /> Enviar por WhatsApp
+    </a>
+    <a class="mp-correo" href="/contacto/?proyecto">Enviar por correo</a>
   </div>
 </PanelLateral>
 
 <style>
-  .mp{display:flex;flex-direction:column;min-height:100%;}
-  .mp-intro{color:var(--ink-60);font-size:var(--fs-sm);margin-bottom:14px;}
+  .mp{display:flex;flex-direction:column;}
+
+  /* ---------- resumen ---------- */
+  .mp-resumen{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    min-height:36px;margin:-4px 0 6px;
+  }
+  .mp-resumen[hidden]{display:none;}
+  .mp-cuenta{font-size:var(--fs-xs);color:var(--ink-60);white-space:nowrap;}
+  .mp-vaciar-zona{display:flex;align-items:center;}
+  /* al confirmar, la pregunta ocupa todo el renglón */
+  .mp-resumen.mp-confirmando .mp-cuenta{display:none;}
+  .mp-resumen.mp-confirmando .mp-vaciar-zona,
+  .mp-resumen.mp-confirmando .mp-confirma{flex:1;}
+  .mp-confirma span{flex:1;}
+  .mp-vaciar{
+    display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;
+    border-radius:999px;background:var(--cemento-suave);
+    font-size:var(--fs-xs);font-weight:600;color:var(--ink);
+    position:relative;transition:background .2s;
+  }
+  .mp-vaciar::after{content:"";position:absolute;inset:-6px -2px;}
+  @media (hover:hover){.mp-vaciar:hover{background:var(--cemento-claro);}}
+  .mp-vaciar[hidden]{display:none;}
+  /* confirmación en el mismo lugar: un toque en falso no borra la lista */
+  .mp-confirma{
+    display:flex;align-items:center;gap:6px;font-size:var(--fs-xs);color:var(--ink-60);
+    animation:mpAparece .22s var(--ease);
+  }
+  .mp-confirma[hidden]{display:none;}
+  .mp-confirma span{margin-right:2px;white-space:nowrap;}
+  .mp-confirma button{
+    position:relative;height:32px;padding:0 12px;border-radius:999px;
+    font-size:var(--fs-xs);font-weight:600;white-space:nowrap;
+  }
+  .mp-confirma button::after{content:"";position:absolute;inset:-6px -2px;}
+  .mp-confirma-no{color:var(--ink);}
+  @media (hover:hover){.mp-confirma-no:hover{background:var(--paper-soft);}}
+  .mp-confirma-si{background:var(--ink);color:var(--white);}
+  @keyframes mpAparece{from{opacity:0;transform:translateX(6px)}to{opacity:1;transform:none}}
+
+  /* ---------- renglones ---------- */
   .mp-lista{list-style:none;margin:0;padding:0;}
   .mp-lista :global(.mp-item){
-    display:grid;grid-template-columns:64px 1fr auto;gap:12px;align-items:center;
-    padding:12px 0;border-bottom:1px solid var(--line);
+    display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:14px;align-items:center;
+    padding:14px 0;border-bottom:1px solid var(--line);
   }
+  .mp-lista :global(.mp-item:last-child){border-bottom:0;}
   .mp-lista :global(.mp-foto){
-    display:block;width:64px;height:64px;border-radius:var(--radius-sm);
+    display:block;width:56px;height:56px;border-radius:var(--radius-sm);
     background:var(--cemento-suave);overflow:hidden;
   }
-  .mp-lista :global(.mp-foto img){width:100%;height:100%;object-fit:contain;padding:6px;}
-  .mp-lista :global(.mp-txt){min-width:0;display:flex;flex-direction:column;gap:6px;}
-  .mp-lista :global(.mp-tipo){font-size:var(--fs-2xs);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-60);}
-  .mp-lista :global(.mp-nombre){font-weight:600;color:var(--ink);line-height:1.25;}
+  .mp-lista :global(.mp-foto img){width:100%;height:100%;object-fit:contain;padding:5px;}
+  .mp-lista :global(.mp-txt){min-width:0;display:flex;flex-direction:column;gap:3px;}
+  .mp-lista :global(.mp-tipo){
+    font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-60);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .mp-lista :global(.mp-nombre){
+    font-size:var(--fs-sm);font-weight:600;color:var(--ink);line-height:1.25;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  }
   @media (hover:hover){.mp-lista :global(.mp-nombre:hover){text-decoration:underline;text-underline-offset:2px;}}
 
-  /* cantidad: menos, número editable y más. Las cantidades grandes (40 sillas)
-     se escriben; los botones son para ajustar. */
-  .mp-lista :global(.mp-cant){display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;align-self:flex-start;}
+  /* cantidad a la derecha, como en las apps de pedidos: en 1, el menos se
+     vuelve bote y quita la pieza. Las cantidades grandes se escriben. */
+  .mp-lista :global(.mp-cant){
+    display:inline-flex;align-items:center;height:36px;padding:0 2px;
+    border-radius:999px;background:var(--cemento-suave);
+  }
   .mp-lista :global(.mp-cant button){
     position:relative;width:32px;height:32px;display:flex;align-items:center;justify-content:center;
-    color:var(--ink);border-radius:50%;
+    color:var(--ink);border-radius:50%;transition:background .15s;
   }
-  .mp-lista :global(.mp-cant button::after){content:"";position:absolute;inset:-6px -3px;}
-  @media (hover:hover){.mp-lista :global(.mp-cant button:hover){background:var(--paper-soft);}}
+  .mp-lista :global(.mp-cant button::after){content:"";position:absolute;inset:-6px -2px;}
+  @media (hover:hover){.mp-lista :global(.mp-cant button:hover){background:var(--white);}}
   .mp-lista :global(.mp-cant input){
-    width:40px;height:32px;border:0;background:none;text-align:center;
+    width:34px;height:32px;border:0;background:none;text-align:center;padding:0;
     font:inherit;font-size:16px;font-weight:600;color:var(--ink);
     -moz-appearance:textfield;appearance:textfield;
   }
   .mp-lista :global(.mp-cant input::-webkit-outer-spin-button),
   .mp-lista :global(.mp-cant input::-webkit-inner-spin-button){-webkit-appearance:none;margin:0;}
 
-  .mp-lista :global(.mp-quitar){
-    position:relative;align-self:start;width:32px;height:32px;margin-right:-6px;
-    display:flex;align-items:center;justify-content:center;border-radius:50%;color:var(--ink-60);
-  }
-  .mp-lista :global(.mp-quitar::after){content:"";position:absolute;inset:-6px;}
-  @media (hover:hover){.mp-lista :global(.mp-quitar:hover){background:var(--paper-soft);color:var(--ink);}}
-
-  .mp-vacio{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding-top:8px;}
+  /* ---------- vacío ---------- */
+  .mp-vacio{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding-top:12px;}
   .mp-vacio[hidden]{display:none;}
+  .mp-vacio-ico{
+    width:52px;height:52px;border-radius:50%;background:var(--cemento-suave);
+    display:flex;align-items:center;justify-content:center;color:var(--ink);margin-bottom:6px;
+  }
   .mp-vacio-ttl{font-weight:700;font-size:var(--fs-body-lg);}
   .mp-vacio-txt{color:var(--ink-60);font-size:var(--fs-sm);margin-bottom:8px;}
 
-  /* los botones de envío se quedan a la vista aunque la lista sea larga */
+  /* ---------- pie anclado ---------- */
   .mp-pie{
-    position:sticky;bottom:0;margin:auto calc(var(--pad) * -1) -40px;
-    padding:16px var(--pad) calc(16px + env(safe-area-inset-bottom));
+    flex:none;
+    padding:14px 20px calc(10px + env(safe-area-inset-bottom));
     background:var(--white);border-top:1px solid var(--line);
-    display:flex;flex-direction:column;gap:10px;
+    box-shadow:0 -10px 24px rgba(0,0,0,.04);
+    display:flex;flex-direction:column;align-items:stretch;gap:4px;
   }
   .mp-pie[hidden]{display:none;}
-  .mp-pie .pill{width:100%;justify-content:center;height:46px;}
-  .mp-vaciar{
-    align-self:center;min-height:44px;padding:0 12px;
-    font-size:var(--fs-xs);color:var(--ink-60);text-decoration:underline;text-underline-offset:2px;
+  .mp-pie .pill{width:100%;justify-content:center;height:50px;}
+  .mp-correo{
+    align-self:center;display:inline-flex;align-items:center;min-height:44px;padding:0 14px;
+    font-size:var(--fs-xs);font-weight:600;color:var(--ink);
+    text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--ink-40);
   }
-  @media (hover:hover){.mp-vaciar:hover{color:var(--ink);}}
+  @media (hover:hover){.mp-correo:hover{text-decoration-color:var(--ink);}}
+
+  @media (prefers-reduced-motion:reduce){.mp-confirma{animation:none;}}
 </style>
 
 <script>
@@ -108,9 +175,12 @@ import { site } from "../data/site.js";
   const raiz = document.querySelector("[data-mp]");
   const lista = raiz.querySelector("[data-mp-lista]");
   const vacio = raiz.querySelector("[data-mp-vacio]");
-  const pie = raiz.querySelector("[data-mp-pie]");
-  const intro = raiz.querySelector("[data-mp-intro]");
-  const wa = raiz.querySelector("[data-mp-wa]");
+  const pie = document.querySelector("[data-mp-pie]");
+  const resumen = raiz.querySelector("[data-mp-resumen]");
+  const total = raiz.querySelector("[data-mp-total]");
+  const botonVaciar = raiz.querySelector("[data-mp-vaciar]");
+  const confirma = raiz.querySelector("[data-mp-confirma]");
+  const wa = pie.querySelector("[data-mp-wa]");
   const dominio = raiz.dataset.dominio;
   const telefono = raiz.dataset.whatsapp;
 
@@ -118,7 +188,7 @@ import { site } from "../data/site.js";
     const d = {
       menos: '<path d="M3 8h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
       mas: '<path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
-      cerrar: '<path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+      basura: '<path d="M2.5 4.5h11M6.5 4.5V3h3v1.5M4 4.5l.7 8.6c.1.8.7 1.4 1.5 1.4h3.6c.8 0 1.4-.6 1.5-1.4l.7-8.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
     }[nombre];
     return `<svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">${d}</svg>`;
   };
@@ -153,19 +223,23 @@ import { site } from "../data/site.js";
     nombre.href = p.url;
     nombre.textContent = p.nombre;
 
+    txt.append(tipo, nombre);
+
+    const n = p.cantidad || 1;
     const cant = document.createElement("div");
     cant.className = "mp-cant";
+    // en 1 el botón de la izquierda quita la pieza en vez de restar
     const menos = document.createElement("button");
     menos.type = "button";
-    menos.innerHTML = icono("menos");
-    menos.setAttribute("aria-label", `Una ${p.nombre} menos`);
-    menos.dataset.accion = "menos";
+    menos.innerHTML = icono(n > 1 ? "menos" : "basura");
+    menos.setAttribute("aria-label", n > 1 ? `Una ${p.nombre} menos` : `Quitar ${p.tipo} ${p.nombre} de tu proyecto`);
+    menos.dataset.accion = n > 1 ? "menos" : "quitar";
     const campo = document.createElement("input");
     campo.type = "number";
     campo.inputMode = "numeric";
     campo.min = "1";
     campo.max = "999";
-    campo.value = String(p.cantidad || 1);
+    campo.value = String(n);
     campo.setAttribute("aria-label", `Cantidad de ${p.tipo} ${p.nombre}`);
     const mas = document.createElement("button");
     mas.type = "button";
@@ -173,16 +247,8 @@ import { site } from "../data/site.js";
     mas.setAttribute("aria-label", `Una ${p.nombre} más`);
     mas.dataset.accion = "mas";
     cant.append(menos, campo, mas);
-    txt.append(tipo, nombre, cant);
 
-    const fuera = document.createElement("button");
-    fuera.type = "button";
-    fuera.className = "mp-quitar";
-    fuera.innerHTML = icono("cerrar");
-    fuera.setAttribute("aria-label", `Quitar ${p.tipo} ${p.nombre} de tu proyecto`);
-    fuera.dataset.accion = "quitar";
-
-    li.append(foto, txt, fuera);
+    li.append(foto, txt, cant);
     return li;
   };
 
@@ -205,10 +271,11 @@ import { site } from "../data/site.js";
     lista.replaceChildren(...piezas.map(pintarPieza));
     vacio.hidden = n > 0;
     pie.hidden = n === 0;
-    intro.hidden = n === 0;
+    resumen.hidden = n === 0;
+    if (!n) pedirConfirmacion(false);
     if (n) {
-      const total = piezas.reduce((s, p) => s + (p.cantidad || 1), 0);
-      intro.textContent = `${n} ${n === 1 ? "modelo" : "modelos"}, ${total} ${total === 1 ? "pieza" : "piezas"}. Ajusta las cantidades y mándanos la lista.`;
+      const suma = piezas.reduce((s, p) => s + (p.cantidad || 1), 0);
+      total.textContent = `${n} ${n === 1 ? "modelo" : "modelos"} · ${suma} ${suma === 1 ? "pieza" : "piezas"}`;
       wa.href = `https://wa.me/${telefono}?text=${encodeURIComponent(mensaje(piezas, dominio))}`;
     }
   };
@@ -230,7 +297,19 @@ import { site } from "../data/site.js";
     const campo = e.target.closest("input");
     if (campo) cantidad(campo.closest(".mp-item").dataset.slug, campo.value);
   });
-  raiz.querySelector("[data-mp-vaciar]").addEventListener("click", vaciar);
+  // vaciar pide confirmación ahí mismo
+  function pedirConfirmacion(si) {
+    botonVaciar.hidden = si;
+    resumen.classList.toggle("mp-confirmando", si);
+    confirma.hidden = !si;
+    if (si) confirma.querySelector("[data-mp-vaciar-no]").focus();
+  }
+  botonVaciar.addEventListener("click", () => pedirConfirmacion(true));
+  confirma.querySelector("[data-mp-vaciar-no]").addEventListener("click", () => {
+    pedirConfirmacion(false);
+    botonVaciar.focus();
+  });
+  confirma.querySelector("[data-mp-vaciar-si]").addEventListener("click", vaciar);
 
   // --- botones de agregar (tarjetas y ficha) ---
   function datosDe(boton) {
@@ -257,7 +336,7 @@ import { site } from "../data/site.js";
     const nombre = `${boton.dataset.tipo} ${boton.dataset.nombre}`;
     if (texto) {
       // la ficha: agregado, el botón lleva a la lista en vez de quitar la pieza
-      texto.textContent = dentro ? "En tu proyecto · Ver la lista" : "Agregar a mi proyecto";
+      texto.textContent = dentro ? "En tu proyecto" : "Agregar al proyecto";
       boton.setAttribute("aria-label", dentro ? "Ver mi proyecto" : `Agregar ${nombre} a mi proyecto`);
     } else {
       // la tarjeta: el mismo botón agrega y quita

@@ -1,138 +1,228 @@
 ---
-// Buscador del sitio: una capa que baja desde arriba, con el fondo
-// difuminado, y busca mientras se escribe.
+// Buscador del sitio: una capa a pantalla completa, sobre el sitio
+// difuminado, que busca mientras se escribe.
 //
 // Va una sola vez, en Base.astro. Se abre desde cualquier elemento con
 // data-bs-abrir (la lupa del encabezado) y también con "/" o Ctrl/Cmd+K en
-// escritorio. Cierra con animación, con Escape y tocando fuera.
+// escritorio. Cierra con animación, con Escape y con su botón.
 //
 // El índice (/buscar.json) se pide la primera vez que se abre, no al cargar la
 // página: quien no busca no lo descarga. Busca en piezas, categorías y
 // proyectos, sin importar acentos ni mayúsculas, y entiende singular y plural
 // ("sillas" encuentra "silla").
 import Icon from "./Icon.astro";
+import Logo from "./Logo.astro";
 import { categories } from "../data/site.js";
+import { piezas } from "../data/catalogo.js";
+
+// Sugerencias para empezar: el tipo de mueble con más piezas de cada
+// categoría, en el orden del menú. Salen del catálogo, así que cambian solas
+// cuando cambia el catálogo.
+const sugeridas = categories
+  .map((c) => {
+    const cuenta = new Map();
+    piezas.filter((p) => p.cat === c.slug).forEach((p) => cuenta.set(p.tipo, (cuenta.get(p.tipo) || 0) + 1));
+    return [...cuenta.entries()].sort((a, b) => b[1] - a[1])[0]?.[0];
+  })
+  .filter(Boolean)
+  .slice(0, 6);
 ---
-<div class="bs-velo" data-bs-velo hidden></div>
 <div class="bs" id="buscador" role="dialog" aria-modal="true" aria-label="Buscar en el sitio" data-src="/buscar.json" hidden>
-  <div class="container bs-cab">
-    <span class="bs-lupa" aria-hidden="true"><Icon name="buscar" size={20} /></span>
-    <input
-      class="bs-campo"
-      type="search"
-      placeholder="Busca una pieza, un material o un color"
-      autocomplete="off"
-      autocapitalize="off"
-      spellcheck="false"
-      enterkeyhint="search"
-      aria-label="Buscar"
-      aria-controls="bsResultados"
-      data-bs-campo
-    />
+  <div class="container bs-barra">
+    <span class="bs-logo" aria-hidden="true"><Logo height={26} /></span>
     <button class="bs-x" type="button" data-bs-cerrar aria-label="Cerrar la búsqueda">
-      <Icon name="cerrar" size={16} />
+      <Icon name="cerrar" size={18} />
     </button>
   </div>
 
-  <div class="bs-cuerpo">
-    <div class="container">
-      <!-- con el campo vacío: atajos a las categorías -->
-      <div class="bs-sugerencias" data-bs-sugerencias>
-        <p class="rotulo bs-rotulo">Explora por categoría</p>
-        <ul class="bs-chips">
-          {categories.map((c) => (
-            <li><a class="bs-chip" href={`/muebles/${c.slug}/`}>{c.name}</a></li>
-          ))}
-        </ul>
-      </div>
+  <div class="bs-cuerpo" data-bs-cuerpo>
+    <div class="container bs-marco">
+      <label class="bs-campo-caja">
+        <span class="bs-lupa" aria-hidden="true"><Icon name="buscar" size={24} /></span>
+        <input
+          class="bs-campo"
+          type="search"
+          placeholder="¿Qué buscas?"
+          autocomplete="off"
+          autocapitalize="off"
+          spellcheck="false"
+          enterkeyhint="search"
+          aria-label="Buscar una pieza, un material o un color"
+          aria-controls="bsResultados"
+          data-bs-campo
+        />
+        <button class="bs-borrar" type="button" data-bs-borrar aria-label="Borrar la búsqueda" hidden>
+          <Icon name="cerrar" size={14} />
+        </button>
+      </label>
+      <p class="bs-ayuda">Busca por pieza, tipo de mueble, material o color.</p>
+
       <div id="bsResultados" class="bs-resultados" data-bs-resultados aria-live="polite" hidden></div>
+
+      <!-- con el campo vacío, y también debajo de "sin resultados" -->
+      <div class="bs-inicio" data-bs-inicio>
+        <section class="bs-seccion">
+          <p class="rotulo bs-rotulo">Prueba con</p>
+          <ul class="bs-chips">
+            {sugeridas.map((t) => (
+              <li><button class="bs-chip" type="button" data-bs-sugerir={t}><Icon name="buscar" size={13} />{t}</button></li>
+            ))}
+          </ul>
+        </section>
+        <section class="bs-seccion">
+          <p class="rotulo bs-rotulo">Explora por categoría</p>
+          <ul class="bs-cats">
+            {categories.map((c) => (
+              <li>
+                <a class="bs-cat" href={`/muebles/${c.slug}/`}>
+                  <span class="bs-cat-foto"><img src={c.photo} alt="" loading="lazy" /></span>
+                  <span class="bs-cat-nombre">{c.name}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      </div>
     </div>
   </div>
 </div>
 
 <style>
-  .bs-velo[hidden],.bs[hidden]{display:none !important;}
-  .bs-velo{
-    position:fixed;inset:0;z-index:62;
-    background:rgba(20,19,17,.4);
-    -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
-    animation:bsVelo .3s var(--ease);
-  }
+  .bs[hidden]{display:none !important;}
+  /* Pantalla completa, pero el sitio sigue ahí detrás, difuminado */
   .bs{
-    position:fixed;top:0;left:0;right:0;z-index:63;
-    max-height:min(88vh,760px);display:flex;flex-direction:column;
-    background:var(--white);box-shadow:0 20px 60px rgba(0,0,0,.14);
-    border-radius:0 0 var(--radius) var(--radius);
-    animation:bsBaja .34s var(--ease);
+    position:fixed;inset:0;z-index:63;
+    display:flex;flex-direction:column;
+    background:rgba(246,245,242,.86);
+    -webkit-backdrop-filter:blur(28px) saturate(1.2);backdrop-filter:blur(28px) saturate(1.2);
+    animation:bsEntra .32s var(--ease);
   }
-  .bs.bs-cerrando{animation:bsSube .26s var(--ease) forwards;}
-  .bs-velo.bs-cerrando{animation:bsApaga .26s var(--ease) forwards;}
-  @keyframes bsVelo{from{opacity:0}to{opacity:1}}
-  @keyframes bsApaga{to{opacity:0}}
-  @keyframes bsBaja{from{transform:translateY(-24px);opacity:0}to{transform:none;opacity:1}}
-  @keyframes bsSube{to{transform:translateY(-24px);opacity:0}}
+  .bs.bs-cerrando{animation:bsSale .24s var(--ease) forwards;}
+  .bs-marco{animation:bsSube .42s var(--ease);}
+  @keyframes bsEntra{from{opacity:0}to{opacity:1}}
+  @keyframes bsSale{to{opacity:0}}
+  @keyframes bsSube{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
 
-  /* ancho completo: en una columna flexible, el contenedor centrado con
-     márgenes automáticos se encogía al ancho de su contenido */
-  .bs-cab{
-    width:100%;flex:none;display:flex;align-items:center;gap:12px;
-    height:calc(var(--header-h) + 8px);border-bottom:1px solid var(--line);
+  .bs-barra{
+    width:100%;flex:none;display:flex;align-items:center;justify-content:space-between;
+    height:var(--header-h);
   }
-  .bs-lupa{display:flex;color:var(--ink-60);}
+  .bs-logo{display:flex;}
+  .bs-x{
+    position:relative;flex:none;width:44px;height:44px;margin-right:-4px;
+    display:flex;align-items:center;justify-content:center;border-radius:50%;
+    background:var(--white);color:var(--ink);box-shadow:0 1px 0 var(--line);
+    transition:transform .2s var(--ease),background .2s;
+  }
+  @media (hover:hover){.bs-x:hover{transform:rotate(90deg);}}
+
+  .bs-cuerpo{flex:1;overflow-y:auto;overscroll-behavior:contain;padding-bottom:64px;}
+  .bs-marco{padding-top:clamp(20px,6vh,72px);}
+
+  /* ---------- el campo ---------- */
+  .bs-campo-caja{
+    display:flex;align-items:center;gap:14px;
+    border-bottom:1.5px solid var(--ink);padding-bottom:10px;cursor:text;
+  }
+  .bs-lupa{display:flex;color:var(--ink);flex:none;}
   /* 16 px como mínimo: con menos, iOS acerca la página al enfocar el campo */
   .bs-campo{
-    flex:1;min-width:0;height:44px;border:0;background:none;outline:none;
-    font:inherit;font-size:max(16px,var(--fs-body-lg));color:var(--ink);
+    flex:1;min-width:0;height:clamp(48px,6vw,68px);border:0;background:none;outline:none;padding:0;
+    font:inherit;font-size:clamp(26px,3.6vw,44px);font-weight:500;letter-spacing:-.02em;color:var(--ink);
   }
+  .bs-campo:focus-visible{outline:none;}
   .bs-campo::placeholder{color:var(--ink-40);}
   .bs-campo::-webkit-search-cancel-button{-webkit-appearance:none;}
-  .bs-x{
-    position:relative;flex:none;width:32px;height:32px;margin-right:-6px;
-    display:flex;align-items:center;justify-content:center;border-radius:50%;color:var(--ink);
+  .bs-borrar{
+    position:relative;flex:none;width:32px;height:32px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--cemento-claro);color:var(--ink);
   }
-  .bs-x::after{content:"";position:absolute;inset:-6px;}
-  @media (hover:hover){.bs-x:hover{background:var(--paper-soft);}}
+  .bs-borrar[hidden]{display:none;}
+  .bs-borrar::after{content:"";position:absolute;inset:-6px;}
+  .bs-ayuda{margin-top:12px;font-size:var(--fs-xs);color:var(--ink-60);}
 
-  .bs-cuerpo{flex:1;overflow-y:auto;overscroll-behavior:contain;padding-block:20px 28px;}
-  .bs-rotulo{color:var(--ink-60);margin-bottom:12px;}
+  /* ---------- inicio ---------- */
+  .bs-inicio{margin-top:clamp(36px,6vh,56px);display:flex;flex-direction:column;gap:clamp(36px,5vh,48px);}
+  .bs-inicio[hidden]{display:none;}
+  .bs-rotulo{color:var(--ink-60);margin-bottom:16px;}
   .bs-chips{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px;}
   .bs-chip{
-    display:inline-flex;align-items:center;min-height:40px;padding:0 16px;
-    border:1px solid var(--line);border-radius:999px;font-size:var(--fs-sm);color:var(--ink);
-    transition:border-color .2s,background .2s;
+    display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 18px 0 16px;
+    border-radius:999px;background:var(--white);font-size:var(--fs-sm);color:var(--ink);
+    box-shadow:0 1px 0 var(--line);transition:background .2s,color .2s;
   }
-  @media (pointer:coarse),(max-width:899px){.bs-chip{min-height:44px;}}
-  @media (hover:hover){.bs-chip:hover{border-color:var(--ink-40);background:var(--paper-soft);}}
+  .bs-chip :global(svg){color:var(--ink-60);}
+  /* en teléfono, una sola fila que se desliza con el dedo */
+  @media (max-width:759px){
+    .bs-chips{
+      flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;
+      margin-inline:calc(var(--gutter, 20px) * -1);padding-inline:var(--gutter, 20px);
+      scroll-padding-inline:var(--gutter, 20px);
+    }
+    .bs-chips::-webkit-scrollbar{display:none;}
+    .bs-chips li{flex:none;}
+    .bs-chip{white-space:nowrap;}
+  }
+  @media (hover:hover){.bs-chip:hover{background:var(--ink);color:var(--white);}.bs-chip:hover :global(svg){color:inherit;}}
 
-  .bs-resultados :global(.bs-grupo + .bs-grupo){margin-top:24px;}
-  .bs-resultados :global(.bs-lista){list-style:none;margin:0;padding:0;display:grid;gap:4px;}
-  @media (min-width:760px){
-    .bs-resultados :global(.bs-lista--piezas){grid-template-columns:repeat(2,1fr);column-gap:24px;}
+  .bs-cats{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,1fr);gap:18px 12px;}
+  @media (min-width:760px){.bs-cats{grid-template-columns:repeat(4,1fr);gap:28px 18px;}}
+  .bs-cat{display:flex;flex-direction:column;gap:10px;color:var(--ink);}
+  .bs-cat-foto{display:block;aspect-ratio:4/3;border-radius:var(--radius-sm);overflow:hidden;background:var(--cemento-suave);}
+  .bs-cat-foto img{width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease);}
+  @media (hover:hover){.bs-cat:hover .bs-cat-foto img{transform:scale(1.04);}}
+  .bs-cat-nombre{font-size:var(--fs-sm);font-weight:600;line-height:1.25;}
+
+  /* ---------- resultados ---------- */
+  .bs-resultados{margin-top:clamp(28px,5vh,44px);}
+  .bs-resultados :global(.bs-grupo + .bs-grupo){margin-top:44px;}
+  .bs-resultados :global(.bs-cabeza){display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:16px;}
+  .bs-resultados :global(.bs-cabeza .bs-rotulo){margin-bottom:0;}
+  .bs-resultados :global(.bs-lista){list-style:none;margin:0;padding:0;}
+
+  /* piezas: rejilla de fichas con foto, como el catálogo */
+  .bs-resultados :global(.bs-lista--piezas){display:grid;grid-template-columns:repeat(2,1fr);gap:22px 12px;}
+  @media (min-width:760px){.bs-resultados :global(.bs-lista--piezas){grid-template-columns:repeat(4,1fr);gap:32px 18px;}}
+  @media (min-width:1200px){.bs-resultados :global(.bs-lista--piezas){grid-template-columns:repeat(5,1fr);}}
+  .bs-resultados :global(.bs-pieza){display:flex;flex-direction:column;gap:10px;color:var(--ink);outline:none;border-radius:var(--radius-sm);}
+  .bs-resultados :global(.bs-pieza .bs-foto){
+    display:block;aspect-ratio:1;border-radius:var(--radius-sm);overflow:hidden;background:var(--cemento-suave);
+    transition:box-shadow .2s;
   }
-  .bs-resultados :global(.bs-item){
-    display:grid;grid-template-columns:56px 1fr;gap:14px;align-items:center;
-    padding:8px;margin-inline:-8px;border-radius:var(--radius-sm);color:var(--ink);
-    outline:none;transition:background .15s;
+  .bs-resultados :global(.bs-pieza .bs-foto img){width:100%;height:100%;object-fit:contain;padding:10%;transition:transform .6s var(--ease);}
+  @media (hover:hover){.bs-resultados :global(.bs-pieza:hover .bs-foto img){transform:scale(1.05);}}
+  .bs-resultados :global(.bs-pieza:focus-visible .bs-foto),
+  .bs-resultados :global(.bs-pieza.bs-activo .bs-foto){box-shadow:0 0 0 2px var(--ink);}
+
+  /* categorías y proyectos: renglones compactos con foto */
+  .bs-resultados :global(.bs-lista--filas){display:grid;gap:6px;}
+  @media (min-width:760px){.bs-resultados :global(.bs-lista--filas){grid-template-columns:repeat(2,1fr);column-gap:18px;}}
+  .bs-resultados :global(.bs-fila){
+    display:grid;grid-template-columns:64px 1fr;gap:14px;align-items:center;
+    padding:8px;margin-inline:-8px;border-radius:var(--radius-sm);color:var(--ink);outline:none;transition:background .15s;
   }
-  .bs-resultados :global(.bs-item:focus-visible),
-  .bs-resultados :global(.bs-item.bs-activo){background:var(--paper-soft);}
-  @media (hover:hover){.bs-resultados :global(.bs-item:hover){background:var(--paper-soft);}}
-  .bs-resultados :global(.bs-foto){
-    width:56px;height:56px;border-radius:var(--radius-sm);overflow:hidden;background:var(--cemento-suave);
-  }
-  .bs-resultados :global(.bs-foto img){width:100%;height:100%;object-fit:cover;}
-  .bs-resultados :global(.bs-foto--recorte img){object-fit:contain;padding:5px;}
+  .bs-resultados :global(.bs-fila:focus-visible),
+  .bs-resultados :global(.bs-fila.bs-activo){background:var(--white);}
+  @media (hover:hover){.bs-resultados :global(.bs-fila:hover){background:var(--white);}}
+  .bs-resultados :global(.bs-fila .bs-foto){width:64px;height:48px;border-radius:var(--radius-sm);overflow:hidden;background:var(--cemento-suave);}
+  .bs-resultados :global(.bs-fila .bs-foto img){width:100%;height:100%;object-fit:cover;}
+
   .bs-resultados :global(.bs-txt){min-width:0;display:flex;flex-direction:column;gap:3px;}
-  .bs-resultados :global(.bs-tipo){font-size:var(--fs-2xs);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-60);}
+  .bs-resultados :global(.bs-tipo){font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-60);}
   .bs-resultados :global(.bs-nombre){font-weight:600;line-height:1.25;}
   .bs-resultados :global(.bs-meta){font-size:var(--fs-xs);color:var(--ink-60);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .bs-resultados :global(.bs-nombre mark){background:none;color:inherit;text-decoration:underline;text-decoration-color:var(--olive);text-decoration-thickness:2px;text-underline-offset:3px;}
-  .bs-resultados :global(.bs-nada){color:var(--ink-60);}
-  .bs-resultados :global(.bs-nada strong){color:var(--ink);}
-  .bs-resultados :global(.bs-cuenta){margin-top:14px;font-size:var(--fs-xs);color:var(--ink-60);}
+  .bs-resultados :global(.bs-cuenta){margin-top:24px;font-size:var(--fs-xs);color:var(--ink-60);}
+  .bs-resultados :global(.bs-espera){color:var(--ink-60);font-size:var(--fs-sm);}
+
+  /* sin resultados: aire de sobra antes de las sugerencias */
+  .bs-resultados :global(.bs-nada){max-width:560px;padding:8px 0 4px;}
+  .bs-resultados :global(.bs-nada-ttl){font-size:clamp(20px,2.2vw,26px);font-weight:600;letter-spacing:-.01em;line-height:1.25;color:var(--ink);overflow-wrap:anywhere;}
+  .bs-resultados :global(.bs-nada-txt){margin-top:10px;font-size:var(--fs-sm);color:var(--ink-60);}
 
   @media (prefers-reduced-motion:reduce){
-    .bs,.bs-velo,.bs.bs-cerrando,.bs-velo.bs-cerrando{animation:none;}
+    .bs,.bs.bs-cerrando,.bs-marco{animation:none;}
   }
 </style>
 
@@ -140,9 +230,10 @@ import { categories } from "../data/site.js";
   import { bloquear, soltar } from "../scripts/bloqueo-scroll.js";
 
   const capa = document.getElementById("buscador");
-  const velo = document.querySelector("[data-bs-velo]");
   const campo = capa.querySelector("[data-bs-campo]");
-  const sugerencias = capa.querySelector("[data-bs-sugerencias]");
+  const borrar = capa.querySelector("[data-bs-borrar]");
+  const cuerpo = capa.querySelector("[data-bs-cuerpo]");
+  const inicio = capa.querySelector("[data-bs-inicio]");
   const salida = capa.querySelector("[data-bs-resultados]");
   const quieto = matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -260,9 +351,9 @@ import { categories } from "../data/site.js";
   }
 
   function item(x, palabras) {
-    const a = el("a", "bs-item");
+    const a = el("a", "bs-item " + (x.tipo === "pieza" ? "bs-pieza" : "bs-fila"));
     a.href = base + x.u;
-    const foto = el("span", "bs-foto" + (x.tipo === "pieza" ? " bs-foto--recorte" : ""));
+    const foto = el("span", "bs-foto");
     if (x.i) {
       const img = el("img");
       img.src = base + x.i;
@@ -275,16 +366,18 @@ import { categories } from "../data/site.js";
     if (x.tipo === "proyecto") txt.append(el("span", "bs-tipo", "Proyecto"));
     if (x.tipo === "categoria") txt.append(el("span", "bs-tipo", "Categoría"));
     txt.append(nombreResaltado(x, palabras));
-    const meta = x.tipo === "pieza" ? [x.c, x.m].filter(Boolean).join(" · ") : x.tipo === "proyecto" ? x.t : "";
+    const meta = x.tipo === "pieza" ? x.m : x.tipo === "proyecto" ? x.t : "";
     if (meta) txt.append(el("span", "bs-meta", meta));
     a.append(foto, txt);
     return a;
   }
 
   const MAX_PIEZAS = 40;
-  function grupo(titulo, lista, palabras, clase = "") {
+  function grupo(titulo, lista, palabras, clase) {
     const g = el("section", "bs-grupo");
-    g.append(el("p", "rotulo bs-rotulo", titulo));
+    const cab = el("div", "bs-cabeza");
+    cab.append(el("p", "rotulo bs-rotulo", titulo));
+    g.append(cab);
     const ul = el("ul", "bs-lista " + clase);
     lista.forEach((x) => {
       const li = el("li");
@@ -295,45 +388,72 @@ import { categories } from "../data/site.js";
     return g;
   }
 
+  // Desde dos letras: con una sola casi todo coincide y la lista no ayuda.
+  const MINIMO = 2;
+  let ultima = "";
   function pintar() {
     const q = campo.value.trim();
+    borrar.hidden = !campo.value;
     const palabras = norm(q).split(/\s+/).filter(Boolean);
-    if (!palabras.length) {
-      sugerencias.hidden = false;
+    if (q.length < MINIMO) {
+      inicio.hidden = false;
       salida.hidden = true;
       salida.replaceChildren();
+      ultima = "";
       return;
     }
-    sugerencias.hidden = true;
+    inicio.hidden = true;
     salida.hidden = false;
     if (!indice) {
-      salida.replaceChildren(el("p", "bs-nada", "Buscando…"));
+      salida.replaceChildren(el("p", "bs-espera", "Buscando…"));
       return;
     }
+    // una búsqueda nueva empieza arriba
+    if (q !== ultima) cuerpo.scrollTop = 0;
+    ultima = q;
 
     const cats = buscarEn(indice.categorias, palabras);
     const pzs = buscarEn(indice.piezas, palabras);
     const prys = buscarEn(indice.proyectos, palabras);
 
     const hijos = [];
-    if (cats.length) hijos.push(grupo("Categorías", cats.slice(0, 4), palabras));
     if (pzs.length) {
-      const g = grupo(`Piezas · ${pzs.length}`, pzs.slice(0, MAX_PIEZAS), palabras, "bs-lista--piezas");
+      const g = grupo(pzs.length === 1 ? "1 pieza" : `${pzs.length} piezas`, pzs.slice(0, MAX_PIEZAS), palabras, "bs-lista--piezas");
       if (pzs.length > MAX_PIEZAS) g.append(el("p", "bs-cuenta", `Se muestran ${MAX_PIEZAS} de ${pzs.length}. Escribe algo más para afinar.`));
       hijos.push(g);
     }
-    if (prys.length) hijos.push(grupo("Proyectos", prys.slice(0, 4), palabras));
+    if (cats.length) hijos.push(grupo("Categorías", cats.slice(0, 4), palabras, "bs-lista--filas"));
+    if (prys.length) hijos.push(grupo("Proyectos", prys.slice(0, 4), palabras, "bs-lista--filas"));
 
     if (!hijos.length) {
-      const nada = el("p", "bs-nada");
-      nada.append("No encontramos nada con ", el("strong", "", `“${q}”`), ". Prueba con otra palabra o explora por categoría.");
+      const nada = el("div", "bs-nada");
+      const ttl = el("p", "bs-nada-ttl");
+      ttl.append("Sin resultados para ", `“${q}”`);
+      nada.append(
+        ttl,
+        el("p", "bs-nada-txt", "Revisa cómo está escrito o prueba con algo más general, como el tipo de mueble, el material o el color.")
+      );
       hijos.push(nada);
-      sugerencias.hidden = false;
+      inicio.hidden = false;
     }
     salida.replaceChildren(...hijos);
   }
 
   campo.addEventListener("input", pintar);
+  borrar.addEventListener("click", (e) => {
+    e.preventDefault();
+    campo.value = "";
+    pintar();
+    campo.focus();
+  });
+  // las sugerencias escriben la búsqueda por ti
+  capa.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-bs-sugerir]");
+    if (!b) return;
+    campo.value = b.dataset.bsSugerir;
+    pintar();
+    campo.focus();
+  });
 
   // --- flechas del teclado para recorrer resultados ---
   campo.addEventListener("keydown", (e) => {
@@ -362,9 +482,7 @@ import { categories } from "../data/site.js";
     if (abierta) return;
     abierta = true;
     capa.classList.remove("bs-cerrando");
-    velo.classList.remove("bs-cerrando");
     capa.hidden = false;
-    velo.hidden = false;
     bloquear();
     campo.focus();
     cargar().then(() => pintar());
@@ -379,14 +497,16 @@ import { categories } from "../data/site.js";
       if (listo) return;
       listo = true;
       capa.hidden = true;
-      velo.hidden = true;
       capa.classList.remove("bs-cerrando");
-      velo.classList.remove("bs-cerrando");
     };
     if (quieto.matches) return guardar();
     capa.classList.add("bs-cerrando");
-    velo.classList.add("bs-cerrando");
-    capa.addEventListener("animationend", guardar, { once: true });
+    const fin = (e) => {
+      if (e.target !== capa) return; // la del contenido también burbujea
+      capa.removeEventListener("animationend", fin);
+      guardar();
+    };
+    capa.addEventListener("animationend", fin);
     setTimeout(guardar, 360);
   }
 
@@ -397,7 +517,6 @@ import { categories } from "../data/site.js";
     }
   });
   capa.querySelector("[data-bs-cerrar]").addEventListener("click", cerrar);
-  velo.addEventListener("click", cerrar);
   addEventListener("keydown", (e) => {
     if (e.key === "Escape" && abierta) return cerrar();
     // atajos de escritorio: "/" y Ctrl/Cmd+K, salvo si ya se está escribiendo

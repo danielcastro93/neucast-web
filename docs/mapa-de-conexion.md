@@ -350,10 +350,11 @@ propio con categoría y posición.
 ## 11b. "Mi proyecto" y el buscador
 
 **Mi proyecto** es una lista tipo carrito, sin venta en línea. Se agrega desde
-el botón con el signo de más de cada tarjeta de pieza y desde "Agregar a mi
+el botón con el signo de más de cada tarjeta de pieza y desde "Agregar al
 proyecto" en la ficha. El ícono del encabezado abre el panel con la lista, las
-cantidades y dos salidas: WhatsApp, con la lista escrita en el mensaje, y el
-formulario de contacto, que la manda en el campo `proyecto` (apartado 6).
+cantidades y dos salidas ancladas al fondo del panel: WhatsApp, con la lista
+escrita en el mensaje, y el formulario de contacto, que la manda en el campo
+`proyecto` (apartado 6). Vaciar la lista pide confirmación en el mismo lugar.
 
 - Vive en el navegador de la persona (`localStorage`, llave
   `neucast:proyecto`). No hay cuentas ni servidor.
@@ -364,11 +365,13 @@ formulario de contacto, que la manda en el campo `proyecto` (apartado 6).
 - Se vacía sola cuando la solicitud se envía por el formulario.
 - El código vive en `src/scripts/proyecto.js` y `src/components/MiProyecto.astro`.
 
-**El buscador** abre una capa desde la lupa del encabezado (o con "/" y
+**El buscador** abre una capa a pantalla completa desde la lupa del encabezado (o con "/" y
 Ctrl/Cmd+K en escritorio). Busca en piezas, categorías y proyectos al teclear,
-sin importar acentos ni mayúsculas, y entiende singular, plural y género:
+desde dos letras, sin importar acentos ni mayúsculas, y entiende singular, plural y género:
 "sillas negras" encuentra sillas de color "Negro". No hay servidor de búsqueda:
-lee `buscar.json` (apartado 10). Vive en `src/components/Buscador.astro`.
+lee `buscar.json` (apartado 10). Vive en `src/components/Buscador.astro`. Con
+el campo vacío propone el tipo de mueble con más piezas de cada categoría y
+las categorías con foto; todo sale del catálogo, nada se captura aparte.
 
 Se eligió un índice propio en vez de Pagefind, que era lo previsto: el catálogo
 es información con campos (tipo, material, color), no texto corrido, y así los
