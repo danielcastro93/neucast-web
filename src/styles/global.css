@@ -23,6 +23,9 @@
   /* Gris cálido claro para superficies de tarjeta con grano. Va con .grano:
      el cliente quería "cemento" y en claro es esto, no un beige plano. */
   --cemento-claro:#E6E4DE;
+  /* Un paso más claro que el de las tarjetas: va detrás de los recortes de
+     producto, donde el fondo tiene que callar y el mueble hablar. */
+  --cemento-suave:#EDECE7;
   /* Cemento oscuro para bloques con texto en blanco, como la referencia del
      cliente. No es la tinta: es un gris cálido que deja ver el grano. */
   --cemento-oscuro:#3D3B37;

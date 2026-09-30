@@ -276,7 +276,7 @@ const VENTANA_PUNTOS = 5;
            convierte en cuadrícula. */
         <div class="pd-apoyos rail rail-mask">
           {apoyos.map((a) => (
-            <article class="pd-apoyo grano">
+            <article class="pd-apoyo grano grano--oscuro">
               {/* rótulo, no encabezado: el esquema de la página lo encabeza
                   el nombre de la pieza y estos son apoyos de un bloque */}
               <p class="pd-apoyo-ttl">{a.titulo}</p>
@@ -482,7 +482,7 @@ const VENTANA_PUNTOS = 5;
       flex:none;width:100%;scroll-snap-align:center;
       margin:0;padding:0;border:0;
       border-radius:var(--radius);overflow:hidden;
-      background:var(--cemento-claro);aspect-ratio:1/1;
+      background:var(--cemento-suave);aspect-ratio:1/1;
       cursor:zoom-in;
     }
     .pd-foto img{width:100%;height:100%;object-fit:cover;display:block;}
@@ -681,14 +681,14 @@ const VENTANA_PUNTOS = 5;
       padding:clamp(20px,2.4vw,26px);
       /* el mismo arena del bloque de apoyo del menú, no el arena fuerte
                  de las etiquetas: es un fondo, no un acento */
-      /* gris claro con grano, como la tarjeta de proyectos del home */
-      border-radius:var(--radius);background:var(--cemento-claro);
+      /* cemento oscuro con el texto en blanco, como "La idea es simple" */
+      border-radius:var(--radius);background:var(--cemento-oscuro);color:var(--white);
     }
     .pd-apoyo-ttl{
       margin:0;font-family:var(--serif);font-size:var(--fs-body-lg);
-      letter-spacing:-.01em;color:var(--ink);
+      letter-spacing:-.01em;color:var(--white);
     }
-    .pd-apoyo-txt{margin:0;color:var(--ink-60);text-wrap:pretty;}
+    .pd-apoyo-txt{margin:0;color:rgba(255,255,255,.8);text-wrap:pretty;}
     /* De aquí para arriba caben los tres, así que el riel deja de serlo: sin
        desplazamiento y sin degradado. El relleno del riel se queda, porque es
        justo el que alinea la fila con el margen de la página; anularlo pegaba
