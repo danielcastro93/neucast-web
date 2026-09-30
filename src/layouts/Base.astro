@@ -126,7 +126,7 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
                Sin proyectos cargados no se pinta, en vez de tumbar el menú
                entero, que es el estado en el que arranca la migración. -->
           {proyectoDestacado && (
-          <a class="hd-promo grano" href="/proyectos/">
+          <a class="hd-promo grano grano--oscuro" href="/proyectos/">
             <span class="hd-promo-media">
               <img src={proyectoDestacado.portada.img} alt="" loading="lazy" />
             </span>
@@ -398,7 +398,7 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
       grid-column:2;
       display:flex;flex-direction:column;
       padding:14px;border-radius:var(--radius);
-      background:var(--cemento-claro);color:var(--ink);
+      background:var(--cemento-oscuro);color:var(--white);
     }
     .hd-promo-media{
       display:block;aspect-ratio:16/10;border-radius:var(--radius-sm);
@@ -411,17 +411,18 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
     }
     .hd-promo-txt{
       display:block;margin-top:5px;
-      font-size:var(--fs-xs);font-weight:400;color:var(--ink-60);
+      font-size:var(--fs-xs);font-weight:400;color:rgba(255,255,255,.8);
       letter-spacing:0;line-height:1.5;
     }
     .hd-promo-cta{
       display:inline-flex;align-items:center;justify-content:center;gap:8px;
       margin-top:14px;height:40px;border-radius:999px;
-      background:var(--ink);color:var(--white);
+      /* sobre el cemento oscuro el botón se invierte: blanco con la tinta */
+      background:var(--white);color:var(--ink);
       font-size:var(--fs-xs);font-weight:600;
       transition:background .25s var(--ease);
     }
-    @media (hover:hover){.hd-promo:hover .hd-promo-cta{background:#000;}}
+    @media (hover:hover){.hd-promo:hover .hd-promo-cta{background:var(--paper);}}
     .hd-promo-cta svg{transition:transform .25s var(--ease);}
     @media (hover:hover){.hd-promo:hover .hd-promo-cta svg{transform:translateX(3px);}}
     /* sobre el hero el header es transparente, pero el panel nunca lo es */
