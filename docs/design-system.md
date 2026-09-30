@@ -13,15 +13,20 @@ Un `clamp()` suelto dentro de un componente es un bug, no una decisión.
 | Token | Valor | Uso |
 |---|---|---|
 | `--white` | `#ffffff` | Fondo base del sitio |
-| `--paper` | `#F5F2E7` | Superficies alternas (footer, cards de producto, secciones) |
-| `--paper-soft` | `#FAF8F1` | Variante aún más clara |
+| `--cemento-oscuro` | `#3D3B37` | Bloques de peso con texto en blanco y grano en modo aclarar: "La idea es simple", el card de proyectos del megamenú, los tres apoyos de la ficha |
+| `--cemento-claro` | `#E6E4DE` | Superficies de apoyo con grano: el footer y la tarjeta de proyectos del home en teléfono |
+| `--cemento-suave` | `#EDECE7` | Liso, sin grano, detrás de los recortes de producto en tarjetas y galería de la ficha |
+| `--paper` | `#EDECE7` | Mismo valor que el suave. Conserva el nombre por historia: fondos detrás de fotos, tintes de hover, croquis, miniaturas |
+| `--paper-soft` | `#F2F1ED` | La versión más tenue del anterior |
+| `--olive-ink` | `#48542B` | Verde para texto chico sobre los grises; el `--olive-deep` se queda corto de contraste ahí |
 | `--ink` | `#1D1D1B` | Texto principal, botón primario |
 | `--ink-60` | `#5f5e59` | Texto secundario, párrafos de apoyo |
 | `--ink-40` | `#95948e` | Texto terciario, metadatos, iconos inactivos |
 | `--line` | `#E7E4DA` | Bordes y divisores |
 | `--olive` | `#78894A` | **Acento.** Solo detalles: links, viñetas, hotspot activo |
 | `--olive-deep` | `#5E6C39` | Acento sobre fondo claro (links, hover) |
-| `--sage` / `--sand` | `#A1B39D` / `#D9C7A1` | Apoyo, uso muy puntual |
+| `--sage` | `#A1B39D` | Bullets sobre cemento oscuro, donde el oliva se apaga |
+| `--sand` | `#D9C7A1` | Solo la etiqueta "Nuevo". Es el único arena que queda: acento, nunca fondo |
 | `--wa` | `#1DAA61` | Exclusivo de WhatsApp. Nunca decorativo |
 
 El verde **acentúa, no domina**. Si una sección se ve verde, está mal.
@@ -455,7 +460,13 @@ logo sale blanco sobre blanco cuando se abre el panel.
 
 ## 7. Superficies y overlays
 
-- Fondo del sitio: `--white`. Secciones alternas: `--paper`.
+- Fondo del sitio: `--white`. Tres grises para todo lo demás: oscuro para
+  bloques con texto blanco, claro con grano para superficies de apoyo, suave
+  y liso detrás de los muebles. El arena se retiró el 30 de septiembre de
+  2026 a petición del cliente; solo queda en la etiqueta "Nuevo".
+- El grano es `public/img/grano.png` (7 KB) en la clase `.grano`, en una capa
+  que no recibe toques; `.grano--oscuro` lo pone en modo aclarar para fondos
+  oscuros. Nunca detrás de fotos de producto: compite con el borde del mueble.
 - Radio: `--radius` (12px) en media y contenedores, `--radius-sm` (8px) en elementos chicos.
 - **Todo overlay difumina el fondo**: clase `.scrim` (blur 16px + velo tenue).
   Nunca solo oscurecer.
