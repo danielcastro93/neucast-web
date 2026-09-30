@@ -1,0 +1,410 @@
+---
+// Buscador del sitio: una capa que baja desde arriba, con el fondo
+// difuminado, y busca mientras se escribe.
+//
+// Va una sola vez, en Base.astro. Se abre desde cualquier elemento con
+// data-bs-abrir (la lupa del encabezado) y también con "/" o Ctrl/Cmd+K en
+// escritorio. Cierra con animación, con Escape y tocando fuera.
+//
+// El índice (/buscar.json) se pide la primera vez que se abre, no al cargar la
+// página: quien no busca no lo descarga. Busca en piezas, categorías y
+// proyectos, sin importar acentos ni mayúsculas, y entiende singular y plural
+// ("sillas" encuentra "silla").
+import Icon from "./Icon.astro";
+import { categories } from "../data/site.js";
+---
+<div class="bs-velo" data-bs-velo hidden></div>
+<div class="bs" id="buscador" role="dialog" aria-modal="true" aria-label="Buscar en el sitio" data-src="/buscar.json" hidden>
+  <div class="container bs-cab">
+    <span class="bs-lupa" aria-hidden="true"><Icon name="buscar" size={20} /></span>
+    <input
+      class="bs-campo"
+      type="search"
+      placeholder="Busca una pieza, un material o un color"
+      autocomplete="off"
+      autocapitalize="off"
+      spellcheck="false"
+      enterkeyhint="search"
+      aria-label="Buscar"
+      aria-controls="bsResultados"
+      data-bs-campo
+    />
+    <button class="bs-x" type="button" data-bs-cerrar aria-label="Cerrar la búsqueda">
+      <Icon name="cerrar" size={16} />
+    </button>
+  </div>
+
+  <div class="bs-cuerpo">
+    <div class="container">
+      <!-- con el campo vacío: atajos a las categorías -->
+      <div class="bs-sugerencias" data-bs-sugerencias>
+        <p class="rotulo bs-rotulo">Explora por categoría</p>
+        <ul class="bs-chips">
+          {categories.map((c) => (
+            <li><a class="bs-chip" href={`/muebles/${c.slug}/`}>{c.name}</a></li>
+          ))}
+        </ul>
+      </div>
+      <div id="bsResultados" class="bs-resultados" data-bs-resultados aria-live="polite" hidden></div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .bs-velo[hidden],.bs[hidden]{display:none !important;}
+  .bs-velo{
+    position:fixed;inset:0;z-index:62;
+    background:rgba(20,19,17,.4);
+    -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+    animation:bsVelo .3s var(--ease);
+  }
+  .bs{
+    position:fixed;top:0;left:0;right:0;z-index:63;
+    max-height:min(88vh,760px);display:flex;flex-direction:column;
+    background:var(--white);box-shadow:0 20px 60px rgba(0,0,0,.14);
+    border-radius:0 0 var(--radius) var(--radius);
+    animation:bsBaja .34s var(--ease);
+  }
+  .bs.bs-cerrando{animation:bsSube .26s var(--ease) forwards;}
+  .bs-velo.bs-cerrando{animation:bsApaga .26s var(--ease) forwards;}
+  @keyframes bsVelo{from{opacity:0}to{opacity:1}}
+  @keyframes bsApaga{to{opacity:0}}
+  @keyframes bsBaja{from{transform:translateY(-24px);opacity:0}to{transform:none;opacity:1}}
+  @keyframes bsSube{to{transform:translateY(-24px);opacity:0}}
+
+  /* ancho completo: en una columna flexible, el contenedor centrado con
+     márgenes automáticos se encogía al ancho de su contenido */
+  .bs-cab{
+    width:100%;flex:none;display:flex;align-items:center;gap:12px;
+    height:calc(var(--header-h) + 8px);border-bottom:1px solid var(--line);
+  }
+  .bs-lupa{display:flex;color:var(--ink-60);}
+  /* 16 px como mínimo: con menos, iOS acerca la página al enfocar el campo */
+  .bs-campo{
+    flex:1;min-width:0;height:44px;border:0;background:none;outline:none;
+    font:inherit;font-size:max(16px,var(--fs-body-lg));color:var(--ink);
+  }
+  .bs-campo::placeholder{color:var(--ink-40);}
+  .bs-campo::-webkit-search-cancel-button{-webkit-appearance:none;}
+  .bs-x{
+    position:relative;flex:none;width:32px;height:32px;margin-right:-6px;
+    display:flex;align-items:center;justify-content:center;border-radius:50%;color:var(--ink);
+  }
+  .bs-x::after{content:"";position:absolute;inset:-6px;}
+  @media (hover:hover){.bs-x:hover{background:var(--paper-soft);}}
+
+  .bs-cuerpo{flex:1;overflow-y:auto;overscroll-behavior:contain;padding-block:20px 28px;}
+  .bs-rotulo{color:var(--ink-60);margin-bottom:12px;}
+  .bs-chips{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px;}
+  .bs-chip{
+    display:inline-flex;align-items:center;min-height:40px;padding:0 16px;
+    border:1px solid var(--line);border-radius:999px;font-size:var(--fs-sm);color:var(--ink);
+    transition:border-color .2s,background .2s;
+  }
+  @media (pointer:coarse),(max-width:899px){.bs-chip{min-height:44px;}}
+  @media (hover:hover){.bs-chip:hover{border-color:var(--ink-40);background:var(--paper-soft);}}
+
+  .bs-resultados :global(.bs-grupo + .bs-grupo){margin-top:24px;}
+  .bs-resultados :global(.bs-lista){list-style:none;margin:0;padding:0;display:grid;gap:4px;}
+  @media (min-width:760px){
+    .bs-resultados :global(.bs-lista--piezas){grid-template-columns:repeat(2,1fr);column-gap:24px;}
+  }
+  .bs-resultados :global(.bs-item){
+    display:grid;grid-template-columns:56px 1fr;gap:14px;align-items:center;
+    padding:8px;margin-inline:-8px;border-radius:var(--radius-sm);color:var(--ink);
+    outline:none;transition:background .15s;
+  }
+  .bs-resultados :global(.bs-item:focus-visible),
+  .bs-resultados :global(.bs-item.bs-activo){background:var(--paper-soft);}
+  @media (hover:hover){.bs-resultados :global(.bs-item:hover){background:var(--paper-soft);}}
+  .bs-resultados :global(.bs-foto){
+    width:56px;height:56px;border-radius:var(--radius-sm);overflow:hidden;background:var(--cemento-suave);
+  }
+  .bs-resultados :global(.bs-foto img){width:100%;height:100%;object-fit:cover;}
+  .bs-resultados :global(.bs-foto--recorte img){object-fit:contain;padding:5px;}
+  .bs-resultados :global(.bs-txt){min-width:0;display:flex;flex-direction:column;gap:3px;}
+  .bs-resultados :global(.bs-tipo){font-size:var(--fs-2xs);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-60);}
+  .bs-resultados :global(.bs-nombre){font-weight:600;line-height:1.25;}
+  .bs-resultados :global(.bs-meta){font-size:var(--fs-xs);color:var(--ink-60);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .bs-resultados :global(.bs-nombre mark){background:none;color:inherit;text-decoration:underline;text-decoration-color:var(--olive);text-decoration-thickness:2px;text-underline-offset:3px;}
+  .bs-resultados :global(.bs-nada){color:var(--ink-60);}
+  .bs-resultados :global(.bs-nada strong){color:var(--ink);}
+  .bs-resultados :global(.bs-cuenta){margin-top:14px;font-size:var(--fs-xs);color:var(--ink-60);}
+
+  @media (prefers-reduced-motion:reduce){
+    .bs,.bs-velo,.bs.bs-cerrando,.bs-velo.bs-cerrando{animation:none;}
+  }
+</style>
+
+<script>
+  import { bloquear, soltar } from "../scripts/bloqueo-scroll.js";
+
+  const capa = document.getElementById("buscador");
+  const velo = document.querySelector("[data-bs-velo]");
+  const campo = capa.querySelector("[data-bs-campo]");
+  const sugerencias = capa.querySelector("[data-bs-sugerencias]");
+  const salida = capa.querySelector("[data-bs-resultados]");
+  const quieto = matchMedia("(prefers-reduced-motion: reduce)");
+
+  // En la vista previa el sitio cuelga de una subcarpeta: el prefijo sale de
+  // la propia dirección del índice, que el script de la vista previa ajusta.
+  const src = capa.dataset.src;
+  const base = src.replace(/\/buscar\.json$/, "");
+
+  let indice = null;
+  let cargando = null;
+  const cargar = () =>
+    (cargando ??= fetch(src)
+      .then((r) => r.json())
+      .then((d) => {
+        indice = preparar(d);
+        return indice;
+      })
+      .catch(() => {
+        cargando = null;
+        return null;
+      }));
+
+  // --- normalización: sin acentos, sin mayúsculas ---
+  const norm = (s) =>
+    (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+
+  function preparar(d) {
+    const prep = (x, tipo) => ({
+      ...x,
+      tipo,
+      _n: norm(x.n),
+      _t: norm(x.t),
+      _c: norm(x.c),
+      _m: norm(x.m),
+      _k: norm(x.k),
+    });
+    return {
+      piezas: (d.piezas || []).map((x) => prep(x, "pieza")),
+      categorias: (d.categorias || []).map((x) => prep(x, "categoria")),
+      proyectos: (d.proyectos || []).map((x) => prep(x, "proyecto")),
+    };
+  }
+
+  // Singular, plural y género: "sillas" encuentra "silla", "mesas" encuentra
+  // "mesa", y "negra", "roja" o "blanca" encuentran los colores "Negro",
+  // "Rojo" y "Blanco". Sin lo último, "silla negra" no daba nada.
+  const variantes = (t) => {
+    const v = new Set([t]);
+    if (t.length > 4 && t.endsWith("es")) v.add(t.slice(0, -2));
+    if (t.length > 3 && t.endsWith("s")) v.add(t.slice(0, -1));
+    for (const x of [...v]) {
+      if (x.length > 3 && /[ao]$/.test(x)) v.add(x.slice(0, -1));
+    }
+    return [...v];
+  };
+
+  // Cada palabra tiene que aparecer en algún campo; pesa más si aparece en el
+  // nombre, y más aún si el nombre empieza con ella.
+  const PESOS = [["_n", 10], ["_t", 5], ["_c", 4], ["_m", 3], ["_k", 3]];
+  function puntuar(item, palabras) {
+    let total = 0;
+    for (const p of palabras) {
+      let mejor = 0;
+      variantes(p).forEach((v, n) => {
+        for (const [campo, peso] of PESOS) {
+          const texto = item[campo];
+          if (!texto) continue;
+          // La palabra tal cual se busca en cualquier parte. Sus variantes
+          // recortadas, solo al inicio de una palabra: si no, "mesa" recortada
+          // a "mes" encontraba sillas de malla "SmartMesh".
+          let i = texto.indexOf(v);
+          while (n > 0 && i > 0 && texto[i - 1] !== " ") i = texto.indexOf(v, i + 1);
+          if (i === -1) continue;
+          const inicioPalabra = i === 0 || texto[i - 1] === " ";
+          const valor = peso + (inicioPalabra ? 2 : 0) + (campo === "_n" && i === 0 ? 4 : 0);
+          if (valor > mejor) mejor = valor;
+        }
+      });
+      if (!mejor) return 0;
+      total += mejor;
+    }
+    return total;
+  }
+
+  const buscarEn = (lista, palabras) =>
+    lista
+      .map((x) => [x, puntuar(x, palabras)])
+      .filter(([, p]) => p > 0)
+      .sort((a, b) => b[1] - a[1] || a[0].n.localeCompare(b[0].n, "es"))
+      .map(([x]) => x);
+
+  // --- pintado, con nodos y textContent: los textos vendrán del administrador ---
+  const el = (tag, clase, texto) => {
+    const e = document.createElement(tag);
+    if (clase) e.className = clase;
+    if (texto != null) e.textContent = texto;
+    return e;
+  };
+
+  // resalta en el nombre la primera palabra buscada que aparezca
+  function nombreResaltado(x, palabras) {
+    const span = el("span", "bs-nombre");
+    for (const p of palabras) {
+      for (const v of variantes(p)) {
+        const i = x._n.indexOf(v);
+        if (i === -1) continue;
+        span.append(x.n.slice(0, i));
+        span.append(el("mark", "", x.n.slice(i, i + v.length)));
+        span.append(x.n.slice(i + v.length));
+        return span;
+      }
+    }
+    span.textContent = x.n;
+    return span;
+  }
+
+  function item(x, palabras) {
+    const a = el("a", "bs-item");
+    a.href = base + x.u;
+    const foto = el("span", "bs-foto" + (x.tipo === "pieza" ? " bs-foto--recorte" : ""));
+    if (x.i) {
+      const img = el("img");
+      img.src = base + x.i;
+      img.alt = "";
+      img.loading = "lazy";
+      foto.append(img);
+    }
+    const txt = el("span", "bs-txt");
+    if (x.tipo === "pieza") txt.append(el("span", "bs-tipo", x.t));
+    if (x.tipo === "proyecto") txt.append(el("span", "bs-tipo", "Proyecto"));
+    if (x.tipo === "categoria") txt.append(el("span", "bs-tipo", "Categoría"));
+    txt.append(nombreResaltado(x, palabras));
+    const meta = x.tipo === "pieza" ? [x.c, x.m].filter(Boolean).join(" · ") : x.tipo === "proyecto" ? x.t : "";
+    if (meta) txt.append(el("span", "bs-meta", meta));
+    a.append(foto, txt);
+    return a;
+  }
+
+  const MAX_PIEZAS = 40;
+  function grupo(titulo, lista, palabras, clase = "") {
+    const g = el("section", "bs-grupo");
+    g.append(el("p", "rotulo bs-rotulo", titulo));
+    const ul = el("ul", "bs-lista " + clase);
+    lista.forEach((x) => {
+      const li = el("li");
+      li.append(item(x, palabras));
+      ul.append(li);
+    });
+    g.append(ul);
+    return g;
+  }
+
+  function pintar() {
+    const q = campo.value.trim();
+    const palabras = norm(q).split(/\s+/).filter(Boolean);
+    if (!palabras.length) {
+      sugerencias.hidden = false;
+      salida.hidden = true;
+      salida.replaceChildren();
+      return;
+    }
+    sugerencias.hidden = true;
+    salida.hidden = false;
+    if (!indice) {
+      salida.replaceChildren(el("p", "bs-nada", "Buscando…"));
+      return;
+    }
+
+    const cats = buscarEn(indice.categorias, palabras);
+    const pzs = buscarEn(indice.piezas, palabras);
+    const prys = buscarEn(indice.proyectos, palabras);
+
+    const hijos = [];
+    if (cats.length) hijos.push(grupo("Categorías", cats.slice(0, 4), palabras));
+    if (pzs.length) {
+      const g = grupo(`Piezas · ${pzs.length}`, pzs.slice(0, MAX_PIEZAS), palabras, "bs-lista--piezas");
+      if (pzs.length > MAX_PIEZAS) g.append(el("p", "bs-cuenta", `Se muestran ${MAX_PIEZAS} de ${pzs.length}. Escribe algo más para afinar.`));
+      hijos.push(g);
+    }
+    if (prys.length) hijos.push(grupo("Proyectos", prys.slice(0, 4), palabras));
+
+    if (!hijos.length) {
+      const nada = el("p", "bs-nada");
+      nada.append("No encontramos nada con ", el("strong", "", `“${q}”`), ". Prueba con otra palabra o explora por categoría.");
+      hijos.push(nada);
+      sugerencias.hidden = false;
+    }
+    salida.replaceChildren(...hijos);
+  }
+
+  campo.addEventListener("input", pintar);
+
+  // --- flechas del teclado para recorrer resultados ---
+  campo.addEventListener("keydown", (e) => {
+    const items = [...salida.querySelectorAll(".bs-item")];
+    if (!items.length) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      items[0].focus();
+    }
+    if (e.key === "Enter") {
+      e.preventDefault();
+      items[0].click();
+    }
+  });
+  salida.addEventListener("keydown", (e) => {
+    const items = [...salida.querySelectorAll(".bs-item")];
+    const i = items.indexOf(document.activeElement);
+    if (i === -1) return;
+    if (e.key === "ArrowDown" && items[i + 1]) { e.preventDefault(); items[i + 1].focus(); }
+    if (e.key === "ArrowUp") { e.preventDefault(); (items[i - 1] || campo).focus(); }
+  });
+
+  // --- abrir y cerrar ---
+  let abierta = false;
+  function abrir() {
+    if (abierta) return;
+    abierta = true;
+    capa.classList.remove("bs-cerrando");
+    velo.classList.remove("bs-cerrando");
+    capa.hidden = false;
+    velo.hidden = false;
+    bloquear();
+    campo.focus();
+    cargar().then(() => pintar());
+    pintar();
+  }
+  function cerrar() {
+    if (!abierta) return;
+    abierta = false;
+    soltar();
+    let listo = false;
+    const guardar = () => {
+      if (listo) return;
+      listo = true;
+      capa.hidden = true;
+      velo.hidden = true;
+      capa.classList.remove("bs-cerrando");
+      velo.classList.remove("bs-cerrando");
+    };
+    if (quieto.matches) return guardar();
+    capa.classList.add("bs-cerrando");
+    velo.classList.add("bs-cerrando");
+    capa.addEventListener("animationend", guardar, { once: true });
+    setTimeout(guardar, 360);
+  }
+
+  document.addEventListener("click", (e) => {
+    if (e.target.closest("[data-bs-abrir]")) {
+      e.preventDefault();
+      abrir();
+    }
+  });
+  capa.querySelector("[data-bs-cerrar]").addEventListener("click", cerrar);
+  velo.addEventListener("click", cerrar);
+  addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && abierta) return cerrar();
+    // atajos de escritorio: "/" y Ctrl/Cmd+K, salvo si ya se está escribiendo
+    const escribiendo = /input|textarea|select/i.test(document.activeElement?.tagName || "");
+    if (!abierta && ((e.key === "/" && !escribiendo) || ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k"))) {
+      e.preventDefault();
+      abrir();
+    }
+  });
+</script>

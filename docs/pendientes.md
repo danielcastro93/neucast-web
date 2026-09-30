@@ -39,14 +39,9 @@ del build y comprobar que cada ruta existe en `dist/`.
 
 ## Buscador
 
-**Decisión: no va en fase 1.** Con un catálogo curado y 8 categorías, la
-navegación por categorías resuelve. Un buscador con pocos productos se siente
-vacío y da resultados pobres.
-
-**Cuándo sí:** cuando el catálogo pase de ~60 piezas o el cliente lo pida por
-uso real. Entonces la opción es **Pagefind** (índice estático, se genera en el
-build, no necesita servidor ni costo). Encaja perfecto con Astro y no cambia la
-arquitectura.
+**Hecho el 30 de septiembre de 2026.** Se adelantó porque el catálogo va a
+pasar de 500 piezas. Índice propio (`buscar.json`) en vez de Pagefind; el
+porqué está en `mapa-de-conexion.md`, apartado 11b.
 
 ## Origen de las imágenes
 

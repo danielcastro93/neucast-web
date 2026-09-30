@@ -1,0 +1,292 @@
+---
+// Panel de "Mi proyecto" y todo su cableado: la lista, las cantidades, el
+// envío y los botones de agregar que haya en la página (tarjetas y ficha).
+//
+// Va una sola vez, en Base.astro, así que existe en todas las páginas. Se abre
+// desde cualquier elemento con data-abre="miProyecto" (el del encabezado).
+//
+// Un botón de agregar solo necesita esto:
+//   <button data-mp-agregar data-slug data-nombre data-tipo data-ruta>
+// y estar dentro de algo con data-mp-scope que tenga la foto marcada con
+// data-mp-foto. La dirección se toma de un enlace con data-mp-enlace dentro
+// del mismo scope, o de la página actual si no lo hay (la ficha).
+import PanelLateral from "./PanelLateral.astro";
+import Icon from "./Icon.astro";
+import { site } from "../data/site.js";
+---
+<PanelLateral id="miProyecto" titulo="Mi proyecto">
+  <div class="mp" data-mp data-dominio={site.domain} data-whatsapp={site.whatsapp}>
+    <p class="mp-intro" data-mp-intro hidden></p>
+    <ul class="mp-lista" data-mp-lista></ul>
+
+    <div class="mp-vacio" data-mp-vacio>
+      <p class="mp-vacio-ttl">Tu proyecto está vacío</p>
+      <p class="mp-vacio-txt">
+        Mientras recorres el catálogo, agrega las piezas que te interesen y ponles
+        cantidad. Al final nos mandas la lista completa y te cotizamos todo junto.
+      </p>
+      <a class="pill pill--primary" href="/muebles/">Explorar el catálogo <Icon name="arrow" size={14} /></a>
+    </div>
+
+    <div class="mp-pie" data-mp-pie hidden>
+      <!-- nace con el enlace general; el script le pone la lista al pintarse -->
+      <a class="pill pill--wa" data-mp-wa href={`https://wa.me/${site.whatsapp}`} target="_blank" rel="noopener">
+        <Icon name="whatsapp" size={16} /> Enviar por WhatsApp
+      </a>
+      <a class="pill pill--ghost" href="/contacto/?proyecto">Enviar por correo</a>
+      <button class="mp-vaciar" type="button" data-mp-vaciar>Vaciar la lista</button>
+    </div>
+  </div>
+</PanelLateral>
+
+<style>
+  .mp{display:flex;flex-direction:column;min-height:100%;}
+  .mp-intro{color:var(--ink-60);font-size:var(--fs-sm);margin-bottom:14px;}
+  .mp-lista{list-style:none;margin:0;padding:0;}
+  .mp-lista :global(.mp-item){
+    display:grid;grid-template-columns:64px 1fr auto;gap:12px;align-items:center;
+    padding:12px 0;border-bottom:1px solid var(--line);
+  }
+  .mp-lista :global(.mp-foto){
+    display:block;width:64px;height:64px;border-radius:var(--radius-sm);
+    background:var(--cemento-suave);overflow:hidden;
+  }
+  .mp-lista :global(.mp-foto img){width:100%;height:100%;object-fit:contain;padding:6px;}
+  .mp-lista :global(.mp-txt){min-width:0;display:flex;flex-direction:column;gap:6px;}
+  .mp-lista :global(.mp-tipo){font-size:var(--fs-2xs);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-60);}
+  .mp-lista :global(.mp-nombre){font-weight:600;color:var(--ink);line-height:1.25;}
+  @media (hover:hover){.mp-lista :global(.mp-nombre:hover){text-decoration:underline;text-underline-offset:2px;}}
+
+  /* cantidad: menos, número editable y más. Las cantidades grandes (40 sillas)
+     se escriben; los botones son para ajustar. */
+  .mp-lista :global(.mp-cant){display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;align-self:flex-start;}
+  .mp-lista :global(.mp-cant button){
+    position:relative;width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+    color:var(--ink);border-radius:50%;
+  }
+  .mp-lista :global(.mp-cant button::after){content:"";position:absolute;inset:-6px -3px;}
+  @media (hover:hover){.mp-lista :global(.mp-cant button:hover){background:var(--paper-soft);}}
+  .mp-lista :global(.mp-cant input){
+    width:40px;height:32px;border:0;background:none;text-align:center;
+    font:inherit;font-size:16px;font-weight:600;color:var(--ink);
+    -moz-appearance:textfield;appearance:textfield;
+  }
+  .mp-lista :global(.mp-cant input::-webkit-outer-spin-button),
+  .mp-lista :global(.mp-cant input::-webkit-inner-spin-button){-webkit-appearance:none;margin:0;}
+
+  .mp-lista :global(.mp-quitar){
+    position:relative;align-self:start;width:32px;height:32px;margin-right:-6px;
+    display:flex;align-items:center;justify-content:center;border-radius:50%;color:var(--ink-60);
+  }
+  .mp-lista :global(.mp-quitar::after){content:"";position:absolute;inset:-6px;}
+  @media (hover:hover){.mp-lista :global(.mp-quitar:hover){background:var(--paper-soft);color:var(--ink);}}
+
+  .mp-vacio{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding-top:8px;}
+  .mp-vacio[hidden]{display:none;}
+  .mp-vacio-ttl{font-weight:700;font-size:var(--fs-body-lg);}
+  .mp-vacio-txt{color:var(--ink-60);font-size:var(--fs-sm);margin-bottom:8px;}
+
+  /* los botones de envío se quedan a la vista aunque la lista sea larga */
+  .mp-pie{
+    position:sticky;bottom:0;margin:auto calc(var(--pad) * -1) -40px;
+    padding:16px var(--pad) calc(16px + env(safe-area-inset-bottom));
+    background:var(--white);border-top:1px solid var(--line);
+    display:flex;flex-direction:column;gap:10px;
+  }
+  .mp-pie[hidden]{display:none;}
+  .mp-pie .pill{width:100%;justify-content:center;height:46px;}
+  .mp-vaciar{
+    align-self:center;min-height:44px;padding:0 12px;
+    font-size:var(--fs-xs);color:var(--ink-60);text-decoration:underline;text-underline-offset:2px;
+  }
+  @media (hover:hover){.mp-vaciar:hover{color:var(--ink);}}
+</style>
+
+<script>
+  import { leer, agregar, quitar, cantidad, vaciar, mensaje, tiene, EVENTO } from "../scripts/proyecto.js";
+
+  const raiz = document.querySelector("[data-mp]");
+  const lista = raiz.querySelector("[data-mp-lista]");
+  const vacio = raiz.querySelector("[data-mp-vacio]");
+  const pie = raiz.querySelector("[data-mp-pie]");
+  const intro = raiz.querySelector("[data-mp-intro]");
+  const wa = raiz.querySelector("[data-mp-wa]");
+  const dominio = raiz.dataset.dominio;
+  const telefono = raiz.dataset.whatsapp;
+
+  const icono = (nombre) => {
+    const d = {
+      menos: '<path d="M3 8h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+      mas: '<path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+      cerrar: '<path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+    }[nombre];
+    return `<svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">${d}</svg>`;
+  };
+
+  // Se arma con nodos y textContent, nunca con HTML de los datos: los nombres
+  // vendrán del administrador y no deben poder inyectar marcado.
+  const pintarPieza = (p) => {
+    const li = document.createElement("li");
+    li.className = "mp-item";
+    li.dataset.slug = p.slug;
+
+    const foto = document.createElement("a");
+    foto.className = "mp-foto";
+    foto.href = p.url;
+    foto.tabIndex = -1;
+    foto.setAttribute("aria-hidden", "true");
+    if (p.img) {
+      const img = document.createElement("img");
+      img.src = p.img;
+      img.alt = "";
+      img.loading = "lazy";
+      foto.append(img);
+    }
+
+    const txt = document.createElement("div");
+    txt.className = "mp-txt";
+    const tipo = document.createElement("span");
+    tipo.className = "mp-tipo";
+    tipo.textContent = p.tipo;
+    const nombre = document.createElement("a");
+    nombre.className = "mp-nombre";
+    nombre.href = p.url;
+    nombre.textContent = p.nombre;
+
+    const cant = document.createElement("div");
+    cant.className = "mp-cant";
+    const menos = document.createElement("button");
+    menos.type = "button";
+    menos.innerHTML = icono("menos");
+    menos.setAttribute("aria-label", `Una ${p.nombre} menos`);
+    menos.dataset.accion = "menos";
+    const campo = document.createElement("input");
+    campo.type = "number";
+    campo.inputMode = "numeric";
+    campo.min = "1";
+    campo.max = "999";
+    campo.value = String(p.cantidad || 1);
+    campo.setAttribute("aria-label", `Cantidad de ${p.tipo} ${p.nombre}`);
+    const mas = document.createElement("button");
+    mas.type = "button";
+    mas.innerHTML = icono("mas");
+    mas.setAttribute("aria-label", `Una ${p.nombre} más`);
+    mas.dataset.accion = "mas";
+    cant.append(menos, campo, mas);
+    txt.append(tipo, nombre, cant);
+
+    const fuera = document.createElement("button");
+    fuera.type = "button";
+    fuera.className = "mp-quitar";
+    fuera.innerHTML = icono("cerrar");
+    fuera.setAttribute("aria-label", `Quitar ${p.tipo} ${p.nombre} de tu proyecto`);
+    fuera.dataset.accion = "quitar";
+
+    li.append(foto, txt, fuera);
+    return li;
+  };
+
+  const pintar = () => {
+    const piezas = leer();
+    const n = piezas.length;
+
+    // contador del encabezado
+    document.querySelectorAll("[data-mp-cuenta]").forEach((c) => {
+      c.textContent = String(n);
+      c.hidden = n === 0;
+      const boton = c.closest("button");
+      if (boton) boton.setAttribute("aria-label", n ? `Mi proyecto, ${n} ${n === 1 ? "pieza" : "piezas"}` : "Mi proyecto");
+    });
+
+    // botones de agregar de la página
+    document.querySelectorAll("[data-mp-agregar]").forEach(pintarBoton);
+
+    // el panel
+    lista.replaceChildren(...piezas.map(pintarPieza));
+    vacio.hidden = n > 0;
+    pie.hidden = n === 0;
+    intro.hidden = n === 0;
+    if (n) {
+      const total = piezas.reduce((s, p) => s + (p.cantidad || 1), 0);
+      intro.textContent = `${n} ${n === 1 ? "modelo" : "modelos"}, ${total} ${total === 1 ? "pieza" : "piezas"}. Ajusta las cantidades y mándanos la lista.`;
+      wa.href = `https://wa.me/${telefono}?text=${encodeURIComponent(mensaje(piezas, dominio))}`;
+    }
+  };
+
+  // --- cambios desde el panel ---
+  lista.addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-accion]");
+    if (!b) return;
+    const li = b.closest(".mp-item");
+    const slug = li.dataset.slug;
+    const actual = Number(li.querySelector("input").value) || 1;
+    if (b.dataset.accion === "quitar") quitar(slug);
+    if (b.dataset.accion === "mas") cantidad(slug, actual + 1);
+    if (b.dataset.accion === "menos") cantidad(slug, actual - 1);
+  });
+  // lo escrito se guarda al salir del campo o al dar Enter, no a cada tecla:
+  // pintar a cada tecla reemplazaría el campo mientras se escribe
+  lista.addEventListener("change", (e) => {
+    const campo = e.target.closest("input");
+    if (campo) cantidad(campo.closest(".mp-item").dataset.slug, campo.value);
+  });
+  raiz.querySelector("[data-mp-vaciar]").addEventListener("click", vaciar);
+
+  // --- botones de agregar (tarjetas y ficha) ---
+  function datosDe(boton) {
+    const scope = boton.closest("[data-mp-scope]") || document;
+    const foto = scope.querySelector("[data-mp-foto]") || scope.querySelector("img");
+    const enlace = scope.querySelector("[data-mp-enlace]");
+    return {
+      slug: boton.dataset.slug,
+      nombre: boton.dataset.nombre,
+      tipo: boton.dataset.tipo,
+      ruta: boton.dataset.ruta,
+      // dirección y foto tal como las sirve esta página: así funcionan igual en
+      // la vista previa, que cuelga de una subcarpeta
+      url: enlace ? new URL(enlace.href).pathname : location.pathname,
+      img: foto ? new URL(foto.currentSrc || foto.src).pathname : "",
+    };
+  }
+
+  function pintarBoton(boton) {
+    const dentro = tiene(boton.dataset.slug);
+    boton.setAttribute("aria-pressed", String(dentro));
+    boton.classList.toggle("mp-dentro", dentro);
+    const texto = boton.querySelector("[data-mp-texto]");
+    const nombre = `${boton.dataset.tipo} ${boton.dataset.nombre}`;
+    if (texto) {
+      // la ficha: agregado, el botón lleva a la lista en vez de quitar la pieza
+      texto.textContent = dentro ? "En tu proyecto · Ver la lista" : "Agregar a mi proyecto";
+      boton.setAttribute("aria-label", dentro ? "Ver mi proyecto" : `Agregar ${nombre} a mi proyecto`);
+    } else {
+      // la tarjeta: el mismo botón agrega y quita
+      boton.setAttribute("aria-label", dentro ? `Quitar ${nombre} de mi proyecto` : `Agregar ${nombre} a mi proyecto`);
+    }
+  }
+
+  const abrirPanel = () => document.querySelector('[data-abre="miProyecto"]')?.click();
+
+  // delegado: sirve también para las tarjetas que el catálogo pinta después
+  document.addEventListener("click", (e) => {
+    const boton = e.target.closest("[data-mp-agregar]");
+    if (!boton) return;
+    e.preventDefault();
+    const slug = boton.dataset.slug;
+    if (tiene(slug)) {
+      if (boton.hasAttribute("data-mp-ficha")) abrirPanel();
+      else quitar(slug);
+      return;
+    }
+    agregar(datosDe(boton));
+    // el contador del encabezado da un pequeño salto: confirma sin estorbar
+    document.querySelectorAll("[data-mp-cuenta]").forEach((c) => {
+      c.classList.remove("mp-salto");
+      void c.offsetWidth;
+      c.classList.add("mp-salto");
+    });
+  });
+
+  addEventListener(EVENTO, pintar);
+  pintar();
+</script>

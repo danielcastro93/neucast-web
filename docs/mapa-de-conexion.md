@@ -85,6 +85,21 @@ posiciona cada una: una sola página no puede posicionar por las ocho.
 
 ## 4. Ficha de producto
 
+### 4.0 Qué campos son obligatorios
+
+Aprobado por el cliente el 30 de septiembre de 2026. Es lo que el administrador
+tiene que exigir al dar de alta una pieza.
+
+| Nivel | Campos | Regla |
+| --- | --- | --- |
+| **Obligatorios para todas las piezas** | Nombre, tipo, categoría, al menos una foto, texto alternativo de la foto principal, párrafo descriptivo (`resumen`), material, acabados (al menos uno), disponibilidad, tipo de uso | Sin esto la pieza no se publica. Son los que alimentan los filtros, el buscador, las fichas en PDF y Google |
+| **Obligatorios según el tipo de mueble** | Sillas: respaldo, descansabrazos y base. Sofás y bancas: plazas. Mesas y escritorios: base | El administrador los pide solo cuando aplican a la categoría. Un librero no tiene respaldo: no se le puede exigir |
+| **Opcionales** | Medidas completas, construcción, mecanismo, cuidados, destacados | Si se capturan se muestran; si no, el bloque correspondiente no aparece en la ficha ni en el PDF |
+
+Los obligatorios según el tipo existen porque no todos los filtros aplican a
+todos los muebles. Se revisó contra el catálogo: ninguna pieza de
+almacenamiento tiene respaldo, descansabrazos, plazas ni base.
+
 La pantalla con más campos del sitio. Se lee de arriba abajo.
 
 ### 4.1 Galería
@@ -229,6 +244,7 @@ El formulario manda un `POST` con JSON a la dirección que se ponga en `ENDPOINT
 | `estado` | Una de las **32 entidades**, de una lista cerrada | Obligatorio |
 | `mensaje` | Texto | Obligatorio |
 | `aviso` | `"on"` | Obligatorio |
+| `proyecto` | Opcional. Solo llega si la persona armó una lista en "Mi proyecto": un arreglo de `{ pieza, cantidad, url }`, por ejemplo `{ "pieza": "Silla operativa Órbita", "cantidad": 40, "url": "https://neucast.com.mx/muebles/..." }` | Cantidad entre 1 y 999 |
 
 **Hay que validar otra vez en el servidor.** Lo del navegador es comodidad para
 quien escribe, no seguridad: cualquiera puede mandar un `POST` a mano.
@@ -307,6 +323,11 @@ No hay que conectar nada de esto, pero conviene saber que existe:
 - **`sitemap.xml`** sale de las mismas listas que generan las páginas. Si el
   catálogo crece, crece solo.
 - **`robots.txt`** apunta al mapa del sitio.
+- **`buscar.json`**, el índice del buscador, sale de las mismas listas que
+  las páginas. Lleva de cada pieza lo justo para encontrarla y pintarla
+  (nombre, tipo, categoría, material, colores, dirección y foto): unos 250
+  bytes por pieza, así que 500 piezas son unos 115 KB, que el navegador solo
+  descarga la primera vez que alguien abre el buscador.
 - **Las canónicas** y la etiqueta `robots` de cada página viven en
   `src/layouts/Base.astro`.
 - **Los datos estructurados** de cada pieza, categoría y proyecto.
@@ -325,6 +346,34 @@ Hoy no se conectan. Si se quisieran administrar, serían un tipo de contenido
 propio con categoría y posición.
 
 ---
+
+## 11b. "Mi proyecto" y el buscador
+
+**Mi proyecto** es una lista tipo carrito, sin venta en línea. Se agrega desde
+el botón con el signo de más de cada tarjeta de pieza y desde "Agregar a mi
+proyecto" en la ficha. El ícono del encabezado abre el panel con la lista, las
+cantidades y dos salidas: WhatsApp, con la lista escrita en el mensaje, y el
+formulario de contacto, que la manda en el campo `proyecto` (apartado 6).
+
+- Vive en el navegador de la persona (`localStorage`, llave
+  `neucast:proyecto`). No hay cuentas ni servidor.
+- Al agregar se guarda una copia de nombre, tipo, dirección y foto: el panel
+  no necesita el catálogo. **Consecuencia para el administrador:** si una
+  pieza cambia de nombre o se da de baja, la copia de quien ya la tenía en su
+  lista no se entera hasta que la quite. No es grave, pero conviene saberlo.
+- Se vacía sola cuando la solicitud se envía por el formulario.
+- El código vive en `src/scripts/proyecto.js` y `src/components/MiProyecto.astro`.
+
+**El buscador** abre una capa desde la lupa del encabezado (o con "/" y
+Ctrl/Cmd+K en escritorio). Busca en piezas, categorías y proyectos al teclear,
+sin importar acentos ni mayúsculas, y entiende singular, plural y género:
+"sillas negras" encuentra sillas de color "Negro". No hay servidor de búsqueda:
+lee `buscar.json` (apartado 10). Vive en `src/components/Buscador.astro`.
+
+Se eligió un índice propio en vez de Pagefind, que era lo previsto: el catálogo
+es información con campos (tipo, material, color), no texto corrido, y así los
+resultados salen con foto, agrupados y ordenados por relevancia sin agregar una
+dependencia.
 
 ## 12. Lo que no se conecta, y por qué
 

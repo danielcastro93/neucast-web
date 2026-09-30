@@ -40,8 +40,9 @@ let cambios = 0;
 for (const f of archivos) {
   let s = fs.readFileSync(f, "utf8");
 
-  // atributos: href, src y action. La doble barra de //dominio.com se respeta.
-  s = s.replace(/\s(href|src|action)="\/(?!\/)/g, (m, attr) => ` ${attr}="${BASE}/`);
+  // atributos: href, src, action y data-src (la dirección del índice del
+  // buscador). La doble barra de //dominio.com se respeta.
+  s = s.replace(/\s(href|src|action|data-src)="\/(?!\/)/g, (m, attr) => ` ${attr}="${BASE}/`);
 
   // rutas dentro de los scripts, que Astro deja con comillas invertidas
   s = s.replace(/(["'`])\/(gracias|muebles|proyectos|contacto|nosotros|img|video|fichas)\//g,

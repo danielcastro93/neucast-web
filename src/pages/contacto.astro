@@ -61,6 +61,16 @@ const schema = {
           <input type="text" id="ct-sitio" name="sitio_web" tabindex="-1" autocomplete="off" />
         </div>
 
+        <!-- Si la persona llega con "Mi proyecto", ve su lista aquí y la lista
+             viaja con la solicitud en el campo `proyecto`. -->
+        <div class="ct-proyecto" data-ct-proyecto data-dominio={site.domain} hidden>
+          <div class="ct-proyecto-cab">
+            <p class="rotulo">Tu proyecto</p>
+            <button class="ct-proyecto-editar" type="button" data-abre="miProyecto">Editar la lista</button>
+          </div>
+          <ul class="ct-proyecto-lista" data-ct-proyecto-lista></ul>
+        </div>
+
         <p class="ct-campo">
           <label for="ct-asunto">¿Qué quieres resolver? <span class="ct-req" aria-hidden="true">*</span></label>
           <select id="ct-asunto" name="asunto" required>
@@ -170,6 +180,17 @@ const schema = {
       --paint-ghost:rgba(29,29,27,.2);--paint-fill:var(--ink);
     }
     .ct-intro{color:var(--ink-60);font-size:var(--fs-body-lg);}
+    .ct-proyecto{padding:16px 18px;border-radius:var(--radius);background:var(--cemento-suave);}
+    .ct-proyecto[hidden]{display:none;}
+    .ct-proyecto-cab{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+    .ct-proyecto-cab .rotulo{color:var(--ink-60);}
+    .ct-proyecto-editar{
+      min-height:44px;margin-block:-10px;font-size:var(--fs-xs);font-weight:600;color:var(--ink);
+      text-decoration:underline;text-underline-offset:2px;
+    }
+    .ct-proyecto-lista{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:6px;font-size:var(--fs-sm);}
+    .ct-proyecto-lista :global(li){display:flex;justify-content:space-between;gap:12px;}
+    .ct-proyecto-lista :global(.ct-pz-cant){flex:none;font-weight:700;}
     /* desvía al que solo tenía una duda, antes de que llene el formulario */
     /* tamaño de nota al pie, no de párrafo: es un aviso, no parte del texto.
        Se queda en el gris medio: el tenue no llega al contraste mínimo. */
@@ -278,6 +299,8 @@ const schema = {
     // SMTP el correo se va a spam. Falta también permitir el origen del sitio
     // por CORS.
     // =========================================================================
+    import { leer as leerProyecto, vaciar as vaciarProyecto, EVENTO as CAMBIO_PROYECTO } from "../scripts/proyecto.js";
+
     const SIMULAR_ENVIO = true;
     const ENDPOINT = ""; // p. ej. "https://admin.neucast.com.mx/wp-json/neucast/v1/contacto"
     const GRACIAS = "/gracias/";
@@ -403,6 +426,15 @@ const schema = {
       const datos = Object.fromEntries(new FormData(form).entries());
       delete datos.sitio_web;
       datos.telefono = soloDigitos(datos.telefono);
+      // la lista de "Mi proyecto", si la hay: pieza, cantidad y dirección
+      const piezasProyecto = leerProyecto();
+      if (piezasProyecto.length) {
+        datos.proyecto = piezasProyecto.map((p) => ({
+          pieza: `${p.tipo} ${p.nombre}`,
+          cantidad: p.cantidad || 1,
+          url: cajaProyecto.dataset.dominio + p.ruta,
+        }));
+      }
 
       cargando(true);
       try {
@@ -419,6 +451,8 @@ const schema = {
         }
         // se marca como enviado para que /gracias/ sepa que se llegó por el flujo
         try { sessionStorage.setItem("neucast:solicitud", "1"); } catch (err) {}
+        // la lista ya se mandó: se vacía para no reenviarla por error
+        if (piezasProyecto.length) vaciarProyecto();
         form.reset();
         location.assign(GRACIAS);
       } catch (err) {
@@ -435,5 +469,30 @@ const schema = {
         );
       }
     });
+  
+    // ---------- "Mi proyecto" en el formulario ----------
+    const cajaProyecto = document.querySelector("[data-ct-proyecto]");
+    const listaProyecto = cajaProyecto.querySelector("[data-ct-proyecto-lista]");
+    const pintarProyecto = () => {
+      const piezas = leerProyecto();
+      cajaProyecto.hidden = piezas.length === 0;
+      listaProyecto.replaceChildren(
+        ...piezas.map((p) => {
+          const li = document.createElement("li");
+          const nombre = document.createElement("span");
+          nombre.textContent = `${p.tipo} ${p.nombre}`;
+          const cant = document.createElement("span");
+          cant.className = "ct-pz-cant";
+          cant.textContent = `× ${p.cantidad || 1}`;
+          li.append(nombre, cant);
+          return li;
+        })
+      );
+      // con lista, el asunto se propone solo si nadie lo ha elegido
+      const asunto = document.getElementById("ct-asunto");
+      if (piezas.length && asunto && !asunto.value) asunto.value = "Cotizar una o varias piezas";
+    };
+    addEventListener(CAMBIO_PROYECTO, pintarProyecto);
+    pintarProyecto();
   </script>
 </Base>

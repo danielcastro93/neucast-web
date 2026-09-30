@@ -6,8 +6,14 @@ const paths = {
   arrow: '<path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
   chevron: '<path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
   chevronLeft: '<path d="M10 3 5 8l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
+  buscar: '<circle cx="7" cy="7" r="4.6" stroke="currentColor" stroke-width="1.6"/><path d="M10.5 10.5 14 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+  mas: '<path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+  menos: '<path d="M3 8h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+  check: '<path d="M3 8.5 6.5 12 13 4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>',
+  cerrar: '<path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+  proyecto: '<rect x="3" y="2.5" width="10" height="11.5" rx="1.8" stroke="currentColor" stroke-width="1.5"/><path d="M5.8 6.2h4.4M5.8 8.8h4.4M5.8 11.4h2.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
 };
-const box = { arrow: 16, chevron: 16, chevronLeft: 16 };
+const box = { arrow: 16, chevron: 16, chevronLeft: 16, buscar: 16, mas: 16, menos: 16, check: 16, cerrar: 16, proyecto: 16 };
 ---
 {name === "whatsapp" ? (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">

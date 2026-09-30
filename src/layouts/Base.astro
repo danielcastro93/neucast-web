@@ -1,6 +1,9 @@
 ---
 import "../styles/global.css";
 import Logo from "../components/Logo.astro";
+import Icon from "../components/Icon.astro";
+import MiProyecto from "../components/MiProyecto.astro";
+import Buscador from "../components/Buscador.astro";
 import { site, organizacion, waLink, categories, todosLosMuebles } from "../data/site.js";
 import { proyectoDestacado } from "../data/proyectos.js";
 
@@ -95,9 +98,16 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
           {nav.slice(1).map((n) => <a class="label" href={n.href}>{n.label}</a>)}
         </nav>
         <div class="hd-actions">
-          <a class="hd-wa label" href={waGeneral} target="_blank" rel="noopener">
+          <button class="hd-ico" type="button" data-bs-abrir aria-label="Buscar">
+            <Icon name="buscar" size={19} />
+          </button>
+          <button class="hd-ico" type="button" data-abre="miProyecto" aria-label="Mi proyecto">
+            <Icon name="proyecto" size={19} />
+            <span class="hd-cuenta" data-mp-cuenta hidden>0</span>
+          </button>
+          <a class="hd-wa label" href={waGeneral} target="_blank" rel="noopener" aria-label="Cotiza por WhatsApp">
             <Fragment set:html={waIcon} />
-            <span>Cotiza</span>
+            <span class="hd-wa-txt">Cotiza</span>
           </a>
         </div>
       </div>
@@ -249,6 +259,9 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
     )}
 
     <!-- Burbuja WhatsApp (se oculta cuando el CTA grande o el footer están en pantalla) -->
+    <MiProyecto />
+    <Buscador />
+
     <div class="fab-wrap fab-hidden" id="fabWrap">
       <div class="fab-tip" aria-hidden="true">
         <span class="fab-tip-txt"><strong>¿Cotizamos tu proyecto?</strong><br />Respondemos hoy mismo</span>
@@ -312,7 +325,33 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
       .hd-chevron{transition:transform .3s var(--ease);}
       .hd-muebles[aria-expanded="true"] .hd-chevron{transform:rotate(180deg);}
 
-      .hd-actions{margin-left:auto;display:flex;align-items:center;}
+      .hd-actions{margin-left:auto;display:flex;align-items:center;gap:6px;}
+      /* lupa y "Mi proyecto": íconos de 44 que heredan el color de la barra,
+         blanco sobre el hero y tinta sobre fondo claro */
+      .hd-ico{
+        position:relative;width:44px;height:44px;flex:none;
+        display:flex;align-items:center;justify-content:center;border-radius:50%;
+        color:inherit;transition:background .2s;
+      }
+      @media (hover:hover){.hd-ico:hover{background:rgba(29,29,27,.06);}}
+      @media (hover:hover){.hd.overlay:not(.scrolled):not(.mega-abierto) .hd-ico:hover{background:rgba(255,255,255,.14);}}
+      .hd-cuenta{
+        position:absolute;top:5px;right:3px;min-width:18px;height:18px;padding:0 5px;
+        border-radius:999px;background:var(--olive-deep);color:#fff;
+        font-size:11px;font-weight:700;line-height:18px;text-align:center;
+      }
+      .hd-cuenta[hidden]{display:none;}
+      .hd-cuenta.mp-salto{animation:mpSalto .45s var(--ease);}
+      @keyframes mpSalto{40%{transform:scale(1.35)}100%{transform:none}}
+      /* En teléfono no caben tres íconos y la palabra "Cotiza": el botón de
+         WhatsApp se queda en su círculo verde y el texto pasa a ser solo para
+         lectores de pantalla. */
+      @media (max-width:479px){
+        .hd-actions{gap:2px;}
+        .hd .hd-wa{width:44px;height:44px;padding:0;justify-content:center;}
+        .hd-wa-txt{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+      }
+      @media (prefers-reduced-motion:reduce){.hd-cuenta.mp-salto{animation:none;}}
 
       .hd-wa{
         position:relative;

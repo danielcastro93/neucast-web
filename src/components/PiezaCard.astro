@@ -5,6 +5,7 @@
 // con el dedo y en escritorio las flechas aparecen sobre la foto, a los lados,
 // solo al acercar el cursor. Así la cuadrícula se mantiene limpia.
 import { gruposColor, materiales } from "../data/catalogo.js";
+import Icon from "./Icon.astro";
 
 // `ancho` convierte la card en pieza de carrusel (el home). Sin él, la card
 // es una celda de cuadrícula y la mide el contenedor.
@@ -50,15 +51,33 @@ const datos = {
   "data-nuevo": pieza.nuevo ? "1" : "0",
 };
 ---
-<article class:list={["pz", { "pz--rail": ancho }]} style={ancho ? `--pz-w:${ancho}` : undefined} {...datos}>
+<article class:list={["pz", { "pz--rail": ancho }]} style={ancho ? `--pz-w:${ancho}` : undefined} {...datos} data-mp-scope>
   <div class="pz-marco">
     {pieza.nuevo && <span class="pz-nuevo">Nuevo</span>}
+
+    <!-- Agrega o quita la pieza de "Mi proyecto". Va fuera del enlace de la
+         foto, así que tocarlo no abre la ficha. -->
+    <button
+      class="pz-mp"
+      type="button"
+      data-mp-agregar
+      data-slug={pieza.slug}
+      data-nombre={pieza.nombre}
+      data-tipo={pieza.tipo}
+      data-ruta={ruta}
+      aria-pressed="false"
+      aria-label={`Agregar ${pieza.tipo} ${pieza.nombre} a mi proyecto`}
+    >
+      <span class="pz-mp-mas"><Icon name="mas" size={16} /></span>
+      <span class="pz-mp-ok"><Icon name="check" size={16} /></span>
+    </button>
 
     <a class="pz-fotos" href={ruta} tabindex="-1" aria-hidden="true">
       {fotos.map((src, i) => (
         <img
           src={src}
           alt={i === 0 ? pieza.alt : ""}
+          data-mp-foto={i === 0 ? "" : undefined}
           aria-hidden={i > 0 ? "true" : undefined}
           loading="lazy"
           draggable="false"
@@ -86,7 +105,7 @@ const datos = {
   </div>
 
   <Titulo class="pz-nombre">
-    <a href={ruta}>
+    <a href={ruta} data-mp-enlace>
       <span class="pz-tipo">{pieza.tipo}</span>
       {pieza.nombre}
     </a>
@@ -116,15 +135,35 @@ const datos = {
   }
 
   /* etiqueta Nuevo, como la de la referencia */
+  /* Blanca con la tinta y en mayúsculas espaciadas, como los rótulos. La de
+     arena se perdía sobre el gris de fondo y no combinaba con él. */
   .pz-nuevo{
     position:absolute;top:12px;left:12px;z-index:3;
-    padding:5px 11px;border-radius:999px;
-    background:var(--sand);color:var(--ink);
-    font-size:var(--fs-2xs);font-weight:700;letter-spacing:.02em;
+    padding:5px 10px;border-radius:999px;
+    background:var(--white);color:var(--ink);
+    font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;
   }
+  /* "Mi proyecto" en la tarjeta: círculo blanco en la esquina, con más al
+     agregar y palomita cuando ya está en la lista */
+  .pz-mp{
+    position:absolute;top:10px;right:10px;z-index:3;
+    width:34px;height:34px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--white);color:var(--ink);
+    box-shadow:0 1px 3px rgba(0,0,0,.08);
+    transition:background .2s,color .2s,transform .2s var(--ease);
+  }
+  .pz-mp::after{content:"";position:absolute;inset:-5px;}
+  .pz-mp-mas{display:flex;}
+  .pz-mp-ok{display:none;}
+  .pz-mp.mp-dentro{background:var(--ink);color:var(--white);}
+  .pz-mp.mp-dentro .pz-mp-mas{display:none;}
+  .pz-mp.mp-dentro .pz-mp-ok{display:flex;}
+  @media (hover:hover){.pz-mp:hover{transform:scale(1.08);}}
   /* en la cuadrícula de dos columnas la etiqueta se comía la esquina del mueble */
   @media (max-width:759px){
-    .pz-nuevo{top:8px;left:8px;padding:3px 8px;font-size:11px;}
+    .pz-nuevo{top:8px;left:8px;padding:3px 8px;font-size:9px;letter-spacing:.14em;}
+    .pz-mp{top:6px;right:6px;}
   }
 
   /* Carrusel y enlace a la vez: mucha gente da clic en la foto esperando que

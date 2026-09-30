@@ -166,7 +166,7 @@ const VENTANA_PUNTOS = 5;
 <Base title={title} description={description} image={pieza.img[0]} schema={schema}>
   <article class="pd">
     <!-- ============ GALERÍA + FICHA ============ -->
-    <div class="container pd-top">
+    <div class="container pd-top" data-mp-scope>
       <div class="pd-galeria">
         <div class="pd-fotos" id="pdFotos">
           {pieza.img.map((src, i) => (
@@ -177,7 +177,7 @@ const VENTANA_PUNTOS = 5;
               data-ampliar
               aria-label={`Ampliar foto ${i + 1} de ${pieza.img.length}`}
             >
-              <img src={src} alt={i === 0 ? pieza.alt : `${pieza.nombre} en uso`} loading={i === 0 ? "eager" : "lazy"} draggable="false" />
+              <img src={src} alt={i === 0 ? pieza.alt : `${pieza.nombre} en uso`} loading={i === 0 ? "eager" : "lazy"} draggable="false" data-mp-foto={i === 0 ? "" : undefined} />
             </button>
           ))}
 
@@ -244,6 +244,22 @@ const VENTANA_PUNTOS = 5;
             <a class="pill pill--ghost" href="/contacto/">
               Pedir cotización por correo
             </a>
+            <!-- suma la pieza a "Mi proyecto"; ya agregada, lleva a la lista -->
+            <button
+              class="pd-mp"
+              type="button"
+              data-mp-agregar
+              data-mp-ficha
+              data-slug={pieza.slug}
+              data-nombre={pieza.nombre}
+              data-tipo={pieza.tipo}
+              data-ruta={`/muebles/${pieza.cat}/${pieza.slug}/`}
+              aria-pressed="false"
+            >
+              <span class="pd-mp-ico pd-mp-ico--mas"><Icon name="mas" size={15} /></span>
+              <span class="pd-mp-ico pd-mp-ico--ok"><Icon name="check" size={15} /></span>
+              <span data-mp-texto>Agregar a mi proyecto</span>
+            </button>
           </div>
 
           <ul class="pd-aperturas">
@@ -628,6 +644,19 @@ const VENTANA_PUNTOS = 5;
     /* ---------- acciones ---------- */
     .pd-ctas{display:flex;flex-direction:column;gap:9px;margin-top:22px;}
     .pd-ctas .pill{width:100%;}
+    /* "Mi proyecto": más discreto que los dos botones de cotizar, que son el
+       camino principal. Texto con su ícono, centrado y con zona de toque de 44. */
+    .pd-mp{
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      min-height:44px;margin-top:2px;
+      font-size:var(--fs-sm);font-weight:600;color:var(--ink);
+      border-radius:999px;transition:background .2s;
+    }
+    @media (hover:hover){.pd-mp:hover{background:var(--paper-soft);}}
+    .pd-mp-ico{display:flex;}
+    .pd-mp-ico--ok{display:none;color:var(--olive-deep);}
+    .pd-mp.mp-dentro .pd-mp-ico--mas{display:none;}
+    .pd-mp.mp-dentro .pd-mp-ico--ok{display:flex;}
 
     .pd-aperturas{margin-top:26px;padding:0;border-top:1px solid var(--line);list-style:none;}
     .pd-aperturas li{border-bottom:1px solid var(--line);}

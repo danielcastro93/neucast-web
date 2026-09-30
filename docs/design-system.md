@@ -26,7 +26,7 @@ Un `clamp()` suelto dentro de un componente es un bug, no una decisión.
 | `--olive` | `#78894A` | **Acento.** Solo detalles: links, viñetas, hotspot activo |
 | `--olive-deep` | `#5E6C39` | Acento sobre fondo claro (links, hover) |
 | `--sage` | `#A1B39D` | Bullets sobre cemento oscuro, donde el oliva se apaga |
-| `--sand` | `#D9C7A1` | Solo la etiqueta "Nuevo". Es el único arena que queda: acento, nunca fondo |
+
 | `--wa` | `#1DAA61` | Exclusivo de WhatsApp. Nunca decorativo |
 
 El verde **acentúa, no domina**. Si una sección se ve verde, está mal.
@@ -462,8 +462,9 @@ logo sale blanco sobre blanco cuando se abre el panel.
 
 - Fondo del sitio: `--white`. Tres grises para todo lo demás: oscuro para
   bloques con texto blanco, claro con grano para superficies de apoyo, suave
-  y liso detrás de los muebles. El arena se retiró el 30 de septiembre de
-  2026 a petición del cliente; solo queda en la etiqueta "Nuevo".
+  y liso detrás de los muebles. El arena se retiró por completo el 30 de
+  septiembre de 2026. La etiqueta "Nuevo" va blanca con la tinta, en
+  mayúsculas espaciadas.
 - El grano es `public/img/grano.png` (7 KB) en la clase `.grano`, en una capa
   que no recibe toques; `.grano--oscuro` lo pone en modo aclarar para fondos
   oscuros. Nunca detrás de fotos de producto: compite con el borde del mueble.
