@@ -140,7 +140,7 @@ const pilares = [
   </section>
 
   <!-- ============ CIERRE ============ -->
-  <section class="ns-cierre" data-hides-fab>
+  <section class="ns-cierre">
     <img class="ns-cierre-bg" src="/img/nosotros/cierre-material.jpg" alt="" aria-hidden="true" loading="lazy" />
     <div class="ns-cierre-shade" aria-hidden="true"></div>
     <div class="container ns-cierre-inner">
@@ -167,10 +167,12 @@ const pilares = [
        angosta); el centrado estilo editorial entra a partir de tablet */
     .ns-centro{max-width:880px;margin-inline:auto;text-align:left;}
     @media (min-width:700px){.ns-centro{text-align:center;}}
+    /* Era el último párrafo en serif del sitio. Va en la misma letra que el
+       resto, con el peso y el aire de un titular corto, y conserva su tamaño. */
     .ns-lead{
-      font-family:var(--serif);
+      font-weight:600;letter-spacing:-.015em;
       font-size:clamp(19px,2.4vw,27px);
-      line-height:1.4;margin-bottom:26px;text-wrap:balance;
+      line-height:1.35;margin-bottom:26px;text-wrap:balance;
     }
     /* el cuerpo usa el ancho completo del bloque: así cada párrafo
        cabe en tres renglones */

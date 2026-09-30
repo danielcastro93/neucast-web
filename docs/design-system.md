@@ -36,7 +36,7 @@ El verde **acentúa, no domina**. Si una sección se ve verde, está mal.
 ## 2. Tipografía
 
 Familias: `--sans` (Helvetica Neue nativa en Apple, Inter como respaldo) y
-`--serif` (Baskerville / Libre Baskerville) para acentos editoriales.
+La serif (Baskerville) se retiró el 30 de septiembre de 2026: los rótulos pasaron a mayúsculas espaciadas y el sitio quedó en una sola familia. El token `--serif` ya no existe.
 
 ### Escala (fluida: móvil → escritorio)
 
@@ -60,7 +60,7 @@ Un H3 nunca puede verse más grande que el H2 que lo contiene.
 
 - `.display`: peso 700 y tracking apretado. Se combina con la clase de nivel:
   `class="display t-h2"`. **No define tamaño.**
-- `.serif-eyebrow`: antetítulo en serif.
+- `.rotulo`: antetítulo en mayúsculas espaciadas (12 px, peso 500, tracking .28em; .2em en teléfono). Sustituyó a `.serif-eyebrow`. No fija color: lo hereda del bloque.
 - `.overline`: 12px, mayúsculas, tracking amplio, color oliva.
 - `.label`: 13px, peso 600. Navegación y botones.
 
@@ -364,7 +364,7 @@ descartó: con una sola pieza fuerte el bloque se lee mejor y no compite con el
 video.
 
 **Cierre de página.** El bloque de conversión va sobre foto, con antetítulo en
-serif que entra con `.rise`, el título en `t-h1` partido en dos `.paint-line`
+rótulo en mayúsculas que entra con `.rise`, el título en `t-h1` partido en dos `.paint-line`
 escalonadas con `--i`, y los CTA con `.fade-in`. La secuencia arranca cuando el
 bloque entra en pantalla (`.in-view` pone `--play:running`).
 

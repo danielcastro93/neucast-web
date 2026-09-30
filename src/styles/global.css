@@ -40,7 +40,6 @@
 
   /* Tipografía */
   --sans:"Helvetica Neue","HelveticaNeue",Inter,Roboto,"Segoe UI",Arial,sans-serif;
-  --serif:Baskerville,"Libre Baskerville","Baskerville Old Face","Times New Roman",serif;
 
   /* ---------- Escala tipográfica ----------
      Fluida: el primer valor manda en móvil, el tercero en escritorio.

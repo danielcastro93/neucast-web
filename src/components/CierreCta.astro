@@ -13,7 +13,9 @@ const {
   mensaje = "Hola, quiero cotizar un proyecto de mobiliario para mi empresa.",
 } = Astro.props;
 ---
-<section class="cta" data-hides-fab>
+<!-- La burbuja de WhatsApp se queda a la vista también aquí: el cliente la
+     quiere siempre presente, y sobre este bloque no tapa ningún botón. -->
+<section class="cta">
   <img class="cta-bg" src={img} alt="" loading="lazy" aria-hidden="true" />
   <div class="cta-shade" aria-hidden="true"></div>
   <div class="container cta-inner" data-cta>
