@@ -279,7 +279,7 @@ const VENTANA_PUNTOS = 5;
             <article class="pd-apoyo grano grano--oscuro">
               {/* rótulo, no encabezado: el esquema de la página lo encabeza
                   el nombre de la pieza y estos son apoyos de un bloque */}
-              <p class="pd-apoyo-ttl">{a.titulo}</p>
+              <p class="rotulo pd-apoyo-ttl">{a.titulo}</p>
               <p class="pd-apoyo-txt">{a.texto}</p>
             </article>
           ))}
@@ -684,10 +684,8 @@ const VENTANA_PUNTOS = 5;
       /* cemento oscuro con el texto en blanco, como "La idea es simple" */
       border-radius:var(--radius);background:var(--cemento-oscuro);color:var(--white);
     }
-    .pd-apoyo-ttl{
-      margin:0;font-family:var(--serif);font-size:var(--fs-body-lg);
-      letter-spacing:-.01em;color:var(--white);
-    }
+    /* mismo rótulo que el del hero: mayúsculas espaciadas, en blanco atenuado */
+    .pd-apoyo-ttl{margin:0 0 4px;color:rgba(255,255,255,.72);}
     .pd-apoyo-txt{margin:0;color:rgba(255,255,255,.8);text-wrap:pretty;}
     /* De aquí para arriba caben los tres, así que el riel deja de serlo: sin
        desplazamiento y sin degradado. El relleno del riel se queda, porque es
