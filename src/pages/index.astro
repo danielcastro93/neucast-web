@@ -180,11 +180,13 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
        para "proyectos ya instalados": fondo arena, la foto dentro con su
        esquina redondeada y el texto debajo. De 900 para arriba el texto se
        monta sobre la foto, y ahí sí pide el velo oscuro. */
-    /* gris claro con grano, no papel liso: es la tarjeta que el cliente señaló */
+    /* en teléfono, el mismo gris claro y liso de la tarjeta de home office
+       (30 de septiembre); antes fue gris más oscuro con grano */
     .proj-stage{
       position:relative;margin:0;
-      border-radius:var(--radius);background:var(--cemento-claro);padding:14px;
+      border-radius:var(--radius);background:var(--paper-soft);padding:14px;
     }
+    .proj-stage::before{display:none;}
     /* el radio va en la foto y no en su caja: la caja no puede recortar,
        porque las tarjetas de los puntos se salen de la imagen */
     .proj-stage :global(.esc) > :global(img){border-radius:var(--radius-sm);}
@@ -213,8 +215,6 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
     @media (min-width:900px){
       /* el mismo oscuro que "La idea es simple": un solo oscuro en todo el home */
       .proj-stage{background:var(--cemento-oscuro);padding:0;overflow:hidden;}
-      /* en escritorio la tarjeta es oscura y va sin grano */
-      .proj-stage::before{display:none;}
       .proj-stage :global(.esc) > :global(img){border-radius:0;}
       .proj-caption{
         position:absolute;left:0;right:0;bottom:0;padding:110px 44px 36px;
