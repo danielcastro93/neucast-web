@@ -21,6 +21,7 @@ const FIJAS = [
   { ruta: "/", prioridad: "1.0", cada: "weekly" },
   { ruta: "/muebles/", prioridad: "0.9", cada: "weekly" },
   { ruta: "/proyectos/", prioridad: "0.8", cada: "monthly" },
+  { ruta: "/home-office/", prioridad: "0.8", cada: "monthly" },
   { ruta: "/nosotros/", prioridad: "0.6", cada: "yearly" },
   { ruta: "/contacto/", prioridad: "0.7", cada: "yearly" },
   { ruta: "/preguntas-frecuentes/", prioridad: "0.5", cada: "yearly" },

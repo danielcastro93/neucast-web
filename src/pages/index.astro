@@ -11,6 +11,7 @@ import { proyectoDestacado, escenaDeHome } from "../data/proyectos.js";
 import EscenaHotspots from "../components/EscenaHotspots.astro";
 import CierreCta from "../components/CierreCta.astro";
 import { buscarPieza } from "../data/catalogo.js";
+import { homeOffice, sets as setsHomeOffice } from "../data/homeOffice.js";
 
 const piezasDestacadas = destacados.map(buscarPieza).filter(Boolean);
 const escenaHome = proyectoDestacado ? escenaDeHome(proyectoDestacado) : null;
@@ -87,6 +88,27 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
     </div>
   </section>
   )}
+
+  <!-- ============ HOME OFFICE ============ -->
+  <section class="ho">
+    <div class="container">
+      <a class="ho-card reveal" href={homeOffice.ruta}>
+        <span class="ho-media">
+          <img src={homeOffice.portada.img} alt={homeOffice.portada.alt} loading="lazy" />
+        </span>
+        <span class="ho-copy">
+          <span class="rotulo ho-rotulo">Home office</span>
+          <span class="display t-h2 ho-title">Trabaja desde casa como en la oficina</span>
+          <span class="ho-text">
+            Sillas, escritorios y almacenamiento para armar tu espacio en casa, con
+            {setsHomeOffice.length > 0 ? " sets listos para empezar e" : ""} ideas para acomodarlo.
+            Y si es para todo tu equipo, lo cotizamos completo.
+          </span>
+          <span class="pill pill--ghost ho-cta">Armar mi home office <Fragment set:html={arrow} /></span>
+        </span>
+      </a>
+    </div>
+  </section>
 
   <!-- ============ EDITORIAL / NOSOTROS ============ -->
   <section class="edit grano grano--oscuro" id="nosotros">
@@ -250,6 +272,27 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
     /* el verde oliva se apaga sobre oscuro; el salvia sí se lee */
     .edit .edit-points li::before{background:var(--sage);}
 
-  </style>
+  
+    /* ---------- Home office ---------- */
+    .ho-card{
+      display:grid;border-radius:var(--radius);overflow:hidden;
+      background:var(--paper-soft);color:var(--ink);
+    }
+    @media (min-width:900px){.ho-card{grid-template-columns:minmax(0,7fr) minmax(0,5fr);}}
+    .ho-media{display:block;aspect-ratio:4/3;overflow:hidden;}
+    @media (min-width:900px){.ho-media{aspect-ratio:auto;min-height:480px;}}
+    .ho-media img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease);}
+    @media (hover:hover){.ho-card:hover .ho-media img{transform:scale(1.03);}}
+    .ho-copy{
+      display:flex;flex-direction:column;align-items:flex-start;justify-content:center;
+      padding:clamp(24px,4vw,56px);
+    }
+    .ho-rotulo{color:var(--olive-ink);}
+    .ho-title{margin:12px 0 14px;}
+    .ho-text{color:var(--ink-60);max-width:460px;}
+    .ho-cta{margin-top:26px;}
+    @media (max-width:639px){.ho-cta{width:100%;}}
+    @media (hover:hover){.ho-card:hover .ho-cta{background:var(--ink);color:var(--white);border-color:var(--ink);}}
+</style>
 
 </Base>

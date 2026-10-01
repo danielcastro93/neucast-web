@@ -20,6 +20,7 @@ Lo urgente, en orden:
 | Categoría | `/muebles/{categoria}/` | ✅ Listas (8) |
 | Detalle de pieza | `/muebles/{categoria}/{pieza}/` | ✅ Listas (26, fichas de maqueta) |
 | Proyectos | `/proyectos/` | ✅ Lista (contenido de maqueta) |
+| Home office | `/home-office/` | ✅ Lista (fotos de Pexels, de posicionamiento) |
 | Detalle de proyecto | `/proyectos/{slug}/` | ✅ Listas (4, contenido de maqueta) |
 | Nosotros | `/nosotros/` | ✅ Lista |
 | Preguntas frecuentes | `/preguntas-frecuentes/` | ✅ Lista |
@@ -112,6 +113,17 @@ mismo nombre en `public/img/nosotros/` y `public/img/faq-oficina.jpg`.
 | `faq-hero.jpg` | 16630138 |
 | `gracias-tela.jpg` | 4862997 |
 | `contacto-hero.jpg` (solo Open Graph) | 14002100 |
+| `home-office/hero.jpg` | 28461034 |
+| `home-office/set-completo.jpg` | 14245340 |
+| `home-office/idea-luz.jpg` | 15062127 |
+| `home-office/idea-silla.jpg` | 31726663 |
+| `home-office/idea-guardar.jpg` | 6958123 |
+| `home-office/idea-casa.jpg` | 6969995 |
+| `home-office/cierre.jpg` | 6934243 |
+
+Las de **home office** son de posicionamiento: no hay todavía fotografía de
+home office de Neucast. Se cambian por propias sustituyendo el archivo con el
+mismo nombre.
 
 
 Videos (Pexels): `oficina-neucast.mp4` 8347237, `editorial-neucast.mp4` 7533208.
@@ -366,6 +378,12 @@ páginas legales. Son los últimos huecos antes de publicar.
       atención. Sin esos tres no se puede declarar.
 - [ ] **Para los legales:** razón social, RFC, domicilio fiscal y jurisdicción.
 - [x] Logo cuadrado de 512 px para el esquema `Organization`. Resuelto.
+- [ ] **Home office: ¿entregan a domicilios particulares?** ¿Y a varios
+      domicilios para una misma empresa? Hoy la página no lo promete: habla de
+      cotizar sets por puesto en una sola propuesta y nada más. Si la respuesta
+      es sí, se dice en la página y en el bloque para empresas.
+- [ ] **Home office: fotos propias** de espacios de trabajo en casa con piezas
+      de Neucast, para sustituir las de Pexels.
 
 ## Proyectos: los cuatro casos son de maqueta
 

@@ -6,6 +6,7 @@ import MiProyecto from "../components/MiProyecto.astro";
 import Buscador from "../components/Buscador.astro";
 import { site, organizacion, waLink, categories, todosLosMuebles } from "../data/site.js";
 import { proyectoDestacado } from "../data/proyectos.js";
+import { homeOffice } from "../data/homeOffice.js";
 
 const {
   title = "Muebles para oficina y mobiliario corporativo de diseño | Neucast",
@@ -130,6 +131,15 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
                 <span class="hd-mega-nombre">{c.name}</span>
               </a>
             ))}
+            <!-- colección por espacio, no categoría: lleva su rótulo para
+                 que no se lea como una categoría más -->
+            <a class="hd-mega-cat" href={homeOffice.ruta}>
+              <span class="hd-mega-thumb"><img src={homeOffice.portada.img} alt="" loading="lazy" /></span>
+              <span class="hd-mega-txt">
+                <span class="hd-mega-nombre">{homeOffice.nombre}</span>
+                <span class="hd-mega-nota">Sets e ideas para trabajar en casa</span>
+              </span>
+            </a>
           </div>
 
           <!-- Bloque de apoyo: el menú también puede llevar a otra cosa.
@@ -201,6 +211,13 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
                   <span class="drow-name">{c.name}</span>
                 </a>
               ))}
+              <a href={homeOffice.ruta} class="crow">
+                <span class="crow-thumb"><img src={homeOffice.portada.img} alt="" loading="lazy" /></span>
+                <span class="crow-txt">
+                  <span class="drow-name">{homeOffice.nombre}</span>
+                  <span class="crow-nota">Sets e ideas para trabajar en casa</span>
+                </span>
+              </a>
             </nav>
           </div>
         </div>
@@ -221,6 +238,7 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
             <a href="/muebles/sillas-ejecutivas/">Sillas ejecutivas</a>
             <a href="/muebles/salas-de-juntas/">Salas de juntas</a>
             <a href="/muebles/escritorios/">Escritorios</a>
+            <a href={homeOffice.ruta}>Home office</a>
             <a href="/muebles/">Ver todo el catálogo</a>
           </div>
           <div>
@@ -430,6 +448,8 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
       letter-spacing:0;
     }
     @media (hover:hover){.hd-mega-cat:hover .hd-mega-nombre{color:var(--olive-deep);}}
+    .hd-mega-txt{display:flex;flex-direction:column;gap:2px;min-width:0;}
+    .hd-mega-nota{font-size:var(--fs-2xs);color:var(--ink-60);letter-spacing:0;}
 
     /* bloque de apoyo a la derecha */
     .hd-promo{
@@ -567,6 +587,8 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
         width:52px;height:52px;border-radius:11px;overflow:hidden;flex:none;background:var(--paper);
       }
       .crow-thumb img{width:100%;height:100%;object-fit:cover;}
+      .crow-txt{display:flex;flex-direction:column;gap:2px;min-width:0;}
+      .crow-nota{font-size:var(--fs-xs);font-weight:400;color:var(--ink-60);}
       /* Fijar el body, no solo esconder su scroll: en iOS `overflow:hidden`
          deja que la página de atrás se siga moviendo y el dedo se pelea entre
          las dos. La posición la guarda y la devuelve src/scripts/bloqueo-scroll.js */

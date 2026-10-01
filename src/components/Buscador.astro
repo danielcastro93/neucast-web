@@ -364,7 +364,8 @@ const sugeridas = categories
     const txt = el("span", "bs-txt");
     if (x.tipo === "pieza") txt.append(el("span", "bs-tipo", x.t));
     if (x.tipo === "proyecto") txt.append(el("span", "bs-tipo", "Proyecto"));
-    if (x.tipo === "categoria") txt.append(el("span", "bs-tipo", "Categoría"));
+    // las colecciones por espacio (home office) viven fuera de /muebles/
+    if (x.tipo === "categoria") txt.append(el("span", "bs-tipo", x.u.startsWith("/muebles/") ? "Categoría" : "Espacio"));
     txt.append(nombreResaltado(x, palabras));
     const meta = x.tipo === "pieza" ? x.m : x.tipo === "proyecto" ? x.t : "";
     if (meta) txt.append(el("span", "bs-meta", meta));
@@ -417,12 +418,17 @@ const sugeridas = categories
     const prys = buscarEn(indice.proyectos, palabras);
 
     const hijos = [];
+    // si lo escrito es el nombre de una sección ("home office", "escritorios"),
+    // la sección va primero: es a donde la persona quería ir
+    const q0 = norm(q);
+    const seccionPrimero = cats.length > 0 && cats[0]._n.startsWith(q0);
+    if (seccionPrimero) hijos.push(grupo("Secciones", cats.slice(0, 4), palabras, "bs-lista--filas"));
     if (pzs.length) {
       const g = grupo(pzs.length === 1 ? "1 pieza" : `${pzs.length} piezas`, pzs.slice(0, MAX_PIEZAS), palabras, "bs-lista--piezas");
       if (pzs.length > MAX_PIEZAS) g.append(el("p", "bs-cuenta", `Se muestran ${MAX_PIEZAS} de ${pzs.length}. Escribe algo más para afinar.`));
       hijos.push(g);
     }
-    if (cats.length) hijos.push(grupo("Categorías", cats.slice(0, 4), palabras, "bs-lista--filas"));
+    if (cats.length && !seccionPrimero) hijos.push(grupo("Secciones", cats.slice(0, 4), palabras, "bs-lista--filas"));
     if (prys.length) hijos.push(grupo("Proyectos", prys.slice(0, 4), palabras, "bs-lista--filas"));
 
     if (!hijos.length) {

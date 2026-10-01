@@ -16,6 +16,7 @@
 import { categories } from "../data/site.js";
 import { piezas, rutaPieza, materiales, gruposColor } from "../data/catalogo.js";
 import { proyectos } from "../data/proyectos.js";
+import { homeOffice } from "../data/homeOffice.js";
 
 const nombreDe = (lista, id) => lista.find((x) => x.id === id)?.nombre || "";
 
@@ -28,11 +29,18 @@ export function GET() {
       t: p.tipo,
       c: catNombre[p.cat] || "",
       m: nombreDe(materiales, p.material),
-      k: (p.colores || []).map((id) => nombreDe(gruposColor, id)).filter(Boolean).join(" "),
+      // colores y espacios: "home office" también encuentra sus piezas
+      k: [...(p.colores || []).map((id) => nombreDe(gruposColor, id)), ...(p.espacios || []).includes("home-office") ? ["home office casa"] : []]
+        .filter(Boolean)
+        .join(" "),
       u: rutaPieza(p),
       i: p.img?.[0] || "",
     })),
-    categorias: categories.map((c) => ({ n: c.name, u: `/muebles/${c.slug}/`, i: c.photo })),
+    // las colecciones por espacio van con las categorías: se buscan igual
+    categorias: [
+      ...categories.map((c) => ({ n: c.name, u: `/muebles/${c.slug}/`, i: c.photo })),
+      { n: homeOffice.nombre, u: homeOffice.ruta, i: homeOffice.portada.img },
+    ],
     proyectos: proyectos.map((p) => ({
       n: p.nombre,
       t: `${p.espacio} · ${p.ciudad}`,

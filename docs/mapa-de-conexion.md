@@ -378,6 +378,27 @@ es información con campos (tipo, material, color), no texto corrido, y así los
 resultados salen con foto, agrupados y ordenados por relevancia sin agregar una
 dependencia.
 
+## 11c. Home office, la primera colección por espacio
+
+`/home-office/` no es una categoría: las piezas siguen en la suya y aparecen
+aquí porque traen `home-office` en su campo `espacios` (lista cerrada, varios
+valores). Una silla operativa es de Sillas operativas y también de home office.
+
+| Qué se ve | Sale de | En el administrador |
+| --- | --- | --- |
+| Piezas para tu home office | Piezas con `espacios` que incluye `home-office` | Casilla "Home office" en la pieza |
+| Sets para empezar | `src/data/homeOffice.js` → `sets` | Nombre, texto corto y de dos a cuatro piezas elegidas de una lista. Un set con menos de dos piezas publicadas no sale |
+| Ideas para armar tu espacio | `homeOffice.js` → `ideas` | Título, texto y foto. Sin cifras que no estén confirmadas |
+| Fotos de cabecera, portada y cierre | `homeOffice.js` → `homeOffice` | Tres imágenes |
+
+El botón de cada set agrega todas sus piezas a Mi proyecto de una vez (las que
+ya estaban no se duplican) y abre la lista. Se llega a la página desde el menú
+de Muebles, el cajón del teléfono, el bloque del home, el footer y el buscador,
+que la pone primero cuando se escribe "home office".
+
+Si mañana hay más espacios (recepción, cafetería en casa, etc.), se agrega el
+valor a la lista de `espacios` y una página igual.
+
 ## 12. Lo que no se conecta, y por qué
 
 | Qué | Por qué |

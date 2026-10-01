@@ -122,7 +122,11 @@ export const filtros = [
   },
 ];
 
-const p = (o) => ({ nuevo: false, plazas: null, extras: [], ...o });
+// `espacios`: en qué colecciones por espacio aparece la pieza, además de su
+// categoría. Una pieza tiene una sola categoría pero puede servir en varios
+// espacios: una silla operativa también es de home office. Lista cerrada,
+// hoy solo "home-office" (ver src/data/homeOffice.js).
+const p = (o) => ({ nuevo: false, plazas: null, extras: [], espacios: [], ...o });
 
 export const piezas = [
   p({ slug:"silla-polanco", nombre:"Polanco", cat:"sillas-ejecutivas", tipo:"Silla de dirección",
@@ -131,7 +135,7 @@ export const piezas = [
     nuevo:true, uso:"direccion", respaldo:"cabecera", brazos:"ajustables", base:"aluminio",
     material:"smartmesh", colores:["negro","gris"], extras:["ruedas","reclinable"], entrega:"10dias" }),
 
-  p({ slug:"silla-reforma", nombre:"Reforma", cat:"sillas-ejecutivas", tipo:"Silla ejecutiva",
+  p({ slug:"silla-reforma", espacios:["home-office"], nombre:"Reforma", cat:"sillas-ejecutivas", tipo:"Silla ejecutiva",
     img:["/img/products/silla-ejecutiva-aria.png","/img/cats/sillas-ejecutivas.jpg"],
     alt:"Silla ejecutiva Reforma tapizada en azul",
     nuevo:true, uso:"ejecutiva", respaldo:"alto", brazos:"ajustables", base:"aluminio",
@@ -149,19 +153,19 @@ export const piezas = [
     uso:"visita", respaldo:"bajo", brazos:"fijos", base:"cantilever",
     material:"technoleather", colores:["negro","beige"], entrega:"10dias" }),
 
-  p({ slug:"silla-orbita", nombre:"Órbita", cat:"sillas-operativas", tipo:"Silla operativa",
+  p({ slug:"silla-orbita", espacios:["home-office"], nombre:"Órbita", cat:"sillas-operativas", tipo:"Silla operativa",
     img:["/img/products/silla-operativa-orbita.png","/img/cats/sillas-operativas.jpg"],
     alt:"Silla operativa Órbita negra con ruedas",
     uso:"operativa", respaldo:"bajo", brazos:"ajustables", base:"nylon",
     material:"smartmesh", colores:["negro"], extras:["ruedas"], entrega:"inmediata" }),
 
-  p({ slug:"silla-vertice", nombre:"Vértice", cat:"sillas-operativas", tipo:"Silla operativa",
+  p({ slug:"silla-vertice", espacios:["home-office"], nombre:"Vértice", cat:"sillas-operativas", tipo:"Silla operativa",
     img:["/img/products/silla-operativa-orbita.png","/img/cats/sillas-operativas.jpg"],
     alt:"Silla operativa Vértice con respaldo de malla gris",
     nuevo:true, uso:"operativa", respaldo:"bajo", brazos:"fijos", base:"nylon",
     material:"smartmesh", colores:["gris","negro"], extras:["ruedas"], entrega:"inmediata" }),
 
-  p({ slug:"silla-nodo", nombre:"Nodo", cat:"sillas-operativas", tipo:"Silla multitask",
+  p({ slug:"silla-nodo", espacios:["home-office"], nombre:"Nodo", cat:"sillas-operativas", tipo:"Silla multitask",
     img:["/img/products/silla-operativa-orbita.png","/img/cats/sillas-operativas.jpg"],
     alt:"Silla multitask Nodo sin brazos",
     uso:"operativa", respaldo:"bajo", brazos:"sin", base:"nylon",
@@ -185,13 +189,13 @@ export const piezas = [
     uso:"ejecutiva", respaldo:null, brazos:null, base:"patas",
     material:"cristal", colores:["negro","gris"], entrega:"10dias" }),
 
-  p({ slug:"escritorio-eje", nombre:"Eje", cat:"escritorios", tipo:"Escritorio recto",
+  p({ slug:"escritorio-eje", espacios:["home-office"], nombre:"Eje", cat:"escritorios", tipo:"Escritorio recto",
     img:["/img/products/escritorio-eje.png","/img/cats/escritorios.jpg"],
     alt:"Escritorio Eje minimalista con cubierta clara",
     uso:"operativa", respaldo:null, brazos:null, base:"patas",
     material:"madera", colores:["beige","blanco"], extras:["modular"], entrega:"inmediata" }),
 
-  p({ slug:"escritorio-angulo", nombre:"Ángulo", cat:"escritorios", tipo:"Escritorio en L",
+  p({ slug:"escritorio-angulo", espacios:["home-office"], nombre:"Ángulo", cat:"escritorios", tipo:"Escritorio en L",
     img:["/img/products/escritorio-eje.png","/img/cats/escritorios.jpg"],
     alt:"Escritorio Ángulo en L con credenza lateral",
     nuevo:true, uso:"ejecutiva", respaldo:null, brazos:null, base:"patas",
@@ -251,19 +255,19 @@ export const piezas = [
     uso:"colectividad", respaldo:"bajo", brazos:"sin", base:"trineo",
     material:"technoleather", colores:["negro","gris"], plazas:"4", entrega:"pedido" }),
 
-  p({ slug:"librero-lineal", nombre:"Lineal", cat:"almacenamiento", tipo:"Librero",
+  p({ slug:"librero-lineal", espacios:["home-office"], nombre:"Lineal", cat:"almacenamiento", tipo:"Librero",
     img:["/img/products/librero-lineal.png","/img/cats/almacenamiento.jpg"],
     alt:"Librero Lineal modular con repisas abiertas",
     uso:"operativa", respaldo:null, brazos:null, base:null,
     material:"madera", colores:["blanco","cafe"], extras:["modular"], entrega:"10dias" }),
 
-  p({ slug:"credenza-bosques", nombre:"Bosques", cat:"almacenamiento", tipo:"Credenza",
+  p({ slug:"credenza-bosques", espacios:["home-office"], nombre:"Bosques", cat:"almacenamiento", tipo:"Credenza",
     img:["/img/products/librero-lineal.png","/img/cats/almacenamiento.jpg"],
     alt:"Credenza Bosques de dos puertas",
     nuevo:true, uso:"ejecutiva", respaldo:null, brazos:null, base:null,
     material:"madera", colores:["cafe","blanco"], extras:["modular"], entrega:"pedido" }),
 
-  p({ slug:"archivero-bitacora", nombre:"Bitácora", cat:"almacenamiento", tipo:"Archivero",
+  p({ slug:"archivero-bitacora", espacios:["home-office"], nombre:"Bitácora", cat:"almacenamiento", tipo:"Archivero",
     img:["/img/products/librero-lineal.png","/img/cats/almacenamiento.jpg"],
     alt:"Archivero Bitácora de dos gavetas con ruedas",
     uso:"operativa", respaldo:null, brazos:null, base:null,

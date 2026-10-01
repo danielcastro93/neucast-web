@@ -266,6 +266,7 @@ import { site } from "../data/site.js";
 
     // botones de agregar de la página
     document.querySelectorAll("[data-mp-agregar]").forEach(pintarBoton);
+    document.querySelectorAll("[data-mp-set]").forEach(pintarSet);
 
     // el panel
     lista.replaceChildren(...piezas.map(pintarPieza));
@@ -343,6 +344,42 @@ import { site } from "../data/site.js";
       boton.setAttribute("aria-label", dentro ? `Quitar ${nombre} de mi proyecto` : `Agregar ${nombre} a mi proyecto`);
     }
   }
+
+  // --- sets (home office): un botón agrega varias piezas de una vez ---
+  // Cada pieza del set es un enlace con data-mp-set-item dentro del mismo
+  // data-mp-set-scope; su foto y su dirección se leen de la página, igual
+  // que en las tarjetas, para que funcionen también en la vista previa.
+  const piezasDelSet = (boton) =>
+    [...(boton.closest("[data-mp-set-scope]")?.querySelectorAll("[data-mp-set-item]") || [])];
+
+  function pintarSet(boton) {
+    const items = piezasDelSet(boton);
+    const dentro = items.length > 0 && items.every((a) => tiene(a.dataset.slug));
+    boton.classList.toggle("mp-dentro", dentro);
+    boton.setAttribute("aria-pressed", String(dentro));
+    const texto = boton.querySelector("[data-mp-set-texto]");
+    if (texto) texto.textContent = dentro ? "Set en tu proyecto" : "Agregar el set a mi proyecto";
+  }
+
+  document.addEventListener("click", (e) => {
+    const boton = e.target.closest("[data-mp-set]");
+    if (!boton) return;
+    const items = piezasDelSet(boton);
+    const faltan = items.filter((a) => !tiene(a.dataset.slug));
+    faltan.forEach((a) => {
+      const img = a.querySelector("img");
+      agregar({
+        slug: a.dataset.slug,
+        nombre: a.dataset.nombre,
+        tipo: a.dataset.tipo,
+        ruta: a.dataset.ruta,
+        url: new URL(a.href).pathname,
+        img: img ? new URL(img.currentSrc || img.src).pathname : "",
+      });
+    });
+    // se abre la lista: así se ve qué entró y se ajustan las cantidades
+    abrirPanel();
+  });
 
   const abrirPanel = () => document.querySelector('[data-abre="miProyecto"]')?.click();
 
