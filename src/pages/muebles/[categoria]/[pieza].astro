@@ -596,6 +596,9 @@ const VENTANA_PUNTOS = 5;
       /* el video llena su casilla como una foto más */
       .pd-foto--video :global(.vf){height:100%;}
       .pd-foto--video :global(.vf-video){height:100%;aspect-ratio:auto;}
+      /* el video es la última casilla y "Ver toda la galería" vive en esa
+         esquina: la pausa sube para que no quede tapada */
+      .pd-foto--video :global(.vf-btn){top:14px;bottom:auto;}
     }
     @media (max-width:899px){
       .pd-ver{
