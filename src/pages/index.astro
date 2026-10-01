@@ -250,12 +250,12 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
     .edit-grid{display:grid;grid-template-columns:1fr;gap:clamp(28px,5vw,72px);align-items:center;}
     .edit-copy{order:1;}
     .edit-media{order:2;}
-    /* en escritorio el video va a la izquierda y el texto a la derecha; en
-       teléfono el texto sigue arriba, que es lo que se lee primero */
+    /* texto a la izquierda y video a la derecha en escritorio, y texto arriba
+       en teléfono. Estuvo invertido; regresó así cuando entró el bloque de
+       home office arriba, que ya pone la foto a la izquierda: dos bloques
+       seguidos con la imagen del mismo lado se leían repetidos. */
     @media (min-width:900px){
       .edit-grid{grid-template-columns:1fr 1fr;}
-      .edit-media{order:1;}
-      .edit-copy{order:2;}
     }
     
     .edit-title{margin:10px 0 16px;}
