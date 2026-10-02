@@ -234,8 +234,10 @@ const pilares = [
       --play:paused;
     }
     .ns-cierre.in-view{--play:running;}
-    @media (min-width:1500px){
-      .ns-cierre{margin-inline:auto;max-width:calc(var(--container) - var(--gutter)*2);}
+    /* desde 900 px de orilla a orilla y sin esquinas, como el cierre del
+       resto del sitio; en teléfono se queda como tarjeta */
+    @media (min-width:900px){
+      .ns-cierre{margin-inline:0;border-radius:0;}
     }
     .ns-cierre-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
     .ns-cierre-shade{position:absolute;inset:0;background:rgba(12,11,9,.58);}

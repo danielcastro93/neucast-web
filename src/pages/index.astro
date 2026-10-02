@@ -188,6 +188,12 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
       border-radius:var(--radius);background:var(--paper-soft);padding:14px;
     }
     .proj-stage::before{display:none;}
+    /* Los puntos van por encima del degradado del texto. La regla general de
+       .grano le daba a la escena su propia capa (z-index 1) y el pie, que
+       viene después, la tapaba con todo y puntos. Sin esa capa, la foto queda
+       debajo del degradado y los puntos (z-index 3) encima. */
+    .proj-stage > :global(.esc){z-index:auto;}
+    .proj-caption{z-index:1;}
     /* el radio va en la foto y no en su caja: la caja no puede recortar,
        porque las tarjetas de los puntos se salen de la imagen */
     .proj-stage :global(.esc) > :global(img){border-radius:var(--radius-sm);}
