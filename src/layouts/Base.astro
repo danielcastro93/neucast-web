@@ -190,7 +190,6 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
                 <a href="/proyectos/" class="drow"><span class="drow-name">Proyectos</span></a>
               <a href="/nosotros/" class="drow"><span class="drow-name">Nosotros</span></a>
               <a href="/preguntas-frecuentes/" class="drow"><span class="drow-name">Preguntas frecuentes</span></a>
-              <a href="/recursos/" class="drow"><span class="drow-name">Catálogos</span></a>
               <a href="/contacto/" class="drow"><span class="drow-name">Contacto</span></a>
             </nav>
             <div class="drawer-foot">
@@ -217,6 +216,15 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
                 <span class="crow-txt">
                   <span class="drow-name">{homeOffice.nombre}</span>
                   <span class="crow-nota">Sets e ideas para trabajar en casa</span>
+                </span>
+              </a>
+              <!-- al final de Muebles, como en el footer: es de los muebles,
+                   pero no es una sección de la lista principal -->
+              <a href="/recursos/" class="crow">
+                <span class="crow-thumb crow-thumb--ico"><Icon name="descargar" size={20} /></span>
+                <span class="crow-txt">
+                  <span class="drow-name">Catálogos</span>
+                  <span class="crow-nota">La colección para descargar</span>
                 </span>
               </a>
             </nav>
@@ -592,6 +600,7 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
       .crow-thumb img{width:100%;height:100%;object-fit:cover;}
       .crow-txt{display:flex;flex-direction:column;gap:2px;min-width:0;}
       .crow-nota{font-size:var(--fs-xs);font-weight:400;color:var(--ink-60);}
+      .crow-thumb--ico{display:flex;align-items:center;justify-content:center;background:var(--paper-soft);color:var(--ink);}
       /* Fijar el body, no solo esconder su scroll: en iOS `overflow:hidden`
          deja que la página de atrás se siga moviendo y el dedo se pelea entre
          las dos. La posición la guarda y la devuelve src/scripts/bloqueo-scroll.js */
