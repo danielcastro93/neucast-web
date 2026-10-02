@@ -592,14 +592,7 @@ dialog.modal.modal--cerrando::backdrop{animation:veloSale .24s var(--ease-salida
 .acceso-foto{position:relative;overflow:hidden;background:var(--cemento-oscuro);}
 .acceso-foto img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.92;animation:acercaFoto 14s var(--ease) both;}
 @keyframes acercaFoto{from{transform:scale(1.06);}to{transform:scale(1);}}
-.acceso-foto::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,19,17,.05) 0%,rgba(20,19,17,.55) 100%);}
-.acceso-frase{
-  position:absolute;left:clamp(28px,5vw,64px);right:clamp(28px,5vw,64px);bottom:clamp(28px,5vw,56px);z-index:1;
-  color:var(--white);
-}
-.acceso-frase .rotulo{opacity:.8;}
-.acceso-frase p{margin-top:14px;font-size:clamp(24px,2.6vw,34px);font-weight:700;letter-spacing:-.025em;line-height:1.15;max-width:14ch;text-wrap:balance;}
-.acceso-frase p span{color:rgba(255,255,255,.62);}
+.acceso-foto::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,19,17,0) 40%,rgba(20,19,17,.25) 100%);}
 .acceso-panel{display:flex;flex-direction:column;justify-content:center;padding:clamp(28px,6vw,96px);background:var(--white);}
 .acceso-caja{width:100%;max-width:400px;margin:0 auto;}
 .acceso-logo{height:30px;margin-bottom:clamp(40px,7vh,72px);}
@@ -609,7 +602,6 @@ dialog.modal.modal--cerrando::backdrop{animation:veloSale .24s var(--ease-salida
 .acceso-form{margin-top:36px;display:flex;flex-direction:column;gap:var(--space-4);}
 .acceso-form .control{height:50px;font-size:var(--fs-body);}
 .acceso-form .boton--grande{margin-top:8px;height:52px;width:100%;}
-.acceso-pie{margin-top:32px;font-size:12px;color:var(--ink-40);line-height:1.5;}
 .acceso-caja > *{animation:entraPantalla .5s var(--ease) both;}
 .acceso-caja > *:nth-child(2){animation-delay:.06s;}
 .acceso-caja > *:nth-child(3){animation-delay:.12s;}
@@ -637,7 +629,7 @@ dialog.modal.modal--cerrando::backdrop{animation:veloSale .24s var(--ease-salida
 /* ============================================
    Teléfono y tableta
    ============================================ */
-@media (max-width:1023px){
+@media (max-width:1024px){
   .app,html[data-sb="plegada"] .app{grid-template-columns:1fr;}
   .sb{
     position:fixed;top:0;left:0;bottom:0;width:var(--sb-ancha);
@@ -672,12 +664,16 @@ dialog.modal.modal--cerrando::backdrop{animation:veloSale .24s var(--ease-salida
   .formulario-indice a{flex:none;background:var(--white);border:1px solid var(--borde);}
   .formulario-indice a.activo{border-color:var(--ink);}
   .pie-fijo{margin-inline:calc(var(--space-4) * -1);border-radius:0;border-left:0;border-right:0;}
-  .acceso{grid-template-columns:1fr;}
-  .acceso-foto{display:none;}
+  /* tableta (iPad Pro incluido): la foto arriba, el formulario debajo */
+  .acceso{grid-template-columns:1fr;grid-template-rows:min(38vh,420px) 1fr;}
+  .acceso-panel{justify-content:flex-start;padding-top:clamp(32px,6vh,64px);}
+  .acceso-logo{margin-bottom:clamp(28px,5vh,48px);}
   .avisos{left:16px;right:16px;bottom:16px;}
   .aviso{min-width:0;max-width:none;}
 }
 @media (max-width:640px){
+  .acceso{grid-template-rows:200px 1fr;}
+  .acceso-foto img{animation:none;}
   .tabla th,.tabla td{padding:10px 10px;}
   .col-oculta-movil{display:none;}
   .cabecera{align-items:flex-start;flex-direction:column;}

@@ -19,26 +19,22 @@ const base = import.meta.env.BASE_URL;
     <div class="acceso">
       <div class="acceso-foto" aria-hidden="true">
         <img src={`${base}img/hero-oficina.jpg`} alt="" />
-        <div class="acceso-frase">
-          <span class="rotulo">Administrador</span>
-          <p>Lo que guardas aquí <span>es lo que ve la gente.</span></p>
-        </div>
       </div>
       <div class="acceso-panel">
         <div class="acceso-caja">
           <div class="acceso-logo"><Logo height={30} /></div>
           <h1>Entra a tu cuenta</h1>
-          <p class="t-apoyo">Catálogo, proyectos, textos y métricas de neucast.com.mx.</p>
+          <p class="t-apoyo">Administra el sitio de Neucast.</p>
 
           <form class="acceso-form" novalidate data-form>
             <div class="campo">
               <div class="campo-etiqueta"><label for="correo">Correo</label></div>
-              <input class="control" id="correo" name="correo" type="email" autocomplete="username" inputmode="email" spellcheck="false" required autofocus />
+              <input class="control" id="correo" name="correo" type="email" autocomplete="username" inputmode="email" spellcheck="false" placeholder="nombre@neucast.com.mx" required autofocus />
             </div>
             <div class="campo">
               <div class="campo-etiqueta"><label for="clave">Contraseña</label></div>
               <div class="campo-clave">
-                <input class="control" id="clave" name="clave" type="password" autocomplete="current-password" required />
+                <input class="control" id="clave" name="clave" type="password" autocomplete="current-password" placeholder="Tu contraseña" required />
                 <button class="ojo" type="button" data-ojo aria-label="Mostrar la contraseña" aria-pressed="false">
                   <span data-ojo-abierto><IconoAdmin name="ojo" size={18} /></span>
                   <span data-ojo-cerrado hidden><IconoAdmin name="ojoCerrado" size={18} /></span>
@@ -49,7 +45,6 @@ const base = import.meta.env.BASE_URL;
             <button class="boton boton--primario boton--grande" type="submit" data-enviar>Entrar</button>
           </form>
 
-          <p class="acceso-pie" data-pie>Solo para el equipo de Neucast. Si no tienes cuenta, pídesela a quien administra el sitio.</p>
         </div>
       </div>
     </div>
