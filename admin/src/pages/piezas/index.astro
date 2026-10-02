@@ -266,5 +266,12 @@ const base = import.meta.env.BASE_URL;
     }
   });
 
+  // ?estado=borrador llega desde la cifra de borradores del inicio
+  const estadoInicial = new URLSearchParams(location.search).get("estado");
+  if (estadoInicial === "borrador" || estadoInicial === "publicada") {
+    filtro.estado = estadoInicial;
+    document.querySelectorAll("[data-estados] .segmento").forEach((s) => s.setAttribute("aria-pressed", String(s.dataset.estado === estadoInicial)));
+  }
+
   cargar().catch((e) => avisar(e.message || "No se pudo cargar el catálogo", { tipo: "error" }));
 </script>

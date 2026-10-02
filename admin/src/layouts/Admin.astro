@@ -9,11 +9,14 @@
 import "@neucast/compartido/styles/global.css";
 import "../styles/admin.css";
 import "../styles/barra-lateral.css";
+import "../styles/componentes.css";
 import Logo from "@neucast/compartido/components/Logo.astro";
 import IconoAdmin from "../components/IconoAdmin.astro";
 import Modal from "../components/Modal.astro";
 
-const { titulo, seccion = "", migas = [], angosto = false } = Astro.props;
+// publicarAbajo: en el teléfono, el botón de publicar va en una barra al pie.
+// Las pantallas que ya tienen su propio pie fijo (editar una pieza) lo apagan.
+const { titulo, seccion = "", migas = [], angosto = false, publicarAbajo = true } = Astro.props;
 const base = import.meta.env.BASE_URL;
 
 // Inicio va suelto arriba; lo demás, en grupos que se pliegan.
@@ -137,6 +140,7 @@ const simbolo = "M625.9,655.2c-3.1,3.1-6.5,5.5-10.2,7.4-3.8,1.9-7.8,2.8-12.3,2.8
             <div class="bl-cuenta-menu">
               <a role="menuitem" href={`${base}ajustes/`}><IconoAdmin name="ajustes" size={19} /><span>Ajustes</span></a>
               <button role="menuitem" type="button" data-ver-stg><IconoAdmin name="externo" size={19} /><span>Ver el sitio de pruebas</span></button>
+              <button role="menuitem" type="button" data-restablecer hidden><IconoAdmin name="refrescar" size={19} /><span>Restablecer la simulación</span></button>
             </div>
           </div>
         </div>
@@ -174,6 +178,12 @@ const simbolo = "M625.9,655.2c-3.1,3.1-6.5,5.5-10.2,7.4-3.8,1.9-7.8,2.8-12.3,2.8
         <main class:list={["contenido", { "contenido--angosto": angosto }]}>
           <slot />
         </main>
+        {publicarAbajo && (
+          <div class="publicar-movil" data-publicar-movil hidden>
+            <span class="publicar-movil-estado"><span class="pulso"></span><span data-publicar-movil-texto></span></span>
+            <button class="boton boton--primario boton--grande" type="button" data-abre-modal="modal-publicar">Publicar</button>
+          </div>
+        )}
       </div>
     </div>
 
@@ -185,14 +195,24 @@ const simbolo = "M625.9,655.2c-3.1,3.1-6.5,5.5-10.2,7.4-3.8,1.9-7.8,2.8-12.3,2.8
     </Modal>
 
     <Modal id="modal-publicar" titulo="Publicar en neucast.com.mx">
-      <Fragment slot="texto">Lo que está en el sitio de pruebas pasa a producción. Se compila el sitio, se generan los PDF y se revisa; si algo falla, no se publica.</Fragment>
-      <div data-publicar-cuerpo>
-        <ul class="lista-cambios" data-publicar-lista></ul>
+      <Fragment slot="texto">Lo que está en pruebas pasa al sitio público. Si la revisión encuentra un problema, no se publica nada.</Fragment>
+      <div class="publicar-cuerpo" data-publicar-cuerpo>
+        <ul class="lista-filas lista-filas--compacta" data-publicar-lista></ul>
         <p class="t-mini" data-publicar-nota></p>
+      </div>
+      <ol class="pasos" data-pasos hidden>
+        {["Compilando el sitio", "Generando fichas y catálogos en PDF", "Revisando enlaces, textos y mapa del sitio", "Subiendo a neucast.com.mx"].map((p) => (
+          <li class="paso"><span class="paso-marca"><span class="paso-giro"></span><IconoAdmin name="check" size={14} /></span><span>{p}</span></li>
+        ))}
+      </ol>
+      <div class="publicado" data-publicado hidden>
+        <span class="publicado-marca"><IconoAdmin name="check" size={28} /></span>
+        <strong>Publicado</strong>
+        <span class="t-apoyo">neucast.com.mx ya tiene los cambios.</span>
       </div>
       <Fragment slot="pie">
         <span class="izquierda t-mini" data-publicar-ultima></span>
-        <button class="boton" type="button" data-cierra-modal>Todavía no</button>
+        <button class="boton" type="button" data-cierra-modal data-publicar-cancelar>Todavía no</button>
         <button class="boton boton--primario" type="button" data-publicar-ahora>
           <IconoAdmin name="cohete" size={16} />Publicar ahora
         </button>
@@ -201,8 +221,10 @@ const simbolo = "M625.9,655.2c-3.1,3.1-6.5,5.5-10.2,7.4-3.8,1.9-7.8,2.8-12.3,2.8
 
     <script>
       import { exigirSesion, cerrarSesion } from "../scripts/sesion.js";
-      import { listar, publicar } from "../scripts/api.js";
-      import { cablearModales, cerrarModal, avisar, fechaRelativa, escapar, activarGlobos, ocultarGlobo, ESCRITORIO } from "../scripts/ui.js";
+      import { listar, esSimulada } from "../scripts/api.js";
+      import { restablecer } from "../scripts/api-simulada.js";
+      import { estado, filaCambio, correrPublicacion } from "../scripts/publicacion.js";
+      import { cablearModales, cerrarModal, confirmar, avisar, fechaRelativa, escapar, activarGlobos, ocultarGlobo, ESCRITORIO } from "../scripts/ui.js";
 
       const sesion = exigirSesion();
       const base = import.meta.env.BASE_URL;
@@ -372,37 +394,38 @@ const simbolo = "M625.9,655.2c-3.1,3.1-6.5,5.5-10.2,7.4-3.8,1.9-7.8,2.8-12.3,2.8
 
       /* ---------- Estado de publicación ---------- */
       cablearModales();
-      const chip = document.querySelector("[data-publicacion]");
-      const texto = document.querySelector("[data-publicacion-texto]");
-      const lista = document.querySelector("[data-publicar-lista]");
-      const nota = document.querySelector("[data-publicar-nota]");
-      const ultima = document.querySelector("[data-publicar-ultima]");
-      const btnPublicar = document.querySelector("[data-publicar-ahora]");
-
-      const NOMBRES = { piezas: "pieza", categorias: "categoría", proyectos: "proyecto", ajustes: "ajustes", "home-office": "home office" };
+      const chip = $("[data-publicacion]");
+      const texto = $("[data-publicacion-texto]");
+      const lista = $("[data-publicar-lista]");
+      const nota = $("[data-publicar-nota]");
+      const ultima = $("[data-publicar-ultima]");
+      const btnPublicar = $("[data-publicar-ahora]");
+      const cancelar = $("[data-publicar-cancelar]");
+      const cuerpoPublicar = $("[data-publicar-cuerpo]");
+      const pasos = $("[data-pasos]");
+      const publicado = $("[data-publicado]");
+      const movil = $("[data-publicar-movil]");
+      const movilTexto = $("[data-publicar-movil-texto]");
+      const modalPublicar = $("#modal-publicar");
+      let publicando = false;
 
       async function pintarPublicacion() {
         try {
-          const p = await listar("publicacion");
-          const n = (p.pendientes || []).length;
+          const p = await estado();
+          const n = p.pendientes.length;
+          const cambios = `${n} ${n === 1 ? "cambio" : "cambios"}`;
           chip.dataset.estado = n ? "pendiente" : "aldia";
-          texto.innerHTML = n
-            ? `<b>${n} ${n === 1 ? "cambio" : "cambios"}</b> en pruebas`
-            : `Publicado ${escapar(fechaRelativa(p.produccion?.fecha))}`;
-          ultima.textContent = `Última publicación: ${fechaRelativa(p.produccion?.fecha)}${p.produccion?.por ? ", por " + p.produccion.por : ""}`;
-          lista.innerHTML = n
-            ? p.pendientes
-                .slice()
-                .reverse()
-                .map(
-                  (c) => `<li><span class="que">${escapar(NOMBRES[c.coleccion] || c.coleccion)}</span><span class="${c.borrado ? "borrado" : ""}">${escapar(c.nombre || c.id)}</span><span class="cuando">${escapar(fechaRelativa(c.fecha))}</span></li>`
-                )
-                .join("")
-            : "";
-          nota.textContent = n
-            ? "Conviene revisarlos primero en el sitio de pruebas."
-            : "No hay cambios pendientes: producción ya tiene lo mismo que pruebas.";
+          texto.innerHTML = n ? `<b>${cambios}</b> en pruebas` : `Publicado ${escapar(fechaRelativa(p.produccion?.fecha))}`;
+          ultima.textContent = `Última publicación ${fechaRelativa(p.produccion?.fecha)}`;
+          lista.innerHTML = p.pendientes.map((c) => filaCambio(c, p.porSlug)).join("");
+          nota.textContent = n ? "" : "No hay cambios pendientes: producción ya tiene lo mismo que pruebas.";
+          nota.hidden = !!n;
           btnPublicar.disabled = !n;
+          if (movil) {
+            movil.hidden = !n;
+            movilTexto.textContent = `${cambios} en pruebas`;
+            document.body.classList.toggle("con-publicar-movil", !!n);
+          }
         } catch {
           /* sin estado: la barra se queda como está */
         }
@@ -410,19 +433,63 @@ const simbolo = "M625.9,655.2c-3.1,3.1-6.5,5.5-10.2,7.4-3.8,1.9-7.8,2.8-12.3,2.8
       pintarPublicacion();
       addEventListener("neucast:guardado", pintarPublicacion);
 
-      btnPublicar?.addEventListener("click", async () => {
-        btnPublicar.setAttribute("aria-busy", "true");
+      // Al abrir, siempre la vista de lista; los pasos son solo mientras publica.
+      const vistaLista = () => {
+        cuerpoPublicar.hidden = false;
+        pasos.hidden = true;
+        publicado.hidden = true;
+        btnPublicar.hidden = false;
+        cancelar.hidden = false;
+        ultima.hidden = false;
+        pasos.querySelectorAll(".paso").forEach((li) => li.removeAttribute("data-estado"));
+      };
+      modalPublicar.addEventListener("close", () => { if (!publicando) vistaLista(); });
+
+      btnPublicar.addEventListener("click", async () => {
+        publicando = true;
+        cuerpoPublicar.hidden = true;
+        pasos.hidden = false;
+        btnPublicar.hidden = true;
+        cancelar.hidden = true;
+        ultima.hidden = true;
+        const items = [...pasos.querySelectorAll(".paso")];
         try {
-          await publicar("produccion");
-          cerrarModal("modal-publicar");
-          avisar("Publicado en neucast.com.mx");
-          pintarPublicacion();
+          await correrPublicacion((i) => {
+            items.forEach((li, j) => (li.dataset.estado = j < i ? "hecho" : j === i ? "corriendo" : ""));
+          });
+          pasos.hidden = true;
+          publicado.hidden = false;
+          await pintarPublicacion();
+          setTimeout(() => {
+            publicando = false;
+            cerrarModal("modal-publicar");
+            avisar("Publicado en neucast.com.mx");
+          }, 1300);
         } catch (e) {
+          publicando = false;
+          vistaLista();
           avisar(e.message || "No se pudo publicar", { tipo: "error" });
-        } finally {
-          btnPublicar.removeAttribute("aria-busy");
         }
       });
+
+      /* ---------- La simulación ---------- */
+      if (esSimulada) {
+        const restablecerBtn = $("[data-restablecer]");
+        restablecerBtn.hidden = false;
+        restablecerBtn.addEventListener("click", async () => {
+          cerrarCuenta();
+          const ok = await confirmar({
+            titulo: "Restablecer la simulación",
+            texto: "Se borra lo que capturaste en este navegador y vuelven los datos del prototipo. El sitio no se toca.",
+            accion: "Restablecer",
+            peligro: true,
+          });
+          if (!ok) return;
+          restablecer();
+          avisar("La simulación volvió a los datos del prototipo");
+          setTimeout(() => location.reload(), 500);
+        });
+      }
     </script>
   </body>
 </html>

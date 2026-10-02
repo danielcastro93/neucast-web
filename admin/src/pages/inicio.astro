@@ -1,138 +1,193 @@
 ---
-// Inicio: el estado del sitio de un vistazo y a dónde ir.
+// Inicio. Responde "¿qué está pasando con el sitio y qué me toca hacer?".
+// Por eso lo primero es la publicación: qué hay en pruebas y el botón para
+// pasarlo al sitio público. Después las cifras, en una tira compacta, y al
+// final las últimas piezas tocadas, con su foto.
 import Admin from "../layouts/Admin.astro";
 import IconoAdmin from "../components/IconoAdmin.astro";
 const base = import.meta.env.BASE_URL;
+
+const cifras = [
+  { id: "publicadas", rotulo: "Piezas publicadas", icono: "piezas", ruta: "piezas/" },
+  { id: "borradores", rotulo: "Borradores", icono: "paginas", ruta: "piezas/?estado=borrador" },
+  { id: "categorias", rotulo: "Categorías", icono: "categorias", ruta: "categorias/" },
+  { id: "proyectos", rotulo: "Proyectos", icono: "proyectos", ruta: "proyectos/" },
+];
 ---
 <Admin titulo="Inicio" seccion="inicio">
-  <div class="cabecera">
-    <div class="cabecera-textos">
-      <h1 class="t-pantalla" data-saludo>Hola</h1>
-      <p class="t-apoyo" data-resumen>Cargando el estado del sitio…</p>
+  <header class="saludo">
+    <p class="saludo-fecha" data-fecha></p>
+    <h1 class="t-pantalla" data-saludo>Hola</h1>
+    <p class="t-apoyo" data-resumen>&nbsp;</p>
+    <div class="saludo-acciones">
+      <a class="boton boton--primario" href={`${base}piezas/editar/`}><IconoAdmin name="mas" size={16} />Nueva pieza</a>
     </div>
-    <div class="cabecera-acciones">
-      <a class="boton" href={`${base}piezas/editar/`}><IconoAdmin name="mas" size={16} />Nueva pieza</a>
-    </div>
-  </div>
+  </header>
 
-  <div class="rejilla rejilla--4" data-cifras>
-    {["Piezas publicadas", "Borradores", "Categorías", "Proyectos"].map((r) => (
-      <div class="tarjeta cifra">
-        <div class="cifra-rotulo">{r}</div>
-        <div class="cifra-valor"><span class="hueso" style="display:inline-block;width:48px;height:30px"></span></div>
-        <div class="cifra-nota"><span class="hueso" style="display:inline-block;width:120px;height:12px"></span></div>
+  <!-- ============ Publicación ============ -->
+  <section class="tarjeta pub" data-pub data-estado="cargando" aria-labelledby="pub-titulo">
+    <div class="pub-cabeza">
+      <div class="pub-textos">
+        <span class="pub-rotulo"><span class="pulso"></span><span data-pub-rotulo>Publicación</span></span>
+        <h2 class="pub-titulo" id="pub-titulo" data-pub-titulo><span class="hueso" style="display:inline-block;width:260px;height:26px"></span></h2>
+        <p class="t-apoyo" data-pub-nota></p>
       </div>
+      <div class="pub-acciones">
+        <a class="boton" href="#" target="_blank" rel="noopener" data-ver-pruebas><IconoAdmin name="externo" size={16} />Ver en pruebas</a>
+        <button class="boton boton--primario" type="button" data-abre-modal="modal-publicar" data-pub-boton><IconoAdmin name="cohete" size={16} />Publicar</button>
+      </div>
+    </div>
+
+    <!-- el camino: lo guardado va a pruebas solo; producción espera el botón -->
+    <div class="ruta" aria-hidden="true">
+      <div class="ruta-paso ruta-paso--hecho">
+        <span class="ruta-nodo"><IconoAdmin name="check" size={14} /></span>
+        <span class="ruta-txt"><b>Guardado</b><small data-ruta-guardado>&nbsp;</small></span>
+      </div>
+      <span class="ruta-linea ruta-linea--llena"></span>
+      <div class="ruta-paso ruta-paso--hecho">
+        <span class="ruta-nodo"><IconoAdmin name="check" size={14} /></span>
+        <span class="ruta-txt"><b>Pruebas</b><small data-ruta-pruebas>&nbsp;</small></span>
+      </div>
+      <span class="ruta-linea" data-ruta-linea></span>
+      <div class="ruta-paso" data-ruta-produccion>
+        <span class="ruta-nodo"><IconoAdmin name="check" size={14} /><span class="ruta-espera"></span></span>
+        <span class="ruta-txt"><b>neucast.com.mx</b><small data-ruta-prod>&nbsp;</small></span>
+      </div>
+    </div>
+
+    <ul class="lista-filas" data-pub-lista></ul>
+  </section>
+
+  <!-- ============ Cifras ============ -->
+  <dl class="tira" data-tira>
+    {cifras.map((c) => (
+      <a class="tira-celda" href={`${base}${c.ruta}`} data-cifra={c.id}>
+        <dt><IconoAdmin name={c.icono} size={16} />{c.rotulo}</dt>
+        <dd data-valor>0</dd>
+        <small data-nota>&nbsp;</small>
+      </a>
     ))}
-  </div>
+  </dl>
 
-  <div class="rejilla rejilla--2" style="margin-top:var(--space-4)">
-    <div class="tarjeta">
-      <div class="tarjeta-cabeza">
-        <div>
-          <h2 class="t-seccion">Cambios en pruebas</h2>
-          <p class="t-mini">Lo guardado que todavía no está en producción</p>
-        </div>
-        <button class="boton boton--chico" type="button" data-abre-modal="modal-publicar">Publicar</button>
-      </div>
-      <ul class="lista-cambios" style="border:0;border-radius:0" data-pendientes>
-        <li><span class="hueso" style="width:60%;height:14px"></span></li>
-      </ul>
+  <!-- ============ Últimas piezas ============ -->
+  <section class="tarjeta" aria-labelledby="recientes-titulo">
+    <div class="modulo-cabeza">
+      <h2 class="t-seccion" id="recientes-titulo">Últimas piezas tocadas</h2>
+      <a class="enlace" href={`${base}piezas/`}>Ver todas<IconoAdmin name="chevron" size={16} /></a>
     </div>
-    <div class="tarjeta">
-      <div class="tarjeta-cabeza">
-        <div>
-          <h2 class="t-seccion">Últimas piezas tocadas</h2>
-          <p class="t-mini">Por fecha de cambio</p>
-        </div>
-        <a class="boton boton--chico" href={`${base}piezas/`}>Ver todas</a>
-      </div>
-      <ul class="lista-cambios" style="border:0;border-radius:0" data-recientes>
-        <li><span class="hueso" style="width:50%;height:14px"></span></li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="tarjeta" style="margin-top:var(--space-4)" data-simulacion hidden>
-    <div class="tarjeta-cabeza">
-      <div>
-        <h2 class="t-seccion">Simulación de la API</h2>
-        <p class="t-mini">Mientras no exista la API real, lo que guardas vive en este navegador. Puedes volver a la semilla cuando quieras.</p>
-      </div>
-      <button class="boton boton--chico" type="button" data-restablecer><IconoAdmin name="refrescar" size={14} />Restablecer la simulación</button>
-    </div>
-  </div>
+    <ul class="lista-filas" data-recientes>
+      {[1, 2, 3, 4, 5].map(() => (
+        <li><div class="renglon"><span class="miniatura hueso"></span><span class="renglon-texto"><span class="hueso" style="width:140px;height:14px"></span><span class="hueso" style="width:90px;height:11px;margin-top:6px"></span></span></div></li>
+      ))}
+    </ul>
+  </section>
 </Admin>
 
 <script>
-  import { listar, esSimulada } from "../scripts/api.js";
-  import { restablecer } from "../scripts/api-simulada.js";
+  import { listar } from "../scripts/api.js";
+  import { medio } from "../scripts/medios.js";
+  import { estado, filaCambio } from "../scripts/publicacion.js";
   import { sesionActual } from "../scripts/sesion.js";
-  import { confirmar, avisar, fechaRelativa, escapar } from "../scripts/ui.js";
+  import { avisar, fechaRelativa, escapar } from "../scripts/ui.js";
 
   const base = import.meta.env.BASE_URL;
+  const $ = (s) => document.querySelector(s);
+  const quieto = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- Saludo ---------- */
   const sesion = sesionActual();
-  const hora = new Date().getHours();
+  const ahora = new Date();
+  const hora = ahora.getHours();
   const saludo = hora < 12 ? "Buenos días" : hora < 19 ? "Buenas tardes" : "Buenas noches";
-  document.querySelector("[data-saludo]").textContent = `${saludo}, ${sesion?.nombre?.split(" ")[0] || ""}`.trim();
+  $("[data-saludo]").textContent = `${saludo}, ${sesion?.nombre?.split(" ")[0] || ""}`.trim();
+  const fecha = new Intl.DateTimeFormat("es-MX", { weekday: "long", day: "numeric", month: "long" }).format(ahora);
+  $("[data-fecha]").textContent = fecha.charAt(0).toUpperCase() + fecha.slice(1);
+  $("[data-ver-pruebas]").href = import.meta.env.PUBLIC_STG || "http://localhost:4321/";
 
-  const NOMBRES = { piezas: "pieza", categorias: "categoría", proyectos: "proyecto", ajustes: "ajustes", "home-office": "home office" };
-  const RUTA = { piezas: (id) => `${base}piezas/editar/?slug=${encodeURIComponent(id)}` };
-
-  async function pintar() {
-    const [piezas, categorias, proyectos, publicacion] = await Promise.all([
-      listar("piezas"), listar("categorias"), listar("proyectos"), listar("publicacion"),
-    ]);
-    const publicadas = piezas.filter((p) => p.estado === "publicada").length;
-    const borradores = piezas.length - publicadas;
-    const cifras = document.querySelectorAll("[data-cifras] .cifra");
-    const pon = (i, valor, nota) => {
-      cifras[i].querySelector(".cifra-valor").textContent = valor;
-      cifras[i].querySelector(".cifra-nota").textContent = nota;
+  /* ---------- Cifras que cuentan hasta su valor ---------- */
+  function contar(el, valor) {
+    const desde = Number(el.dataset.actual || 0);
+    el.dataset.actual = valor;
+    if (quieto || desde === valor) return (el.textContent = valor);
+    const t0 = performance.now();
+    const dur = 700;
+    const paso = (t) => {
+      const k = Math.min(1, (t - t0) / dur);
+      const suave = 1 - Math.pow(1 - k, 3);
+      el.textContent = Math.round(desde + (valor - desde) * suave);
+      if (k < 1) requestAnimationFrame(paso);
     };
-    pon(0, publicadas, `${piezas.filter((p) => p.nuevo).length} marcadas como nuevas`);
-    pon(1, borradores, borradores ? "Sin publicar todavía" : "Nada pendiente de terminar");
-    pon(2, categorias.length, `${categorias.filter((c) => piezas.some((p) => p.cat === c.slug)).length} con piezas`);
-    pon(3, proyectos.length, `${proyectos.filter((p) => p.destacado).length} en el home`);
+    requestAnimationFrame(paso);
+  }
+  const cifra = (id, valor, nota) => {
+    const c = $(`[data-cifra="${id}"]`);
+    contar(c.querySelector("[data-valor]"), valor);
+    c.querySelector("[data-nota]").textContent = nota;
+  };
 
-    const n = (publicacion.pendientes || []).length;
-    document.querySelector("[data-resumen]").textContent = n
-      ? `Hay ${n} ${n === 1 ? "cambio" : "cambios"} en el sitio de pruebas sin publicar.`
-      : `Producción está al día. Última publicación ${fechaRelativa(publicacion.produccion?.fecha)}.`;
+  /* ---------- Publicación ---------- */
+  async function pintarPublicacion() {
+    const p = await estado();
+    const n = p.pendientes.length;
+    const caja = $("[data-pub]");
+    caja.dataset.estado = n ? "pendiente" : "aldia";
+    $("[data-pub-rotulo]").textContent = n ? "Listo para publicar" : "Sitio al día";
+    $("[data-pub-titulo]").textContent = n
+      ? `${n} ${n === 1 ? "cambio espera" : "cambios esperan"} en pruebas`
+      : "Producción tiene lo mismo que pruebas";
+    $("[data-pub-nota]").textContent = n
+      ? "Revísalos en el sitio de pruebas y publícalos cuando estén bien."
+      : `Última publicación ${fechaRelativa(p.produccion?.fecha)}${p.produccion?.por ? `, por ${p.produccion.por}` : ""}.`;
+    $("[data-pub-boton]").hidden = !n;
+    $("[data-ruta-guardado]").textContent = n ? fechaRelativa(p.pendientes[0]?.fecha) : "Nada pendiente";
+    $("[data-ruta-pruebas]").textContent = fechaRelativa(p.pruebas?.fecha);
+    $("[data-ruta-prod]").textContent = n ? "Esperando que publiques" : fechaRelativa(p.produccion?.fecha);
+    $("[data-ruta-produccion]").classList.toggle("ruta-paso--hecho", !n);
+    $("[data-ruta-produccion]").classList.toggle("ruta-paso--espera", !!n);
+    $("[data-ruta-linea]").classList.toggle("ruta-linea--llena", !n);
+    $("[data-ruta-linea]").classList.toggle("ruta-linea--fluye", !!n);
+    $("[data-pub-lista]").innerHTML = p.pendientes.slice(0, 5).map((c) => filaCambio(c, p.porSlug)).join("")
+      + (n > 5 ? `<li class="renglon-mas">y ${n - 5} más</li>` : "");
+    $("[data-resumen]").textContent = n
+      ? `Tienes ${n} ${n === 1 ? "cambio" : "cambios"} sin publicar.`
+      : "Todo lo guardado ya está en neucast.com.mx.";
+  }
 
-    const pend = document.querySelector("[data-pendientes]");
-    pend.innerHTML = n
-      ? publicacion.pendientes.slice().reverse().slice(0, 6).map((c) => {
-          const ruta = RUTA[c.coleccion]?.(c.id);
-          const nombre = escapar(c.nombre || c.id);
-          return `<li><span class="que">${escapar(NOMBRES[c.coleccion] || c.coleccion)}</span>${ruta && !c.borrado ? `<a href="${ruta}">${nombre}</a>` : `<span class="${c.borrado ? "borrado" : ""}">${nombre}</span>`}<span class="cuando">${escapar(fechaRelativa(c.fecha))}</span></li>`;
-        }).join("")
-      : `<li><span class="t-apoyo">Nada pendiente. Todo lo guardado ya está publicado.</span></li>`;
+  /* ---------- Cifras y recientes ---------- */
+  async function pintarCatalogo() {
+    const [piezas, categorias, proyectos] = await Promise.all([listar("piezas"), listar("categorias"), listar("proyectos")]);
+    const publicadas = piezas.filter((p) => p.estado === "publicada");
+    const borradores = piezas.length - publicadas.length;
+    cifra("publicadas", publicadas.length, `${publicadas.filter((p) => p.nuevo).length} marcadas como nuevas`);
+    cifra("borradores", borradores, borradores ? "Por terminar" : "Nada por terminar");
+    $('[data-cifra="borradores"]').classList.toggle("tira-celda--alerta", borradores > 0);
+    cifra("categorias", categorias.length, `${categorias.filter((c) => piezas.some((p) => p.cat === c.slug)).length} con piezas`);
+    cifra("proyectos", proyectos.length, `${proyectos.filter((p) => p.destacado).length} en el home`);
 
-    const rec = document.querySelector("[data-recientes]");
-    rec.innerHTML = piezas
+    const nombreCat = (slug) => categorias.find((c) => c.slug === slug)?.name || "";
+    $("[data-recientes]").innerHTML = piezas
       .slice()
       .sort((a, b) => (b.actualizado || "").localeCompare(a.actualizado || ""))
-      .slice(0, 6)
-      .map((p) => `<li><a href="${RUTA.piezas(p.slug)}"><b>${escapar(p.nombre)}</b> <span class="t-mini">${escapar(p.tipo)}</span></a><span class="cuando">${escapar(fechaRelativa(p.actualizado))}</span></li>`)
+      .slice(0, 5)
+      .map((p) => `
+        <li><a class="renglon" href="${base}piezas/editar/?slug=${encodeURIComponent(p.slug)}">
+          <span class="miniatura">${p.img?.[0] ? `<img src="${escapar(medio(p.img[0]))}" alt="" loading="lazy" />` : ""}</span>
+          <span class="renglon-texto">
+            <strong>${escapar(p.nombre)}</strong>
+            <small>${escapar(p.tipo)} · ${escapar(nombreCat(p.cat))}</small>
+          </span>
+          <span class="renglon-der">
+            <span class="estado estado--${p.estado === "publicada" ? "publicada" : "borrador"}">${p.estado === "publicada" ? "Publicada" : "Borrador"}</span>
+            <small>${escapar(fechaRelativa(p.actualizado))}</small>
+          </span>
+          <svg class="renglon-flecha" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7.5 5 5 5-5 5"/></svg>
+        </a></li>`)
       .join("");
   }
-  pintar().catch((e) => avisar(e.message || "No se pudo cargar el inicio", { tipo: "error" }));
-  addEventListener("neucast:guardado", () => pintar().catch(() => {}));
 
-  if (esSimulada) {
-    const caja = document.querySelector("[data-simulacion]");
-    caja.hidden = false;
-    caja.querySelector("[data-restablecer]").addEventListener("click", async () => {
-      const ok = await confirmar({
-        titulo: "Restablecer la simulación",
-        texto: "Se borra todo lo que capturaste en este navegador y vuelven los datos del prototipo. No afecta al sitio.",
-        accion: "Restablecer",
-        peligro: true,
-      });
-      if (!ok) return;
-      restablecer();
-      avisar("La simulación volvió a la semilla");
-      setTimeout(() => location.reload(), 400);
-    });
-  }
+  const todo = () => Promise.all([pintarPublicacion(), pintarCatalogo()]).catch((e) => avisar(e.message || "No se pudo cargar el inicio", { tipo: "error" }));
+  todo();
+  addEventListener("neucast:guardado", todo);
+  addEventListener("neucast:publicado", todo);
 </script>

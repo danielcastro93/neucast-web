@@ -138,11 +138,6 @@ body.no-scroll{position:fixed;width:100%;overflow:hidden;}
 @media (max-width:1100px){.rejilla--4{grid-template-columns:repeat(2,minmax(0,1fr));}.rejilla--3{grid-template-columns:repeat(2,minmax(0,1fr));}}
 @media (max-width:640px){.rejilla--2,.rejilla--3,.rejilla--4{grid-template-columns:1fr;}}
 
-/* cifras de la pantalla de inicio */
-.cifra{padding:20px 22px;}
-.cifra-rotulo{font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-40);}
-.cifra-valor{margin-top:10px;font-size:34px;font-weight:700;letter-spacing:-.03em;line-height:1;}
-.cifra-nota{margin-top:8px;font-size:var(--fs-xs);color:var(--ink-60);}
 
 /* ============================================
    Botones
@@ -455,13 +450,6 @@ dialog.modal.modal--cerrando::backdrop{animation:veloSale .24s var(--ease-salida
 .modal-pie{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:24px;}
 .modal-pie .izquierda{margin-right:auto;}
 
-/* resumen de lo que se va a publicar */
-.lista-cambios{margin:0;padding:0;display:flex;flex-direction:column;border:1px solid var(--borde);border-radius:12px;overflow:hidden;}
-.lista-cambios li{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--borde);font-size:var(--fs-sm);list-style:none;}
-.lista-cambios li:last-child{border-bottom:0;}
-.lista-cambios .que{color:var(--ink-40);font-size:12px;min-width:76px;text-transform:capitalize;}
-.lista-cambios .cuando{margin-left:auto;color:var(--ink-40);font-size:12px;white-space:nowrap;}
-.lista-cambios .borrado{text-decoration:line-through;color:var(--ink-40);}
 
 /* ============================================
    Avisos (toast)
