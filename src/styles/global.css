@@ -44,7 +44,7 @@
      Fluida: el primer valor manda en móvil, el tercero en escritorio.
      Jerarquía garantizada en todos los anchos:
      display > h1 > h2 > h3 > h4 > body. */
-  --fs-display:clamp(31px,6.4vw,72px);  /* solo el H1 del hero          */
+  --fs-display:clamp(40px,6.4vw,72px);  /* H1 sobre foto; 40 en teléfono (prueba del 2 oct) */
   --fs-h1:clamp(27px,5vw,52px);         /* título de página / banner    */
   --fs-h2:clamp(25px,3.6vw,38px);       /* título de sección            */
   --fs-h3:clamp(20px,2.4vw,28px);       /* subtítulo dentro de sección  */
