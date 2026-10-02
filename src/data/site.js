@@ -1,14 +1,14 @@
 // Datos de la empresa: los usa el encabezado, el pie, los botones de WhatsApp y
 // el esquema Organization que viaja en las 48 páginas.
 //
-// PARA WORDPRESS: ver docs/wordpress.md, apartado 3.1. Lo que hay que sustituir
+// PARA EL ADMINISTRADOR: ver docs/administrador.md, apartado 3.1. Lo que hay que sustituir
 // está marcado abajo con "simulado". Cuidado con `domain`: de ahí salen las
 // canónicas, el mapa del sitio y el robots.txt, así que si queda mal, quedan
 // mal los tres de golpe.
 //
 // Datos demo del prototipo.
-// En Fase 3 estos objetos se reemplazan por fetch a WordPress (WPGraphQL/REST).
-// La forma de cada objeto es la que tendrán los campos del CMS, así que el
+// Cuando exista el administrador, estos objetos vendrán de su API al compilar.
+// La forma de cada objeto es la que tiene que entregar la API, así que el
 // diseño no cambia cuando se conecte: solo cambia de dónde vienen los datos.
 
 export const site = {
@@ -56,7 +56,7 @@ export const waLink = (msg) =>
   `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(msg)}`;
 
 // photo = foto de ambiente (cards de categoría y menú)
-// alt   = texto alternativo editable desde el CMS
+// alt   = texto alternativo editable desde el administrador
 // La entrada a "todos los muebles" necesita su propia imagen: tomar prestada
 // la de sillas ejecutivas hacía que el menú pareciera tener dos veces la misma
 // categoría. Esta toma es del piso completo, con escritorios, sillas, guardado

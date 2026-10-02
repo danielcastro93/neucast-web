@@ -1,7 +1,7 @@
 // Los proyectos instalados.
 //
-// PARA WORDPRESS: ver docs/wordpress.md, apartado 3.4. Es un tipo de contenido
-// `proyecto` con un campo repetidor de bloques. Es lo más laborioso de modelar
+// PARA EL ADMINISTRADOR: ver docs/administrador.md, apartado 3.4. Es la tabla
+// de proyectos con una lista ordenable de bloques. Es lo más laborioso de modelar
 // y lo que más rinde: es lo que evita que todos los proyectos se vean iguales.
 // Las medidas de cada texto están en el apartado 4 del mismo documento; si se
 // respetan, las páginas se ven parejas entre sí.
@@ -31,7 +31,7 @@
 //
 // OJO: los cuatro casos son de maqueta. Los textos, las ciudades, los años y
 // las cifras se escribieron para poder ver la sección completa y para dejar por
-// escrito qué campos tiene que traer WordPress. Nada está confirmado. Ver
+// escrito qué campos tiene que traer el administrador. Nada está confirmado. Ver
 // docs/pendientes.md.
 //
 // Sobre el nombre del cliente: se usa el sector y la ciudad, no la razón
@@ -203,7 +203,7 @@ export const proyectos = [
 
   // ---------------------------------------------------------------------------
   // CASO COMPLETO. Este es el único proyecto armado de punta a punta: sirve de
-  // plantilla para los que vengan de WordPress. Los demás traen la secuencia
+  // plantilla para los que vengan del administrador. Los demás traen la secuencia
   // corta a propósito, para no llenar el sitio de material inventado.
   // ---------------------------------------------------------------------------
   p({
@@ -693,8 +693,6 @@ export const mediosDe = (proyecto) =>
 
 // Para el schema: la portada también cuenta como imagen del proyecto.
 export const imagenesDe = (proyecto) => [proyecto.portada, ...mediosDe(proyecto)];
-
-export const proyectoPorSlug = (slug) => proyectos.find((x) => x.slug === slug);
 
 // El home enseña uno. Es el primero de la lista para no tener dos fuentes: si
 // mañana se reordena, el home sigue solo.

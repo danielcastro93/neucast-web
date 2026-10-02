@@ -1,7 +1,8 @@
 # Arquitectura del sitio
 
-Cómo está armado el front. Si vienes a conectar WordPress, lee primero
-[wordpress.md](wordpress.md) y usa este como referencia.
+Cómo está armado el front. Si vienes a conectar el administrador (propio,
+hecho desde cero; ya no se usa WordPress), lee primero
+[administrador.md](administrador.md) y usa este como referencia.
 
 ---
 
@@ -17,6 +18,8 @@ npm run dev      # servidor local en http://localhost:4321
 npm run build    # compila a dist/
 npm run preview  # sirve dist/ para revisarlo antes de publicar
 npm run revisar  # revisa dist/ (ver el apartado 8)
+npm run fichas     # fichas técnicas en PDF, a public/fichas/ (en una Mac)
+npm run catalogos  # catálogos en PDF, a public/catalogos/ (en una Mac)
 ```
 
 Node 22.12 o superior.
@@ -27,11 +30,16 @@ Node 22.12 o superior.
 
 ```
 src/
-├── data/          el contenido. Es lo que se conecta a WordPress
+├── data/          el contenido. Es lo que va a entregar la API del administrador
 ├── layouts/       Base.astro: cabeza, encabezado, pie y capas comunes
 ├── components/    piezas reutilizables
 ├── pages/         una por ruta; los corchetes generan varias
+├── scripts/       JavaScript compartido del navegador (Mi proyecto, bloqueo de scroll)
 └── styles/        global.css: las variables de diseño
+
+scripts/
+├── revisar.mjs    la revisión de dist/ (apartado 8)
+└── fichas/        la generación de fichas y catálogos en PDF (apartado 5c)
 
 public/
 ├── img/           fotos
@@ -39,7 +47,9 @@ public/
 │   ├── products/  fotos de pieza (hoy son demostraciones)
 │   └── nosotros/  las de la página de nosotros
 ├── video/         clips y sus carteles
-├── fichas/        PDF de ficha técnica
+├── fichas/        PDF de ficha técnica, neucast-{slug}.pdf
+├── catalogos/     PDF de catálogo por categoría y general
+│   └── propios/   catálogos que pase el cliente; sustituyen al generado
 └── favicon.*
 
 docs/              toda la documentación
@@ -57,6 +67,8 @@ docs/              toda la documentación
 | `muebles/[categoria]/[pieza].astro` | `/muebles/{cat}/{pieza}/` | 26 |
 | `proyectos/index.astro` | `/proyectos/` | 1 |
 | `proyectos/[proyecto].astro` | `/proyectos/{slug}/` | 4 |
+| `home-office.astro` | `/home-office/` | 1 |
+| `recursos.astro` | `/recursos/` | 1 |
 | `nosotros.astro` | `/nosotros/` | 1 |
 | `contacto.astro` | `/contacto/` | 1 |
 | `preguntas-frecuentes.astro` | `/preguntas-frecuentes/` | 1 |
@@ -66,8 +78,9 @@ docs/              toda la documentación
 | `404.astro` | `/404/` | 1, sin indexar |
 | `sitemap.xml.js` | `/sitemap.xml` | se genera |
 | `robots.txt.js` | `/robots.txt` | se genera |
+| `buscar.json.js` | `/buscar.json` | se genera: el índice del buscador |
 
-48 páginas HTML, 44 indexables.
+50 páginas HTML, 46 indexables.
 
 Las rutas con corchetes usan `getStaticPaths()`, que recorre las listas de
 `src/data/`. Agregar una pieza al arreglo agrega su página, su entrada en el
@@ -90,8 +103,16 @@ Todas las páginas lo envuelven. Recibe:
 
 Y resuelve solo: canónica con diagonal final, `robots` explícito, Open Graph,
 Twitter, el JSON-LD de `Organization` en todas las páginas, el encabezado con su
-panel de categorías, el menú de teléfono, el pie, la burbuja de WhatsApp y el
-observador que hace entrar los bloques al hacer scroll.
+panel de categorías, el menú de teléfono, el pie, la burbuja de WhatsApp, el
+observador que hace entrar los bloques al hacer scroll, y las dos capas que
+existen en todas las páginas: el buscador (`Buscador.astro`) y Mi proyecto
+(`MiProyecto.astro`).
+
+**Cada página nueva abre arriba.** Al final del `body` hay un script en línea
+que lleva el scroll al inicio cuando se llega a una página por una navegación
+nueva. No actúa con "atrás" o "adelante" (el navegador devuelve a donde
+estabas), ni cuando la dirección trae un `#ancla`, ni si la persona ya empezó
+a moverse con la rueda, el dedo o el teclado.
 
 ---
 
@@ -108,8 +129,11 @@ observador que hace entrar los bloques al hacer scroll.
 | `CursorAmpliar.astro` | ficha de pieza, proyecto | La pastilla "Ampliar" que sigue al cursor |
 | `EscenaHotspots.astro` | home, proyectos | Foto con puntos sobre las piezas |
 | `EscenasCarrusel.astro` | proyectos | Varias escenas, con su pie dentro de la foto |
-| `PanelLateral.astro` | ficha de pieza | El cajón lateral de detalles |
-| `CierreCta.astro` | home, proyectos | El bloque de cierre con foto de fondo |
+| `PanelLateral.astro` | ficha de pieza, Mi proyecto | El cajón lateral que entra por la derecha con el fondo difuminado. Tiene un slot `pie` para lo que va fijo abajo, fuera de la zona que se desplaza (lo usa Mi proyecto para sus dos salidas) |
+| `Buscador.astro` | todas, desde `Base.astro` | La capa del buscador a pantalla completa. Lee `/buscar.json` la primera vez que se abre |
+| `MiProyecto.astro` | todas, desde `Base.astro` | El panel de Mi proyecto y el cableado de los botones de agregar |
+| `Destacado.astro` | proyectos, detalle de proyecto, home office, nosotros | La frase grande centrada en dos tonos: primera línea en tinta, las siguientes en gris |
+| `CierreCta.astro` | home, detalle de proyecto, home office | El bloque de cierre con foto de fondo, de orilla a orilla |
 | `VideoFrame.astro` | nosotros, ficha de pieza | Video con su cartel |
 | `LegalDoc.astro` | aviso, términos | El molde de las páginas legales |
 | `WaButton.astro`, `Icon.astro`, `Logo.astro` | varias | Piezas chicas |
@@ -118,6 +142,42 @@ Cuando algo se usa en dos páginas, sale a componente. Es la razón por la que
 existen `VisorGaleria`, `CursorAmpliar`, `CierreCta` y `EscenasCarrusel`: los
 tres primeros nacieron dentro de una página y salieron cuando una segunda pidió
 lo mismo.
+
+---
+
+## 5b. Los datos y los scripts del navegador
+
+| Archivo | Qué tiene |
+| --- | --- |
+| `src/data/site.js` | Datos de la empresa, las categorías, las destacadas del home |
+| `src/data/catalogo.js` | Las piezas, los filtros y los bloques editoriales. Cada pieza trae `espacios`, la lista cerrada de colecciones por espacio en las que aparece además de su categoría (hoy solo `home-office`) |
+| `src/data/fichas.js` | Las fichas técnicas, una por pieza |
+| `src/data/proyectos.js` | Los proyectos y sus bloques |
+| `src/data/homeOffice.js` | La colección por espacio de home office: fotos de la página, `sets` e `ideas`. Las piezas no se capturan aquí: salen de las que traen `home-office` en `espacios` |
+| `src/data/pdfs.js` | Averigua si existe la ficha o el catálogo en PDF y lee del archivo sus hojas y su peso. Si hay un catálogo en `public/catalogos/propios/` con el mismo nombre, se descarga ese en lugar del generado |
+| `src/pages/buscar.json.js` | El índice del buscador, generado de las mismas listas que las páginas |
+| `src/scripts/proyecto.js` | La lista de Mi proyecto en el navegador (`localStorage`, llave `neucast:proyecto`): leer, agregar, quitar, cambiar cantidad, vaciar, armar el mensaje de WhatsApp y el evento de cambio |
+| `src/scripts/bloqueo-scroll.js` | Fija el body mientras hay una capa abierta y lo devuelve a su sitio al cerrar, contando cuántas capas lo pidieron |
+
+El detalle de Mi proyecto, el buscador, home office y recursos, pantalla por
+pantalla, está en [mapa-de-conexion.md](mapa-de-conexion.md), apartados 11b,
+11c y 11d.
+
+---
+
+## 5c. Los PDF: `scripts/fichas/`
+
+| Archivo | Qué hace |
+| --- | --- |
+| `plantilla.mjs` | Arma el HTML de una ficha técnica con los datos del catálogo y de las fichas |
+| `generar.mjs` | Imprime las fichas a PDF con Chrome sin interfaz. `npm run fichas` las deja en `public/fichas/` |
+| `catalogo.mjs` | La plantilla de los catálogos: por categoría y general |
+| `catalogos.mjs` | Genera los catálogos. `npm run catalogos` los deja en `public/catalogos/` |
+| `fotos.py` | Achica las fotos para los catálogos (Python con Pillow) |
+
+Hoy se corren a mano **en una Mac**, porque la plantilla usa Helvetica Neue y
+Linux no la trae. Cuando exista el administrador se generan en el mismo paso
+de publicación (ver [despliegue.md](despliegue.md), apartado 3).
 
 ---
 
@@ -194,4 +254,5 @@ npm run build && npm run revisar
    una menos.
 
 Devuelve código 1 si algo falla, así que sirve en un proceso automático. Es lo
-que hay que correr en cada publicación una vez que el contenido venga del CMS.
+que hay que correr en cada publicación una vez que el contenido venga del
+administrador.

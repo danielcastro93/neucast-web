@@ -1,5 +1,6 @@
 ---
 import Destacado from "../../components/Destacado.astro";
+import { migas } from "../../data/migas.js";
 import Base from "../../layouts/Base.astro";
 import EscenasCarrusel from "../../components/EscenasCarrusel.astro";
 import VisorGaleria from "../../components/VisorGaleria.astro";
@@ -47,7 +48,7 @@ const title = `${proyecto.espacio} en ${proyecto.ciudad} | Proyectos | Neucast`;
 const description = `${proyecto.nombre}. ${proyecto.resumen}`.slice(0, 158);
 const url = `${site.domain}/proyectos/${proyecto.slug}`;
 
-const schema = {
+const schema = [{
   "@context": "https://schema.org",
   "@type": "Article",
   headline: proyecto.nombre,
@@ -58,7 +59,7 @@ const schema = {
   author: { "@id": `${site.domain}/#organizacion` },
   publisher: { "@id": `${site.domain}/#organizacion` },
   about: `${proyecto.espacio}, ${proyecto.ciudad}`,
-};
+}, migas([["Proyectos", "/proyectos/"], [proyecto.nombre, `/proyectos/${proyecto.slug}/`]])];
 
 const waMensaje = `Hola, vi el proyecto de ${proyecto.espacio.toLowerCase()} en ${proyecto.ciudad} y quiero algo parecido.`;
 ---

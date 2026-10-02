@@ -1,4 +1,5 @@
 ---
+import { migas } from "../../data/migas.js";
 import Base from "../../layouts/Base.astro";
 import Catalogo from "../../components/Catalogo.astro";
 import { site } from "../../data/site.js";
@@ -29,7 +30,8 @@ const schema = [
     description,
     inLanguage: "es-MX",
     isPartOf: { "@id": `${site.domain}/#organizacion` },
-  }
+  },
+  migas([["Muebles", "/muebles/"]]),
 ];
 ---
 <Base title={title} description={description} schema={schema}>

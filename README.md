@@ -6,30 +6,34 @@ espacios corporativos.
 **Vista previa:** https://danielcastro93.github.io/neucast-web/
 
 Astro 7, estático. El contenido vive en `src/data/` y está preparado para venir
-de WordPress.
+de un administrador propio: un sitio Astro aparte que habla con una API (ya no
+se usa WordPress).
 
 ```bash
 npm install
 npm run dev      # http://localhost:4321
 npm run build    # compila a dist/
 npm run revisar  # revisa dist/: enlaces, SEO, encabezados y reglas del proyecto
+npm run fichas     # fichas técnicas en PDF, en una Mac
+npm run catalogos  # catálogos en PDF, en una Mac
 ```
 
 Node 22.12 o superior.
 
 ## Documentación
 
-Todo está en [`docs/`](docs/). Si vienes a conectar WordPress, empieza por
+Todo está en [`docs/`](docs/). Si vienes a construir o conectar el
+administrador, empieza por
 [`docs/mapa-de-conexion.md`](docs/mapa-de-conexion.md): pantalla por pantalla,
-qué se ve, de dónde sale y qué hay que crear en el gestor. Después
-[`docs/wordpress.md`](docs/wordpress.md) para la forma exacta de cada dato y
-[`docs/despliegue.md`](docs/despliegue.md) para hospedaje, certificados y
-seguridad.
+qué se ve, de dónde sale y qué hay que crear en el administrador. Después
+[`docs/administrador.md`](docs/administrador.md) para la forma exacta de cada
+dato (el contrato con la API) y [`docs/despliegue.md`](docs/despliegue.md) para
+hospedaje, publicación, certificados y seguridad.
 
 El índice completo está en [`docs/README.md`](docs/README.md).
 
 ## Estado
 
-48 páginas, 44 indexables, sin enlaces rotos. Lo que falta es contenido y datos
+50 páginas, 46 indexables, sin enlaces rotos. Lo que falta es contenido y datos
 del cliente, no código: la lista está en
 [`docs/pendientes.md`](docs/pendientes.md).

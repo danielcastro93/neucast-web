@@ -1,8 +1,8 @@
 // Las fichas técnicas, una por pieza, con la misma slug del catálogo.
 //
-// PARA WORDPRESS: ver docs/wordpress.md, apartado 3.3. La ficha pinta solo los
+// PARA EL ADMINISTRADOR: ver docs/administrador.md, apartado 3.3. La ficha pinta solo los
 // campos que existen, así que una pieza sin mecanismo o sin plazas no muestra
-// esa parte y no hay que rellenar de vacíos. Si el CMS agrega una clave nueva
+// esa parte y no hay que rellenar de vacíos. Si la API agrega una clave nueva
 // de medida o de construcción, hay que darla de alta en `etiquetasMedida` o
 // `etiquetasConstruccion` del final del archivo, o no se muestra.
 //
@@ -14,7 +14,7 @@
 // sin plazas no muestra esa parte.
 //
 // OJO: los valores son de maqueta. Sirven para ver la ficha completa y para que
-// el desarrollo sepa qué campos tiene que traer WordPress, pero ninguno está
+// el desarrollo sepa qué campos tiene que traer el administrador, pero ninguno está
 // confirmado. Hay que sustituirlos uno por uno antes de publicar.
 // Ver docs/pendientes.md.
 

@@ -1,5 +1,6 @@
 ---
 import Destacado from "../components/Destacado.astro";
+import { migas } from "../data/migas.js";
 import Base from "../layouts/Base.astro";
 import Icon from "../components/Icon.astro";
 import WaButton from "../components/WaButton.astro";
@@ -26,7 +27,8 @@ const schema = [
     // el sujeto de la página es la propia marca
     about: { "@id": `${site.domain}/#organizacion` },
     publisher: { "@id": `${site.domain}/#organizacion` },
-  }
+  },
+  migas([["Nosotros", "/nosotros/"]]),
 ];
 
 const pilares = [

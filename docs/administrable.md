@@ -1,26 +1,28 @@
 # Qué es administrable
 
-Inventario completo de lo que el cliente va a poder editar desde WordPress, qué
-tipo de contenido le toca a cada cosa y dónde vive hoy.
+Inventario completo de lo que el cliente va a poder editar desde el
+administrador propio de Neucast (un sitio Astro aparte que habla con una API; ya
+no se usa WordPress), qué tabla le toca a cada cosa y dónde vive hoy.
 
-Es el documento que hay que tener a la mano al modelar el CMS. La forma exacta
-de cada campo está en [wordpress.md](wordpress.md).
+Es el documento que hay que tener a la mano al modelar la base del
+administrador. La forma exacta de cada campo está en
+[administrador.md](administrador.md).
 
 ---
 
 ## 1. Resumen
 
-| Qué | Tipo de contenido | Archivo de hoy | Piezas |
+| Qué | En el administrador | Archivo de hoy | Piezas |
 | --- | --- | --- | --- |
-| Categorías | taxonomía | `site.js` → `categories` | 8 |
-| Piezas | entrada `pieza` | `catalogo.js` → `piezas` | 26 |
-| Ficha técnica de cada pieza | campos de `pieza` | `fichas.js` | 26 |
-| Proyectos | entrada `proyecto` | `proyectos.js` | 4 |
-| Piezas destacadas del home | selección | `site.js` → `destacados` | 8 |
-| Opciones de los filtros | taxonomías | `catalogo.js` → `filtros`, `materiales`, `gruposColor` | |
-| Bloques editoriales del catálogo | entrada `bloque` | `catalogo.js` | 2 por listado |
-| Datos de la empresa | ajustes | `site.js` → `site` | |
-| Preguntas frecuentes | entrada `pregunta` | `preguntas-frecuentes.astro` | 31 |
+| Categorías | tabla `categorias` | `site.js` → `categories` | 8 |
+| Piezas | tabla `piezas` | `catalogo.js` → `piezas` | 26 |
+| Ficha técnica de cada pieza | campos de la pieza | `fichas.js` | 26 |
+| Proyectos | tabla `proyectos` con sus bloques | `proyectos.js` | 4 |
+| Piezas destacadas del home | selección ordenada de piezas | `site.js` → `destacados` | 8 |
+| Opciones de los filtros | listas cerradas | `catalogo.js` → `filtros`, `materiales`, `gruposColor` | |
+| Bloques editoriales del catálogo | tabla `bloques` | `catalogo.js` | 2 por listado |
+| Datos de la empresa | pantalla de ajustes | `site.js` → `site` | |
+| Preguntas frecuentes | tabla `preguntas` | `preguntas-frecuentes.astro` | 31 |
 
 Lo que **no** se conecta, y por qué, está en el apartado 8.
 
@@ -45,7 +47,7 @@ un nivel de la dirección de cada pieza.
 pieza. Cambiarlo después de publicar rompe las direcciones de todas sus piezas y
 obliga a una redirección por cada una.
 
-Agregar una categoría en el CMS crea sola su página, su entrada en el menú, su
+Agregar una categoría en el administrador crea sola su página, su entrada en el menú, su
 tarjeta en el home, su filtro y su lugar en el mapa del sitio.
 
 ---
@@ -73,17 +75,18 @@ El criterio para poner nombre a una pieza nueva está en
 
 **Estos son los que hacen funcionar el panel de filtros y no pueden ser texto
 libre.** Cada uno solo acepta los valores declarados en `filtros`, `materiales`
-y `gruposColor`. Si el CMS manda un valor que no está en la lista, la pieza
+y `gruposColor`. Si la API manda un valor que no está en la lista, la pieza
 desaparece al filtrar por ese campo, y es un fallo difícil de ver porque la
 pieza se sigue viendo bien en su página.
 
-En WordPress tienen que ser **listas desplegables o taxonomías**.
+En el administrador tienen que ser **listas cerradas (selectores)**.
 
 | Campo | Aplica a | Valores |
 | --- | --- | --- |
 | `material` | todas | uno de `materiales` |
 | `colores` | todas | uno o varios de `gruposColor` |
-| `entrega` | todas | inmediata, 2-3-semanas, sobre-pedido |
+| `entrega` | todas | inmediata, 10dias, pedido |
+| `espacios` | las que apliquen | una o varias colecciones por espacio; hoy solo home-office |
 | `uso` | sillería | dirección, ejecutiva, operativa, multitask, visita, colectividad |
 | `respaldo` | sillería | alto, bajo, con cabecera, sin cabecera |
 | `brazos` | sillería | sin brazos, fijos, ajustables |
@@ -110,7 +113,7 @@ no tienen ninguna pieza.
 ancho, y una pieza sin mecanismo no muestra ese panel. No hay que rellenar de
 vacíos.
 
-Si el CMS agrega una clave nueva de medida o de construcción, hay que darla de
+Si el administrador agrega una clave nueva de medida o de construcción, hay que darla de
 alta en `etiquetasMedida` o `etiquetasConstruccion` (en `fichas.js`) o no se
 muestra. Es el único punto donde agregar un campo pide tocar código.
 
@@ -131,9 +134,9 @@ que todos los proyectos se vean iguales.
 
 ### 4.2 Los bloques
 
-Campo repetidor con seis tipos: `capitulo`, `imagen`, `duo`, `escenas`,
+Lista ordenable de bloques con seis tipos: `capitulo`, `imagen`, `duo`, `escenas`,
 `destacado` y `video`. Los campos de cada uno están en
-[wordpress.md](wordpress.md).
+[administrador.md](administrador.md).
 
 La secuencia que llevan los cuatro de hoy, y que conviene respetar:
 
@@ -154,7 +157,7 @@ del catálogo.
 no existe. Eso va a pasar seguido mientras se carga el catálogo, así que es a
 propósito y no hay que "arreglarlo".
 
-En el CMS lo ideal es un selector de pieza (no texto libre) más dos campos de
+En el administrador lo ideal es un selector de pieza (no texto libre) más dos campos de
 posición, y si se puede, un selector visual sobre la foto.
 
 ---
@@ -164,7 +167,7 @@ posición, y si se puede, un selector visual sobre la foto.
 Hoy es una lista de ocho `slug` en `site.js`, y **el orden es el orden en que se
 ven**. El home las enseña en un carrusel.
 
-Dos maneras de modelarlo en WordPress, las dos válidas:
+Dos maneras de modelarlo en el administrador, las dos válidas:
 
 - **Un campo de relación** en una pantalla de ajustes, donde el cliente arrastra
   las piezas que quiere y en qué orden. Es lo más claro para quien administra.
@@ -213,7 +216,7 @@ Viven en `site.js` y se ven en todas las páginas.
 | Logotipo | encabezado, pie y la ficha que lee Google |
 | Descripción de marca | la ficha que lee Google |
 
-En WordPress es una pantalla de ajustes, no una entrada.
+En el administrador es una pantalla de ajustes (un solo registro), no una lista.
 
 **Cuidado con el dominio.** Si queda mal, quedan mal las canónicas, el mapa del
 sitio y el robots.txt de golpe. Es el dato más caro de equivocar.
@@ -231,7 +234,7 @@ sitio y el robots.txt de golpe. Es el dato más caro de equivocar.
 
 Las **31 preguntas frecuentes** son un caso aparte: hoy están en el código y
 conviene conectarlas, porque son las que más se actualizan cuando cambia una
-política de entrega o de garantía. Es un tipo de contenido sencillo: pregunta,
+política de entrega o de garantía. Es una tabla sencilla: pregunta,
 respuesta y grupo. Queda a criterio de si entra en esta fase.
 
 ---
@@ -239,7 +242,7 @@ respuesta y grupo. Queda a criterio de si entra en esta fase.
 ## 9. Qué pasa al migrar
 
 Hoy hay 26 piezas y 4 proyectos porque el prototipo necesitaba enseñar el sitio
-lleno. **Al conectar el CMS, esas páginas desaparecen** y vuelven a aparecer
+lleno. **Al conectar el administrador, esas páginas desaparecen** y vuelven a aparecer
 conforme se cargue el contenido real. Es lo esperado.
 
 Lo que **no** desaparece son las plantillas. Son tres:
@@ -250,7 +253,7 @@ Lo que **no** desaparece son las plantillas. Son tres:
 | Detalle de pieza | una página por pieza | 26 |
 | Detalle de proyecto | una página por proyecto | 4 |
 
-Y **nueve páginas únicas**, que existen siempre con contenido o sin él:
+Y **once páginas únicas**, que existen siempre con contenido o sin él:
 
 | Página | Ruta |
 | --- | --- |
@@ -263,6 +266,8 @@ Y **nueve páginas únicas**, que existen siempre con contenido o sin él:
 | Gracias | `/gracias/` |
 | Aviso de privacidad | `/aviso-de-privacidad/` |
 | Términos y condiciones | `/terminos-y-condiciones/` |
+| Home office | `/home-office/` |
+| Recursos (catálogos en PDF) | `/recursos/` |
 
 Más el `404`, que no es una página que se visite sino la que responde cuando una
 dirección no existe.
@@ -275,12 +280,14 @@ filtros, y es de las que más tráfico recibe.
 
 Compilé el sitio con cero piezas, cero proyectos y cero destacadas, que es el
 estado exacto del día uno de la migración. **Compila y salen 18 páginas**: las
-nueve únicas, las ocho categorías y el 404. Pasa la revisión completa.
+nueve únicas que había entonces, las ocho categorías y el 404. Pasa la revisión
+completa. La prueba es anterior a `/home-office/` y `/recursos/`; conviene
+repetirla con esas dos páginas.
 
 Para que eso funcionara hubo que tapar cuatro huecos, que ya están tapados:
 
 - El **menú** enseña una tarjeta con la foto del primer proyecto. Sin proyectos
-  tumbaba el menú entero, y con él las 48 páginas. Ahora no se pinta.
+  tumbaba el menú entero, y con él todas las páginas. Ahora no se pinta.
 - El **listado de proyectos** tomaba la foto del primero para compartir en
   redes. Ahora la página existe igual, con su H1 y un aviso de que todavía no
   hay proyectos publicados.

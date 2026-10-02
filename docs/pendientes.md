@@ -1,7 +1,7 @@
 # Pendientes y decisiones abiertas
 
 Lo que falta es contenido y datos del cliente, no código. El front está
-terminado: 48 páginas, 44 indexables, sin enlaces rotos.
+terminado: 50 páginas, 46 indexables, sin enlaces rotos.
 
 Lo urgente, en orden:
 
@@ -9,6 +9,30 @@ Lo urgente, en orden:
 2. El número de WhatsApp y el correo de ventas reales.
 3. El contenido real del catálogo, las fichas y los proyectos.
 4. Las fotos reales de producto y de proyecto.
+5. El administrador propio (ver abajo): definir el backend con el desarrollador.
+
+## Administrador propio
+
+Ya no se usa WordPress: el administrador se hace desde cero, con el frontend
+en Astro (sitio estático aparte, tipo `admin.neucast.com.mx`) y una API. El
+porqué está en `decisiones.md`; el contrato de datos, en `administrador.md`; el
+flujo de publicación, en `despliegue.md`.
+
+- [ ] **Definir el backend con el desarrollador**, según su lenguaje: si es
+      PHP, Laravel con MySQL en Hostinger; si es Node, ver el punto siguiente.
+- [ ] **Confirmar qué acepta el plan de Hostinger** (Business Web Hosting):
+      si corre Node, qué versión de PHP trae y si deja crear los subdominios
+      del administrador y de la API.
+- [ ] **Avisarle al desarrollador del cambio.** Ya se le había mandado un
+      mensaje hablando de WordPress headless; hay que decirle que ahora es un
+      administrador propio y pasarle `administrador.md`.
+- [ ] **Licencia o alternativa de Helvetica Neue** para generar las fichas y
+      los catálogos en PDF en el servidor de compilación (Linux no la trae).
+- [ ] **Pasar el dominio `neucast.com.mx` a Hostinger** y retirar el WordPress
+      que hoy está instalado para ese dominio, revisando antes si alguna
+      dirección publicada está indexada.
+- [ ] **El paso a producción en GitHub Actions**: compilar con los datos de la
+      API, generar los PDF, pasar `npm run revisar` y subir `dist/` por SSH.
 
 ## Páginas
 
@@ -71,9 +95,9 @@ la ficha web.
 
 **Lo que falta:**
 
-1. Generarlos al publicar en vez de a mano, para que nunca se desfasen. Depende
-   del punto 3 (la letra) y del administrador propio, que es quien sabrá qué
-   pieza cambió.
+1. Generarlos al publicar en vez de a mano, para que nunca se desfasen: en el
+   mismo paso de GitHub Actions que compila el sitio. Depende del punto 3 (la
+   letra) y del administrador propio, que es quien sabrá qué pieza cambió.
 2. ~~El catálogo por categoría~~ **Hecho el 2 de octubre de 2026.** Página
    `/recursos/` con el catálogo general y uno por categoría; cada categoría
    enlaza el suyo en un bloque al final del listado (en la cabecera competía
@@ -104,7 +128,7 @@ Las fotos de **Nosotros** y **Preguntas frecuentes** son de stock de
 [Pexels](https://www.pexels.com) (licencia libre, sin atribución obligatoria).
 Se descargaron, recortaron y optimizaron dentro del repo. Se reemplazan por
 fotografía propia de Neucast cuando exista: basta sustituir el archivo con el
-mismo nombre en `public/img/nosotros/` y `public/img/faq-oficina.jpg`.
+mismo nombre en `public/img/nosotros/` y `public/img/faq-hero.jpg`.
 
 **Línea visual.** Dos reglas para elegir foto en Nosotros:
 
@@ -125,7 +149,6 @@ mismo nombre en `public/img/nosotros/` y `public/img/faq-oficina.jpg`.
 | `nosotros/cierre-material.jpg` | 7232397 |
 | `faq-hero.jpg` | 16630138 |
 | `gracias-tela.jpg` | 4862997 |
-| `contacto-hero.jpg` (solo Open Graph) | 14002100 |
 | `home-office/hero.jpg` | 28461034 |
 | `home-office/set-completo.jpg` | 14245340 |
 | `home-office/idea-luz.jpg` | 15062127 |
@@ -133,6 +156,11 @@ mismo nombre en `public/img/nosotros/` y `public/img/faq-oficina.jpg`.
 | `home-office/idea-guardar.jpg` | 6958123 |
 | `home-office/idea-casa.jpg` | 6969995 |
 | `home-office/cierre.jpg` | 6934243 |
+
+La página de contacto no tiene foto propia: como imagen para compartir
+(Open Graph) usa la que trae `Base.astro` por omisión,
+`public/img/hero-oficina.jpg`. El `contacto-hero.jpg` (Pexels 14002100) que
+listaba esta tabla no existe en el repositorio.
 
 Las de **home office** son de posicionamiento: no hay todavía fotografía de
 home office de Neucast. Se cambian por propias sustituyendo el archivo con el
@@ -148,13 +176,14 @@ Videos (Pexels): `oficina-neucast.mp4` 8347237, `editorial-neucast.mp4` 7533208.
   Se suben al hosting tal cual. Para actualizar una, se reemplaza el archivo
   **con el mismo nombre** y listo.
 - **De catálogo** (piezas, categorías, proyectos): hoy están en `public/img/`
-  como demo; en fase 3 vendrán de WordPress y el `src` saldrá del CMS.
+  como demo; vendrán del administrador y el `src` saldrá de su API.
 
 ### Nombres y alt (SEO)
 - Nombre de archivo descriptivo y con guiones: `sillas-ejecutivas.jpg`,
   `proyecto-cafeteria.jpg`. Nunca `IMG_2831.jpg`.
 - El `alt` describe la imagen, no repite keywords. Los componentes aceptan un
-  campo `alt` desde los datos, así que **el cliente podrá editarlo desde el CMS**.
+  campo `alt` desde los datos, así que **el cliente podrá editarlo desde el
+  administrador**.
   Si no se define, se arma uno razonable por defecto.
 
 ### Optimización pendiente
@@ -195,18 +224,19 @@ const ENDPOINT = "";          // ← poner la URL real
 real.** Una persona llenaría el formulario, vería la página de gracias y su
 solicitud no llegaría a ningún lado.
 
-### Recomendación: recibirlo en el propio WordPress
+### Recomendación: recibirlo en la API del administrador
 
-Como el proyecto ya va a tener WordPress en Hostinger para administrar el
-catálogo, lo más limpio es que ese mismo WordPress reciba el formulario. No
-agrega proveedores, no cuesta nada extra y no hay un tercero más que declarar en
-el aviso de privacidad.
+Como el proyecto va a tener su propia API en Hostinger para administrar el
+catálogo, lo más limpio es que esa misma API reciba el formulario. No agrega
+proveedores, no cuesta nada extra y no hay un tercero más que declarar en el
+aviso de privacidad. El campo `proyecto` (la lista de Mi proyecto) viaja en el
+mismo envío.
 
-1. **Ruta REST en el tema**: `POST /wp-json/neucast/v1/contacto`, registrada con
-   `register_rest_route`.
-2. **Guardar la solicitud como custom post type** antes de mandar el correo. Es
-   lo que hace que el cliente vea los prospectos en el panel aunque el correo
-   falle o se vaya a spam. Un formulario que solo manda correo pierde clientes en
+1. **Una ruta de contacto en la API** (por ejemplo `POST /contacto`; la
+   dirección exacta la define quien haga la API).
+2. **Guardar la solicitud en la base** antes de mandar el correo. Es lo que hace
+   que el cliente vea los prospectos en el administrador aunque el correo falle
+   o se vaya a spam. Un formulario que solo manda correo pierde clientes en
    silencio.
 3. **Enviar con SMTP autenticado** del buzón de Hostinger, no con el `mail()` del
    servidor. Sin SMTP el correo acaba en spam.
@@ -219,7 +249,7 @@ el aviso de privacidad.
 
 La alternativa es un servicio tipo Web3Forms o Formspree, que se monta en una
 tarde, pero suma un proveedor que hay que declarar y deja los prospectos fuera
-del panel del cliente.
+del administrador del cliente.
 
 ## Páginas legales
 
@@ -309,8 +339,8 @@ JavaScript solo esconde las que sobran de la tanda. Con 26 da igual. Con 300 o
 500, el navegador descarga las 500 cards con sus fotos antes de pintar la
 primera, y Core Web Vitals se cae.
 
-Cuando el catálogo viva en WordPress, **el botón tiene que traer la siguiente
-tanda de la API**, no destapar lo que ya está. Y los filtros, que hoy también
+Cuando el catálogo venga del administrador, **el botón tiene que traer la
+siguiente tanda**, no destapar lo que ya está. Y los filtros, que hoy también
 corren sobre el DOM, tendrán que viajar en la consulta.
 
 ### Las especificaciones de la ficha son de maqueta
@@ -318,7 +348,7 @@ corren sobre el DOM, tendrán que viajar en la consulta.
 `src/data/fichas.js` tiene las 26 fichas completas: medidas, construcción,
 mecanismo y cuidados. **Ninguno de esos valores está confirmado contra un
 catálogo.** Se escribieron para poder ver la ficha llena y, sobre todo, para
-dejar por escrito qué campos tiene que traer WordPress.
+dejar por escrito qué campos tiene que traer el administrador.
 
 Antes de publicar hay que sustituirlos uno por uno contra las tablas de medidas
 de PREMIUM y las especificaciones de Zol. Mientras tanto, esas páginas no
@@ -329,9 +359,9 @@ También falta:
 - **Fotos reales.** Hoy cada pieza reusa uno de ocho PNG de demostración y la
   foto de su categoría. La galería está hecha para tres o cuatro tomas por
   pieza: producto recortado, ambiente y detalle de material.
-- **La ficha técnica en PDF.** `public/fichas/ficha-tecnica-ejemplo.pdf` es un
-  archivo de una página hecho para probar el flujo de descarga. WordPress tiene
-  que servir la de cada pieza.
+- **La ficha técnica en PDF con datos reales.** Ya se genera una por pieza
+  (ver "Fichas técnicas y catálogos en PDF"), pero con los datos de maqueta:
+  hay que regenerarlas cuando entren los reales.
 - **Video de producto.** La referencia lo tiene y le sienta bien a la ficha,
   pero no hay material. No se puso un clip genérico repetido en 26 páginas.
 
@@ -367,7 +397,7 @@ quien llega desde una búsqueda cae ahí directo y no pasó por el catálogo.
 
 ### Lo que falta de la tarjeta de marca
 
-`Organization` ya viaja en las 43 páginas desde el layout, con una sola
+`Organization` ya viaja en todas las páginas desde el layout, con una sola
 matrícula. Falta `WebSite` con `potentialAction` de búsqueda, que es lo que habilita
 la caja de búsqueda en el resultado, ni `LocalBusiness` con domicilio y horario,
 que es lo que conecta con la ficha de Google Business. Las dos piden datos del
@@ -403,8 +433,8 @@ páginas legales. Son los últimos huecos antes de publicar.
 La sección está construida (`/proyectos/` y cuatro páginas de detalle), pero
 **todo el contenido de `src/data/proyectos.js` está inventado**: los sectores,
 las ciudades, los años, las cifras y los textos. Se escribieron para poder ver
-la sección completa y para dejar por escrito qué campos tiene que traer
-WordPress. Antes de publicar hay que sustituirlos por casos reales.
+la sección completa y para dejar por escrito qué campos tiene que traer el
+administrador. Antes de publicar hay que sustituirlos por casos reales.
 
 Los cuatro llevan hoy la misma secuencia de bloques, que es la plantilla de la
 sección y la que hay que llenar en cada caso nuevo:
@@ -487,7 +517,7 @@ Ya resuelto y no hay que volver a hacerlo:
 
 - [x] `sitemap.xml` y `robots.txt`, generados de las mismas listas que generan
       las páginas. Se actualizan solos.
-- [x] Canónicas con diagonal final y `robots` explícito en las 48 páginas
+- [x] Canónicas con diagonal final y `robots` explícito en las 50 páginas
 - [x] Datos estructurados: `Organization` en todas, más `Product`,
       `CollectionPage`, `Article`, `FAQPage`, `ContactPage` y `AboutPage` donde
       corresponde. `BreadcrumbList` se quitó a propósito, porque las migas no se

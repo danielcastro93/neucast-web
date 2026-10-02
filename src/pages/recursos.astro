@@ -13,6 +13,7 @@ import Icon from "../components/Icon.astro";
 import { site, categories, todosLosMuebles } from "../data/site.js";
 import { piezas } from "../data/catalogo.js";
 import { catalogoPdf } from "../data/pdfs.js";
+import { migas } from "../data/migas.js";
 
 const title = "Catálogos de mobiliario de oficina para descargar | Neucast";
 const description =
@@ -23,7 +24,7 @@ const conCatalogo = categories
   .map((c) => ({ ...c, pdf: catalogoPdf(c.slug), n: piezas.filter((p) => p.cat === c.slug).length }))
   .filter((c) => c.pdf && c.n > 0);
 
-const schema = {
+const schema = [{
   "@context": "https://schema.org",
   "@type": "CollectionPage",
   name: "Catálogos para descargar",
@@ -31,7 +32,7 @@ const schema = {
   description,
   inLanguage: "es-MX",
   isPartOf: { "@id": `${site.domain}/#organizacion` },
-};
+}, migas([["Catálogos", "/recursos/"]])];
 ---
 <Base title={title} description={description} image={todosLosMuebles.photo} schema={schema}>
   <section class="rc">

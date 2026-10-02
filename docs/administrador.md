@@ -1,46 +1,68 @@
-# Conexión con WordPress
+# Conexión con el administrador
 
-Este documento es para quien va a conectar el sitio con WordPress. Dice qué es
-administrable, dónde vive hoy cada dato, qué forma tiene que devolver la API y
-qué cosas **no** hay que tocar.
+Este documento es para quien va a construir el administrador de Neucast y
+conectarlo con el sitio. Dice qué es administrable, dónde vive hoy cada dato,
+qué forma tiene que devolver la API y qué cosas **no** hay que tocar.
 
 Léelo junto con [administrable.md](administrable.md), que lista todo lo que el
-cliente va a poder editar, y con [arquitectura.md](arquitectura.md), que explica
-cómo está armado el front.
+cliente va a poder editar, con [mapa-de-conexion.md](mapa-de-conexion.md), que
+lo recorre pantalla por pantalla, y con [arquitectura.md](arquitectura.md), que
+explica cómo está armado el front.
+
+---
+
+## 0. Cómo es el administrador
+
+Ya no se usa WordPress. El administrador se construye desde cero, propio, para
+poder crecer sin depender de plugins ni de la forma de datos de un gestor ajeno.
+Tiene dos partes:
+
+| Parte | Qué es | Estado |
+| --- | --- | --- |
+| **Frontend del administrador** | Un sitio aparte hecho en Astro, estático, en un subdominio tipo `admin.neucast.com.mx`. Reutiliza los tokens y componentes del sistema de diseño de este repositorio (`src/styles/global.css` y `src/components/`) y habla con la API | Decidido |
+| **Backend y API** | Guarda los datos, recibe el formulario de contacto y dispara la publicación | **Por definir con el desarrollador.** Si trabaja en PHP: Laravel con MySQL en Hostinger. Si trabaja en Node: primero confirmar que el plan de Hostinger lo acepte |
+
+El hospedaje es Hostinger (plan Business Web Hosting). Cómo se publica está en
+[despliegue.md](despliegue.md).
 
 ---
 
 ## 1. La idea en una frase
 
-Hoy el contenido vive en cuatro archivos de JavaScript dentro de `src/data/`.
-Cada uno exporta un arreglo de objetos planos. **Conectar WordPress es cambiar
-de dónde sale ese arreglo, no cambiar las páginas.**
+Hoy el contenido vive en archivos de JavaScript dentro de `src/data/`. Cada uno
+exporta arreglos de objetos planos. **Conectar el administrador es cambiar de
+dónde sale ese arreglo, no cambiar las páginas.**
 
 Si `piezas` sigue siendo un arreglo de objetos con los mismos campos, no importa
-si viene de un archivo o de una API: las páginas se compilan igual.
+si viene de un archivo o de una API: las páginas se compilan igual. **El
+contrato de datos es la forma que tienen hoy los objetos de `src/data/*.js`, y
+la API tiene que entregar exactamente esas formas.**
 
 ```
 ANTES                          DESPUÉS
 src/data/catalogo.js           src/data/catalogo.js
-  export const piezas = [...]    const res = await fetch(`${WP}/wp-json/wp/v2/pieza?per_page=100`)
-                                 export const piezas = res.map(mapearPieza)
+  export const piezas = [...]    const res = await fetch(`${API}/piezas`)
+                                 export const piezas = await res.json()
 ```
 
-El sitio es **estático**: se compila con `npm run build` y se publica la carpeta
-`dist/`. Las llamadas a WordPress ocurren **en la compilación**, no en el
-navegador del visitante. Eso significa que:
+(La dirección `${API}/piezas` es ilustrativa: las rutas las define quien haga la
+API.)
 
-- WordPress no necesita estar disponible para que el sitio funcione.
-- Publicar un cambio en WordPress requiere volver a compilar. Conviene un
-  *webhook* de WordPress que dispare la compilación en Hostinger.
+El sitio es **estático**: se compila con `npm run build` y se publica la carpeta
+`dist/`. Las llamadas a la API ocurren **en la compilación**, no en el navegador
+del visitante. Eso significa que:
+
+- La API no necesita estar disponible para que el sitio funcione.
+- Publicar un cambio requiere volver a compilar. Al guardar en el administrador,
+  la API dispara la compilación en GitHub Actions.
 - No hay que preocuparse por la velocidad de la API ni por protegerla del
-  tráfico público.
+  tráfico público de lectura.
 
 ---
 
 ## 2. Qué es administrable y qué no
 
-| Administrable desde WordPress | Se queda en código |
+| Administrable desde el administrador | Se queda en código |
 | --- | --- |
 | Piezas del catálogo | La estructura de las páginas |
 | Fichas técnicas de cada pieza | Los filtros disponibles y sus opciones |
@@ -48,6 +70,7 @@ navegador del visitante. Eso significa que:
 | Proyectos completos | Los textos de páginas fijas (nosotros, contacto, legales) |
 | Piezas destacadas del home | Las preguntas frecuentes |
 | Datos de contacto y redes | Los bloques editoriales del catálogo |
+| Colecciones por espacio (home office) | |
 
 Los textos de las páginas fijas **no** se conectan a propósito: cambian una vez
 al año y pasarlos por un editor invita a que alguien rompa el posicionamiento
@@ -56,12 +79,12 @@ que el resto.
 
 ---
 
-## 3. Los cuatro archivos de datos
+## 3. Los archivos de datos
 
 ### 3.1 `src/data/site.js`: datos de la empresa
 
 Lo usa el encabezado, el pie, los botones de WhatsApp y el esquema
-`Organization` que va en las 48 páginas.
+`Organization` que va en las 50 páginas.
 
 | Campo | Qué es | Hoy |
 | --- | --- | --- |
@@ -74,6 +97,9 @@ Lo usa el encabezado, el pie, los botones de WhatsApp y el esquema
 | `todosLosMuebles` | Foto de la tarjeta "Todos los muebles" | real |
 | `organizacion` | El JSON-LD de `Organization` | real, falta `LocalBusiness` |
 | `waLink(mensaje)` | Arma el enlace de WhatsApp con el mensaje ya escrito | |
+
+En el administrador, los datos de la empresa son **una pantalla de ajustes**
+(un solo registro), no una lista. Las categorías son su propia tabla.
 
 **Cuidado con `site.domain`.** Si queda mal, quedan mal las canónicas, el mapa
 del sitio y el `robots.txt` de golpe. Es el dato más caro de equivocar.
@@ -100,21 +126,26 @@ Forma de una pieza:
   alt: "...",                    // descripción de la primera foto
   material: "malla",             // un id de `materiales`
   colores: ["negro", "gris"],    // ids de `gruposColor`
-  entrega: "inmediata",          // inmediata | 2-3-semanas | sobre-pedido
+  entrega: "inmediata",          // un id de la lista `entrega` de `filtros`
   nuevo: true,                   // pinta la etiqueta "Nuevo"
+  espacios: ["home-office"],     // colecciones por espacio; hoy solo home-office
   // campos de filtro, según la categoría:
   uso, respaldo, plazas, brazos, base, extras
 }
 ```
 
-**Los campos de filtro son los que hacen funcionar el panel de filtros.** No son
-libres: cada uno solo acepta los valores declarados en `filtros`. Si WordPress
-manda un valor que no está en la lista, la pieza deja de aparecer al filtrar por
-ese campo. Conviene que en WordPress sean listas desplegables, no texto libre.
+Los valores de `entrega` hoy son `inmediata`, `10dias` y `pedido`. La lista
+manda: se lee de `filtros` en `catalogo.js`.
 
-En WordPress esto es un **tipo de contenido `pieza`** con campos personalizados
-(ACF o el que prefieras). La categoría es una taxonomía; los campos de filtro,
-taxonomías o selectores.
+**Los campos de filtro son los que hacen funcionar el panel de filtros.** No son
+libres: cada uno solo acepta los valores declarados en `filtros`. Si la API
+manda un valor que no está en la lista, la pieza deja de aparecer al filtrar por
+ese campo. En el administrador tienen que ser **listas cerradas** (selectores de
+una opción o de varias), nunca texto libre.
+
+En el administrador esto es la **tabla de piezas**. La categoría es una
+referencia a la tabla de categorías; los campos de filtro, `colores`,
+`material` y `espacios` son listas cerradas.
 
 ### 3.3 `src/data/fichas.js`: las fichas técnicas
 
@@ -136,8 +167,11 @@ maqueta, escritos para poder ver la ficha completa y para dejar por escrito qué
 campos hay que capturar. Ninguno se puede publicar.
 
 `etiquetasMedida` y `etiquetasConstruccion` traducen las claves a lo que se lee
-en pantalla. Si WordPress agrega una clave nueva, hay que agregarla ahí o no se
-muestra.
+en pantalla. Si el administrador agrega una clave nueva, hay que agregarla ahí o
+no se muestra.
+
+En el administrador la ficha puede ir dentro de la misma pantalla de la pieza:
+para quien captura es una sola cosa.
 
 **Dónde sale cada campo en la página.** Importa al escribirlos:
 
@@ -193,19 +227,41 @@ Nunca dos imágenes seguidas ni dos capítulos seguidos.
 **Los hotspots** llevan `x` e `y` en porcentaje sobre la foto (escritorio) y
 `mx`/`my` opcionales para teléfono, donde el recorte cambia. Un punto cuya
 `slug` no exista en el catálogo **no se pinta**, para no mandar a una página que
-no existe. Esto va a pasar seguido al conectar WordPress, así que es a propósito
-y no hay que "arreglarlo".
+no existe. Esto va a pasar seguido mientras se carga el catálogo, así que es a
+propósito y no hay que "arreglarlo".
 
-En WordPress esto es un **tipo de contenido `proyecto`** con un campo repetidor
-de bloques. Es lo más laborioso de modelar y lo que más rinde: es lo que evita
-que todos los proyectos se vean iguales.
+En el administrador esto es la **tabla de proyectos** con una **lista ordenable
+de bloques**, donde cada bloque elige su tipo y pide solo los campos de ese
+tipo. Es lo más laborioso de construir y lo que más rinde: es lo que evita que
+todos los proyectos se vean iguales.
+
+### 3.5 `src/data/homeOffice.js`: la colección por espacio
+
+Las piezas de home office no se capturan aquí: aparecen porque traen
+`home-office` en su campo `espacios` (apartado 3.2). Lo que sí vive aquí:
+
+| Export | Qué es |
+| --- | --- |
+| `homeOffice` | Las fotos de la página: `hero`, `portada` (con su `alt`) y `cierre` |
+| `sets` | `id`, `nombre`, `texto` y `piezas` (de dos a cuatro `slug`). Un set con menos de dos piezas publicadas no sale |
+| `ideas` | Título, texto y foto. Sin cifras que no estén confirmadas |
+
+El detalle pantalla por pantalla está en
+[mapa-de-conexion.md](mapa-de-conexion.md), apartado 11c.
+
+### 3.6 `src/data/pdfs.js`: los PDF
+
+No se captura nada. Lee de `public/` si existe la ficha o el catálogo en PDF y
+saca del archivo las hojas y el peso. Un catálogo propio del cliente va en
+`public/catalogos/propios/` con el mismo nombre que el generado y se descarga
+ese en su lugar. Cómo se generan está en [despliegue.md](despliegue.md).
 
 ---
 
 ## 4. Las medidas de los textos
 
 La retícula está calibrada para textos de un largo concreto. Si los textos que
-entren por WordPress se salen de estos rangos, las páginas dejan de verse
+entren por el administrador se salen de estos rangos, las páginas dejan de verse
 parejas entre sí. Conviene poner el contador de caracteres en los campos.
 
 | Campo | Caracteres | Para que quede en |
@@ -244,9 +300,9 @@ Por orden de urgencia:
 
 1. **El formulario de contacto.** Hoy `SIMULAR_ENVIO = true` en
    `src/pages/contacto.astro`: el formulario valida, enseña la pantalla de
-   gracias y **no manda nada**. Hay que poner `false` y apuntar `ENDPOINT` al
-   destino real. Sin esto el sitio pierde solicitudes en silencio, que es el
-   peor error posible aquí.
+   gracias y **no manda nada**. Hay que poner `false` y apuntar `ENDPOINT` a la
+   ruta de contacto de la API del administrador. Sin esto el sitio pierde
+   solicitudes en silencio, que es el peor error posible aquí.
 
    El `POST` llega como JSON con estos campos:
 
@@ -259,7 +315,10 @@ Por orden de urgencia:
      "telefono": "5512345678",
      "ciudad": "Monterrey", "estado": "Nuevo León",
      "mensaje": "...",
-     "aviso": "on"
+     "aviso": "on",
+     "proyecto": [
+       { "pieza": "Silla operativa Órbita", "cantidad": 40, "url": "https://neucast.com.mx/muebles/..." }
+     ]
    }
    ```
 
@@ -268,10 +327,14 @@ Por orden de urgencia:
    entidades, elegida de una lista cerrada que vive en el frontmatter de
    `contacto.astro`, así que se puede agrupar por estado sin limpiar nada.
    `nombre`, `apellido` y `ciudad` aceptan letras, acentos, ñ, espacios y los
-   signos de un apellido compuesto, nunca dígitos.
+   signos de un apellido compuesto, nunca dígitos. `proyecto` es opcional: solo
+   llega si la persona armó una lista en "Mi proyecto", y viaja en el mismo
+   envío (cantidad entre 1 y 999).
 
    **Valida otra vez en el servidor.** Lo de aquí es comodidad para quien
-   escribe, no seguridad: cualquiera puede mandar un `POST` a mano.
+   escribe, no seguridad: cualquiera puede mandar un `POST` a mano. Lo demás que
+   tiene que hacer la API con el envío (guardarlo, SMTP, CORS, campo trampa,
+   límite por IP) está en [despliegue.md](despliegue.md), apartado 4.
 2. **El número de WhatsApp.** `site.whatsapp` es un número de ejemplo y lo usan
    269 enlaces del sitio.
 3. **El correo de ventas.** `site.email`, también de ejemplo.
@@ -290,8 +353,11 @@ La lista completa y al día está en [pendientes.md](pendientes.md).
 
 - **`src/styles/global.css`**: las variables de diseño. Cambiar un valor aquí
   cambia el sitio entero, que es justo para lo que sirve, pero hay que saberlo.
+  El frontend del administrador las reutiliza, así que un cambio aquí también
+  se nota allá.
 - **La generación de `sitemap.xml` y `robots.txt`**: salen de las mismas listas
-  que generan las páginas. Si se conecta WordPress bien, se actualizan solos.
+  que generan las páginas. Si la API entrega bien los datos, se actualizan
+  solos.
 - **Las canónicas y el `robots` de cada página**: viven en `src/layouts/Base.astro`
   y ya están resueltos. Las páginas que no se indexan lo declaran con la
   propiedad `noindex`.

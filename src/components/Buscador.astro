@@ -192,8 +192,7 @@ const sugeridas = categories
   }
   .bs-resultados :global(.bs-pieza .bs-foto img){width:100%;height:100%;object-fit:contain;padding:10%;transition:transform .6s var(--ease);}
   @media (hover:hover){.bs-resultados :global(.bs-pieza:hover .bs-foto img){transform:scale(1.05);}}
-  .bs-resultados :global(.bs-pieza:focus-visible .bs-foto),
-  .bs-resultados :global(.bs-pieza.bs-activo .bs-foto){box-shadow:0 0 0 2px var(--ink);}
+  .bs-resultados :global(.bs-pieza:focus-visible .bs-foto){box-shadow:0 0 0 2px var(--ink);}
 
   /* categorías y proyectos: renglones compactos con foto */
   .bs-resultados :global(.bs-lista--filas){display:grid;gap:6px;}
@@ -202,8 +201,7 @@ const sugeridas = categories
     display:grid;grid-template-columns:64px 1fr;gap:14px;align-items:center;
     padding:8px;margin-inline:-8px;border-radius:var(--radius-sm);color:var(--ink);outline:none;transition:background .15s;
   }
-  .bs-resultados :global(.bs-fila:focus-visible),
-  .bs-resultados :global(.bs-fila.bs-activo){background:var(--white);}
+  .bs-resultados :global(.bs-fila:focus-visible){background:var(--white);}
   @media (hover:hover){.bs-resultados :global(.bs-fila:hover){background:var(--white);}}
   .bs-resultados :global(.bs-fila .bs-foto){width:64px;height:48px;border-radius:var(--radius-sm);overflow:hidden;background:var(--cemento-suave);}
   .bs-resultados :global(.bs-fila .bs-foto img){width:100%;height:100%;object-fit:cover;}
@@ -522,6 +520,14 @@ const sugeridas = categories
     }
   });
   capa.querySelector("[data-bs-cerrar]").addEventListener("click", cerrar);
+
+  // /?q=silla abre el buscador con ese texto: es la dirección que el home
+  // declara a Google como buscador del sitio (SearchAction)
+  const q = new URLSearchParams(location.search).get("q");
+  if (q) {
+    campo.value = q;
+    abrir();
+  }
   addEventListener("keydown", (e) => {
     if (e.key === "Escape" && abierta) return cerrar();
     // atajos de escritorio: "/" y Ctrl/Cmd+K, salvo si ya se está escribiendo

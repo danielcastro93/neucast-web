@@ -9,7 +9,7 @@
 // además en robots.txt sería contraproducente, porque el robot no podría
 // entrar a leer esa etiqueta.
 //
-// PARA WORDPRESS: si el sitio queda detrás de un dominio de pruebas antes de
+// PARA EL ADMINISTRADOR: si el sitio queda detrás de un dominio de pruebas antes de
 // salir a producción, ahí sí conviene un `Disallow: /` temporal. Acuérdate de
 // quitarlo el día del lanzamiento.
 import { site } from "../data/site.js";

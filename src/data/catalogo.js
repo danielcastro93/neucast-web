@@ -1,15 +1,16 @@
 // El catálogo: piezas, filtros y bloques editoriales.
 //
-// PARA WORDPRESS: ver docs/wordpress.md, apartado 3.2. Es un tipo de contenido
-// `pieza` con campos personalizados. Los campos de filtro (uso, respaldo,
+// PARA EL ADMINISTRADOR: ver docs/administrador.md, apartado 3.2. Es la tabla
+// de piezas del administrador propio. Los campos de filtro (uso, respaldo,
 // plazas, brazos, base, extras, material, colores, entrega) NO son texto libre:
 // solo aceptan los valores declarados en `filtros`, `materiales` y
-// `gruposColor` de este mismo archivo. Si el CMS manda otro valor, la pieza
-// desaparece al filtrar por ese campo. En WordPress tienen que ser listas
-// desplegables o taxonomías, nunca un campo de texto.
+// `gruposColor` de este mismo archivo. Si la API manda otro valor, la pieza
+// desaparece al filtrar por ese campo. En el administrador tienen que ser
+// listas cerradas (selectores), nunca un campo de texto.
 //
 // Datos demo del catálogo. La forma de cada objeto es la que tendrán los campos
-// del CMS en fase 3, así que el diseño no cambia cuando se conecte.
+// que tiene que entregar la API del administrador, así que el diseño no cambia
+// cuando se conecte.
 //
 // NOMENCLATURA: las piezas llevan nombre propio de Neucast. El criterio es que
 // el nombre diga algo de la pieza. Unas son lugares mexicanos cuyo carácter

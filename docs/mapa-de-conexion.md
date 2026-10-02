@@ -1,36 +1,40 @@
 # Mapa de conexión, pantalla por pantalla
 
 Este documento responde a una sola pregunta: **para cada cosa que se ve en el
-sitio, ¿de dónde sale y qué hay que conectar en WordPress?**
+sitio, ¿de dónde sale y qué hay que conectar en el administrador?**
 
-Léelo con [wordpress.md](wordpress.md), que explica la forma exacta de cada dato,
+El administrador es propio, hecho desde cero: un sitio Astro aparte que habla
+con una API (ver [administrador.md](administrador.md), apartado 0). Ya no se usa
+WordPress.
+
+Léelo con [administrador.md](administrador.md), que explica la forma exacta de cada dato,
 y con [administrable.md](administrable.md), que lo cuenta desde el punto de vista
 del cliente.
 
 ## Cómo leer las tablas
 
 - **Sale de**: el archivo y el campo de donde viene hoy.
-- **En WordPress**: qué hay que crear para que lo administre el cliente.
+- **En el administrador**: qué hay que crear para que lo administre el cliente.
 - **Fijo**: está escrito en el código a propósito. Ver el apartado 12.
 
-Los cuatro archivos de datos son `src/data/site.js`, `catalogo.js`, `fichas.js` y
-`proyectos.js`. Cuando la tabla dice "site.js" se refiere a ese archivo.
+Los archivos de datos son `src/data/site.js`, `catalogo.js`, `fichas.js`,
+`proyectos.js` y `homeOffice.js`. Cuando la tabla dice "site.js" se refiere a ese archivo.
 
 ---
 
 ## 1. Lo que sale en todas las páginas
 
 El encabezado, el pie, la burbuja de WhatsApp y la tarjeta de marca aparecen en
-las 48 páginas. Un error aquí se multiplica por 48.
+las 50 páginas. Un error aquí se multiplica por 50.
 
-| Qué se ve | Sale de | En WordPress |
+| Qué se ve | Sale de | En el administrador |
 | --- | --- | --- |
-| Número de WhatsApp de la burbuja, del encabezado, del pie y de cada botón de cotizar | `site.js` → `site.whatsapp` | Un campo de opciones del tema. **Formato internacional sin signos ni espacios:** `5215512345678` |
-| Correo de ventas | `site.js` → `site.email` | Campo de opciones |
-| Facebook e Instagram | `site.js` → `site.social` | Campos de opciones |
-| Dominio con `https://` y sin diagonal final | `site.js` → `site.domain` | Campo de opciones. **El dato más caro de equivocar:** de aquí salen las canónicas, el mapa del sitio y las direcciones absolutas |
-| Las ocho categorías del menú y del pie | `site.js` → `categories` | La taxonomía de categorías |
-| Tarjeta de marca de Google (`Organization`) | `site.js` → `organizacion` | Campos de opciones. Le falta el bloque `LocalBusiness` con domicilio y teléfono |
+| Número de WhatsApp de la burbuja, del encabezado, del pie y de cada botón de cotizar | `site.js` → `site.whatsapp` | Un campo de la pantalla de ajustes. **Formato internacional sin signos ni espacios:** `5215512345678` |
+| Correo de ventas | `site.js` → `site.email` | Campo de ajustes |
+| Facebook e Instagram | `site.js` → `site.social` | Campos de ajustes |
+| Dominio con `https://` y sin diagonal final | `site.js` → `site.domain` | Campo de ajustes. **El dato más caro de equivocar:** de aquí salen las canónicas, el mapa del sitio y las direcciones absolutas |
+| Las ocho categorías del menú y del pie | `site.js` → `categories` | La tabla de categorías |
+| Tarjeta de marca de Google (`Organization`) | `site.js` → `organizacion` | Campos de ajustes. Le falta el bloque `LocalBusiness` con domicilio y teléfono |
 | Textos del menú, del pie y de los botones | Fijos | — |
 
 **Los mensajes de WhatsApp.** Cada botón abre WhatsApp con un texto ya escrito,
@@ -43,10 +47,10 @@ cada botón.
 
 ## 2. Home
 
-| Bloque | Qué se ve | Sale de | En WordPress |
+| Bloque | Qué se ve | Sale de | En el administrador |
 | --- | --- | --- | --- |
 | Hero | Título, bajada, foto de fondo, botones | Fijos | Fijo, salvo que se pida editable |
-| Categorías | Las ocho tarjetas con foto y nombre | `site.js` → `categories` (`name`, `photo`, `alt`) | Taxonomía |
+| Categorías | Las ocho tarjetas con foto y nombre | `site.js` → `categories` (`name`, `photo`, `alt`) | Tabla de categorías |
 | Piezas destacadas | El carrusel de piezas | `site.js` → `destacados`, una lista de ocho `slug` | **Un selector de piezas ordenable.** Ver el apartado 4 |
 | Proyecto destacado | Foto con puntos sobre las piezas | `proyectos.js` → el **primer** proyecto del arreglo | Marcar un proyecto como destacado, o respetar el orden |
 | Editorial | Texto, video y enlace a Nosotros | Fijos y `public/video/` | Fijo |
@@ -55,7 +59,8 @@ cada botón.
 **Ojo con las piezas destacadas.** `destacados` guarda `slug`, no objetos. Si el
 cliente borra o renombra una pieza, esa tarjeta **desaparece sin avisar** y el
 carrusel se queda con siete. Es a propósito: es preferible a un enlace muerto.
-En WordPress conviene que sea una relación de verdad, no texto libre.
+En el administrador conviene que sea una relación de verdad (elegir piezas de
+una lista), no texto libre.
 
 ---
 
@@ -67,17 +72,17 @@ Cada categoría es **una página indexable propia**, con su `h1`, su título de
 buscador, su descripción y su entrada. Ahí viven las palabras por las que
 posiciona cada una: una sola página no puede posicionar por las ocho.
 
-| Qué se ve | Sale de | En WordPress |
+| Qué se ve | Sale de | En el administrador |
 | --- | --- | --- |
-| Nombre en el menú, el pie y el carrusel | `categories[].name` | Nombre del término |
-| Dirección de la página | `categories[].slug` | Slug del término. **Cambiarlo rompe la dirección**; hay que redirigir |
-| Foto de la tarjeta y del carrusel | `categories[].photo` | Imagen destacada del término |
-| Texto alternativo de esa foto | `categories[].alt` | Campo de texto del término |
-| Encabezado de la página | `categories[].h1` | Campo del término |
-| Título que sale en Google | `categories[].title` | Campo del término, 30 a 65 caracteres |
-| Descripción que sale en Google | `categories[].desc` | Campo del término, 70 a 160 caracteres |
-| Frase bajo el encabezado | `categories[].intro` | Campo del término, 120 a 150 caracteres |
-| Tarjeta "Todos los muebles" | `site.js` → `todosLosMuebles` | Campos de opciones |
+| Nombre en el menú, el pie y el carrusel | `categories[].name` | Nombre de la categoría |
+| Dirección de la página | `categories[].slug` | Slug de la categoría. **Cambiarlo rompe la dirección**; hay que redirigir |
+| Foto de la tarjeta y del carrusel | `categories[].photo` | Foto de la categoría |
+| Texto alternativo de esa foto | `categories[].alt` | Campo de texto de la categoría |
+| Encabezado de la página | `categories[].h1` | Campo de la categoría |
+| Título que sale en Google | `categories[].title` | Campo de la categoría, 30 a 65 caracteres |
+| Descripción que sale en Google | `categories[].desc` | Campo de la categoría, 70 a 160 caracteres |
+| Frase bajo el encabezado | `categories[].intro` | Campo de la categoría, 120 a 150 caracteres |
+| Tarjeta "Todos los muebles" | `site.js` → `todosLosMuebles` | Campos de ajustes |
 | Bloques editoriales entre las piezas | `catalogo.js` → `bloquesPara()` | Ver el apartado 11 |
 | Filtros disponibles y sus opciones | `catalogo.js` → `filtros`, `gruposColor`, `materiales` | **No se conecta.** Ver el apartado 12 |
 
@@ -104,7 +109,7 @@ La pantalla con más campos del sitio. Se lee de arriba abajo.
 
 ### 4.1 Galería
 
-| Qué se ve | Sale de | En WordPress |
+| Qué se ve | Sale de | En el administrador |
 | --- | --- | --- |
 | Todas las fotos de la pieza | `catalogo.js` → `pieza.img[]`, un arreglo | Galería de imágenes. La **primera es la principal** y sale recortada |
 | Texto alternativo de la primera foto | `pieza.alt` | Campo de la pieza |
@@ -123,22 +128,22 @@ se ven en la ficha.
 
 ### 4.2 Columna de compra
 
-| Qué se ve | Sale de | En WordPress |
+| Qué se ve | Sale de | En el administrador |
 | --- | --- | --- |
 | Tipo, encima del nombre | `pieza.tipo` | Campo. Es lo que es: "Silla operativa", "Mesa de juntas" |
 | Nombre | `pieza.nombre` | Título. **Sin el tipo:** "Órbita", no "Silla Órbita" |
-| Acabados disponibles | `pieza.colores[]` | Taxonomía de color, lista cerrada |
-| Categoría | `pieza.cat` | Taxonomía |
-| Disponibilidad | `pieza.entrega` | Lista cerrada: `inmediata`, `2-3-semanas`, `10dias`, `sobre-pedido` |
+| Acabados disponibles | `pieza.colores[]` | Lista cerrada de grupos de color, varios valores |
+| Categoría | `pieza.cat` | Referencia a la tabla de categorías |
+| Disponibilidad | `pieza.entrega` | Lista cerrada: `inmediata`, `10dias`, `pedido` |
 | Material | `pieza.material` | Lista cerrada de `materiales` |
 | Base, respaldo, plazas, descansabrazos | `pieza.base`, `.respaldo`, `.plazas`, `.brazos` | Listas cerradas de `filtros` |
 | Etiqueta "Nuevo" | `pieza.nuevo` | Casilla |
 | Botones de cotizar | `site.whatsapp` y `/contacto/` | — |
 
 **Los campos de filtro no son texto libre.** Cada uno solo acepta los valores
-declarados en `catalogo.js`. Si WordPress manda uno que no está en la lista, la
+declarados en `catalogo.js`. Si la API manda uno que no está en la lista, la
 pieza **deja de aparecer al filtrar por ese campo** y nadie se entera. Tienen que
-ser listas desplegables o taxonomías, nunca un campo de texto.
+ser listas cerradas (selectores), nunca un campo de texto.
 
 ### 4.3 Los cuatro paneles laterales
 
@@ -150,7 +155,7 @@ ser listas desplegables o taxonomías, nunca un campo de texto.
 | Descargas | `public/fichas/` |
 
 `etiquetasMedida` y `etiquetasConstruccion`, al final de `fichas.js`, traducen
-cada clave a lo que se lee en pantalla. **Si WordPress agrega una clave nueva hay
+cada clave a lo que se lee en pantalla. **Si el administrador agrega una clave nueva hay
 que darla de alta ahí o no se muestra**, sin error y sin aviso.
 
 ### 4.4 El bloque bajo la galería
@@ -220,18 +225,19 @@ Nunca dos imágenes seguidas ni dos capítulos seguidos.
 **Los puntos sobre la foto** (`hotspots`) llevan `x` e `y` en porcentaje para
 escritorio y `mx`/`my` opcionales para teléfono, donde el recorte cambia. Cada
 punto apunta a una `slug` del catálogo. **Un punto cuya pieza no exista no se
-pinta**, para no mandar a una página que no está. Esto va a pasar seguido al
-conectar WordPress: es a propósito y no hay que "arreglarlo".
+pinta**, para no mandar a una página que no está. Esto va a pasar seguido
+mientras se carga el catálogo: es a propósito y no hay que "arreglarlo".
 
-En WordPress esto es un tipo de contenido `proyecto` con un **campo repetidor de
-bloques**. Es lo más laborioso de modelar y lo que más rinde: es lo que evita que
-todos los proyectos se vean iguales.
+En el administrador esto es la tabla de proyectos con una **lista ordenable de
+bloques**. Es lo más laborioso de construir y lo que más rinde: es lo que evita
+que todos los proyectos se vean iguales.
 
 ---
 
 ## 6. Contacto
 
-El formulario manda un `POST` con JSON a la dirección que se ponga en `ENDPOINT`.
+El formulario manda un `POST` con JSON a la dirección que se ponga en `ENDPOINT`,
+que será la ruta de contacto de la API del administrador.
 
 | Campo | Qué llega | Validación |
 | --- | --- | --- |
@@ -255,7 +261,7 @@ servidor sin responder nada.
 
 **Hoy no manda nada.** `SIMULAR_ENVIO = true` en `src/pages/contacto.astro`: el
 formulario valida, enseña la pantalla de gracias y se queda ahí. Hay que ponerlo
-en `false` y apuntar `ENDPOINT` al destino real.
+en `false` y apuntar `ENDPOINT` a la API.
 
 ---
 
@@ -279,12 +285,12 @@ las revise un abogado.** Ver `pendientes.md`.
 
 | Dónde | Hoy | Al conectar |
 | --- | --- | --- |
-| Producto | `public/img/products/` | Vienen de WordPress |
-| Categorías | `public/img/cats/` | Vienen de WordPress |
-| Proyectos | `public/img/` | Vienen de WordPress |
+| Producto | `public/img/products/` | Vienen del administrador |
+| Categorías | `public/img/cats/` | Vienen del administrador |
+| Proyectos | `public/img/` | Vienen del administrador |
 | Secciones fijas (hero, nosotros, contacto, 404) | `public/img/` | **Se quedan en el repositorio** |
 | Video | `public/video/` | Se queda |
-| Fichas en PDF | `public/fichas/` | Vienen de WordPress |
+| Fichas y catálogos en PDF | `public/fichas/`, `public/catalogos/` | Se generan al publicar |
 
 **Cada imagen necesita su texto alternativo.** No es un extra: es lo que lee
 Google y lo que oye quien navega con lector de pantalla. La regla es describir lo
@@ -301,7 +307,7 @@ no antes, porque habría que rehacerlo. Ver `pendientes.md`.
 ## 9. Las medidas de los textos
 
 La retícula está calibrada para textos de un largo concreto. Conviene poner el
-contador de caracteres en los campos de WordPress.
+contador de caracteres en los campos del administrador.
 
 | Campo | Caracteres | Para que quede en |
 | --- | --- | --- |
@@ -342,8 +348,8 @@ Entre las piezas de la cuadrícula se intercalan bloques con foto y texto. Qué
 bloque va en qué categoría lo decide `bloquesPara()` en `catalogo.js`, junto a
 los datos y no en la página.
 
-Hoy no se conectan. Si se quisieran administrar, serían un tipo de contenido
-propio con categoría y posición.
+Hoy no se conectan. Si se quisieran administrar, serían una tabla propia con
+categoría y posición.
 
 ---
 
@@ -411,9 +417,11 @@ peso que dice cada botón se leen del archivo (`src/data/pdfs.js`).
 | Catálogo general | Generado de todas las piezas, en rejilla | Nada que capturar |
 | Ficha técnica | Generada de la pieza | Nada que capturar |
 
-Cuando exista el administrador, la generación pasa al momento de publicar:
-cambia una pieza, se regeneran su ficha, el catálogo de su categoría y el
-general.
+Cuando exista el administrador, la generación pasa al momento de publicar,
+dentro del mismo paso de GitHub Actions que compila el sitio: cambia una pieza,
+se regeneran su ficha, el catálogo de su categoría y el general. Mientras
+tanto se generan en una Mac con `npm run fichas` y `npm run catalogos` (por la
+Helvetica Neue; ver [despliegue.md](despliegue.md), apartado 3).
 
 ## 12. Lo que no se conecta, y por qué
 
@@ -440,5 +448,6 @@ una imagen sin alt, un encabezado saltado, un guion largo en el texto visible,
 una palabra que no va, una imagen de compartir que no es absoluta, datos
 estructurados rotos o una página fuera del mapa del sitio.
 
-**Conviene correrlo en cada publicación desde WordPress.** Es lo que avisa de que
+**Conviene correrlo en cada publicación desde el administrador**. El flujo de vista
+previa en GitHub Actions ya lo corre, y el de producción tiene que hacerlo igual. Es lo que avisa de que
 alguien escribió un texto demasiado largo o dejó un enlace muerto.

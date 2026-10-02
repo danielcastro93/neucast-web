@@ -13,11 +13,11 @@ Un `clamp()` suelto dentro de un componente es un bug, no una decisión.
 | Token | Valor | Uso |
 |---|---|---|
 | `--white` | `#ffffff` | Fondo base del sitio |
-| `--cemento-oscuro` | `#3D3B37` | El único oscuro de la marca, con texto en blanco. Solo en momentos de marca: "La idea es simple", el card de proyectos del megamenú y la tarjeta de proyectos del home en escritorio. Nunca en información de producto |
-| `--cemento-claro` | `#E6E4DE` | Superficies de apoyo: la tarjeta de proyectos del home en teléfono (con grano) y las tres tarjetas bajo la foto de la ficha (lisas) |
+| `--cemento-oscuro` | `#3D3B37` | El único oscuro de la marca, con texto en blanco. Solo en momentos de marca: "La idea es simple" (con grano) y el fondo de "Proyectos reales" del home en escritorio. Nunca en información de producto. Ver el apartado 7 |
+| `--cemento-claro` | `#E6E4DE` | Superficies de apoyo: las tres tarjetas bajo la foto de la ficha (lisas), el bloque para empresas de home office y el buscador |
 | `--cemento-suave` | `#EDECE7` | Liso, sin grano, detrás de los recortes de producto en tarjetas y galería de la ficha |
 | `--paper` | `#EDECE7` | Mismo valor que el suave. Conserva el nombre por historia: fondos detrás de fotos, tintes de hover, croquis, miniaturas |
-| `--paper-soft` | `#F2F1ED` | La versión más tenue del anterior |
+| `--paper-soft` | `#F6F5F2` | Gris muy claro y liso. Tarjeta de home office del home, tarjeta "Proyectos ya instalados" del megamenú, sets de home office y fondos de hover de los controles |
 | `--olive-ink` | `#48542B` | Verde para texto chico sobre los grises; el `--olive-deep` se queda corto de contraste ahí |
 | `--ink` | `#1D1D1B` | Texto principal, botón primario |
 | `--ink-60` | `#5f5e59` | Texto secundario, párrafos de apoyo |
@@ -42,8 +42,8 @@ La serif (Baskerville) se retiró el 30 de septiembre de 2026: los rótulos pasa
 
 | Clase | Token | Móvil (375px) | Escritorio (1440px) | Uso |
 |---|---|---|---|---|
-| `.t-display` | `--fs-display` | 31px | 72px | Solo el H1 del hero |
-| `.t-h1` | `--fs-h1` | 28px | 52px | Título de página, banners de cierre |
+| `.t-display` | `--fs-display` | `min(38px, 8.7vw)` | 72px | H1 sobre foto (ver abajo) |
+| `.t-h1` | `--fs-h1` | 27px | 52px | H1 sin foto, banners de cierre |
 | `.t-h2` | `--fs-h2` | 25px | 38px | Título de sección |
 | `.t-h3` | `--fs-h3` | 20px | 28px | Subtítulo dentro de una sección |
 | `.t-h4` | `--fs-h4` | 17px | 20px | Título de card o bloque |
@@ -55,6 +55,26 @@ La serif (Baskerville) se retiró el 30 de septiembre de 2026: los rótulos pasa
 
 La jerarquía se mantiene en **todos** los anchos: display > h1 > h2 > h3 > h4 > body.
 Un H3 nunca puede verse más grande que el H2 que lo contiene.
+
+### Los títulos de página: con foto o sin foto
+
+- **H1 sobre foto** (hero del home, proyectos, home office, preguntas
+  frecuentes y demás cabeceras con imagen): usa `.t-display`. Mide 72 px en
+  escritorio. En teléfono (hasta 639 px) mide `min(38px, 8.7vw)`, y bajo
+  340 px `8.3vw`, para que **no pase de dos renglones**. Se midió con los
+  títulos de home, proyectos, home office y preguntas frecuentes de 320 a
+  430 px; un título nuevo con una línea más larga obliga a volver a medir o a
+  acortarlo.
+- **H1 sin foto** (catálogo, contacto, legales y demás páginas que abren sobre
+  blanco): usa `.t-h1`, 52 px en escritorio.
+
+### La frase destacada (`Destacado.astro`)
+
+Frase grande de pausa: **34 px en escritorio y 24 px en teléfono**, centrada
+en todos los tamaños (es una pausa, no un párrafo de lectura). La primera
+línea va en tinta y las siguientes en gris, y se pinta al entrar en pantalla.
+Se usa en el detalle de proyecto (bloque `destacado`), en `/proyectos/`, en
+home office y en Nosotros.
 
 ### Clases de carácter
 
@@ -92,11 +112,19 @@ Un H3 nunca puede verse más grande que el H2 que lo contiene.
 Los carruseles (`.rail`) calculan su padding con `--rail-pad` para alinearse al
 borde interno de `.container` en cualquier ancho.
 
+**La escala `--space-1..8` se conserva aunque el sitio casi no la usa**: los
+componentes trabajan con `--gutter`, `--section-y`, `--block-y` y medidas
+propias. Se queda porque la va a tomar el frontend del administrador, que
+reutiliza estos tokens y necesita una escala general para formularios y
+listas.
+
 ---
 
 ## 4. Botones
 
-Todos parten de `.pill` (alto 44px, radio completo, 13px/600, centrado).
+Todos parten de `.pill` (radio completo, 13px/600, centrado). **Todas las
+`.pill` miden 44 px de alto en escritorio y 50 px en teléfono**, donde además
+van a todo el ancho. Ningún botón fija su propio alto.
 
 | Clase | Aspecto | Cuándo |
 |---|---|---|
@@ -107,8 +135,12 @@ Todos parten de `.pill` (alto 44px, radio completo, 13px/600, centrado).
 | `.pill--glass` | Translúcido + blur | Secundaria sobre foto |
 
 Reglas:
-- Sobre **fondo claro**: primaria `--primary`, secundaria `--ghost`.
-- Sobre **foto o fondo oscuro**: primaria `.pill` (blanca), secundaria `--glass`.
+- Sobre **fondo claro**: primaria `--primary`, secundaria `--ghost` (contorno).
+- Sobre **foto o fondo oscuro**: primaria `.pill` (blanca), secundaria de
+  vidrio: `--glass`, o el vidrio oscuro donde el blanco translúcido no se lee.
+- Un mismo botón que cambia de fondo según el tamaño cambia de variante con
+  él: "Recorrer el proyecto" en el home es de contorno en teléfono (sobre
+  blanco) y de vidrio en escritorio (sobre la foto).
 
 ### Por qué la acción principal es negra y no verde
 
@@ -471,6 +503,43 @@ logo sale blanco sobre blanco cuando se abre el panel.
 - Radio: `--radius` (12px) en media y contenedores, `--radius-sm` (8px) en elementos chicos.
 - **Todo overlay difumina el fondo**: clase `.scrim` (blur 16px + velo tenue).
   Nunca solo oscurecer.
+
+### Qué gris va dónde
+
+- **Gris muy claro y liso** (`--paper-soft`, `#F6F5F2`): la tarjeta de home
+  office del home, la tarjeta "Proyectos ya instalados" del megamenú (antes fue
+  cemento oscuro con grano) y los sets de home office.
+- **Cemento oscuro con grano** (`--cemento-oscuro` con `.grano--oscuro`):
+  "La idea es simple" del home. Es el único bloque oscuro con grano.
+- **"Proyectos reales" del home**: en escritorio la foto va de orilla a orilla
+  sobre `--cemento-oscuro`, con el texto encima sobre un degradado; ahí el
+  grano está apagado (`.proj-stage::before{display:none}`) porque la foto
+  cubre todo el fondo. En teléfono la foto va de orilla a orilla y el texto
+  debajo, sobre blanco: ya no es una tarjeta gris.
+
+### Fotos de orilla a orilla
+
+Van a todo lo ancho, sin esquinas, **en todos los tamaños**:
+
+- "Proyectos reales" del home.
+- El cierre con foto (`CierreCta.astro`): home, detalle de proyecto y home
+  office.
+- El cierre de Nosotros.
+- La foto de ambiente de la ficha de pieza.
+
+**El footer se pega al cierre.** Si la última sección del `main` lleva la
+clase `.cierre-sangre`, el footer arranca pegado, sin margen superior ni
+línea: la orilla de la foto ya marca el corte. Lo resuelve una regla en
+`Base.astro`; las páginas que terminan en texto o tarjetas conservan su aire.
+Para que una página nueva se comporte así, su bloque final lleva
+`.cierre-sangre`.
+
+### Íconos
+
+De trazo fino y redondeado, estilo Apple: `stroke` con
+`stroke-linecap="round"` y `stroke-linejoin="round"`, **sin relleno**. Los
+controles de Mi proyecto (cantidades, quitar, vaciar) van igual: sin relleno y
+con contorno fino.
 
 ---
 

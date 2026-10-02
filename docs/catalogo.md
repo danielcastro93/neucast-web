@@ -2,7 +2,7 @@
 
 Cómo está estructurado el producto, de dónde sale cada filtro y qué criterio
 siguen los nombres de las piezas. Es el documento a la mano al capturar el
-catálogo real en WordPress.
+catálogo real en el administrador.
 
 ---
 
@@ -131,9 +131,10 @@ entrega rápida y conviene poder verlos solos.
 
 **Cada filtro sale de un campo, nunca del texto libre**, o el filtrado no es
 fiable. Los valores posibles están declarados en `filtros`, `materiales` y
-`gruposColor`, dentro de `src/data/catalogo.js`. Si el CMS manda un valor que no
-esté en la lista, la pieza desaparece al filtrar por ese campo, así que en
-WordPress tienen que ser listas desplegables o taxonomías.
+`gruposColor`, dentro de `src/data/catalogo.js`. Si la API del administrador
+manda un valor que no esté en la lista, la pieza desaparece al filtrar por ese
+campo, así que en el administrador tienen que ser listas cerradas (selectores),
+nunca texto libre.
 
 El panel calcula los conteos en vivo: cada opción dice cuántas piezas quedarían
 si la marcaras, contando las que pasan los demás filtros ya aplicados.

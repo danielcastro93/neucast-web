@@ -6,7 +6,7 @@
 // publicar. Devuelve código 1 si algo falla, para que sirva en un proceso
 // automático.
 //
-// PARA WORDPRESS: cuando el contenido venga del CMS esto es lo que avisa de que
+// PARA EL ADMINISTRADOR: cuando el contenido venga de la API esto es lo que avisa de que
 // alguien escribió un texto demasiado largo, dejó un enlace muerto o metió una
 // palabra que no va. Conviene correrlo en cada publicación.
 import fs from "fs";
@@ -38,6 +38,8 @@ const paginas = [];
   for (const e of fs.readdirSync(d, { withFileTypes: true })) {
     const f = path.join(d, e.name);
     if (e.isDirectory()) rec(f);
+    // "index 2.html": copias que deja macOS (iCloud) en dist/; no son del sitio
+    else if (/ \d+\.html$/.test(e.name)) fs.rmSync(f);
     else if (e.name.endsWith(".html")) paginas.push(f);
   }
 })(DIST);
@@ -52,7 +54,7 @@ const hayPagina = (h) => {
 
 const fallos = [];
 const indexables = [];
-// Para cazar repetidos: con el contenido en un CMS es el error más fácil de
+// Para cazar repetidos: con el contenido en un administrador es el error más fácil de
 // cometer, porque dos piezas parecidas acaban con el mismo título sin que nadie
 // se dé cuenta, y Google se queda con una sola.
 const titulosVistos = new Map();

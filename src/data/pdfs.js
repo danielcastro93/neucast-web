@@ -15,7 +15,7 @@ import path from "node:path";
 
 const PUBLICO = path.join(process.cwd(), "public");
 
-export function infoPdf(ruta) {
+function infoPdf(ruta) {
   const archivo = path.join(PUBLICO, ruta);
   if (!fs.existsSync(archivo)) return null;
   const bytes = fs.readFileSync(archivo);

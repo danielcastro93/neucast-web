@@ -2,18 +2,20 @@
 
 Sitio de [neucast.com.mx](https://neucast.com.mx): mobiliario de diseño para
 espacios corporativos. Astro 7, estático, preparado para que el contenido venga
-de WordPress.
+de un administrador propio: un sitio Astro aparte que habla con una API. Ya no
+se usa WordPress.
 
 ## Por dónde empezar
 
-**Si vienes a conectar WordPress, lee estos tres en este orden:**
+**Si vienes a construir o conectar el administrador, lee estos tres en este
+orden:**
 
-1. [mapa-de-conexion.md](mapa-de-conexion.md) — pantalla por pantalla, qué se ve,
-   de dónde sale y qué hay que crear en WordPress. Empieza aquí.
-2. [wordpress.md](wordpress.md) — la forma exacta de cada dato y qué pasa al
-   migrar.
-3. [despliegue.md](despliegue.md) — dónde se hospeda, el ciclo de publicación,
-   certificados y seguridad.
+1. [mapa-de-conexion.md](mapa-de-conexion.md): pantalla por pantalla, qué se ve,
+   de dónde sale y qué hay que crear en el administrador. Empieza aquí.
+2. [administrador.md](administrador.md): cómo es el administrador, la forma
+   exacta de cada dato (el contrato con la API) y qué pasa al migrar.
+3. [despliegue.md](despliegue.md): dónde se hospeda, el ciclo de publicación,
+   los PDF, certificados y seguridad.
 
 **Para lo demás:**
 
@@ -28,24 +30,27 @@ de WordPress.
 
 ## Estado
 
-El front está terminado: **48 páginas, 44 indexables, sin enlaces rotos.**
+El front está terminado: **50 páginas, 46 indexables, sin enlaces rotos.**
 
 ```bash
 npm install
 npm run dev      # http://localhost:4321
 npm run build    # compila a dist/
 npm run revisar  # revisa dist/
+npm run fichas     # fichas técnicas en PDF (en una Mac)
+npm run catalogos  # catálogos en PDF (en una Mac)
 ```
 
 `revisar` comprueba enlaces, medidas de títulos y descripciones, títulos
 repetidos, encabezados, imágenes sin alt, datos estructurados, el mapa del sitio
 y las reglas de abajo. Hoy pasa limpio, y conviene correrlo en cada publicación
-desde WordPress.
+desde el administrador.
 
 Lo que falta es **contenido y datos del cliente, no código**. Lo más urgente, en
 orden:
 
-1. Conectar el formulario de contacto, que hoy no manda nada.
+1. Conectar el formulario de contacto, que hoy no manda nada (lo va a recibir
+   la API del administrador).
 2. El número de WhatsApp y el correo de ventas reales.
 3. El contenido real del catálogo, las fichas y los proyectos.
 4. Las fotos reales de producto y de proyecto.

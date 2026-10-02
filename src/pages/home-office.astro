@@ -15,12 +15,13 @@ import CierreCta from "../components/CierreCta.astro";
 import { site, waLink } from "../data/site.js";
 import { rutaPieza } from "../data/catalogo.js";
 import { homeOffice, sets, ideas, piezasHomeOffice } from "../data/homeOffice.js";
+import { migas } from "../data/migas.js";
 
 const title = "Muebles para home office: sillas, escritorios y sets | Neucast";
 const description =
   "Sillas, escritorios y almacenamiento para trabajar desde casa como en la oficina. Sets listos, ideas para armar tu espacio y cotización para tu equipo.";
 
-const schema = {
+const schema = [{
   "@context": "https://schema.org",
   "@type": "CollectionPage",
   name: "Home office",
@@ -28,7 +29,7 @@ const schema = {
   description,
   inLanguage: "es-MX",
   isPartOf: { "@id": `${site.domain}/#organizacion` },
-};
+}, migas([["Muebles", "/muebles/"], ["Home office", homeOffice.ruta]])];
 
 const waEquipo = waLink("Hola, quiero cotizar mobiliario de home office para mi equipo.");
 ---

@@ -1,4 +1,5 @@
 ---
+import { migas } from "../data/migas.js";
 import Base from "../layouts/Base.astro";
 import Icon from "../components/Icon.astro";
 import { site } from "../data/site.js";
@@ -7,8 +8,8 @@ const title = "Contacto | Cotiza mobiliario de oficina con Neucast";
 const description =
   "Cuéntanos qué espacio quieres resolver y te mandamos la cotización. Atendemos por WhatsApp y por correo, con envíos e instalación en todo México.";
 
-// Las 32 entidades federativas, escritas como las pide el INEGI. Si esto se
-// conecta a WordPress conviene que siga siendo una lista cerrada: es lo que
+// Las 32 entidades federativas, escritas como las pide el INEGI. Cuando la API
+// del administrador reciba el formulario conviene que siga siendo una lista cerrada: es lo que
 // permite agrupar las solicitudes por estado sin limpiar el dato a mano.
 const estados = [
   "Aguascalientes", "Baja California", "Baja California Sur", "Campeche",
@@ -27,7 +28,7 @@ const asuntos = [
   "Otro tema",
 ];
 
-const schema = {
+const schema = [{
   "@context": "https://schema.org",
   "@type": "ContactPage",
   name: "Contacto",
@@ -35,7 +36,7 @@ const schema = {
   description,
   inLanguage: "es-MX",
   isPartOf: { "@id": `${site.domain}/#organizacion` },
-};
+}, migas([["Contacto", "/contacto/"]])];
 ---
 <Base title={title} description={description} schema={schema}>
   <section class="ct-cuerpo">
@@ -285,25 +286,22 @@ const schema = {
     // hasta /gracias/. ANTES DE PUBLICAR hay que ponerlo en false y llenar
     // ENDPOINT, o el formulario dirá "gracias" sin haber mandado nada.
     //
-    // Recomendación para este proyecto (Astro estático + WordPress en Hostinger):
-    // usar el propio WordPress como receptor, con una ruta REST en el tema:
+    // Recomendación para este proyecto (Astro estático + administrador propio):
+    // que lo reciba la API del administrador, en una ruta propia (por ejemplo
+    // POST /contacto). El campo `proyecto` (la lista de Mi proyecto) viaja en el
+    // mismo envío.
     //
-    //   register_rest_route('neucast/v1', '/contacto', [
-    //     'methods'  => 'POST',
-    //     'callback' => 'neucast_recibir_contacto',
-    //     'permission_callback' => '__return_true',
-    //   ]);
-    //
-    // En el callback: validar, guardar como custom post type (para que el
-    // cliente vea las solicitudes en el panel aunque falle el correo) y mandar
-    // el correo con wp_mail sobre SMTP autenticado del buzón de Hostinger; sin
-    // SMTP el correo se va a spam. Falta también permitir el origen del sitio
-    // por CORS.
+    // En la API: validar otra vez, guardar la solicitud en la base (para que el
+    // cliente la vea en el administrador aunque falle el correo) y mandar el
+    // correo por SMTP autenticado del buzón de Hostinger; sin SMTP el correo se
+    // va a spam. Falta también permitir el origen del sitio por CORS, descartar
+    // los envíos con el campo trampa `sitio_web` lleno y limitar envíos por IP.
+    // Detalle en docs/administrador.md, apartado 6.
     // =========================================================================
     import { leer as leerProyecto, vaciar as vaciarProyecto, EVENTO as CAMBIO_PROYECTO } from "../scripts/proyecto.js";
 
     const SIMULAR_ENVIO = true;
-    const ENDPOINT = ""; // p. ej. "https://admin.neucast.com.mx/wp-json/neucast/v1/contacto"
+    const ENDPOINT = ""; // la ruta de contacto de la API del administrador (dirección por definir)
     const GRACIAS = "/gracias/";
 
     const form = document.getElementById("formContacto");

@@ -4,7 +4,7 @@
 // segunda lista que mantener: si se agrega una categoría, una pieza o un
 // proyecto, el mapa lo recoge solo en la siguiente compilación.
 //
-// PARA WORDPRESS: cuando el catálogo y los proyectos vengan de la API, este
+// PARA EL ADMINISTRADOR: cuando el catálogo y los proyectos vengan de la API, este
 // archivo sigue sirviendo igual. Lo único que cambia es de dónde salen
 // `categories`, `piezas` y `proyectos`; la forma del mapa no se toca.
 //

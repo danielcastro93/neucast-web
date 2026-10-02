@@ -16,7 +16,8 @@ const {
 } = Astro.props;
 
 // Un punto sin pieza en el catálogo no se pinta: llevaría a una página que no
-// existe. Al conectar WordPress esto va a pasar seguido.
+// existe. Mientras se carga el catálogo desde el administrador esto va a pasar
+// seguido.
 const puntos = hotspots
   .map((h) => ({ ...h, pieza: buscarPieza(h.slug) }))
   .filter((h) => h.pieza);

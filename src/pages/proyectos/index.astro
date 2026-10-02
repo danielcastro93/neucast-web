@@ -1,5 +1,6 @@
 ---
 import Destacado from "../../components/Destacado.astro";
+import { migas } from "../../data/migas.js";
 import Base from "../../layouts/Base.astro";
 import Icon from "../../components/Icon.astro";
 import PageHero from "../../components/PageHero.astro";
@@ -10,7 +11,7 @@ const title = "Proyectos de mobiliario corporativo instalados | Neucast";
 const description =
   "Oficinas, cafeterías, recepciones y salas de consejo que amueblamos completas en México. Mira qué se pidió, cómo se resolvió y qué piezas se instalaron.";
 
-const schema = {
+const schema = [{
   "@context": "https://schema.org",
   "@type": "CollectionPage",
   name: "Proyectos",
@@ -18,7 +19,7 @@ const schema = {
   description,
   inLanguage: "es-MX",
   isPartOf: { "@id": `${site.domain}/#organizacion` },
-};
+}, migas([["Proyectos", "/proyectos/"]])];
 ---
 <Base title={title} description={description} image={proyectos[0]?.portada.img} schema={schema}>
   <PageHero

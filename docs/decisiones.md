@@ -8,10 +8,16 @@ Resumen de decisiones aprobadas/propuestas. Propuesta completa: https://claude.a
 
 ## Stack
 - Frontend: **Astro** (estático) + GSAP/View Transitions. Dominio neucast.com.mx.
-- Hosting: se barajó Vercel o Cloudflare Pages y **se decidió Hostinger**, junto
-  al dominio y a WordPress, para no sumar un proveedor más. La compilación vive
-  en GitHub Actions y lo que sube a Hostinger es `dist/`. Ver `despliegue.md`.
-- CMS: **WordPress headless + ACF** en Hostinger (ya pagado), subdominio admin.neucast.com.mx. Webhook → rebuild automático.
+- Hosting: se barajó Vercel o Cloudflare Pages y **se decidió Hostinger** (plan
+  Business Web Hosting, ya pagado), para no sumar un proveedor más. El dominio
+  se pasa a Hostinger. La compilación vive en GitHub Actions y lo que sube a
+  Hostinger es `dist/`. Ver `despliegue.md`.
+- Administración del contenido: **administrador propio**, hecho desde cero. El
+  frontend es un sitio Astro estático aparte (subdominio tipo
+  admin.neucast.com.mx) que habla con una API; el backend está por definir con
+  el desarrollador. Al guardar, la API dispara la compilación. Sustituye a
+  WordPress headless, que fue el plan inicial: ver "Administrador propio en vez
+  de WordPress" al final de este documento.
 - Contacto: WhatsApp (wa.me con mensaje precargado, conversión principal, evento GA4) + formulario email solo en /contacto/.
 - Sin e-commerce en fase 1; escalable a WooCommerce/Stripe después.
 
@@ -285,7 +291,7 @@ y toda página nueva parte de `src/layouts/Base.astro`.
 ## Fases
 1. ✅ Design system + Home navegable + 404: **terminada y aprobada**
 2. ⏭️ Resto de plantillas con contenido demo ← siguiente
-3. WP headless + carga de catálogo real
+3. Administrador propio (frontend en Astro + API) y carga de catálogo real
 4. SEO final, QA, performance, DNS, lanzamiento
 
 ## Pendiente confirmar con cliente
@@ -336,3 +342,43 @@ separación entre el texto y el video.
   menú móvil, para que las dos versiones se lean como el mismo menú. Se abre con
   el cursor, con el teclado y con el primer toque en táctil.
 
+## Administrador propio en vez de WordPress (30 sep y 2 oct 2026)
+
+**30 de septiembre de 2026: se deja WordPress.** El plan era WordPress headless
+con campos personalizados en Hostinger. Se cambia por un administrador propio,
+hecho desde cero, por dos razones:
+
+- **Escalar.** El catálogo va a pasar de 500 piezas, con campos que son listas
+  cerradas, piezas obligatorias según el tipo de mueble, colecciones por
+  espacio y PDF que se regeneran al publicar. En WordPress todo eso se arma con
+  plugins y se queda atado a su forma de guardar los datos; en un administrador
+  propio la base se diseña para esto.
+- **El contrato ya existe.** La forma de los datos de `src/data/*.js` es el
+  contrato: la API tiene que entregar exactamente esas formas, y el sitio no
+  cambia.
+
+**2 de octubre de 2026: el frontend del administrador será en Astro.** Un sitio
+aparte, estático, en un subdominio tipo `admin.neucast.com.mx`, que habla con
+la API. Se eligió Astro para **reutilizar el sistema de diseño** de este
+repositorio (`src/styles/global.css` y `src/components/`): el cliente edita en
+una herramienta que se ve y se comporta como su sitio, y no hay un segundo
+sistema de diseño que mantener.
+
+Lo que queda decidido y lo que no:
+
+- **Hospedaje:** Hostinger, plan Business Web Hosting. El dominio
+  `neucast.com.mx` se pasa a Hostinger, y el WordPress que hoy está instalado
+  para ese dominio se puede retirar en vez de moverlo.
+- **Backend y API: por definir** según el lenguaje del desarrollador. Si es
+  PHP, Laravel con MySQL en Hostinger. Si es Node, primero confirmar que el plan
+  de Hostinger lo acepte.
+- **Publicación:** se guarda en el administrador, la API dispara GitHub
+  Actions, se compila Astro con los datos de la API y `dist/` se sube a
+  Hostinger. En ese mismo paso se generan las fichas técnicas y los catálogos
+  en PDF. Mientras no exista el administrador, los PDF se generan en una Mac
+  con `npm run fichas` y `npm run catalogos`, por la Helvetica Neue, que Linux
+  no trae.
+- **Formulario de contacto:** lo recibe la API. El campo `proyecto` (la lista
+  de Mi proyecto) viaja en el mismo envío.
+
+Detalle en [administrador.md](administrador.md) y [despliegue.md](despliegue.md).

@@ -15,7 +15,7 @@
 // propia de home office. Ver docs/pendientes.md, "Origen de las imágenes".
 import { piezas, buscarPieza } from "./catalogo.js";
 
-export const ESPACIO = "home-office";
+const ESPACIO = "home-office";
 
 export const homeOffice = {
   ruta: "/home-office/",

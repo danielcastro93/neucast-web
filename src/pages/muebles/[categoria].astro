@@ -4,6 +4,7 @@ import Catalogo from "../../components/Catalogo.astro";
 import { site, categories } from "../../data/site.js";
 import { piezas } from "../../data/catalogo.js";
 import { catalogoPdf } from "../../data/pdfs.js";
+import { migas } from "../../data/migas.js";
 
 // Cada categoría tiene su propia URL indexable con su title, su description y
 // su H1. Esos textos viajan con la categoría en src/data/site.js, no aquí: son
@@ -37,7 +38,8 @@ const schema = [
     description: t.desc,
     inLanguage: "es-MX",
     isPartOf: { "@id": `${site.domain}/#organizacion` },
-  }
+  },
+  migas([["Muebles", "/muebles/"], [cat.name, `/muebles/${cat.slug}/`]]),
 ];
 ---
 <Base title={t.title} description={t.desc} image={cat.photo} schema={schema}>

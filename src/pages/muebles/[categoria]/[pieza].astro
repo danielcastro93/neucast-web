@@ -11,6 +11,7 @@ import { site, waLink, categories } from "../../../data/site.js";
 import { piezas, gruposColor, materiales, filtros } from "../../../data/catalogo.js";
 import { fichaDe, etiquetasMedida, etiquetasConstruccion } from "../../../data/fichas.js";
 import { fichaPdf } from "../../../data/pdfs.js";
+import { migas } from "../../../data/migas.js";
 
 export async function getStaticPaths() {
   const { piezas } = await import("../../../data/catalogo.js");
@@ -159,7 +160,8 @@ const schema = [
       ...clave.map((d) => ({ "@type": "PropertyValue", name: d.etiqueta, value: d.valor })),
       ...medidas.map((d) => ({ "@type": "PropertyValue", name: d.etiqueta, value: d.valor })),
     ],
-  }
+  },
+  migas([["Muebles", "/muebles/"], [categoria.name, `/muebles/${pieza.cat}/`], [`${pieza.tipo} ${pieza.nombre}`, `/muebles/${pieza.cat}/${pieza.slug}/`]]),
 ];
 
 const waPieza = waLink(`Hola, me interesa ${pieza.tipo} ${pieza.nombre} que vi en neucast.com.mx`);

@@ -1,6 +1,6 @@
 /* ============================================
    Neucast — design tokens y base global
-   Referencia: BoConcept (Helvetica Neue + Baskerville)
+   Una sola familia: Helvetica Neue, con Inter de respaldo donde no existe
    Identidad: Brandbook verde Neucast
    ============================================ */
 
@@ -65,12 +65,14 @@
   --text-xs:var(--fs-2xs);
   --text-sm:var(--fs-xs);
   --text-base:var(--fs-body);
-  --text-md:var(--fs-body-lg);
 
   --track-tight:-0.032em;
   --track-label:0.01em;
 
-  /* ---------- Espaciado ---------- */
+  /* ---------- Espaciado ----------
+     Escala del sistema de diseño. El sitio público ya casi no la usa (sus
+     bloques miden con --section-y y --block-y), pero se conserva a propósito:
+     es la escala que tomará el administrador, que comparte estos tokens. */
   --space-1:4px;
   --space-2:8px;
   --space-3:12px;
@@ -90,7 +92,6 @@
 
   /* Motion */
   --ease:cubic-bezier(.22,.61,.36,1);
-  --dur:.5s;
 
   --header-h:64px;
 }
@@ -103,7 +104,7 @@ body{
   color:var(--ink);
   font-family:var(--sans);
   font-size:var(--text-base);
-  line-height:1.55;
+  line-height:var(--lh-body);
   letter-spacing:0.01em;
   -webkit-font-smoothing:antialiased;
 }
@@ -213,13 +214,11 @@ h1,h2,h3,h4,p{margin:0;}
    antes de ocultarlo. El !important es para ganarle a la animación de entrada,
    que cada componente declara en sus estilos. */
 @keyframes panelSale{to{transform:translateX(100%)}}
-@keyframes panelSaleIzq{to{transform:translateX(-100%)}}
 @keyframes veloApaga{to{opacity:0}}
 .panel-cerrando{animation:panelSale .3s var(--ease) forwards !important;}
-.panel-cerrando-izq{animation:panelSaleIzq .3s var(--ease) forwards !important;}
 .velo-cerrando{animation:veloApaga .3s var(--ease) forwards !important;}
 @media (prefers-reduced-motion:reduce){
-  .panel-cerrando,.panel-cerrando-izq,.velo-cerrando{animation:none !important;}
+  .panel-cerrando,.velo-cerrando{animation:none !important;}
 }
 
 /* ---------- Carruseles snap con degradado ---------- */
@@ -280,8 +279,7 @@ h1,h2,h3,h4,p{margin:0;}
 /* ---------- Contenedores de imagen ----------
    .media      imagen decorativa: no responde al cursor porque no lleva a ningún lado.
    .zoom-frame imagen que ES un enlace: se acerca un poco al pasar el cursor.
-   .cursor-zoom cursor de lupa. RESERVADO para galerías con lightbox
-                (detalle de pieza y de proyecto). No usar donde no abra nada. */
+   El cursor de lupa de las galerías vive en src/components/CursorAmpliar.astro. */
 .media,
 .zoom-frame{overflow:hidden;border-radius:var(--radius);background:var(--paper);}
 .media img,
@@ -289,9 +287,6 @@ h1,h2,h3,h4,p{margin:0;}
 .zoom-frame img{transition:transform 1.1s var(--ease);}
 @media (hover:hover){
   .zoom-frame:hover img{transform:scale(1.045);}
-  .cursor-zoom{
-    cursor:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44"><circle cx="22" cy="22" r="21" fill="rgba(255,255,255,.92)" stroke="rgba(0,0,0,.08)"/><path d="M22 14v16M14 22h16" stroke="%231D1D1B" stroke-width="1.6" stroke-linecap="round"/></svg>') 22 22, zoom-in;
-  }
 }
 
 /* ---------- Animaciones de entrada ----------
@@ -348,8 +343,6 @@ h1,h2,h3,h4,p{margin:0;}
 .reveal--sube{transform:translateY(26px);transition:opacity .7s var(--ease),transform .7s var(--ease);}
 .reveal--sube.in{transform:none;}
 .reveal-d1{transition-delay:.08s;}
-.reveal-d2{transition-delay:.16s;}
-.reveal-d3{transition-delay:.24s;}
 
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto;}
