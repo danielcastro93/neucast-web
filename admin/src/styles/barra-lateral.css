@@ -111,8 +111,13 @@ html[data-cajon="abierto"] .bl{translate:0 0;}
 .bl-grupo-h:focus-visible{outline:2px solid var(--bl-foco);outline-offset:-2px;}
 .bl-grupo-h svg{width:16px;height:16px;flex:none;opacity:.7;transition:rotate .2s var(--ease);}
 .bl-grupo-h[aria-expanded="false"] svg{rotate:-90deg;}
-.bl-items.plegado{display:none;}
-@media (prefers-reduced-motion:reduce){.bl-grupo-h svg{transition:none;}}
+.bl-items{
+  display:grid;grid-template-rows:1fr;
+  transition:grid-template-rows .28s var(--ease),opacity .2s var(--ease);
+}
+.bl-items-in{min-height:0;overflow:hidden;}
+.bl-items.plegado{grid-template-rows:0fr;opacity:0;}
+@media (prefers-reduced-motion:reduce){.bl-grupo-h svg,.bl-items{transition:none;}}
 
 .bl-nav a{
   position:relative;
@@ -242,13 +247,16 @@ html[data-cajon="abierto"] .bl{translate:0 0;}
 
   /* Cambia la DECLARACIÓN, no una variable: con `width: var(...)` y una
      transición encima, el ancho se quedaba en 256 mientras la variable ya
-     decía 72. Y sin transición de ancho: cambia limpio y al instante. */
-  .app{padding-left:var(--bl-ancha);}
+     decía 72. La barra y el contenido se animan juntos, con la misma curva y
+     la misma duración, para que no se abra un hueco entre los dos. */
+  :root{--bl-t:.3s;--bl-curva:cubic-bezier(.32,.72,0,1);}
+  .app{padding-left:var(--bl-ancha);transition:padding-left var(--bl-t) var(--bl-curva);}
   html[data-sb="plegada"] .app{padding-left:var(--bl-angosta);}
 
   .bl{
     width:var(--bl-ancha);
-    translate:0 0;transition:none;
+    translate:0 0;
+    transition:width var(--bl-t) var(--bl-curva);
     overflow:visible; /* para que la bolita salga del borde */
   }
   html[data-sb="plegada"] .bl{width:var(--bl-angosta);}
@@ -271,18 +279,44 @@ html[data-cajon="abierto"] .bl{translate:0 0;}
   .bl-colapsar svg{position:relative;z-index:1;width:15px;height:15px;transition:rotate .24s var(--ease);}
   @media (prefers-reduced-motion:reduce){.bl-colapsar::after,.bl-colapsar svg{transition:none;}}
 
-  /* ----- angosta ----- todo centrado; el nombre lo dice el globo */
-  html[data-sb="plegada"] .bl-marca{justify-content:center;padding-inline:0;}
+  /* ----- angosta -----
+     Los íconos NO se mueven: ya están donde quedan centrados en 72px (12 de
+     relleno de la barra + 14 del enlace = 26, y 26 + 20/2 = 36). La barra se
+     angosta por debajo de ellos y lo que sobra, el texto, se desvanece y se
+     recorta. Así el gesto se lee como un cajón que se cierra, no como un
+     salto. El nombre lo dice el globo. */
+  .bl-marca{padding-inline:6px;overflow:hidden;}
+  .bl-nav a{padding-inline:14px;}
+  .bl-usuario{padding-inline:7px;overflow:hidden;}
+  .bl-marca-txt,.bl-usuario-txt,.bl-nav a .et{transition:opacity .2s var(--ease) .06s;}
   html[data-sb="plegada"] .bl-marca-txt,
   html[data-sb="plegada"] .bl-usuario-txt,
-  html[data-sb="plegada"] .bl-nav a .et,
-  html[data-sb="plegada"] .bl-grupo-h{display:none;}
-  html[data-sb="plegada"] .bl-nav a{justify-content:center;padding:12px 0;}
-  html[data-sb="plegada"] .bl-nav a .bl-punto{position:absolute;top:4px;right:10px;margin-left:0;}
-  /* los grupos ya no se anuncian con rótulo: se separan con una línea */
-  html[data-sb="plegada"] .bl-grupo + .bl-grupo{margin-top:12px;padding-top:12px;border-top:1px solid var(--bl-linea);}
-  html[data-sb="plegada"] .bl-items.plegado{display:block;}
-  html[data-sb="plegada"] .bl-usuario{justify-content:center;padding:8px 0;}
+  html[data-sb="plegada"] .bl-nav a .et{opacity:0;transition-delay:0s;transition-duration:.12s;}
+
+  /* el contador viaja de la orilla del renglón a la esquina del ícono */
+  .bl-nav a .bl-punto{
+    position:absolute;right:12px;top:50%;translate:0 -50%;margin-left:0;
+    transition:right var(--bl-t) var(--bl-curva),top var(--bl-t) var(--bl-curva),translate var(--bl-t) var(--bl-curva);
+  }
+  html[data-sb="plegada"] .bl-nav a .bl-punto{right:6px;top:4px;translate:0 0;}
+
+  /* los rótulos de grupo se cierran y en su lugar aparece una línea */
+  .bl-grupo-h{
+    max-height:34px;overflow:hidden;white-space:nowrap;
+    transition:max-height var(--bl-t) var(--bl-curva),opacity .16s var(--ease),padding var(--bl-t) var(--bl-curva),margin var(--bl-t) var(--bl-curva),color .16s var(--ease),background-color .16s var(--ease);
+  }
+  html[data-sb="plegada"] .bl-grupo-h{max-height:0;opacity:0;padding-block:0;margin:0;pointer-events:none;}
+  .bl-grupo + .bl-grupo{
+    border-top:1px solid transparent;
+    transition:margin var(--bl-t) var(--bl-curva),padding var(--bl-t) var(--bl-curva),border-color var(--bl-t) var(--bl-curva);
+  }
+  html[data-sb="plegada"] .bl-grupo + .bl-grupo{margin-top:12px;padding-top:12px;border-top-color:var(--bl-linea);}
+  /* angosta enseña todos los íconos aunque el grupo estuviera plegado */
+  html[data-sb="plegada"] .bl-items.plegado{grid-template-rows:1fr;opacity:1;}
+
+  @media (prefers-reduced-motion:reduce){
+    .app,.bl,.bl-marca-txt,.bl-usuario-txt,.bl-nav a .et,.bl-nav a .bl-punto,.bl-grupo-h,.bl-grupo + .bl-grupo{transition:none;}
+  }
   html[data-sb="plegada"] .bl-colapsar svg{rotate:180deg;}
   /* con la barra angosta la ventana de la cuenta no cabe: sale al costado */
   html[data-sb="plegada"] .bl-cuenta{left:calc(100% + 12px);right:auto;bottom:0;width:264px;}

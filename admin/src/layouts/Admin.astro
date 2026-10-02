@@ -92,11 +92,11 @@ const simbolo = "M625.9,655.2c-3.1,3.1-6.5,5.5-10.2,7.4-3.8,1.9-7.8,2.8-12.3,2.8
 
         <nav class="bl-nav" aria-label="Secciones del administrador" data-nav>
           <div class="bl-grupo">
-            <div class="bl-items">
+            <div class="bl-items"><div class="bl-items-in">
               <a href={`${base}${inicio.ruta}`} aria-current={seccion === inicio.id ? "page" : undefined} data-globo={inicio.nombre} data-globo-solo="angosta">
                 <IconoAdmin name={inicio.icono} /><span class="et">{inicio.nombre}</span>
               </a>
-            </div>
+            </div></div>
           </div>
           {grupos.map((g, i) => (
             <div class="bl-grupo">
@@ -104,14 +104,14 @@ const simbolo = "M625.9,655.2c-3.1,3.1-6.5,5.5-10.2,7.4-3.8,1.9-7.8,2.8-12.3,2.8
                 <span>{g.rotulo}</span>
                 <IconoAdmin name="chevronAbajo" size={16} />
               </button>
-              <div class="bl-items" id={`grupo-${i}`} data-tiene-activa={g.items.some((x) => x.id === seccion) ? "1" : undefined}>
+              <div class="bl-items" id={`grupo-${i}`} data-tiene-activa={g.items.some((x) => x.id === seccion) ? "1" : undefined}><div class="bl-items-in">
                 {g.items.map((it) => (
                   <a href={`${base}${it.ruta}`} aria-current={it.id === seccion ? "page" : undefined} data-globo={it.nombre} data-globo-solo="angosta">
                     <IconoAdmin name={it.icono} /><span class="et">{it.nombre}</span>
                     {it.punto && <span class="bl-punto" data-punto={it.punto} hidden></span>}
                   </a>
                 ))}
-              </div>
+              </div></div>
             </div>
           ))}
         </nav>
