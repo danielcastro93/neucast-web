@@ -26,10 +26,10 @@ const logoInterior = logoFuente
   .replaceAll("var(--logo-sym, var(--olive))", "#78894A")
   .replaceAll("var(--logo-txt, var(--ink))", "#1D1D1B");
 const logoViewBox = logoFuente.match(/viewBox="([^"]+)"/)[1];
-const logo = (alto) =>
+export const logo = (alto) =>
   `<svg class="logo" style="height:${alto}" viewBox="${logoViewBox}" xmlns="http://www.w3.org/2000/svg" aria-label="Neucast">${logoInterior}</svg>`;
 
-const esc = (s) =>
+export const esc = (s) =>
   String(s ?? "")
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
@@ -39,7 +39,7 @@ const esc = (s) =>
 const archivo = (ruta) => (ruta ? "file://" + path.join(PUBLICO, ruta) : "");
 
 // "5215512345678" → "+52 55 1234 5678"
-const telefono = (n) => {
+export const telefono = (n) => {
   const d = String(n).replace(/\D/g, "").replace(/^521?/, "");
   return `+52 ${d.slice(0, 2)} ${d.slice(2, 6)} ${d.slice(6)}`;
 };
