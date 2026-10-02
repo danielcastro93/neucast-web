@@ -76,7 +76,10 @@ la ficha web.
    pieza cambió.
 2. ~~El catálogo por categoría~~ **Hecho el 2 de octubre de 2026.** Página
    `/recursos/` con el catálogo general y uno por categoría; cada categoría
-   enlaza el suyo bajo su título y `/muebles/` enlaza el general. Se generan
+   enlaza el suyo en un bloque al final del listado (en la cabecera competía
+   con el título) y `/muebles/` enlaza el general. Por decisión de Daniel, ni
+   la página ni las categorías dicen hojas, peso ni número de piezas, y el
+   enlace del footer y del menú dice "Catálogos", en la columna de Muebles. Se generan
    con `npm run catalogos` (en una Mac, como las fichas) en `public/catalogos/`.
    Formato aprobado: dos piezas por hoja, sin foto de ambiente, con fotos
    achicadas por `scripts/fichas/fotos.py` (Python con Pillow). Medido: unos

@@ -14,11 +14,10 @@ import { site, categories, todosLosMuebles } from "../data/site.js";
 import { piezas } from "../data/catalogo.js";
 import { catalogoPdf } from "../data/pdfs.js";
 
-const title = "Catálogos de mobiliario de oficina en PDF | Neucast";
+const title = "Catálogos de mobiliario de oficina para descargar | Neucast";
 const description =
-  "Descarga los catálogos de Neucast en PDF: el general y uno por categoría, con fotos, acabados y datos de cada pieza, listos para compartir con tu equipo.";
+  "Descarga los catálogos de Neucast: la colección completa o una categoría a la vez, para compartir con tu equipo o revisar con calma.";
 
-const cuenta = (n) => `${n} ${n === 1 ? "pieza" : "piezas"}`;
 const general = catalogoPdf("general");
 const conCatalogo = categories
   .map((c) => ({ ...c, pdf: catalogoPdf(c.slug), n: piezas.filter((p) => p.cat === c.slug).length }))
@@ -38,12 +37,12 @@ const schema = {
   <section class="rc">
     <div class="container">
       <header class="rc-head">
-        <p class="rotulo rc-rotulo">Recursos</p>
-        <h1 class="display t-h1 rc-titulo">Catálogos para descargar</h1>
+        <p class="rotulo rc-rotulo">Catálogos</p>
+        <h1 class="display t-h1 rc-titulo">Nuestras piezas, para llevar contigo</h1>
         <p class="rc-intro">
-          Todo el catálogo o una categoría a la vez, en PDF y listo para compartir con
-          tu equipo. Cada pieza trae su foto, acabados y datos principales, con el
-          enlace a su ficha técnica completa.
+          Comparte la colección con tu equipo, revísala con calma o tenla a la mano
+          en la siguiente junta. Descárgala completa o elige la categoría que estás
+          resolviendo.
         </p>
       </header>
 
@@ -55,15 +54,14 @@ const schema = {
           </span>
           <span class="rc-general-txt">
             <span class="rotulo rc-rotulo">Catálogo general</span>
-            <span class="display t-h2 rc-general-ttl">Todo el catálogo</span>
+            <span class="display t-h2 rc-general-ttl">La colección completa</span>
             <span class="rc-general-p">
-              {cuenta(piezas.length)} en {categories.length} categorías, en una vista
-              rápida para ubicar lo que buscas.
+              De la silla de dirección a la terraza: un recorrido por todo lo que
+              tenemos para los espacios de trabajo.
             </span>
             <span class="pill pill--primary rc-general-btn">
               <Icon name="descargar" size={15} /> Descargar el catálogo general
             </span>
-            <span class="rc-meta">{general.meta}</span>
           </span>
         </a>
       )}
@@ -71,18 +69,16 @@ const schema = {
       <!-- ============ POR CATEGORÍA ============ -->
       {conCatalogo.length > 0 && (
         <section class="rc-sec">
-          <h2 class="display t-h3 rc-sec-ttl">Por categoría</h2>
+          <h2 class="display t-h3 rc-sec-ttl">Una categoría a la vez</h2>
           <ul class="rc-grid">
             {conCatalogo.map((c) => (
               <li>
                 <a class="rc-cat" href={c.pdf.ruta} download={`Neucast catálogo ${c.name}.pdf`}>
                   <span class="rc-cat-foto"><img src={c.photo} alt={c.alt} loading="lazy" /></span>
                   <span class="rc-cat-nombre">{c.name}</span>
-                  <span class="rc-cat-n">{cuenta(c.n)}</span>
                   <span class="pill pill--ghost rc-cat-btn">
                     <Icon name="descargar" size={15} /> Descargar catálogo
                   </span>
-                  <span class="rc-meta">{c.pdf.meta}</span>
                 </a>
               </li>
             ))}
@@ -91,8 +87,8 @@ const schema = {
       )}
 
       <p class="rc-nota">
-        ¿Buscas una pieza en particular? Su ficha técnica, con plano y especificaciones,
-        se descarga desde su página. <a href="/muebles/">Explorar el catálogo</a>
+        Cada pieza tiene además su ficha técnica, con plano y especificaciones, en su
+        propia página. <a href="/muebles/">Explorar las piezas</a>
       </p>
     </div>
   </section>
@@ -123,7 +119,6 @@ const schema = {
     .rc-general-btn{margin-top:24px;gap:8px;}
     @media (max-width:639px){.rc-general-btn{width:100%;}}
     @media (hover:hover){.rc-general:hover .rc-general-btn{background:#000;}}
-    .rc-meta{display:block;margin-top:10px;font-size:var(--fs-2xs);color:var(--ink-60);}
 
     /* ---------- por categoría ---------- */
     .rc-sec{margin-top:var(--section-y);}
@@ -135,9 +130,8 @@ const schema = {
     .rc-cat-foto img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease);}
     @media (hover:hover){.rc-cat:hover .rc-cat-foto img{transform:scale(1.04);}}
     .rc-cat-nombre{margin-top:12px;font-size:var(--fs-sm);font-weight:700;line-height:1.25;}
-    .rc-cat-n{margin-top:2px;font-size:var(--fs-xs);color:var(--ink-60);}
     .rc-cat-btn{margin-top:auto;width:100%;justify-content:center;gap:8px;padding:0 10px;}
-    .rc-cat-n{margin-bottom:14px;}
+    .rc-cat-nombre{margin-bottom:14px;}
     @media (max-width:639px){.rc-cat-btn{height:44px;}}
     /* en teléfonos angostos el texto necesita todo el ancho: el ícono se omite */
     @media (max-width:399px){.rc-cat-btn :global(svg){display:none;}}

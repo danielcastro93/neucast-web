@@ -90,7 +90,7 @@ function portada({ site, titulo, meta, foto }) {
     <div class="portada-txt">
       <p class="rotulo tipo">Catálogo Neucast</p>
       <h1 class="portada-ttl">${esc(titulo)}</h1>
-      <p class="portada-meta">${esc(meta)}</p>
+      ${meta ? `<p class="portada-meta">${esc(meta)}</p>` : ""}
     </div>
     ${pie(site, 1, "{{TOTAL}}")}
   </section>`;
@@ -210,8 +210,7 @@ export function hojasDeCatalogo({ categoria, piezas, fotoPortada, fotos, context
   </section>`;
   });
 
-  const piezasTxt = `${n} ${n === 1 ? "pieza" : "piezas"}`;
-  return (portada({ site, titulo: categoria.name, meta: piezasTxt, foto: fotoPortada }) + indice + hojas.join(""))
+  return (portada({ site, titulo: categoria.name, meta: "", foto: fotoPortada }) + indice + hojas.join(""))
     .replaceAll("{{TOTAL}}", String(total));
 }
 
@@ -225,7 +224,6 @@ const ALTO_TITULO = 16;
 const ALTO_FILA = 58;
 export function hojasDeGeneral({ grupos, fotoPortada, miniatura, contexto }) {
   const { site } = contexto;
-  const totalPiezas = grupos.reduce((s, g) => s + g.piezas.length, 0);
 
   const paginas = [];
   let actual = [];
@@ -254,7 +252,7 @@ export function hojasDeGeneral({ grupos, fotoPortada, miniatura, contexto }) {
   <section class="hoja">
     ${cabecera("Catálogo general", mes.format(new Date()))}
     ${bloques.map((b) => `
-      <div class="grupo-ttl"><h2>${esc(b.categoria.name)}</h2><span class="rotulo">${b.categoria.cuenta} ${b.categoria.cuenta === 1 ? "pieza" : "piezas"}</span></div>
+      <div class="grupo-ttl"><h2>${esc(b.categoria.name)}</h2></div>
       <div class="rejilla">
         ${b.piezas.map((p) => `
           <a class="mini" href="${esc(`${site.domain}/muebles/${p.cat}/${p.slug}/`)}">
@@ -266,7 +264,7 @@ export function hojasDeGeneral({ grupos, fotoPortada, miniatura, contexto }) {
     ${pie(site, 2 + i, total)}
   </section>`);
 
-  return (portada({ site, titulo: "Todo el catálogo", meta: `${totalPiezas} piezas en ${grupos.length} categorías`, foto: fotoPortada }) + hojas.join(""))
+  return (portada({ site, titulo: "La colección completa", meta: "", foto: fotoPortada }) + hojas.join(""))
     .replaceAll("{{TOTAL}}", String(total));
 }
 

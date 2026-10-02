@@ -6,7 +6,15 @@ import { piezas } from "../../data/catalogo.js";
 import { catalogoPdf } from "../../data/pdfs.js";
 
 const pdf = catalogoPdf("general");
-const descarga = pdf ? { ...pdf, nombre: "Neucast catálogo general.pdf" } : null;
+const descarga = pdf
+  ? {
+      ruta: pdf.ruta,
+      nombre: "Neucast catálogo general.pdf",
+      titulo: "La colección completa, para compartir",
+      texto: "Todas nuestras categorías en un solo catálogo, listo para enviar a tu equipo o revisar con calma.",
+      cta: "Descargar el catálogo",
+    }
+  : null;
 
 const title = "Catálogo de muebles para oficina | Neucast";
 const description =

@@ -42,7 +42,7 @@ export function GET() {
     categorias: [
       ...categories.map((c) => ({ n: c.name, u: `/muebles/${c.slug}/`, i: c.photo })),
       { n: homeOffice.nombre, u: homeOffice.ruta, i: homeOffice.portada.img, e: "Espacio" },
-      { n: "Catálogos en PDF", u: "/recursos/", i: todosLosMuebles.photo, e: "Descargas" },
+      { n: "Catálogos", u: "/recursos/", i: todosLosMuebles.photo, e: "Descargas" },
     ],
     proyectos: proyectos.map((p) => ({
       n: p.nombre,

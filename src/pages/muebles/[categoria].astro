@@ -18,7 +18,15 @@ const { cat } = Astro.props;
 const t = cat; // h1, title, desc e intro viajan con la categoría
 const deLaCategoria = piezas.filter((p) => p.cat === cat.slug);
 const pdf = catalogoPdf(cat.slug);
-const descarga = pdf ? { ...pdf, nombre: `Neucast catálogo ${cat.name}.pdf` } : null;
+const descarga = pdf
+  ? {
+      ruta: pdf.ruta,
+      nombre: `Neucast catálogo ${cat.name}.pdf`,
+      titulo: `${cat.name}, para compartir`,
+      texto: "Toda la categoría en un catálogo listo para enviar a tu equipo o revisar con calma.",
+      cta: "Descargar el catálogo",
+    }
+  : null;
 
 const schema = [
   {

@@ -11,7 +11,8 @@ const {
   intro,
   piezas,
   catActiva = null,
-  // el catálogo en PDF de lo que se está viendo: { ruta, meta, nombre }
+  // el catálogo en PDF de lo que se está viendo, al final del listado:
+  // { ruta, nombre (del archivo), titulo, texto, cta }
   descarga = null,
 } = Astro.props;
 
@@ -43,14 +44,6 @@ const bloquesVisibles = bloquesPara(catActiva, piezas.length);
       <div class="mb-head-txt">
         <h1 class="display t-h1 mb-title">{titulo}</h1>
         <p class="mb-intro">{intro}</p>
-        {descarga && (
-          <p class="mb-descarga">
-            <a href={descarga.ruta} download={descarga.nombre}>
-              <Icon name="descargar" size={15} /> Descargar catálogo en PDF
-            </a>
-            <span>{descarga.meta}</span>
-          </p>
-        )}
       </div>
 
       <div class="mb-cats-wrap">
@@ -219,6 +212,20 @@ const bloquesVisibles = bloquesPara(catActiva, piezas.length);
         <p class="mb-mas-txt">Mostrando <span id="mostradas">0</span> de <span id="totales">0</span> piezas</p>
         <button class="pill pill--primary" type="button" id="cargarMas">Cargar más productos</button>
       </div>
+
+      <!-- al final y no en la cabecera: arriba competía con el título; aquí
+           llega quien ya vio las piezas y quiere compartirlas -->
+      {descarga && (
+        <aside class="mb-descarga">
+          <div class="mb-descarga-txt">
+            <p class="mb-descarga-ttl">{descarga.titulo}</p>
+            <p class="mb-descarga-p">{descarga.texto}</p>
+          </div>
+          <a class="pill pill--ghost" href={descarga.ruta} download={descarga.nombre}>
+            <Icon name="descargar" size={15} /> {descarga.cta}
+          </a>
+        </aside>
+      )}
     </div>
   </section>
 
@@ -285,14 +292,7 @@ const bloquesVisibles = bloquesPara(catActiva, piezas.length);
     }
     .mb-title{margin-bottom:14px;}
     .mb-intro{color:var(--ink-60);max-width:44ch;}
-    .mb-descarga{margin-top:14px;display:flex;flex-wrap:wrap;align-items:center;column-gap:12px;}
-    .mb-descarga a{
-      display:inline-flex;align-items:center;gap:8px;min-height:44px;
-      font-size:var(--fs-sm);font-weight:600;color:var(--ink);
-      text-decoration:underline;text-underline-offset:4px;text-decoration-color:var(--ink-40);
-    }
-    @media (hover:hover){.mb-descarga a:hover{text-decoration-color:var(--ink);}}
-    .mb-descarga span{font-size:var(--fs-2xs);color:var(--ink-60);}
+
     /* carrusel de categorías: las flechas solo aparecen con el cursor encima */
     .mb-cats-wrap{position:relative;min-width:0;}
     .mb-cats{--rail-pad:0;gap:clamp(10px,1.4vw,16px);}
@@ -434,6 +434,16 @@ const bloquesVisibles = bloquesPara(catActiva, piezas.length);
       display:flex;flex-direction:column;align-items:center;gap:14px;
     }
     .mb-mas-txt{font-size:var(--fs-sm);color:var(--ink-40);}
+
+    .mb-descarga{
+      margin-top:clamp(48px,7vw,88px);padding:clamp(22px,3vw,32px);
+      border-radius:var(--radius);background:var(--paper-soft);
+      display:flex;flex-direction:column;align-items:flex-start;gap:18px;
+    }
+    @media (min-width:760px){.mb-descarga{flex-direction:row;align-items:center;justify-content:space-between;gap:32px;}}
+    .mb-descarga-ttl{font-size:var(--fs-h4);font-weight:700;letter-spacing:-.01em;line-height:1.2;}
+    .mb-descarga-p{margin-top:6px;color:var(--ink-60);max-width:520px;}
+    .mb-descarga .pill{flex:none;gap:8px;}
 
     /* ---------- Panel de filtros ---------- */
     .mb-scrim{
