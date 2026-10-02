@@ -81,16 +81,26 @@ const { titulo, entradilla, actualizado, secciones = [] } = Astro.props;
   .lg-indice[open] .lg-indice-chevron{transform:rotate(-135deg);margin-top:2px;}
   .lg-indice-caja{overflow:hidden;}
   .lg-indice ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;}
+  /* Minimalista y corto: letra chica, sin líneas entre renglones y el número
+     en una columna fija, para que el 10 no empuje el texto. Si el documento
+     crece, el índice no se vuelve una pared. En teléfono cada renglón
+     conserva su zona de toque de 44 px. */
+  .lg-indice ol{padding-top:6px;}
   .lg-indice a{
-    display:flex;gap:10px;padding:9px 0;
-    font-size:var(--fs-sm);color:var(--ink-60);
-    border-bottom:1px solid var(--line);
+    display:grid;grid-template-columns:22px minmax(0,1fr);align-items:center;
+    min-height:44px;padding:2px 0;
+    font-size:var(--fs-xs);line-height:1.35;color:var(--ink-60);
     transition:color .2s;
   }
   @media (hover:hover){.lg-indice a:hover{color:var(--olive-deep);}}
-  .lg-indice-n{color:var(--ink-40);font-variant-numeric:tabular-nums;flex:none;}
+  .lg-indice-n{color:var(--ink-40);font-variant-numeric:tabular-nums;font-size:var(--fs-2xs);}
   @media (min-width:1000px){
-    .lg-indice{position:sticky;top:calc(var(--header-h) + 24px);}
+    /* si el índice es más alto que la pantalla, se desplaza por dentro */
+    .lg-indice{
+      position:sticky;top:calc(var(--header-h) + 24px);
+      max-height:calc(100vh - var(--header-h) - 48px);overflow-y:auto;scrollbar-width:thin;
+    }
+    .lg-indice ol{padding-top:0;}
     /* en escritorio el índice siempre está a la vista: la cabecera es un
        rótulo, no un control */
     .lg-indice-cab{
@@ -98,6 +108,12 @@ const { titulo, entradilla, actualizado, secciones = [] } = Astro.props;
       padding:0 0 14px;border-bottom:0;
     }
     .lg-indice-chevron{display:none;}
+  }
+
+  /* con mouse, renglones compactos; en pantallas táctiles grandes se queda
+     la zona de toque de 44 */
+  @media (min-width:1000px) and (pointer:fine){
+    .lg-indice a{min-height:0;padding:5px 0;}
   }
 
   .lg-texto{display:flex;flex-direction:column;gap:clamp(30px,4vw,44px);}
