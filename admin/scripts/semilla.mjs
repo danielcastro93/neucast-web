@@ -41,6 +41,9 @@ escribir(
     // captura en el administrador; mientras, cada grupo es un acabado sin nombre
     acabados: (p.colores || []).map((grupo) => ({ nombre: "", grupo })),
     combina: [],
+    destacada: destacados.includes(p.slug),
+    ambiente: "",
+    video: null,
     ficha: fichas[p.slug] || null,
     estado: "publicada",
     actualizado: AYER,

@@ -442,3 +442,36 @@ body:has(.guardar) .avisos{bottom:96px;}
   .guardar .boton{flex:1;height:48px;padding:0 12px;}
   body:has(.guardar) .avisos{bottom:150px;}
 }
+
+/* ---------- Foto de ambiente: se elige una de la galería ---------- */
+.ambiente{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;}
+.ambiente:empty{display:none;}
+.ambiente-foto{
+  position:relative;aspect-ratio:16/10;border-radius:var(--r-3);overflow:hidden;background:var(--relleno);
+  box-shadow:0 0 0 1px var(--borde);transition:box-shadow .2s var(--ease),transform .3s var(--resorte);
+}
+.ambiente-foto img{width:100%;height:100%;object-fit:cover;transition:opacity .2s;}
+.ambiente-foto:not(.activa) img{opacity:.72;}
+@media (hover:hover){.ambiente-foto:not(.activa):hover img{opacity:1;}.ambiente-foto:hover{transform:translateY(-2px);}}
+.ambiente-foto.activa{box-shadow:0 0 0 2.5px var(--olive),0 8px 20px rgba(0,0,0,.08);}
+.ambiente-foto:focus-visible{outline:0;box-shadow:var(--anillo);}
+.ambiente-marca{
+  position:absolute;top:8px;right:8px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;
+  background:var(--olive);color:var(--white);box-shadow:0 2px 6px rgba(0,0,0,.2);
+  opacity:0;transform:scale(.6);transition:opacity .2s,transform .35s var(--resorte);
+}
+.ambiente-foto.activa .ambiente-marca{opacity:1;transform:none;}
+
+/* ---------- Video de la pieza ---------- */
+.video-pieza-ficha{
+  display:flex;align-items:center;gap:16px;padding:10px 14px 10px 10px;border-radius:var(--r-3);
+  background:var(--white);box-shadow:0 0 0 1px var(--borde);
+}
+.video-pieza-ficha video{flex:none;width:112px;aspect-ratio:16/10;object-fit:cover;border-radius:10px;background:var(--relleno);}
+.video-pieza-datos{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+.video-pieza-datos b{font-size:var(--t-llamada);font-weight:600;overflow-wrap:anywhere;}
+@media (max-width:640px){
+  .ambiente{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+  .video-pieza-ficha{flex-wrap:wrap;}
+  .video-pieza-ficha .boton{flex:1 1 100%;height:44px;}
+}

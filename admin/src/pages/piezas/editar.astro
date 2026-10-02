@@ -125,7 +125,19 @@ const secciones = [
               <p class="campo-ayuda">Qué se ve en la foto, para quien no la ve y para Google: el tipo, el nombre y el acabado.</p>
               <p class="campo-error" data-error></p>
             </div>
+            <div class="separador"></div>
+            <div class="campo">
+              <div class="campo-etiqueta"><span class="etiqueta">Foto de ambiente</span><span class="etiqueta-nota">la grande, a todo lo ancho, debajo del párrafo</span></div>
+              <div class="ambiente" data-ambiente role="radiogroup" aria-label="Foto de ambiente"></div>
+              <p class="campo-ayuda" data-ambiente-nota></p>
+            </div>
+            <div class="campo">
+              <div class="campo-etiqueta"><span class="etiqueta">Video</span><span class="etiqueta-nota">opcional · va al final de la galería</span></div>
+              <div class="video-pieza" data-video></div>
+              <p class="campo-ayuda">MP4 horizontal o cuadrado, corto y sin sonido: se reproduce solo. Si no hay, la galería enseña el video general de Neucast.</p>
+            </div>
             <input type="file" accept="image/png,image/jpeg,image/webp" multiple hidden data-archivo />
+            <input type="file" accept="video/mp4,video/webm" hidden data-archivo-video />
           </div>
         </section>
 
@@ -182,7 +194,7 @@ const secciones = [
             <div class="campo" data-campo="resumen">
               <div class="campo-etiqueta"><label for="resumen">Párrafo descriptivo<span class="obligatorio">*</span></label><span class="campo-contador" data-contador="resumen"></span></div>
               <textarea class="control" id="resumen" name="resumen" rows="4" placeholder="Ej. Respaldo de malla tensada de una pieza, pensada para la jornada completa. El soporte lumbar se ajusta en altura sin herramienta."></textarea>
-              <p class="campo-ayuda">La primera frase va en negro bajo la galería: tiene que defender sola a la pieza. Escríbelo para quien amuebla un espacio de trabajo: uso, resistencia y plazos, no decoración.</p>
+              <p class="campo-ayuda">Sale en grande debajo de la galería, antes de la foto de ambiente: la primera frase en negro y el resto en gris. Escríbelo para quien amuebla un espacio de trabajo: uso y resistencia, no decoración ni plazos.</p>
               <p class="campo-error" data-error></p>
             </div>
 
@@ -204,7 +216,6 @@ const secciones = [
               <div class="campo-etiqueta"><span class="etiqueta">Construcción</span><span class="etiqueta-nota">de qué está hecha cada parte</span></div>
               <div class="grupo-lista grupo-lista--dos" data-partes></div>
               <button class="enlace-chico enlace-chico--mas" type="button" data-mas-construccion hidden></button>
-              <p class="campo-ayuda">Las dos primeras con dato arman el recuadro "Materiales" bajo la foto de ambiente.</p>
             </div>
 
             <div class="separador"></div>
@@ -224,7 +235,7 @@ const secciones = [
             <div class="campo">
               <div class="campo-etiqueta"><span class="etiqueta">Cuidados</span></div>
               <div class="grupo-lista" data-frases="cuidados"></div>
-              <p class="campo-ayuda">Cómo se limpia y se mantiene. Los dos primeros arman el recuadro "Cuidados".</p>
+              <p class="campo-ayuda">Cómo se limpia y se mantiene. Se lee en el panel "Materiales y cuidados".</p>
             </div>
           </div>
         </section>
@@ -282,6 +293,11 @@ const secciones = [
               <span class="interruptor-pista"></span>
               <span class="interruptor-texto">Marcar como nueva<small>Pinta la etiqueta "Nuevo" en su tarjeta del catálogo</small></span>
             </label>
+            <label class="interruptor">
+              <input type="checkbox" name="destacada" />
+              <span class="interruptor-pista"></span>
+              <span class="interruptor-texto">Destacar en el inicio<small>Entra al carrusel "Piezas destacadas" de la portada</small></span>
+            </label>
 
             <div class="separador"></div>
 
@@ -325,6 +341,22 @@ const secciones = [
     <Fragment slot="pie">
       <button class="boton" type="button" data-cierra-modal>Cancelar</button>
       <button class="boton boton--primario" type="button" data-agregar-ruta>Agregar la ruta</button>
+    </Fragment>
+  </Modal>
+
+  <Modal id="modal-video" titulo="Video de la pieza" texto="Sube el archivo o escribe la ruta de un video que ya esté en el sitio.">
+    <button class="soltar" type="button" data-zona-video>
+      <IconoAdmin name="subir" size={26} />
+      <b>Arrastra aquí el video o haz clic para elegirlo</b>
+      <span class="t-mini">MP4, corto y sin sonido</span>
+    </button>
+    <div class="campo">
+      <div class="campo-etiqueta"><label for="ruta-video">O la ruta en el sitio</label></div>
+      <input class="control mono" id="ruta-video" type="text" placeholder="Ej. /video/silla-orbita.mp4" spellcheck="false" />
+    </div>
+    <Fragment slot="pie">
+      <button class="boton" type="button" data-cierra-modal>Cancelar</button>
+      <button class="boton boton--primario" type="button" data-video-ruta>Usar la ruta</button>
     </Fragment>
   </Modal>
 
@@ -372,7 +404,7 @@ const secciones = [
     piezaVacia, OBLIGATORIOS, MEDIDAS, MAX_COMBINA,
   } from "../../scripts/esquemas/pieza.js";
   import { opciones, nombreOpcion as nombreDe, listasDeChips, obligatoriasDe, medidasDe, partesDe, medida as medidaDe, esConteo, esObligatoria, CONTROL_PROPIO } from "../../scripts/listas.js";
-  import { abrirModal, cerrarModal, avisar, escapar, fechaRelativa } from "../../scripts/ui.js";
+  import { abrirModal, cerrarModal, avisar, escapar, fechaRelativa, ICONO_BASURA } from "../../scripts/ui.js";
 
   const base = import.meta.env.BASE_URL;
   const SITIO = (import.meta.env.PUBLIC_STG || "http://localhost:4321").replace(/\/+$/, "");
@@ -455,6 +487,9 @@ const secciones = [
     form.material.dispatchEvent(new Event("change"));
     form.entrega.value = pieza.entrega || "";
     form.nuevo.checked = !!pieza.nuevo;
+    form.destacada.checked = !!pieza.destacada;
+    // un video subido en otra sesión de la simulación ya no existe
+    if (pieza.video?.src?.startsWith("blob:")) pieza.video = null;
     $$("input[name='espacios']").forEach((i) => (i.checked = (pieza.espacios || []).includes(i.value)));
     $$("input[name='estado']").forEach((i) => (i.checked = i.value === (pieza.estado || "borrador")));
     form.resumen.value = pieza.ficha?.resumen || "";
@@ -791,6 +826,8 @@ const secciones = [
         ${fotos.length ? "" : '<span class="t-mini">Un recorte con fondo transparente</span>'}
       </button>`;
     $("[data-fotos-cuenta]").textContent = fotos.length ? `${fotos.length} ${fotos.length === 1 ? "foto" : "fotos"}` : "";
+    pintarAmbiente();
+    pintarVideo();
 
     $$(".foto", caja).forEach((el) => el.addEventListener("click", () => abrirFoto(+el.dataset.i)));
     $("[data-abrir-foto]", caja).addEventListener("click", () => {
@@ -879,6 +916,76 @@ const secciones = [
     marcarCambio();
   }
 
+  /* ---------- Foto de ambiente ----------
+     Se elige de la galería (menos la principal, que es un recorte). Si no se
+     elige, el sitio usa la segunda foto; si no hay, la de la categoría. */
+  function pintarAmbiente() {
+    const caja = $("[data-ambiente]");
+    const opciones = (pieza.img || []).map((ruta, i) => ({ ruta, i })).filter(({ i }) => i > 0);
+    const elegida = pieza.ambiente && pieza.img.includes(pieza.ambiente) ? pieza.ambiente : opciones[0]?.ruta;
+    caja.innerHTML = opciones
+      .map(({ ruta, i }) => `<button type="button" class="ambiente-foto${ruta === elegida ? " activa" : ""}" role="radio" aria-checked="${ruta === elegida}" data-ruta="${escapar(ruta)}" aria-label="Foto ${i + 1}">
+        <img src="${escapar(medio(ruta))}" alt="" loading="lazy" draggable="false" />
+        <span class="ambiente-marca" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m4.5 10.5 3.5 3.5 7.5-8"/></svg></span>
+      </button>`)
+      .join("");
+    $("[data-ambiente-nota]").textContent = opciones.length
+      ? "Elige la que mejor enseña la pieza en un espacio real. Va de orilla a orilla: que sea horizontal y con buena luz."
+      : "Agrega a la galería una foto de la pieza en un espacio. Mientras no haya, sale la foto de la categoría.";
+    $$(".ambiente-foto", caja).forEach((b) => b.addEventListener("click", () => {
+      pieza.ambiente = b.dataset.ruta;
+      pintarAmbiente();
+      marcarCambio();
+    }));
+  }
+
+  /* ---------- Video ----------
+     En la simulación un archivo se queda en esta sesión (no cabe en el
+     localStorage); con la API real se sube como las fotos. */
+  function pintarVideo() {
+    const caja = $("[data-video]");
+    const v = pieza.video;
+    caja.innerHTML = v?.src
+      ? `<div class="video-pieza-ficha">
+          <video src="${escapar(medio(v.src))}" muted loop playsinline autoplay preload="metadata"></video>
+          <div class="video-pieza-datos"><b>${escapar(v.nombre || v.src.split("/").pop())}</b><span class="t-mini">Va después de las fotos</span></div>
+          <button class="boton boton--texto-peligro boton--chico" type="button" data-quitar-video>${ICONO_BASURA(15)}Eliminar</button>
+        </div>`
+      : `<button class="boton boton--suave boton--agregar" type="button" data-agregar-video><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><rect x="2.5" y="5" width="11" height="10" rx="2"/><path d="m13.5 9 4-2.5v7l-4-2.5Z"/></svg><span>Agregar video</span></button>`;
+    $("[data-agregar-video]", caja)?.addEventListener("click", () => {
+      $("#ruta-video").value = "";
+      abrirModal("modal-video");
+    });
+    $("[data-quitar-video]", caja)?.addEventListener("click", () => {
+      pieza.video = null;
+      pintarVideo();
+      marcarCambio();
+    });
+  }
+  const archivoVideo = $("[data-archivo-video]");
+  const zonaVideo = $("[data-zona-video]");
+  const usarVideo = (video) => {
+    pieza.video = video;
+    cerrarModal("modal-video");
+    pintarVideo();
+    marcarCambio();
+    avisar("Video agregado");
+  };
+  const videoDeArchivo = (f) => {
+    if (!f || !f.type.startsWith("video/")) return avisar("Ese archivo no es un video", { tipo: "error" });
+    usarVideo({ src: URL.createObjectURL(f), nombre: f.name });
+  };
+  zonaVideo.addEventListener("click", () => archivoVideo.click());
+  zonaVideo.addEventListener("dragover", (e) => { e.preventDefault(); zonaVideo.classList.add("sobre"); });
+  zonaVideo.addEventListener("dragleave", () => zonaVideo.classList.remove("sobre"));
+  zonaVideo.addEventListener("drop", (e) => { e.preventDefault(); zonaVideo.classList.remove("sobre"); videoDeArchivo(e.dataTransfer.files[0]); });
+  archivoVideo.addEventListener("change", () => { videoDeArchivo(archivoVideo.files[0]); archivoVideo.value = ""; });
+  $("[data-video-ruta]").addEventListener("click", () => {
+    const ruta = $("#ruta-video").value.trim();
+    if (!ruta) return $("#ruta-video").focus();
+    usarVideo({ src: ruta.startsWith("/") || /^https?:/.test(ruta) ? ruta : `/${ruta}` });
+  });
+
   // Subir archivos: en la simulación se guardan achicados como data URL para
   // no llenar el localStorage; la API real los recibe como archivo.
   const archivo = $("[data-archivo]");
@@ -958,6 +1065,9 @@ const secciones = [
       colores: [...new Set(acabados.map((a) => a.grupo).filter(Boolean))],
       espacios: marcados("espacios"),
       nuevo: form.nuevo.checked,
+      destacada: form.destacada.checked,
+      ambiente: pieza.ambiente && pieza.img.includes(pieza.ambiente) ? pieza.ambiente : "",
+      video: pieza.video || null,
       // cada lista de chips con su id; las que no aplican a la categoría se vacían
       ...Object.fromEntries(
         listas.listas

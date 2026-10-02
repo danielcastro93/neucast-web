@@ -134,15 +134,29 @@ Forma de una pieza:
 }
 ```
 
-**Dos campos nuevos que trae el administrador** (2 de octubre de 2026). El
-sitio todavía no los lee; la API los guarda y los entrega igual:
+**Campos nuevos que trae el administrador** (2 de octubre de 2026). La API
+los guarda y los entrega con la pieza:
 
 ```js
 {
   acabados: [{ nombre: "Plumbago", grupo: "azul" }], // nombre comercial y su grupo
   combina: ["mesa-tempo", "silla-orbita"],           // piezas que combinan, en orden
+  alts: ["", "Silla Órbita en una sala de juntas"],  // texto alternativo de cada foto (la 0 es `alt`)
+  ambiente: "/img/products/orbita-sala.jpg",         // la foto grande de abajo; "" = la segunda
+  video: { src: "/video/orbita.mp4", poster: "" },   // al final de la galería; null = el general
+  destacada: true,                                   // entra a "Piezas destacadas" del inicio
 }
 ```
+
+El sitio ya lee `alts`, `ambiente`, `video` y los nombres de `acabados`
+(panel "Materiales y cuidados"); sin ellos sale como hoy. `destacada`
+sustituye a la lista `destacados` de `site.js`: la API la arma con las
+piezas publicadas que tengan `destacada: true`, en el orden en que se
+marcaron (después tendrá su pantalla para ordenarlas).
+
+Los tres recuadros bajo la foto de ambiente (Entrega e instalación,
+Materiales, Cuidados) son **textos generales, iguales en todas las piezas y
+sin plazos**: no se administran por pieza.
 
 - `acabados` guarda el nombre comercial de cada tela o color junto con su
   grupo de `gruposColor`. `colores` (lo que filtra el sitio) se sigue

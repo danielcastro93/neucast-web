@@ -44,6 +44,9 @@ export const piezaVacia = () => ({
   alts: [],
   alt: "",
   nuevo: false,
+  destacada: false, // entra al carrusel "Piezas destacadas" del inicio
+  ambiente: "",     // la foto grande de abajo; vacía = la segunda de la galería
+  video: null,      // { src } al final de la galería; null = el video general
   // el valor de cada lista va con el id de la lista (material, entrega,
   // uso, respaldo… o el de una lista nueva)
   material: "",
