@@ -619,6 +619,12 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
       }
       /* las columnas respiran después de la línea */
       .ft-cols{padding-top:clamp(40px,5vw,64px);}
+      /* Si la página termina en un cierre con foto de orilla a orilla
+         (.cierre-sangre), el footer arranca pegado a la foto: el blanco de
+         arriba quedaba como un hueco y la orilla de la foto ya marca el corte.
+         Las páginas que terminan en texto o tarjetas conservan su aire. */
+      /* "último" sin contar scripts: Astro puede dejar alguno después */
+      main:has(> .cierre-sangre):not(:has(> .cierre-sangre ~ :not(script, style, template))) + .ft{margin-top:0;border-top:0;}
 
       @media (min-width:900px){
       }
@@ -650,7 +656,10 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
         padding-top:20px;
         /* la burbuja de WhatsApp ya no se esconde en el footer: el pie deja sitio
            debajo de la última línea para que flote sobre vacío */
-        padding-bottom:calc(104px + env(safe-area-inset-bottom));
+        /* En teléfono los avisos van a la izquierda y la burbuja flota a la
+           derecha: no se tocan, así que basta un respiro. En escritorio los
+           avisos van a la derecha, justo bajo la burbuja (ver abajo). */
+        padding-bottom:calc(28px + env(safe-area-inset-bottom));
         font-size:var(--text-xs);color:var(--ink-60);
         display:flex;flex-direction:column;gap:12px;
       }
@@ -666,6 +675,7 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
       @media (min-width:640px){
         .ft-bottom{
           flex-direction:row;align-items:baseline;justify-content:space-between;gap:24px;
+          padding-bottom:calc(104px + env(safe-area-inset-bottom));
         }
         .ft-legal{flex-direction:row;gap:24px;}
       }
