@@ -5,7 +5,7 @@ import { listar, publicar } from "./api.js";
 import { medio } from "./medios.js";
 import { escapar, fechaRelativa } from "./ui.js";
 
-const QUE = { piezas: "Pieza", categorias: "Categoría", proyectos: "Proyecto", ajustes: "Ajustes", "home-office": "Home office" };
+const QUE = { piezas: "Pieza", categorias: "Categoría", proyectos: "Proyecto", ajustes: "Ajustes", "home-office": "Home office", listas: "Listas" };
 const base = import.meta.env.BASE_URL;
 
 export async function estado() {

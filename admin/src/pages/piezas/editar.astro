@@ -356,6 +356,18 @@ const secciones = [
     </Fragment>
   </Modal>
 
+  <Modal id="modal-opcion" titulo="Nueva opción" texto="Se agrega a la lista para todas las piezas y queda marcada en esta. Para cambiarle el nombre o quitarla, ve a Listas.">
+    <div class="campo">
+      <div class="campo-etiqueta"><label for="opcion-nombre">Nombre</label></div>
+      <input class="control" id="opcion-nombre" type="text" data-opcion-nombre placeholder="Ej. Gerencial" autocomplete="off" />
+      <p class="campo-error" data-opcion-error hidden style="display:block"></p>
+    </div>
+    <Fragment slot="pie">
+      <button class="boton" type="button" data-cierra-modal>Cancelar</button>
+      <button class="boton boton--primario" type="button" data-opcion-crear>Agregar a la lista</button>
+    </Fragment>
+  </Modal>
+
   <Modal id="modal-salir" titulo="Tienes cambios sin guardar" texto="Si sales ahora se pierden.">
     <Fragment slot="pie">
       <button class="boton boton--texto" type="button" data-salir-sin-guardar>Salir sin guardar</button>
@@ -366,11 +378,12 @@ const secciones = [
 
 <script>
   import { obtener, listar, guardar } from "../../scripts/api.js";
+  import { limpiarSlug as idDe } from "../../scripts/validar.js";
   import { medio } from "../../scripts/medios.js";
   import { validarPieza, revisarTexto, revisarMedida, proponerSlug, limpiarSlug, acabadosDe } from "../../scripts/validar.js";
   import {
     piezaVacia, OBLIGATORIOS, SEGUN_CATEGORIA, FILTROS_POR_CATEGORIA, MEDIDAS, GRUPOS_MEDIDA, MEDIDAS_POR_CATEGORIA,
-    EJEMPLO_MEDIDA, CONSTRUCCION_POR_CATEGORIA, EJEMPLO_CONSTRUCCION, MAX_COMBINA,
+    EJEMPLO_MEDIDA, UNIDAD_MEDIDA, CONTEOS, CONSTRUCCION_POR_CATEGORIA, EJEMPLO_CONSTRUCCION, MAX_COMBINA,
   } from "../../scripts/esquemas/pieza.js";
   import { abrirModal, cerrarModal, avisar, escapar, fechaRelativa } from "../../scripts/ui.js";
 
@@ -422,6 +435,14 @@ const secciones = [
   function llenarSelectores() {
     for (const c of categorias) $("#cat").insertAdjacentHTML("beforeend", `<option value="${escapar(c.slug)}">${escapar(c.name)}</option>`);
     for (const m of listas.materiales) $("#material").insertAdjacentHTML("beforeend", `<option value="${escapar(m.id)}">${escapar(m.nombre)}</option>`);
+    $("#material").insertAdjacentHTML("beforeend", `<option value="__nuevo">Nuevo material…</option>`);
+    let materialPrevio = "";
+    $("#material").addEventListener("focus", () => (materialPrevio = $("#material").value));
+    $("#material").addEventListener("change", () => {
+      if ($("#material").value !== "__nuevo") return;
+      $("#material").value = materialPrevio;
+      pedirOpcion("material");
+    });
     for (const o of filtro("entrega").opciones) $("#entrega").insertAdjacentHTML("beforeend", `<option value="${escapar(o.id)}">${escapar(o.nombre)}</option>`);
     $("[data-chips='espacios']").innerHTML = listas.espacios
       .map((e) => `<label class="chip"><input type="checkbox" name="espacios" value="${escapar(e.id)}" />${escapar(e.nombre)}</label>`)
@@ -523,11 +544,12 @@ const secciones = [
           .join("");
         return `<div class="campo" data-campo="${campo}">
           <div class="campo-etiqueta"><span class="etiqueta">${etiquetas[campo] || f.nombre}${oblig ? '<span class="obligatorio">*</span>' : ""}</span>${multiple ? '<span class="etiqueta-nota">las que apliquen</span>' : !oblig ? `<button class="enlace-chico" type="button" data-quitar-radio="${campo}">Ninguno</button>` : ""}</div>
-          <div class="chips">${opciones}</div>
+          <div class="chips">${opciones}<button type="button" class="chip chip--agregar" data-agregar-opcion="${campo}"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg>Agregar</button></div>
           <p class="campo-error" data-error></p>
         </div>`;
       })
       .join("")}</div>`;
+    $$("[data-agregar-opcion]", caja).forEach((b) => b.addEventListener("click", () => pedirOpcion(b.dataset.agregarOpcion)));
     $$("[data-quitar-radio]", caja).forEach((b) =>
       b.addEventListener("click", () => {
         $$(`input[name='${b.dataset.quitarRadio}']`, caja).forEach((i) => (i.checked = false));
@@ -535,6 +557,58 @@ const secciones = [
       })
     );
   }
+
+  /* ---------- Opciones nuevas de una lista cerrada ----------
+     Se dan de alta aquí mismo y quedan marcadas en la pieza. Renombrar o
+     borrar opciones va en la pantalla Listas: eso cambia las piezas que ya
+     las usan. */
+  let opcionPara = null;
+  const NOMBRE_LISTA = { uso: "tipo de uso", respaldo: "respaldo", brazos: "descansabrazos", base: "base", plazas: "plazas", extras: "característica", material: "material" };
+  function pedirOpcion(campo) {
+    opcionPara = campo;
+    $("#modal-opcion [data-titulo]").textContent = `Nueva opción de ${NOMBRE_LISTA[campo] || campo}`;
+    $("[data-opcion-nombre]").value = "";
+    $("[data-opcion-error]").hidden = true;
+    abrirModal("modal-opcion");
+  }
+  async function crearOpcion() {
+    const nombre = $("[data-opcion-nombre]").value.trim().replace(/\s+/g, " ");
+    const error = $("[data-opcion-error]");
+    if (!nombre) { error.textContent = "Escribe el nombre de la opción."; error.hidden = false; return; }
+    const campo = opcionPara;
+    const lista = campo === "material" ? listas.materiales : filtro(campo).opciones;
+    const id = idDe(nombre);
+    if (lista.some((o) => o.id === id || o.nombre.toLowerCase() === nombre.toLowerCase())) {
+      error.textContent = "Esa opción ya existe en la lista."; error.hidden = false; return;
+    }
+    lista.push({ id, nombre });
+    const boton = $("[data-opcion-crear]");
+    boton.setAttribute("aria-busy", "true");
+    try {
+      listas = await guardar("listas", listas);
+      pieza = { ...pieza, ...leer() };
+      if (campo === "material") {
+        $("#material").insertAdjacentHTML("beforeend", `<option value="${escapar(id)}">${escapar(nombre)}</option>`);
+        $("#material").value = id;
+      } else if (campo === "extras") {
+        pieza.extras = [...(pieza.extras || []), id];
+      } else {
+        pieza[campo] = id;
+      }
+      pintarFiltrosCategoria();
+      cerrarModal("modal-opcion");
+      marcarCambio();
+      avisar(`"${nombre}" se agregó a la lista y quedó marcada`);
+      dispatchEvent(new CustomEvent("neucast:guardado"));
+    } catch (e) {
+      lista.pop();
+      avisar(e.message || "No se pudo agregar", { tipo: "error" });
+    } finally {
+      boton.removeAttribute("aria-busy");
+    }
+  }
+  $("[data-opcion-crear]").addEventListener("click", crearOpcion);
+  $("[data-opcion-nombre]").addEventListener("keydown", (e) => e.key === "Enter" && (e.preventDefault(), crearOpcion()));
 
   /* ---------- Medidas en grupos ---------- */
   function pintarMedidas() {
@@ -548,7 +622,7 @@ const secciones = [
           <span class="grupo-rotulo">${escapar(g.nombre)}</span>
           <div class="grupo-lista grupo-lista--dos">${g.claves
             .filter((k) => listas.etiquetasMedida[k])
-            .map((k) => `<label class="fila-lista"><span class="fila-lista-etiqueta">${escapar(listas.etiquetasMedida[k])}</span><input class="fila-lista-control" data-medida="${k}" type="text" value="${escapar(actuales[k] || "")}" placeholder="${escapar(EJEMPLO_MEDIDA[k] || "")}" inputmode="text" /></label>`)
+            .map((k) => `<label class="fila-lista"><span class="fila-lista-etiqueta">${escapar(listas.etiquetasMedida[k])}</span><input class="fila-lista-control fila-lista-control--numero" data-medida="${k}" type="text" value="${escapar(aCampo(k, actuales[k]))}" placeholder="${escapar(EJEMPLO_MEDIDA[k] || "")}" inputmode="${CONTEOS.has(k) ? "numeric" : "decimal"}" autocomplete="off" />${UNIDAD_MEDIDA[k] ? `<span class="fila-lista-unidad">${UNIDAD_MEDIDA[k]}</span>` : ""}</label>`)
             .join("")}</div>
         </div>`)
       .join("");
@@ -556,6 +630,34 @@ const secciones = [
     const mas = $("[data-mas-medidas]");
     mas.hidden = !ocultos && !verTodasMedidas;
     mas.textContent = verTodasMedidas ? "Solo las de esta categoría" : `Más medidas (${ocultos} ${ocultos === 1 ? "grupo" : "grupos"})`;
+  }
+
+  // Lo guardado ("45 a 55 cm") se edita como "45-55"; al guardar regresa
+  // a su forma con la unidad.
+  function aCampo(k, valor) {
+    if (!valor) return "";
+    return String(valor).replace(/\s*(cm|mm|kg)\.?\s*$/i, "").replace(/\s+a\s+/g, "-").trim();
+  }
+  function aDato(k, campo) {
+    const v = (campo || "").trim().replace(/-+$/, "").replace(/^-+/, "");
+    if (!v) return "";
+    const partes = v.split("-").map((x) => x.trim()).filter(Boolean);
+    const unidad = UNIDAD_MEDIDA[k] ? ` ${UNIDAD_MEDIDA[k]}` : "";
+    return `${partes.join(" a ")}${unidad}`;
+  }
+  // Solo números: enteros en los conteos; decimales y un guion de rango en
+  // lo demás. Lo que no cabe ahí ni siquiera se escribe.
+  function filtrarMedida(inp) {
+    const k = inp.dataset.medida;
+    let v = inp.value;
+    if (CONTEOS.has(k)) v = v.replace(/\D/g, "");
+    else {
+      v = v.replace(/,/g, ".").replace(/[^\d.\-]/g, "");
+      const [a, ...resto] = v.split("-");
+      v = resto.length ? `${a}-${resto.join("").replace(/-/g, "")}` : a;
+      v = v.split("-").map((n) => n.replace(/(\..*)\./g, "$1")).join("-");
+    }
+    if (v !== inp.value) inp.value = v;
   }
 
   function pintarConstruccion() {
@@ -704,7 +806,12 @@ const secciones = [
     );
   }
   const leerFrases = (nombre) => $$(`[data-frase='${nombre}']`).map((i) => i.value.trim()).filter(Boolean);
-  const leerPares = (attr) => Object.fromEntries($$(`[data-${attr}]`).map((i) => [i.dataset[attr], i.value.trim()]).filter(([, v]) => v));
+  const leerPares = (attr) =>
+    Object.fromEntries(
+      $$(`[data-${attr}]`)
+        .map((i) => [i.dataset[attr], attr === "medida" ? aDato(i.dataset.medida, i.value) : i.value.trim()])
+        .filter(([, v]) => v)
+    );
 
   /* ---------- Galería ----------
      La principal va grande; las demás, en miniaturas que caben de a muchas
@@ -910,7 +1017,7 @@ const secciones = [
         ...pieza.ficha,
         resumen: form.resumen.value.trim(),
         destacados: leerFrases("destacados"),
-        medidas: { ...pieza.ficha?.medidas, ...Object.fromEntries($$("[data-medida]").map((i) => [i.dataset.medida, i.value.trim()])) },
+        medidas: { ...pieza.ficha?.medidas, ...Object.fromEntries($$("[data-medida]").map((i) => [i.dataset.medida, aDato(i.dataset.medida, i.value)])) },
         construccion: { ...pieza.ficha?.construccion, ...Object.fromEntries($$("[data-construccion]").map((i) => [i.dataset.construccion, i.value.trim()])) },
         mecanismo: mecNombre || ajustes.length ? { nombre: mecNombre, ajustes } : null,
         cuidados: leerFrases("cuidados"),
@@ -1044,6 +1151,7 @@ const secciones = [
       if (campo && $(`[data-campo='${campo}']`)?.dataset.error) ponerError(campo, null);
     });
     form.addEventListener("change", marcarCambio);
+    form.addEventListener("input", (e) => { if (e.target.matches("[data-medida]")) filtrarMedida(e.target); }, true);
 
     // la dirección se propone sola mientras la pieza es nueva y nadie la tocó
     let slugTocado = !!original;

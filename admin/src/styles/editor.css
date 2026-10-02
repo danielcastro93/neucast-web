@@ -140,8 +140,8 @@
 }
 .vacio-chico svg{flex:none;color:var(--ink-40);}
 
-.filtros-categoria{display:grid;gap:24px;grid-template-columns:repeat(2,minmax(0,1fr));}
-.filtros-categoria .campo:has(input[name="extras"]){grid-column:1 / -1;}
+/* una columna: cada lista puede crecer y sus chips fluyen en renglones */
+.filtros-categoria{display:grid;gap:26px;grid-template-columns:1fr;}
 
 /* ---------- Acabados ----------
    Cada acabado es una tarjetita: su nombre comercial arriba y, debajo, el
@@ -169,6 +169,8 @@
 .acabado-grupo-nombre{margin-left:4px;font-size:var(--t-subtitulo);font-weight:600;color:var(--etiqueta-2);}
 .campo[data-error] .acabado{box-shadow:0 0 0 1.5px rgba(179,58,58,.45);}
 .boton--agregar{align-self:flex-start;}
+.chip--agregar{background:transparent;box-shadow:inset 0 0 0 1.5px var(--borde-fuerte);color:var(--etiqueta-2);gap:6px;}
+@media (hover:hover){.chip--agregar:hover{background:var(--relleno);color:var(--etiqueta);box-shadow:inset 0 0 0 1.5px transparent;}}
 
 /* ---------- Lista agrupada ----------
    El patrón de la app de Ajustes: renglones de 52 con la etiqueta a la
@@ -197,6 +199,8 @@
   font-variant-numeric:tabular-nums;
 }
 .fila-lista-control--izq{flex:1;width:auto;min-width:0;text-align:left;}
+.fila-lista-control--numero{width:96px;}
+.fila-lista-unidad{flex:none;width:24px;margin-left:-8px;font-size:var(--t-cuerpo);color:var(--etiqueta-3);}
 .fila-lista-control::placeholder{color:var(--etiqueta-4);}
 .fila-lista-control:focus{outline:0;}
 .fila-lista-n{
@@ -397,6 +401,7 @@ body:has(.guardar) .avisos{bottom:96px;}
   .seccion-cabeza{padding:20px 18px 16px;gap:12px;}
   .seccion-cuerpo{padding:22px 18px;gap:24px;}
   .fila,.filtros-categoria,.opciones-estado{grid-template-columns:1fr;gap:22px;}
+  .fila-lista-control--numero{width:80px;}
   .acabados{grid-template-columns:1fr;}
   .acabado-grupos{gap:6px;}
   .color{width:28px;height:28px;}

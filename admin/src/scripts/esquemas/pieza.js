@@ -52,15 +52,28 @@ export const MEDIDAS_POR_CATEGORIA = {
   almacenamiento: ["generales", "guardado"],
 };
 
+// La unidad de cada medida: va escrita fuera del campo, para que nadie la
+// borre sin querer. Las que no tienen unidad son conteos y solo aceptan
+// enteros. Las que admiten rango (lo que se ajusta) se escriben "45-55" y se
+// guardan "45 a 55 cm", como en la ficha del sitio.
+export const UNIDAD_MEDIDA = {
+  alto: "cm", ancho: "cm", fondo: "cm", largo: "cm", diametro: "cm", peso: "kg",
+  altoAsiento: "cm", anchoAsiento: "cm", fondoAsiento: "cm", altoRespaldo: "cm",
+  brazoInterno: "cm", brazoExterno: "cm", cabecera: "cm",
+  espesorCubierta: "mm", alturaLibre: "cm",
+  carga: "kg", cargaEntrepano: "kg", cargaGaveta: "kg",
+};
+export const CONTEOS = new Set(["plazas", "personas", "puestos", "apilables", "puertas", "gavetas", "entrepanos"]);
+
 // Ejemplos para los placeholders. Son ejemplos de formato, no datos: nada de
 // esto se publica.
 export const EJEMPLO_MEDIDA = {
-  alto: "118 cm", ancho: "68 cm", fondo: "70 cm", largo: "240 cm", diametro: "120 cm", peso: "19 kg",
-  altoAsiento: "45 a 55 cm", anchoAsiento: "50 cm", fondoAsiento: "48 cm", altoRespaldo: "72 cm",
-  brazoInterno: "48 cm", brazoExterno: "68 cm", cabecera: "26 cm",
-  espesorCubierta: "25 mm", alturaLibre: "68 cm",
-  plazas: "3", personas: "8", puestos: "4", apilables: "6", carga: "130 kg",
-  puertas: "2", gavetas: "3", entrepanos: "4", cargaEntrepano: "30 kg", cargaGaveta: "25 kg",
+  alto: "118", ancho: "68", fondo: "70", largo: "240", diametro: "120", peso: "19",
+  altoAsiento: "45-55", anchoAsiento: "50", fondoAsiento: "48", altoRespaldo: "72",
+  brazoInterno: "48", brazoExterno: "68", cabecera: "26",
+  espesorCubierta: "25", alturaLibre: "68",
+  plazas: "3", personas: "8", puestos: "4", apilables: "6", carga: "130",
+  puertas: "2", gavetas: "3", entrepanos: "4", cargaEntrepano: "30", cargaGaveta: "25",
 };
 
 // Qué partes de construcción tiene cada categoría.
