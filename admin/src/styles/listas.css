@@ -1,0 +1,81 @@
+/* ============================================
+   Listas: índice a la izquierda y opciones a la derecha, como los Ajustes
+   de un Mac. En teléfono, el índice es una lista que entra a cada detalle.
+   Usa la lista agrupada de editor.css (grupo-lista, fila-lista).
+   ============================================ */
+
+.listas{display:grid;grid-template-columns:280px minmax(0,1fr);gap:var(--space-6);align-items:start;}
+.listas-indice{position:sticky;top:calc(var(--barra-h) + 20px);}
+.listas-indice ul,.opciones{list-style:none;margin:0;padding:0;}
+.listas-indice li + li .fila-lista{box-shadow:inset 0 1px 0 var(--borde);}
+
+.fila-lista--enlace{cursor:pointer;color:inherit;}
+.fila-lista--enlace .fila-lista-etiqueta{font-weight:500;}
+.fila-lista-cuenta{font-size:var(--t-subtitulo);color:var(--etiqueta-3);font-variant-numeric:tabular-nums;}
+.fila-lista-flecha{flex:none;color:var(--etiqueta-3);transition:transform .25s var(--resorte);}
+@media (hover:hover){.fila-lista--enlace:hover{background:#FAFAF8;}.fila-lista--enlace:hover .fila-lista-flecha{transform:translateX(2px);}}
+.fila-lista--enlace.activa{background:var(--ink);}
+.fila-lista--enlace.activa .fila-lista-etiqueta{color:var(--white);font-weight:600;}
+.fila-lista--enlace.activa .fila-lista-cuenta,.fila-lista--enlace.activa .fila-lista-flecha{color:rgba(255,255,255,.6);}
+.fila-lista--enlace:focus-visible{outline:0;box-shadow:inset 0 0 0 2px var(--olive);}
+
+.listas-detalle{
+  min-width:0;padding:30px 32px 32px;border-radius:var(--radio);
+  background:var(--white);box-shadow:var(--sombra-1);
+  display:flex;flex-direction:column;gap:var(--esp-nota-bloque);
+  animation:entraPantalla .35s var(--ease);
+}
+.listas-cabeza{display:flex;flex-direction:column;gap:var(--esp-titulo-texto);margin-bottom:var(--space-3);}
+.listas-volver{display:none;}
+
+.opciones .fila-lista + .fila-lista{box-shadow:inset 0 1px 0 var(--borde);}
+.opcion-lista{gap:12px;padding-left:8px;cursor:default;}
+.opcion-lista.arrastrando{position:relative;z-index:2;background:var(--white);box-shadow:var(--sombra-2) !important;border-radius:12px;transform:scale(1.01);}
+.opcion-asa{
+  flex:none;width:30px;height:36px;display:grid;place-items:center;border-radius:8px;
+  color:var(--etiqueta-4);cursor:grab;touch-action:none;transition:color .15s,background .15s;
+}
+.opcion-asa:active{cursor:grabbing;}
+@media (hover:hover){.opcion-asa:hover{color:var(--etiqueta-2);background:var(--relleno);}}
+.opcion-color{
+  position:relative;flex:none;width:26px;height:26px;border-radius:50%;cursor:pointer;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.12);transition:transform .3s var(--resorte);
+}
+.opcion-color:hover{transform:scale(1.1);}
+.opcion-color input,.agregar-color input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:0;padding:0;}
+.opcion-lista .fila-lista-control{font-weight:500;}
+.opcion-lista .fila-lista-control:focus{background:transparent;}
+.opcion-uso{flex:none;font-size:var(--t-subtitulo);color:var(--etiqueta-3);white-space:nowrap;font-variant-numeric:tabular-nums;}
+.opcion-uso--libre{color:var(--etiqueta-4);}
+.opciones-vacia{color:var(--etiqueta-3);font-size:var(--t-llamada);}
+
+.agregar-opcion{display:flex;align-items:center;gap:10px;margin-top:var(--space-2);}
+.agregar-opcion .control{flex:1;}
+.agregar-color{
+  position:relative;flex:none;width:48px;height:48px;border-radius:14px;
+  background:#8A8A87;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12);
+}
+.listas-pie{margin-top:var(--space-2);}
+
+/* ---------- Tableta y teléfono: índice y detalle por separado ---------- */
+@media (max-width:900px){
+  .listas{grid-template-columns:minmax(0,1fr);}
+  .listas[data-vista="indice"] .listas-detalle{display:none;}
+  .listas[data-vista="detalle"] .listas-indice{display:none;}
+  .listas-indice{position:static;}
+  .fila-lista--enlace.activa{background:var(--white);}
+  .fila-lista--enlace.activa .fila-lista-etiqueta{color:var(--etiqueta);font-weight:500;}
+  .fila-lista--enlace.activa .fila-lista-cuenta,.fila-lista--enlace.activa .fila-lista-flecha{color:var(--etiqueta-3);}
+  .listas-volver{
+    display:inline-flex;align-items:center;gap:4px;align-self:flex-start;
+    margin:-6px 0 4px -8px;padding:6px 10px 6px 4px;border-radius:999px;
+    font-size:var(--t-llamada);font-weight:600;color:var(--olive-deep);
+  }
+  .listas-detalle{padding:22px 18px 26px;}
+}
+@media (max-width:640px){
+  .agregar-opcion{flex-wrap:wrap;}
+  .agregar-opcion .control{flex:1 1 0;}
+  .agregar-opcion .boton{flex:1 1 100%;height:48px;}
+  .opcion-uso{display:none;}
+}

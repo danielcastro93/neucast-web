@@ -148,13 +148,12 @@ sitio todavía no los lee; la API los guarda y los entrega igual:
   grupo de `gruposColor`. `colores` (lo que filtra el sitio) se sigue
   entregando y es la lista de grupos sin repetir: el administrador la deriva
   al guardar. Cuando la ficha enseñe los nombres comerciales, los lee de aquí.
-- Las **listas cerradas crecen desde el administrador**: en la pieza, cada
-  lista (tipo de uso, respaldo, base, características, material…) tiene
-  "Agregar", que da de alta la opción con un `id` sin acentos y la deja
-  marcada. Por eso, al conectar, `filtros`, `materiales` y `gruposColor`
+- Las **listas cerradas crecen desde el administrador**, en la pantalla
+  Listas: se agregan opciones (con un `id` sin acentos que ya no cambia), se
+  renombran, se ordenan y se quitan si ninguna pieza las usa. Por eso, al conectar, `filtros`, `materiales` y `gruposColor`
   tienen que venir de la API y no de `catalogo.js`: si no, la opción nueva no
-  aparece en el panel de filtros del sitio. Renombrar o borrar una opción va
-  en la pantalla Listas, porque cambia las piezas que ya la usan.
+  aparece en el panel de filtros del sitio, y el orden de la lista es el
+  orden en que el sitio enseña las opciones.
 - Las **medidas** se capturan como número con su unidad fija (cm, mm, kg) o
   como conteo entero (plazas, personas, puertas…). Se siguen guardando como
   texto con la forma de hoy: `"84 cm"`, `"45 a 55 cm"`, `"6"`.

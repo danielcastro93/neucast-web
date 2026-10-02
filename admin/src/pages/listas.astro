@@ -1,0 +1,283 @@
+---
+// Listas: las opciones cerradas que se eligen en cada pieza (material,
+// colores, tipo de uso, respaldo, descansabrazos, base, plazas,
+// características y disponibilidad). Es el único lugar donde se dan de alta,
+// se renombran, se ordenan y se quitan. Se guarda solo, como los Ajustes.
+import Admin from "../layouts/Admin.astro";
+import IconoAdmin from "../components/IconoAdmin.astro";
+import "../styles/editor.css";
+import "../styles/listas.css";
+---
+<Admin titulo="Listas" seccion="listas">
+  <div class="cabecera">
+    <div class="cabecera-textos">
+      <h1 class="t-pantalla">Listas</h1>
+      <p class="t-apoyo">Las opciones que se eligen en cada pieza y con las que se filtra el catálogo. Lo que cambies aquí aparece en todas las piezas y sale a pruebas al momento.</p>
+    </div>
+  </div>
+
+  <div class="listas" data-listas data-vista="indice">
+    <nav class="listas-indice" aria-label="Listas">
+      <ul class="grupo-lista" data-indice></ul>
+    </nav>
+
+    <section class="listas-detalle" aria-live="polite">
+      <button class="listas-volver" type="button" data-volver><IconoAdmin name="chevronIzq" size={18} />Listas</button>
+      <header class="listas-cabeza">
+        <h2 class="t-seccion" data-titulo-lista>&nbsp;</h2>
+        <p class="t-mini" data-nota-lista></p>
+      </header>
+
+      <ul class="grupo-lista opciones" data-opciones></ul>
+
+      <form class="agregar-opcion" data-agregar novalidate>
+        <span class="agregar-color" data-agregar-color hidden>
+          <input type="color" value="#8A8A87" data-color-nuevo aria-label="Color" />
+        </span>
+        <input class="control" type="text" data-nombre-nuevo placeholder="Nueva opción" autocomplete="off" aria-label="Nombre de la opción nueva" />
+        <button class="boton boton--primario" type="submit"><IconoAdmin name="mas" size={16} />Agregar</button>
+      </form>
+      <p class="campo-error" data-error-nuevo hidden style="display:block"></p>
+      <p class="t-mini listas-pie">Arrastra para cambiar el orden: así salen en la pieza y en los filtros del sitio. Para cambiar un nombre, tócalo. Una opción que usa alguna pieza no se puede quitar hasta cambiar esas piezas.</p>
+    </section>
+  </div>
+</Admin>
+
+<script>
+  import { listar, guardar } from "../scripts/api.js";
+  import { confirmar, avisar, escapar } from "../scripts/ui.js";
+  import { limpiarSlug } from "../scripts/validar.js";
+
+  const base = import.meta.env.BASE_URL;
+  const $ = (s, el = document) => el.querySelector(s);
+  const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+  const caja = $("[data-listas]");
+
+  // Qué listas hay, cómo se llaman aquí y qué campo de la pieza las usa.
+  const LISTAS = [
+    { id: "materiales", nombre: "Materiales", campo: "material", nota: "El material principal de cada pieza. Una sola opción por pieza." },
+    { id: "gruposColor", nombre: "Grupos de color", campo: "colores", color: true, nota: "Los grupos por los que se filtra. El nombre comercial de cada tela o acabado se escribe en la pieza; aquí va el color del círculo." },
+    { id: "uso", nombre: "Tipo de uso", campo: "uso", nota: "Para qué se usa la pieza. Obligatorio en todas." },
+    { id: "respaldo", nombre: "Respaldo", campo: "respaldo", nota: "Se pide en sillas." },
+    { id: "brazos", nombre: "Descansabrazos", campo: "brazos", nota: "Se pide en sillas." },
+    { id: "base", nombre: "Base", campo: "base", nota: "Se pide en sillas, mesas y escritorios." },
+    { id: "plazas", nombre: "Plazas", campo: "plazas", nota: "Se pide en sofás y bancas." },
+    { id: "extras", nombre: "Características", campo: "extras", nota: "Varias por pieza: apilable, con ruedas…" },
+    { id: "entrega", nombre: "Disponibilidad", campo: "entrega", nota: "En cuánto se entrega. Sale en la ficha y en el recuadro de entrega." },
+  ];
+
+  let listas = null;
+  let piezas = [];
+  let actual = LISTAS[0];
+
+  const opcionesDe = (l) =>
+    l.id === "materiales" ? listas.materiales
+    : l.id === "gruposColor" ? listas.gruposColor
+    : listas.filtros.find((f) => f.campo === l.id)?.opciones || [];
+
+  const usanOpcion = (l, id) =>
+    piezas.filter((p) => {
+      const v = l.campo === "colores" ? (p.acabados?.length ? p.acabados.map((a) => a.grupo) : p.colores) : p[l.campo];
+      return Array.isArray(v) ? v.includes(id) : String(v ?? "") === id;
+    });
+
+  /* ---------- Pintar ---------- */
+  function pintarIndice() {
+    $("[data-indice]").innerHTML = LISTAS.map((l) => `
+      <li><a class="fila-lista fila-lista--enlace${l === actual ? " activa" : ""}" href="#${l.id}" data-lista="${l.id}">
+        <span class="fila-lista-etiqueta">${escapar(l.nombre)}</span>
+        <span class="fila-lista-cuenta">${opcionesDe(l).length}</span>
+        <svg class="fila-lista-flecha" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 5 5 5-5 5"/></svg>
+      </a></li>`).join("");
+  }
+
+  function pintarDetalle() {
+    $("[data-titulo-lista]").textContent = actual.nombre;
+    $("[data-nota-lista]").textContent = actual.nota;
+    $("[data-agregar-color]").hidden = !actual.color;
+    $("[data-nombre-nuevo]").placeholder = actual.color ? "Nuevo grupo, ej. Naranja" : `Nueva opción de ${actual.nombre.toLowerCase()}`;
+    $("[data-error-nuevo]").hidden = true;
+    const ops = opcionesDe(actual);
+    $("[data-opciones]").innerHTML = ops.length
+      ? ops.map((o, i) => {
+          const n = usanOpcion(actual, o.id).length;
+          return `<li class="fila-lista opcion-lista" data-i="${i}">
+            <span class="opcion-asa" data-asa aria-label="Arrastrar para ordenar" title="Arrastrar para ordenar"><svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><circle cx="7.5" cy="5.5" r="1.3"/><circle cx="12.5" cy="5.5" r="1.3"/><circle cx="7.5" cy="10" r="1.3"/><circle cx="12.5" cy="10" r="1.3"/><circle cx="7.5" cy="14.5" r="1.3"/><circle cx="12.5" cy="14.5" r="1.3"/></svg></span>
+            ${actual.color ? `<label class="opcion-color" style="background:${escapar(o.hex)}"><input type="color" value="${escapar(o.hex)}" data-color aria-label="Color de ${escapar(o.nombre)}" /></label>` : ""}
+            <input class="fila-lista-control fila-lista-control--izq" type="text" value="${escapar(o.nombre)}" data-nombre aria-label="Nombre de la opción" />
+            <span class="opcion-uso${n ? "" : " opcion-uso--libre"}">${n ? `${n} ${n === 1 ? "pieza" : "piezas"}` : "sin usar"}</span>
+            <button class="fila-lista-quitar" type="button" data-quitar aria-label="Quitar ${escapar(o.nombre)}"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h12M8 6V4.5A.5.5 0 0 1 8.5 4h3a.5.5 0 0 1 .5.5V6M6 6l.7 9.3a1 1 0 0 0 1 .7h4.6a1 1 0 0 0 1-.7L14 6"/></svg></button>
+          </li>`;
+        }).join("")
+      : `<li class="fila-lista opciones-vacia">Todavía no hay opciones. Agrega la primera abajo.</li>`;
+    cablearOpciones();
+  }
+
+  function pintar() {
+    pintarIndice();
+    pintarDetalle();
+  }
+
+  /* ---------- Guardar: cada cambio se guarda solo ---------- */
+  let guardando = Promise.resolve();
+  function guardarListas(mensaje) {
+    guardando = guardando.then(async () => {
+      try {
+        // lo local manda: la respuesta no sustituye a `listas`, para que una
+        // edición hecha mientras se guardaba no se pierda
+        await guardar("listas", listas);
+        dispatchEvent(new CustomEvent("neucast:guardado"));
+        if (mensaje) avisar(mensaje);
+      } catch (e) {
+        avisar(e.message || "No se pudo guardar", { tipo: "error" });
+      }
+    });
+    return guardando;
+  }
+
+  /* ---------- Opciones: renombrar, color, quitar, ordenar ---------- */
+  function cablearOpciones() {
+    $$(".opcion-lista").forEach((fila) => {
+      const i = +fila.dataset.i;
+      const nombre = $("[data-nombre]", fila);
+      const original = opcionesDe(actual)[i].nombre;
+      const confirmarNombre = () => {
+        const ops = opcionesDe(actual);
+        const v = nombre.value.trim().replace(/\s+/g, " ");
+        if (!v) { nombre.value = original; return; }
+        if (v === ops[i].nombre) return;
+        if (ops.some((o, j) => j !== i && o.nombre.toLowerCase() === v.toLowerCase())) {
+          avisar("Ya hay otra opción con ese nombre", { tipo: "alerta" });
+          nombre.value = ops[i].nombre;
+          return;
+        }
+        ops[i].nombre = v; // el id no cambia: las piezas la siguen encontrando
+        guardarListas(`Ahora se llama "${v}"`);
+        pintarIndice();
+      };
+      nombre.addEventListener("blur", confirmarNombre);
+      nombre.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") { e.preventDefault(); nombre.blur(); }
+        if (e.key === "Escape") { nombre.value = opcionesDe(actual)[i].nombre; nombre.blur(); }
+      });
+      const color = $("[data-color]", fila);
+      color?.addEventListener("input", () => (color.parentElement.style.background = color.value));
+      color?.addEventListener("change", () => {
+        const o = opcionesDe(actual)[i];
+        o.hex = color.value.toUpperCase();
+        guardarListas(`Se cambió el color de ${o.nombre}`);
+      });
+      $("[data-quitar]", fila).addEventListener("click", () => quitar(i));
+      $("[data-asa]", fila).addEventListener("pointerdown", (e) => arrastrar(e, fila));
+    });
+  }
+
+  async function quitar(i) {
+    const ops = opcionesDe(actual);
+    const o = ops[i];
+    const usan = usanOpcion(actual, o.id);
+    if (usan.length) {
+      const nombres = usan.slice(0, 4).map((p) => p.nombre).join(", ") + (usan.length > 4 ? ` y ${usan.length - 4} más` : "");
+      await confirmar({
+        titulo: `"${o.nombre}" está en uso`,
+        texto: `La usan ${usan.length} ${usan.length === 1 ? "pieza" : "piezas"}: ${nombres}. Cámbialas a otra opción y después podrás quitarla.`,
+        accion: "Entendido",
+      });
+      return;
+    }
+    const ok = await confirmar({
+      titulo: `Quitar "${o.nombre}"`,
+      texto: "Ninguna pieza la usa. Deja de aparecer en las piezas y en los filtros del sitio.",
+      accion: "Quitar",
+      peligro: true,
+    });
+    if (!ok) return;
+    ops.splice(i, 1);
+    pintar();
+    guardarListas(`Se quitó "${o.nombre}"`);
+  }
+
+  // Ordenar arrastrando la asa: funciona con ratón y con el dedo.
+  function arrastrar(e, fila) {
+    e.preventDefault();
+    const lista = $("[data-opciones]");
+    const filas = () => $$(".opcion-lista", lista);
+    const desde = filas().indexOf(fila);
+    fila.classList.add("arrastrando");
+    fila.setPointerCapture(e.pointerId);
+    const mover = (ev) => {
+      const y = ev.clientY;
+      const otras = filas().filter((f) => f !== fila);
+      const despues = otras.find((f) => y < f.getBoundingClientRect().top + f.offsetHeight / 2);
+      if (despues) lista.insertBefore(fila, despues);
+      else lista.appendChild(fila);
+    };
+    const soltar = () => {
+      fila.classList.remove("arrastrando");
+      fila.removeEventListener("pointermove", mover);
+      fila.removeEventListener("pointerup", soltar);
+      fila.removeEventListener("pointercancel", soltar);
+      const hasta = filas().indexOf(fila);
+      if (hasta === desde) return;
+      const ops = opcionesDe(actual);
+      const [o] = ops.splice(desde, 1);
+      ops.splice(hasta, 0, o);
+      pintarDetalle();
+      guardarListas("Orden guardado");
+    };
+    fila.addEventListener("pointermove", mover);
+    fila.addEventListener("pointerup", soltar);
+    fila.addEventListener("pointercancel", soltar);
+  }
+
+  /* ---------- Agregar ---------- */
+  $("[data-agregar]").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const campo = $("[data-nombre-nuevo]");
+    const error = $("[data-error-nuevo]");
+    const nombre = campo.value.trim().replace(/\s+/g, " ");
+    if (!nombre) { campo.focus(); return; }
+    const ops = opcionesDe(actual);
+    if (ops.some((o) => o.nombre.toLowerCase() === nombre.toLowerCase())) {
+      error.textContent = "Esa opción ya está en la lista.";
+      error.hidden = false;
+      return;
+    }
+    error.hidden = true;
+    let id = limpiarSlug(nombre) || `opcion-${ops.length + 1}`;
+    for (let n = 2; ops.some((o) => o.id === id); n++) id = `${limpiarSlug(nombre)}-${n}`;
+    const nueva = { id, nombre };
+    if (actual.color) nueva.hex = $("[data-color-nuevo]").value.toUpperCase();
+    ops.push(nueva);
+    campo.value = "";
+    pintar();
+    guardarListas(`Se agregó "${nombre}"`);
+    campo.focus();
+  });
+  $("[data-color-nuevo]").addEventListener("input", (e) => (e.target.parentElement.style.background = e.target.value));
+
+  /* ---------- Navegación entre listas ---------- */
+  function abrirLista(id, empujar = true) {
+    actual = LISTAS.find((l) => l.id === id) || LISTAS[0];
+    if (empujar) history.replaceState(null, "", `#${actual.id}`);
+    caja.dataset.vista = "detalle";
+    pintar();
+  }
+  $("[data-indice]").addEventListener("click", (e) => {
+    const a = e.target.closest("[data-lista]");
+    if (!a) return;
+    e.preventDefault();
+    abrirLista(a.dataset.lista);
+  });
+  $("[data-volver]").addEventListener("click", () => (caja.dataset.vista = "indice"));
+  addEventListener("hashchange", () => abrirLista(location.hash.slice(1), false));
+
+  async function cargar() {
+    [listas, piezas] = await Promise.all([listar("listas"), listar("piezas")]);
+    const inicial = location.hash.slice(1);
+    actual = LISTAS.find((l) => l.id === inicial) || LISTAS[0];
+    if (inicial) caja.dataset.vista = "detalle";
+    pintar();
+  }
+  cargar().catch((e) => avisar(e.message || "No se pudieron cargar las listas", { tipo: "error" }));
+</script>

@@ -72,6 +72,7 @@
   padding:30px 32px 0;
 }
 .seccion-cabeza .t-mini{margin-top:var(--esp-titulo-texto);line-height:1.5;}
+.seccion-cabeza .t-mini .enlace{padding-block:0;margin-block:0;font-size:inherit;}
 .seccion-n{
   flex:none;width:28px;height:28px;border-radius:50%;margin-top:-2px;
   display:grid;place-items:center;
@@ -85,7 +86,9 @@
 .campo-ayuda--arriba{margin:calc(var(--esp-titulo-texto) - var(--esp-etiqueta)) 0 calc(var(--esp-nota-bloque) - var(--esp-etiqueta));}
 /* la nota de una etiqueta va pegada a ella, no suelta en la otra orilla */
 .campo-etiqueta{justify-content:flex-start;}
-.campo-etiqueta > .campo-contador,.campo-etiqueta > .enlace-chico{margin-left:auto;}
+.campo-etiqueta > .campo-contador,.campo-etiqueta > .enlace-chico,.campo-etiqueta > .etiqueta-acciones{margin-left:auto;}
+.etiqueta-acciones{display:inline-flex;align-items:baseline;gap:18px;}
+.etiqueta-acciones .enlace-chico{margin:-6px -8px;}
 .etiqueta-nota{font-size:var(--t-subtitulo);font-weight:400;color:var(--etiqueta-3);}
 .etiqueta-nota::before{content:"·";margin-right:6px;}
 .campo-ayuda--alerta{color:var(--alerta);}
@@ -170,8 +173,6 @@
 .campo[data-error] .acabado{box-shadow:0 0 0 1.5px rgba(179,58,58,.45);}
 .boton--agregar{align-self:flex-start;}
 .acabados + .boton--agregar,.combina + .boton--agregar{margin-top:4px;}
-.chip--agregar{background:transparent;box-shadow:inset 0 0 0 1.5px var(--borde-fuerte);color:var(--etiqueta-2);gap:6px;}
-@media (hover:hover){.chip--agregar:hover{background:var(--relleno);color:var(--etiqueta);box-shadow:inset 0 0 0 1.5px transparent;}}
 
 /* ---------- Lista agrupada ----------
    El patrón de la app de Ajustes: renglones de 52 con la etiqueta a la

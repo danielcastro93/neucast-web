@@ -24,7 +24,8 @@ admin/
 │   ├── pages/
 │   │   ├── index.astro        entrar
 │   │   ├── inicio.astro       estado del sitio y accesos rápidos
-│   │   └── piezas/            lista y edición de piezas
+│   │   ├── piezas/            lista y edición de piezas
+│   │   └── listas.astro       las listas cerradas: materiales, colores, uso, respaldo, base…
 │   ├── components/            Modal, IconoAdmin
 │   ├── scripts/
 │   │   ├── api.js             la única cara de la API para las pantallas
@@ -113,8 +114,12 @@ reglas de teléfono están en `src/styles/componentes.css`.
 
 ## Reglas que el administrador aplica solas
 
-- Las listas cerradas (material, acabados, uso, respaldo, brazos, base,
-  plazas, características, disponibilidad) son selectores, nunca texto libre.
+- Las listas cerradas (material, grupos de color, uso, respaldo, brazos,
+  base, plazas, características, disponibilidad) son selectores, nunca texto
+  libre. Se administran solo en **Listas**: ahí se agregan, se renombran (el
+  `id` no cambia, así las piezas la siguen encontrando), se ordenan
+  arrastrando y se quitan; una opción en uso no se puede quitar hasta cambiar
+  las piezas que la usan. En la pieza, cada lista enlaza a la suya.
 - Tres niveles de campos: obligatorios para todas, obligatorios según la
   categoría (el formulario los enseña al elegirla) y opcionales.
 - Un borrador se guarda incompleto; una pieza publicada tiene que traer todos
