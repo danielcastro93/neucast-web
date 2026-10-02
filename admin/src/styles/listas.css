@@ -5,14 +5,41 @@
 
 /* ---------- Pestañas ----------
    Pegadas bajo la barra superior; se deslizan si no caben. */
-.pestanas{
+.pestanas-caja{
   position:sticky;top:var(--barra-h);z-index:15;
-  display:flex;align-items:center;gap:4px;overflow-x:auto;scrollbar-width:none;
   margin:0 calc(-1 * var(--space-6)) var(--space-5);padding:10px var(--space-6);
   background:var(--material-fino);
   -webkit-backdrop-filter:var(--desenfoque);backdrop-filter:var(--desenfoque);
   border-bottom:1px solid var(--borde);
 }
+.pestanas{
+  --fade-izq:0px;--fade-der:0px;
+  display:flex;align-items:center;gap:4px;overflow-x:auto;scrollbar-width:none;
+  padding:4px 2px 6px;margin:-4px -2px -6px;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 var(--fade-izq),#000 calc(100% - var(--fade-der)),transparent 100%);
+  mask-image:linear-gradient(90deg,transparent 0,#000 var(--fade-izq),#000 calc(100% - var(--fade-der)),transparent 100%);
+  transition:--fade-izq .25s,--fade-der .25s;
+}
+@property --fade-izq{syntax:"<length>";inherits:true;initial-value:0px;}
+@property --fade-der{syntax:"<length>";inherits:true;initial-value:0px;}
+.hay-izq .pestanas{--fade-izq:72px;}
+.hay-der .pestanas{--fade-der:72px;}
+/* flechas encima, redondas y con vidrio, como los carruseles de Apple */
+.pestanas-flecha{
+  position:absolute;top:50%;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+  background:rgba(255,255,255,.92);color:var(--etiqueta);
+  box-shadow:0 2px 10px rgba(0,0,0,.12),0 0 0 .5px rgba(0,0,0,.06);
+  -webkit-backdrop-filter:var(--desenfoque);backdrop-filter:var(--desenfoque);
+  opacity:0;pointer-events:none;transform:translateY(-50%) scale(.85);
+  transition:opacity .2s var(--ease),transform .3s var(--resorte);
+}
+.pestanas-flecha--izq{left:calc(var(--space-6) - 6px);}
+.pestanas-flecha--der{right:calc(var(--space-6) - 6px);}
+@media (hover:hover){
+  .hay-izq:hover .pestanas-flecha--izq,.hay-der:hover .pestanas-flecha--der{opacity:1;pointer-events:auto;transform:translateY(-50%);}
+  .pestanas-flecha:hover{transform:translateY(-50%) scale(1.06) !important;}
+}
+.pestanas-flecha:active{transform:translateY(-50%) scale(.94) !important;}
 .pestanas::-webkit-scrollbar{display:none;}
 .pestana{
   flex:none;display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 14px;border-radius:999px;
@@ -44,10 +71,12 @@
 @media (hover:hover){.fila-lista--enlace:hover{background:#FAFAF8;}.fila-lista--enlace:hover .fila-lista-flecha{transform:translateX(2px);}}
 .fila-lista--enlace:focus-visible{outline:0;box-shadow:inset 0 0 0 2px var(--olive) !important;}
 .fila-boton{width:100%;text-align:left;font:inherit;color:inherit;}
+.ajustes-lista .fila-lista{min-height:60px;padding:12px 18px;gap:20px;cursor:default;}
+.ajustes-lista .fila-lista--enlace{cursor:pointer;}
+.ajustes-lista .fila-lista-sub{margin-top:4px;}
 .ajustes-lista .segmentos{flex:none;}
 .ajustes-lista .segmento{height:32px;padding:0 14px;}
 .interruptor--solo{flex:none;}
-.interruptor input:disabled + .interruptor-pista{opacity:.5;}
 .pastilla{
   flex:none;display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:999px;
   background:var(--relleno);font-size:var(--t-nota);font-weight:600;color:var(--etiqueta-2);
@@ -102,12 +131,15 @@
 
 /* ---------- Tableta y teléfono ---------- */
 @media (max-width:1024px){
-  .pestanas{margin-inline:calc(-1 * var(--space-4));padding-inline:var(--space-4);}
+  .pestanas-caja{margin-inline:calc(-1 * var(--space-4));padding-inline:var(--space-4);}
+  .pestanas-flecha--izq{left:calc(var(--space-4) - 6px);}
+  .pestanas-flecha--der{right:calc(var(--space-4) - 6px);}
 }
 @media (max-width:640px){
   .listas-panel{padding:22px 18px 26px;}
   .panel-cabeza{flex-direction:column;}
   .panel-cabeza .boton{width:100%;height:48px;}
+  .ajustes-lista .fila-lista{padding:12px 16px;gap:14px;}
   .opciones-cabeza{flex-direction:column;align-items:stretch;}
   .opciones-buscar{width:100%;}
   .agregar-opcion{flex-wrap:wrap;}

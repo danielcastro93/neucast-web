@@ -28,7 +28,11 @@ import "../styles/listas.css";
     </div>
   </div>
 
-  <nav class="pestanas" aria-label="Listas" data-pestanas></nav>
+  <div class="pestanas-caja" data-pestanas-caja>
+    <nav class="pestanas" aria-label="Listas" data-pestanas></nav>
+    <button class="pestanas-flecha pestanas-flecha--izq" type="button" data-flecha="-1" aria-label="Ver las anteriores" tabindex="-1"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.5 5-5 5 5 5"/></svg></button>
+    <button class="pestanas-flecha pestanas-flecha--der" type="button" data-flecha="1" aria-label="Ver las siguientes" tabindex="-1"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 5 5 5-5 5"/></svg></button>
+  </div>
 
   <section class="tarjeta listas-panel" data-panel aria-live="polite"></section>
 
@@ -43,6 +47,19 @@ import "../styles/listas.css";
     <Fragment slot="pie">
       <button class="boton" type="button" data-cierra-modal>Cancelar</button>
       <button class="boton boton--primario" type="button" data-categorias-listo>Listo</button>
+    </Fragment>
+  </Modal>
+
+  <!-- Cambiar el nombre de una lista -->
+  <Modal id="modal-nombre" titulo="Cambiar el nombre" texto="Es como se ve la lista en las piezas y en los filtros del sitio. Lo ya capturado no cambia.">
+    <div class="campo">
+      <div class="campo-etiqueta"><label for="nombre-lista">Nombre de la lista</label></div>
+      <input class="control" id="nombre-lista" type="text" placeholder="Ej. Material" autocomplete="off" data-renombrar />
+      <p class="campo-error" data-renombrar-error hidden style="display:block"></p>
+    </div>
+    <Fragment slot="pie">
+      <button class="boton" type="button" data-cierra-modal>Cancelar</button>
+      <button class="boton boton--primario" type="button" data-renombrar-guardar>Guardar</button>
     </Fragment>
   </Modal>
 
@@ -207,8 +224,23 @@ import "../styles/listas.css";
     if (activa && caja.scrollWidth > caja.clientWidth) {
       caja.scrollTo({ left: activa.offsetLeft - caja.clientWidth / 2 + activa.offsetWidth / 2, behavior: "smooth" });
     }
+    requestAnimationFrame(bordesPestanas);
   }
-  $("[data-pestanas]").addEventListener("click", (e) => {
+  // Degradados y flechas como en los carruseles: aparecen solo del lado donde
+  // hay más pestañas escondidas.
+  const tiraPestanas = $("[data-pestanas]");
+  const cajaPestanas = $("[data-pestanas-caja]");
+  function bordesPestanas() {
+    const max = tiraPestanas.scrollWidth - tiraPestanas.clientWidth;
+    cajaPestanas.classList.toggle("hay-izq", tiraPestanas.scrollLeft > 4);
+    cajaPestanas.classList.toggle("hay-der", tiraPestanas.scrollLeft < max - 4);
+  }
+  tiraPestanas.addEventListener("scroll", bordesPestanas, { passive: true });
+  addEventListener("resize", bordesPestanas);
+  $$("[data-flecha]").forEach((b) => b.addEventListener("click", () => {
+    tiraPestanas.scrollBy({ left: +b.dataset.flecha * tiraPestanas.clientWidth * 0.7, behavior: "smooth" });
+  }));
+  tiraPestanas.addEventListener("click", (e) => {
     const a = e.target.closest("[data-vista]");
     if (!a) return;
     e.preventDefault();
@@ -245,15 +277,12 @@ import "../styles/listas.css";
           <h2 class="t-seccion">${escapar(l.nombre)}</h2>
           <p class="t-mini">${escapar(l.nota || (l.seleccion === "varias" ? "En cada pieza se pueden elegir varias." : "En cada pieza se elige una."))}</p>
         </div>
+        <button class="boton boton--suave" type="button" data-cfg-nombre><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 3.5a2.1 2.1 0 0 1 3 3L7 16l-4 1 1-4 9.5-9.5Z"/></svg>Cambiar el nombre</button>
       </header>
 
       <div class="panel-bloque">
-        <span class="grupo-rotulo">Cómo funciona</span>
+        <span class="grupo-rotulo">Cómo se usa en las piezas</span>
         <ul class="grupo-lista ajustes-lista">
-          <li class="fila-lista">
-            <span class="fila-lista-etiqueta fila-lista-etiqueta--fija">Nombre</span>
-            <input class="fila-lista-control fila-lista-control--izq" type="text" value="${escapar(l.nombre)}" data-cfg-nombre aria-label="Nombre de la lista" />
-          </li>
           <li class="fila-lista">
             <span class="fila-lista-etiqueta">En cada pieza se elige</span>
             ${sistema
@@ -339,20 +368,12 @@ import "../styles/listas.css";
 
   function cablearLista() {
     const l = laLista();
-    const nombre = $("[data-cfg-nombre]");
-    nombre.addEventListener("blur", () => {
-      const v = nombre.value.trim().replace(/\s+/g, " ");
-      if (!v || v === l.nombre) return (nombre.value = l.nombre);
-      if (listas.listas.some((x) => x !== l && sinAcentos(x.nombre) === sinAcentos(v))) {
-        avisar("Ya hay otra lista con ese nombre", { tipo: "alerta" });
-        return (nombre.value = l.nombre);
-      }
-      l.nombre = v; // el id no cambia: las piezas la siguen encontrando
-      pintarPestanas();
-      $(".panel-cabeza .t-seccion").textContent = v;
-      guardarListas(`La lista ahora se llama "${v}"`);
+    $("[data-cfg-nombre]").addEventListener("click", () => {
+      $("[data-renombrar]").value = l.nombre;
+      $("[data-renombrar-error]").hidden = true;
+      abrirModal("modal-nombre");
+      setTimeout(() => $("[data-renombrar]").select(), 60);
     });
-    nombre.addEventListener("keydown", (e) => e.key === "Enter" && (e.preventDefault(), nombre.blur()));
 
     $("[data-cfg-seleccion]")?.addEventListener("click", async (e) => {
       const b = e.target.closest("[data-valor]");
@@ -724,6 +745,24 @@ import "../styles/listas.css";
     pintar();
     guardarListas(`Se quitó "${p.nombre}"`);
   });
+
+  /* ---------- Cambiar el nombre (el id no cambia: las piezas la siguen encontrando) ---------- */
+  function renombrar() {
+    const l = laLista();
+    const v = $("[data-renombrar]").value.trim().replace(/\s+/g, " ");
+    const error = $("[data-renombrar-error]");
+    if (!v) { error.textContent = "Escribe el nombre."; error.hidden = false; return; }
+    if (listas.listas.some((x) => x !== l && sinAcentos(x.nombre) === sinAcentos(v))) {
+      error.textContent = "Ya hay otra lista con ese nombre."; error.hidden = false; return;
+    }
+    cerrarModal("modal-nombre");
+    if (v === l.nombre) return;
+    l.nombre = v;
+    pintar();
+    guardarListas(`La lista ahora se llama "${v}"`);
+  }
+  $("[data-renombrar-guardar]").addEventListener("click", renombrar);
+  $("[data-renombrar]").addEventListener("keydown", (e) => e.key === "Enter" && (e.preventDefault(), renombrar()));
 
   /* ============================================
      Nueva lista

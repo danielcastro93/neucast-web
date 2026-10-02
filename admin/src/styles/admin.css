@@ -324,21 +324,26 @@ select.control{
 .chip-color{width:14px;height:14px;border-radius:50%;flex:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12);}
 .chip:has(input:checked) .chip-color{box-shadow:inset 0 0 0 1px rgba(255,255,255,.35);}
 
-/* interruptor */
-.interruptor{display:inline-flex;align-items:center;gap:12px;cursor:pointer;user-select:none;}
+/* interruptor: el de Apple, a la medida del texto de cuerpo. Es el único
+   del administrador; todo sí/no usa este. */
+.interruptor{display:inline-flex;align-items:center;gap:12px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;}
 .interruptor input{position:absolute;opacity:0;width:0;height:0;}
 .interruptor-pista{
-  position:relative;width:51px;height:31px;border-radius:999px;background:rgba(29,29,27,.14);
+  position:relative;width:38px;height:22px;border-radius:999px;background:rgba(120,120,128,.24);
   transition:background .25s var(--ease);flex:none;
 }
 .interruptor-pista::after{
-  content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;
-  background:var(--white);box-shadow:0 3px 8px rgba(0,0,0,.15),0 1px 1px rgba(0,0,0,.06);
-  transition:transform .35s var(--resorte);
+  content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;
+  background:var(--white);box-shadow:0 2px 5px rgba(0,0,0,.16),0 0 0 .5px rgba(0,0,0,.04);
+  transition:transform .35s var(--resorte),width .2s var(--ease);
 }
+.interruptor:active .interruptor-pista::after{width:22px;}
 .interruptor input:checked + .interruptor-pista{background:var(--olive);}
-.interruptor input:checked + .interruptor-pista::after{transform:translateX(20px);}
+.interruptor input:checked + .interruptor-pista::after{transform:translateX(16px);}
+.interruptor:active input:checked + .interruptor-pista::after{transform:translateX(12px);}
 .interruptor input:focus-visible + .interruptor-pista{outline:2px solid var(--olive);outline-offset:2px;}
+.interruptor input:disabled + .interruptor-pista{opacity:.45;}
+.interruptor:has(input:disabled){cursor:default;}
 .interruptor-texto{font-size:var(--fs-sm);font-weight:500;}
 .interruptor-texto small{display:block;font-weight:400;color:var(--ink-40);font-size:12px;}
 
