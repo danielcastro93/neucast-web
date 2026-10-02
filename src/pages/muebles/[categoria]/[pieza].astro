@@ -293,10 +293,11 @@ const VENTANA_PUNTOS = 5;
           {relatoResto && <span class="pd-relato-b">{relatoResto}</span>}
         </p>
 
-        <figure class="pd-contexto-marco">
-          <img src={ambiente} alt={`${pieza.nombre} instalada en un espacio corporativo`} loading="lazy" />
-        </figure>
       </div>
+      <!-- fuera del contenedor: desde 900 px la foto va de orilla a orilla -->
+      <figure class="pd-contexto-marco">
+        <img src={ambiente} alt={`${pieza.nombre} instalada en un espacio corporativo`} loading="lazy" />
+      </figure>
 
       {apoyos.length > 0 && (
         /* En teléfono se pasan con el dedo, como el resto de los carruseles del
@@ -701,7 +702,7 @@ const VENTANA_PUNTOS = 5;
 
     /* La foto va limpia: el pie que llevaba encima competía con ella y lo que
        decía se cuenta mejor en los apoyos de abajo. */
-    .pd-contexto-marco{margin:0;}
+    .pd-contexto-marco{margin:0 var(--gutter);}
     .pd-contexto-marco img{
       display:block;width:100%;aspect-ratio:4/3;object-fit:cover;
       border-radius:var(--radius);background:var(--paper);
@@ -761,6 +762,12 @@ const VENTANA_PUNTOS = 5;
     @media (min-width:760px){
       .pd-contexto-marco{overflow:hidden;border-radius:var(--radius);}
       .pd-contexto-marco img{aspect-ratio:16/9;border-radius:0;}
+    }
+    /* desde 900 px, de orilla a orilla y sin esquinas, más recostada para
+       que no se coma la pantalla */
+    @media (min-width:900px){
+      .pd-contexto-marco{margin:0;border-radius:0;}
+      .pd-contexto-marco img{aspect-ratio:21/9;}
     }
 
     /* ---------- relacionadas ---------- */

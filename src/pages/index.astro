@@ -70,7 +70,9 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
       <div class="reveal">
         <SectionHead title="Proyectos reales" linkHref="/proyectos/" linkLabel="Ver todos los proyectos" />
       </div>
-      <figure class="proj-stage grano reveal reveal-d1">
+    </div>
+    <!-- fuera del contenedor: desde 900 px la foto va de orilla a orilla -->
+    <figure class="proj-stage grano reveal reveal-d1">
         <EscenaHotspots
           img={escenaHome.img}
           alt={escenaHome.alt}
@@ -84,8 +86,7 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
             Recorrer el proyecto <Fragment set:html={arrow} />
           </a>
         </figcaption>
-      </figure>
-    </div>
+    </figure>
   </section>
   )}
 
@@ -183,7 +184,7 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
     /* en teléfono, el mismo gris claro y liso de la tarjeta de home office
        (30 de septiembre); antes fue gris más oscuro con grano */
     .proj-stage{
-      position:relative;margin:0;
+      position:relative;margin:0 var(--gutter);
       border-radius:var(--radius);background:var(--paper-soft);padding:14px;
     }
     .proj-stage::before{display:none;}
@@ -214,10 +215,14 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
 
     @media (min-width:900px){
       /* el mismo oscuro que "La idea es simple": un solo oscuro en todo el home */
-      .proj-stage{background:var(--cemento-oscuro);padding:0;overflow:hidden;}
+      /* a todo lo ancho, sin esquinas: la foto que más vende pide escala. La
+         escena tiene proporción fija, así que los puntos no se mueven. */
+      .proj-stage{background:var(--cemento-oscuro);padding:0;overflow:hidden;margin:0;border-radius:0;}
       .proj-stage :global(.esc) > :global(img){border-radius:0;}
       .proj-caption{
-        position:absolute;left:0;right:0;bottom:0;padding:110px 44px 36px;
+        /* el texto se alinea con el borde del contenido de la página */
+        position:absolute;left:0;right:0;bottom:0;
+        padding:140px max(var(--gutter), calc((100% - var(--container)) / 2 + var(--gutter))) clamp(36px,4vw,56px);
         color:#fff;align-items:flex-start;
         background:linear-gradient(to top,rgba(15,15,12,.92) 0%,rgba(15,15,12,.62) 48%,rgba(15,15,12,0) 100%);
         /* El velo no debe bloquear los clics a los puntos que tiene debajo,
@@ -227,7 +232,7 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
       }
       .proj-caption a{pointer-events:auto;}
       .proj-caption :global(.rotulo){color:#fff;}
-      .proj-intro{max-width:52ch;color:rgba(255,255,255,.9);}
+      .proj-intro{max-width:560px;color:rgba(255,255,255,.9);}
       .proj-link{
         display:inline-flex;height:auto;border-radius:0;
         background:none;color:#fff;opacity:.9;
