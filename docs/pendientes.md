@@ -21,6 +21,7 @@ Lo urgente, en orden:
 | Detalle de pieza | `/muebles/{categoria}/{pieza}/` | ✅ Listas (26, fichas de maqueta) |
 | Proyectos | `/proyectos/` | ✅ Lista (contenido de maqueta) |
 | Home office | `/home-office/` | ✅ Lista (fotos de Pexels, de posicionamiento) |
+| Recursos | `/recursos/` | ✅ Lista: catálogo general y uno por categoría |
 | Detalle de proyecto | `/proyectos/{slug}/` | ✅ Listas (4, contenido de maqueta) |
 | Nosotros | `/nosotros/` | ✅ Lista |
 | Preguntas frecuentes | `/preguntas-frecuentes/` | ✅ Lista |
@@ -73,15 +74,24 @@ la ficha web.
 1. Generarlos al publicar en vez de a mano, para que nunca se desfasen. Depende
    del punto 3 (la letra) y del administrador propio, que es quien sabrá qué
    pieza cambió.
-2. El catálogo por categoría: las mismas hojas de todas sus piezas con una
-   portada y un índice delante, en una página de Recursos.
+2. ~~El catálogo por categoría~~ **Hecho el 2 de octubre de 2026.** Página
+   `/recursos/` con el catálogo general y uno por categoría; cada categoría
+   enlaza el suyo bajo su título y `/muebles/` enlaza el general. Se generan
+   con `npm run catalogos` (en una Mac, como las fichas) en `public/catalogos/`.
+   Formato aprobado: dos piezas por hoja, sin foto de ambiente, con fotos
+   achicadas por `scripts/fichas/fotos.py` (Python con Pillow). Medido: unos
+   35 KB por pieza (100 piezas, unos 3.4 MB; 200, unos 6.8 MB); el general en
+   rejilla, unos 11 KB por pieza. Si una categoría pasa de unas 150 piezas,
+   conviene partir su catálogo por tipo de mueble. Un catálogo que pase el
+   cliente va en `public/catalogos/propios/` con el mismo nombre y se descarga
+   ese en lugar del generado. **Al cambiar el catálogo hay que correr
+   `npm run catalogos` y subir los PDF**, igual que con las fichas.
 3. **Tipografía en el servidor de compilación.** La plantilla usa Helvetica
    Neue, que en Mac viene instalada pero en Linux no. Para que el PDF salga
-   igual al compilar en GitHub Actions hay que instalar Inter o empaquetar la
-   fuente.
-4. **Peso.** Un catálogo de 200 piezas con fotos a resolución completa pesa
-   demasiado para bajarlo en un teléfono. Hay que reducir las fotos antes de
-   imprimir. Una ficha de hoy pesa entre 200 y 350 KB.
+   igual al compilar en GitHub Actions hay que licenciar la fuente para ese
+   uso o elegir una alternativa muy parecida.
+4. ~~Peso~~ Resuelto en los catálogos con fotos achicadas (punto 2). Las
+   fichas individuales siguen con las fotos completas, como se aprobaron.
 5. **Tiempo de publicación.** Con cientos de piezas conviene regenerar solo
    los PDF de lo que cambió.
 

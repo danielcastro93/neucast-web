@@ -11,7 +11,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "revisar": "node scripts/revisar.mjs",
-    "fichas": "node scripts/fichas/generar.mjs public/fichas"
+    "fichas": "node scripts/fichas/generar.mjs public/fichas",
+    "catalogos": "node scripts/fichas/catalogos.mjs public/catalogos"
   },
   "dependencies": {
     "astro": "^7.3.4"

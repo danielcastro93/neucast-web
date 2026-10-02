@@ -1,0 +1,152 @@
+---
+// Recursos: los catálogos en PDF para descargar.
+//
+// Se alimenta de las categorías: cada una trae su tarjeta con su misma foto y
+// su catálogo. Si mañana hay una categoría nueva, aparece sola cuando exista
+// su PDF (`npm run catalogos`). Una categoría sin PDF todavía no se enseña,
+// para no dejar un botón que no descarga nada.
+//
+// Si el cliente pasa un catálogo propio para una categoría, se descarga ese
+// en vez del generado: ver src/data/pdfs.js.
+import Base from "../layouts/Base.astro";
+import Icon from "../components/Icon.astro";
+import { site, categories, todosLosMuebles } from "../data/site.js";
+import { piezas } from "../data/catalogo.js";
+import { catalogoPdf } from "../data/pdfs.js";
+
+const title = "Catálogos de mobiliario de oficina en PDF | Neucast";
+const description =
+  "Descarga los catálogos de Neucast en PDF: el general y uno por categoría, con fotos, acabados y datos de cada pieza, listos para compartir con tu equipo.";
+
+const cuenta = (n) => `${n} ${n === 1 ? "pieza" : "piezas"}`;
+const general = catalogoPdf("general");
+const conCatalogo = categories
+  .map((c) => ({ ...c, pdf: catalogoPdf(c.slug), n: piezas.filter((p) => p.cat === c.slug).length }))
+  .filter((c) => c.pdf && c.n > 0);
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  name: "Catálogos para descargar",
+  url: `${site.domain}/recursos`,
+  description,
+  inLanguage: "es-MX",
+  isPartOf: { "@id": `${site.domain}/#organizacion` },
+};
+---
+<Base title={title} description={description} image={todosLosMuebles.photo} schema={schema}>
+  <section class="rc">
+    <div class="container">
+      <header class="rc-head">
+        <p class="rotulo rc-rotulo">Recursos</p>
+        <h1 class="display t-h1 rc-titulo">Catálogos para descargar</h1>
+        <p class="rc-intro">
+          Todo el catálogo o una categoría a la vez, en PDF y listo para compartir con
+          tu equipo. Cada pieza trae su foto, acabados y datos principales, con el
+          enlace a su ficha técnica completa.
+        </p>
+      </header>
+
+      <!-- ============ GENERAL ============ -->
+      {general && (
+        <a class="rc-general" href={general.ruta} download="Neucast catálogo general.pdf">
+          <span class="rc-general-foto">
+            <img src={todosLosMuebles.photo} alt={todosLosMuebles.alt} fetchpriority="high" />
+          </span>
+          <span class="rc-general-txt">
+            <span class="rotulo rc-rotulo">Catálogo general</span>
+            <span class="display t-h2 rc-general-ttl">Todo el catálogo</span>
+            <span class="rc-general-p">
+              {cuenta(piezas.length)} en {categories.length} categorías, en una vista
+              rápida para ubicar lo que buscas.
+            </span>
+            <span class="pill pill--primary rc-general-btn">
+              <Icon name="descargar" size={15} /> Descargar el catálogo general
+            </span>
+            <span class="rc-meta">{general.meta}</span>
+          </span>
+        </a>
+      )}
+
+      <!-- ============ POR CATEGORÍA ============ -->
+      {conCatalogo.length > 0 && (
+        <section class="rc-sec">
+          <h2 class="display t-h3 rc-sec-ttl">Por categoría</h2>
+          <ul class="rc-grid">
+            {conCatalogo.map((c) => (
+              <li>
+                <a class="rc-cat" href={c.pdf.ruta} download={`Neucast catálogo ${c.name}.pdf`}>
+                  <span class="rc-cat-foto"><img src={c.photo} alt={c.alt} loading="lazy" /></span>
+                  <span class="rc-cat-nombre">{c.name}</span>
+                  <span class="rc-cat-n">{cuenta(c.n)}</span>
+                  <span class="pill pill--ghost rc-cat-btn">
+                    <Icon name="descargar" size={15} /> Descargar catálogo
+                  </span>
+                  <span class="rc-meta">{c.pdf.meta}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <p class="rc-nota">
+        ¿Buscas una pieza en particular? Su ficha técnica, con plano y especificaciones,
+        se descarga desde su página. <a href="/muebles/">Explorar el catálogo</a>
+      </p>
+    </div>
+  </section>
+
+  <style>
+    .rc{padding-top:calc(var(--header-h) + clamp(32px,5vw,64px));}
+    .rc-head{max-width:720px;}
+    .rc-rotulo{color:var(--olive-ink);}
+    .rc-titulo{margin:12px 0 14px;}
+    .rc-intro{color:var(--ink-60);}
+
+    /* ---------- general ---------- */
+    .rc-general{
+      display:grid;margin-top:clamp(32px,5vw,56px);
+      border-radius:var(--radius);overflow:hidden;background:var(--paper-soft);color:var(--ink);
+    }
+    @media (min-width:900px){.rc-general{grid-template-columns:minmax(0,7fr) minmax(0,5fr);}}
+    .rc-general-foto{display:block;aspect-ratio:16/10;overflow:hidden;}
+    @media (min-width:900px){.rc-general-foto{aspect-ratio:auto;min-height:420px;}}
+    .rc-general-foto img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease);}
+    @media (hover:hover){.rc-general:hover .rc-general-foto img{transform:scale(1.03);}}
+    .rc-general-txt{
+      display:flex;flex-direction:column;align-items:flex-start;justify-content:center;
+      padding:clamp(24px,4vw,56px);
+    }
+    .rc-general-ttl{margin:12px 0 12px;}
+    .rc-general-p{color:var(--ink-60);max-width:420px;}
+    .rc-general-btn{margin-top:24px;gap:8px;}
+    @media (max-width:639px){.rc-general-btn{width:100%;}}
+    @media (hover:hover){.rc-general:hover .rc-general-btn{background:#000;}}
+    .rc-meta{display:block;margin-top:10px;font-size:var(--fs-2xs);color:var(--ink-60);}
+
+    /* ---------- por categoría ---------- */
+    .rc-sec{margin-top:var(--section-y);}
+    .rc-sec-ttl{margin-bottom:var(--block-y);}
+    .rc-grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px 12px;}
+    @media (min-width:900px){.rc-grid{grid-template-columns:repeat(4,1fr);gap:44px 18px;}}
+    .rc-cat{display:flex;flex-direction:column;height:100%;color:var(--ink);}
+    .rc-cat-foto{display:block;aspect-ratio:1/1;border-radius:var(--radius);overflow:hidden;background:var(--cemento-suave);}
+    .rc-cat-foto img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease);}
+    @media (hover:hover){.rc-cat:hover .rc-cat-foto img{transform:scale(1.04);}}
+    .rc-cat-nombre{margin-top:12px;font-size:var(--fs-sm);font-weight:700;line-height:1.25;}
+    .rc-cat-n{margin-top:2px;font-size:var(--fs-xs);color:var(--ink-60);}
+    .rc-cat-btn{margin-top:auto;width:100%;justify-content:center;gap:8px;padding:0 10px;}
+    .rc-cat-n{margin-bottom:14px;}
+    @media (max-width:639px){.rc-cat-btn{height:44px;}}
+    /* en teléfonos angostos el texto necesita todo el ancho: el ícono se omite */
+    @media (max-width:399px){.rc-cat-btn :global(svg){display:none;}}
+    @media (hover:hover){.rc-cat:hover .rc-cat-btn{background:var(--ink);color:var(--white);border-color:var(--ink);}}
+
+    .rc-nota{
+      margin-top:var(--section-y);padding-top:28px;border-top:1px solid var(--line);
+      font-size:var(--fs-sm);color:var(--ink-60);
+    }
+    .rc-nota a{color:var(--ink);font-weight:600;text-decoration:underline;text-underline-offset:3px;white-space:nowrap;}
+  </style>
+</Base>

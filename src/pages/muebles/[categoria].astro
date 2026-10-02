@@ -3,6 +3,7 @@ import Base from "../../layouts/Base.astro";
 import Catalogo from "../../components/Catalogo.astro";
 import { site, categories } from "../../data/site.js";
 import { piezas } from "../../data/catalogo.js";
+import { catalogoPdf } from "../../data/pdfs.js";
 
 // Cada categoría tiene su propia URL indexable con su title, su description y
 // su H1. Esos textos viajan con la categoría en src/data/site.js, no aquí: son
@@ -16,6 +17,8 @@ export async function getStaticPaths() {
 const { cat } = Astro.props;
 const t = cat; // h1, title, desc e intro viajan con la categoría
 const deLaCategoria = piezas.filter((p) => p.cat === cat.slug);
+const pdf = catalogoPdf(cat.slug);
+const descarga = pdf ? { ...pdf, nombre: `Neucast catálogo ${cat.name}.pdf` } : null;
 
 const schema = [
   {
@@ -35,5 +38,6 @@ const schema = [
     intro={t.intro}
     piezas={deLaCategoria}
     catActiva={cat.slug}
+    descarga={descarga}
   />
 </Base>

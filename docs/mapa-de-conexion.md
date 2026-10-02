@@ -399,6 +399,22 @@ que la pone primero cuando se escribe "home office".
 Si mañana hay más espacios (recepción, cafetería en casa, etc.), se agrega el
 valor a la lista de `espacios` y una página igual.
 
+## 11d. Recursos: los catálogos en PDF
+
+`/recursos/` sale de las categorías: cada una con su foto, su número de
+piezas y su catálogo. Una categoría sin PDF todavía no aparece. Las hojas y el
+peso que dice cada botón se leen del archivo (`src/data/pdfs.js`).
+
+| Qué se descarga | De dónde sale | En el administrador |
+| --- | --- | --- |
+| Catálogo por categoría | Generado de las piezas de la categoría | Nada que capturar. Opcional: subir un PDF propio que lo sustituya |
+| Catálogo general | Generado de todas las piezas, en rejilla | Nada que capturar |
+| Ficha técnica | Generada de la pieza | Nada que capturar |
+
+Cuando exista el administrador, la generación pasa al momento de publicar:
+cambia una pieza, se regeneran su ficha, el catálogo de su categoría y el
+general.
+
 ## 12. Lo que no se conecta, y por qué
 
 | Qué | Por qué |

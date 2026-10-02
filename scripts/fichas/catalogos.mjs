@@ -1,9 +1,16 @@
 // Genera los catálogos en PDF: uno por categoría y el general.
 //
+//   npm run catalogos        → public/catalogos/, los que enlaza el sitio
 //   node scripts/fichas/catalogos.mjs <carpeta-de-salida>
 //   node scripts/fichas/catalogos.mjs <carpeta-de-salida> --escala 100,200
+//   node scripts/fichas/catalogos.mjs <carpeta-de-salida> --una-por-hoja
 //
-// --escala es para medir: arma catálogos de prueba de N piezas repitiendo las
+// Formato aprobado por Daniel el 2 de octubre de 2026: dos piezas por hoja y
+// sin foto de ambiente (unos 35 KB por pieza; 100 piezas, unos 3.4 MB). Con
+// --una-por-hoja sale la versión con foto de ambiente, que pesa casi cuatro
+// veces más; quedó solo para comparar.
+//
+// --escala es para medir y NUNCA debe apuntar a public/: arma catálogos de prueba de N piezas repitiendo las
 // del catálogo de maqueta, cada una con su foto única, y dice cuánto pesan.
 // Sirve para saber cómo se comportará el archivo cuando una categoría crezca.
 //
@@ -31,10 +38,13 @@ const args = process.argv.slice(2);
 const salida = args[0];
 const iEscala = args.indexOf("--escala");
 const escalas = iEscala > -1 ? args[iEscala + 1].split(",").map(Number) : [];
-// --compacto: dos piezas por hoja y sin foto de ambiente
-const compacto = args.includes("--compacto");
+const compacto = !args.includes("--una-por-hoja");
 const porHoja = compacto ? 2 : 1;
-const sufijo = compacto ? "-compacto" : "";
+const sufijo = compacto ? "" : "-una-por-hoja";
+if (escalas.length && path.resolve(salida).startsWith(path.join(RAIZ, "public"))) {
+  console.error("Las pruebas de --escala no van en public/: se publicarían con el sitio.");
+  process.exit(1);
+}
 if (!salida) {
   console.error("Uso: node scripts/fichas/catalogos.mjs <carpeta-de-salida> [--escala 100,200]");
   process.exit(1);
@@ -90,7 +100,7 @@ for (const categoria of categories) {
       categoria,
       piezas: suyas,
       fotoPortada: foto(categoria.photo, "portada"),
-      fotos: (p) => ({ recorte: foto(p.img[0], "recorte", p.slug), ambiente: compacto ? "" : foto(p.img[1], "ambiente", p.slug) }),
+      fotos: (p) => ({ recorte: foto(p.img[0], "recorte"), ambiente: compacto ? "" : foto(p.img[1], "ambiente") }),
       contexto,
       porHoja,
     }),
@@ -106,7 +116,7 @@ for (const categoria of categories) {
     .map((c) => ({ categoria: { ...c, cuenta: piezas.filter((p) => p.cat === c.slug).length }, piezas: piezas.filter((p) => p.cat === c.slug) }))
     .filter((g) => g.piezas.length);
   const html = documentoCatalogo(
-    hojasDeGeneral({ grupos, fotoPortada: foto(todosLosMuebles.photo, "portada"), miniatura: (p) => foto(p.img[0], "miniatura", p.slug), contexto }),
+    hojasDeGeneral({ grupos, fotoPortada: foto(todosLosMuebles.photo, "portada"), miniatura: (p) => foto(p.img[0], "miniatura"), contexto }),
     "Catálogo general · Neucast"
   );
   procesarFotos();

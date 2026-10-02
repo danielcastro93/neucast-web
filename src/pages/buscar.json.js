@@ -17,6 +17,7 @@ import { categories } from "../data/site.js";
 import { piezas, rutaPieza, materiales, gruposColor } from "../data/catalogo.js";
 import { proyectos } from "../data/proyectos.js";
 import { homeOffice } from "../data/homeOffice.js";
+import { todosLosMuebles } from "../data/site.js";
 
 const nombreDe = (lista, id) => lista.find((x) => x.id === id)?.nombre || "";
 
@@ -36,10 +37,12 @@ export function GET() {
       u: rutaPieza(p),
       i: p.img?.[0] || "",
     })),
-    // las colecciones por espacio van con las categorías: se buscan igual
+    // las secciones que no son categoría van en la misma lista y se buscan
+    // igual; `e` es la etiqueta que lleva el resultado (por omisión, Categoría)
     categorias: [
       ...categories.map((c) => ({ n: c.name, u: `/muebles/${c.slug}/`, i: c.photo })),
-      { n: homeOffice.nombre, u: homeOffice.ruta, i: homeOffice.portada.img },
+      { n: homeOffice.nombre, u: homeOffice.ruta, i: homeOffice.portada.img, e: "Espacio" },
+      { n: "Catálogos en PDF", u: "/recursos/", i: todosLosMuebles.photo, e: "Descargas" },
     ],
     proyectos: proyectos.map((p) => ({
       n: p.nombre,

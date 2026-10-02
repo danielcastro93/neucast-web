@@ -364,8 +364,7 @@ const sugeridas = categories
     const txt = el("span", "bs-txt");
     if (x.tipo === "pieza") txt.append(el("span", "bs-tipo", x.t));
     if (x.tipo === "proyecto") txt.append(el("span", "bs-tipo", "Proyecto"));
-    // las colecciones por espacio (home office) viven fuera de /muebles/
-    if (x.tipo === "categoria") txt.append(el("span", "bs-tipo", x.u.startsWith("/muebles/") ? "Categoría" : "Espacio"));
+    if (x.tipo === "categoria") txt.append(el("span", "bs-tipo", x.e || "Categoría"));
     txt.append(nombreResaltado(x, palabras));
     const meta = x.tipo === "pieza" ? x.m : x.tipo === "proyecto" ? x.t : "";
     if (meta) txt.append(el("span", "bs-meta", meta));

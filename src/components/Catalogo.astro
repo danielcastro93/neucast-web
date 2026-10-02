@@ -11,6 +11,8 @@ const {
   intro,
   piezas,
   catActiva = null,
+  // el catálogo en PDF de lo que se está viendo: { ruta, meta, nombre }
+  descarga = null,
 } = Astro.props;
 
 // Cinco filas de cuatro en escritorio: alcanza para los dos bloques
@@ -41,6 +43,14 @@ const bloquesVisibles = bloquesPara(catActiva, piezas.length);
       <div class="mb-head-txt">
         <h1 class="display t-h1 mb-title">{titulo}</h1>
         <p class="mb-intro">{intro}</p>
+        {descarga && (
+          <p class="mb-descarga">
+            <a href={descarga.ruta} download={descarga.nombre}>
+              <Icon name="descargar" size={15} /> Descargar catálogo en PDF
+            </a>
+            <span>{descarga.meta}</span>
+          </p>
+        )}
       </div>
 
       <div class="mb-cats-wrap">
@@ -275,6 +285,14 @@ const bloquesVisibles = bloquesPara(catActiva, piezas.length);
     }
     .mb-title{margin-bottom:14px;}
     .mb-intro{color:var(--ink-60);max-width:44ch;}
+    .mb-descarga{margin-top:14px;display:flex;flex-wrap:wrap;align-items:center;column-gap:12px;}
+    .mb-descarga a{
+      display:inline-flex;align-items:center;gap:8px;min-height:44px;
+      font-size:var(--fs-sm);font-weight:600;color:var(--ink);
+      text-decoration:underline;text-underline-offset:4px;text-decoration-color:var(--ink-40);
+    }
+    @media (hover:hover){.mb-descarga a:hover{text-decoration-color:var(--ink);}}
+    .mb-descarga span{font-size:var(--fs-2xs);color:var(--ink-60);}
     /* carrusel de categorías: las flechas solo aparecen con el cursor encima */
     .mb-cats-wrap{position:relative;min-width:0;}
     .mb-cats{--rail-pad:0;gap:clamp(10px,1.4vw,16px);}

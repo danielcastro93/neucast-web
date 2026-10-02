@@ -3,6 +3,10 @@ import Base from "../../layouts/Base.astro";
 import Catalogo from "../../components/Catalogo.astro";
 import { site } from "../../data/site.js";
 import { piezas } from "../../data/catalogo.js";
+import { catalogoPdf } from "../../data/pdfs.js";
+
+const pdf = catalogoPdf("general");
+const descarga = pdf ? { ...pdf, nombre: "Neucast catálogo general.pdf" } : null;
 
 const title = "Catálogo de muebles para oficina | Neucast";
 const description =
@@ -25,5 +29,6 @@ const schema = [
     titulo="Muebles de oficina"
     intro="Desde una silla suelta hasta el equipamiento completo de un piso de oficinas."
     piezas={piezas}
+    descarga={descarga}
   />
 </Base>
