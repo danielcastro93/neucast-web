@@ -120,7 +120,7 @@ import "../styles/listas.css";
       <p class="t-apoyo" data-medida-cats-texto></p>
     </div>
     <Fragment slot="pie">
-      <button class="boton boton--texto boton--texto-peligro izquierda" type="button" data-medida-quitar>Quitar</button>
+      <button class="boton boton--texto boton--texto-peligro izquierda" type="button" data-medida-quitar><IconoAdmin name="basura" size={16} />Eliminar</button>
       <button class="boton" type="button" data-cierra-modal>Cancelar</button>
       <button class="boton boton--primario" type="button" data-medida-guardar>Guardar</button>
     </Fragment>
@@ -143,7 +143,7 @@ import "../styles/listas.css";
       <p class="t-apoyo" data-parte-cats-texto></p>
     </div>
     <Fragment slot="pie">
-      <button class="boton boton--texto boton--texto-peligro izquierda" type="button" data-parte-quitar>Quitar</button>
+      <button class="boton boton--texto boton--texto-peligro izquierda" type="button" data-parte-quitar><IconoAdmin name="basura" size={16} />Eliminar</button>
       <button class="boton" type="button" data-cierra-modal>Cancelar</button>
       <button class="boton boton--primario" type="button" data-parte-guardar>Guardar</button>
     </Fragment>
@@ -152,7 +152,7 @@ import "../styles/listas.css";
 
 <script>
   import { listar, guardar } from "../scripts/api.js";
-  import { abrirModal, cerrarModal, confirmar, avisar, escapar } from "../scripts/ui.js";
+  import { abrirModal, cerrarModal, confirmar, avisar, escapar, ICONO_BASURA } from "../scripts/ui.js";
   import { limpiarSlug } from "../scripts/validar.js";
   import { idNuevo } from "../scripts/listas.js";
 
@@ -305,12 +305,12 @@ import "../styles/listas.css";
           <li class="fila-lista">
             <span class="fila-lista-etiqueta">Filtra en el catálogo del sitio<small class="fila-lista-sub">Aparece en el panel de filtros de /muebles/</small></span>
             <label class="interruptor interruptor--solo">
-              <input type="checkbox" data-cfg-filtro ${l.filtro ? "checked" : ""} ${sistema ? "disabled" : ""} aria-label="Filtra en el catálogo del sitio" />
+              <input type="checkbox" role="switch" data-cfg-filtro ${l.filtro ? "checked" : ""} aria-label="Filtra en el catálogo del sitio" />
               <span class="interruptor-pista"></span>
             </label>
           </li>
         </ul>
-        ${sistema ? '<p class="t-mini panel-nota">Esta lista la usa todo el catálogo: se pueden cambiar su nombre y sus opciones, pero no dónde aparece ni si es obligatoria.</p>' : ""}
+        ${sistema ? '<p class="t-mini panel-nota">Esta lista la usa todo el catálogo: aparece y es obligatoria en todas las categorías. Su nombre, sus opciones y si filtra sí se cambian.</p>' : ""}
       </div>
 
       <div class="panel-bloque">
@@ -330,7 +330,7 @@ import "../styles/listas.css";
       </div>
 
       ${sistema ? "" : `<div class="panel-pie">
-        <button class="boton boton--texto boton--texto-peligro" type="button" data-quitar-lista>Eliminar la lista</button>
+        <button class="boton boton--texto boton--texto-peligro" type="button" data-quitar-lista>${ICONO_BASURA(16)}Eliminar la lista</button>
         <span class="t-mini">${usadas ? `La usan ${usadas} ${usadas === 1 ? "pieza" : "piezas"}` : "Ninguna pieza la usa"}</span>
       </div>`}`;
     pintarOpciones();
@@ -355,7 +355,7 @@ import "../styles/listas.css";
             ${l.color ? `<label class="opcion-color" style="background:${escapar(o.hex || "#ccc")}"><input type="color" value="${escapar(o.hex || "#cccccc")}" data-color aria-label="Color de ${escapar(o.nombre)}" /></label>` : ""}
             <input class="fila-lista-control fila-lista-control--izq" type="text" value="${escapar(o.nombre)}" data-nombre aria-label="Nombre de la opción" />
             <span class="opcion-uso${n ? "" : " opcion-uso--libre"}">${n ? `${n} ${n === 1 ? "pieza" : "piezas"}` : "sin usar"}</span>
-            <button class="fila-lista-quitar" type="button" data-quitar aria-label="Quitar ${escapar(o.nombre)}"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h12M8 6V4.5A.5.5 0 0 1 8.5 4h3a.5.5 0 0 1 .5.5V6M6 6l.7 9.3a1 1 0 0 0 1 .7h4.6a1 1 0 0 0 1-.7L14 6"/></svg></button>
+            <button class="fila-lista-quitar" type="button" data-quitar aria-label="Quitar ${escapar(o.nombre)}">${ICONO_BASURA(17)}</button>
           </li>`;
         }).join("")
       : `<li class="fila-lista opciones-vacia">${busqueda ? "Ninguna opción coincide." : "Todavía no hay opciones. Agrega la primera abajo."}</li>`;
@@ -498,36 +498,55 @@ import "../styles/listas.css";
     guardarListas(`Se quitó "${o.nombre}"`);
   }
 
-  // Ordenar arrastrando la asa: funciona con ratón y con el dedo.
+  // Ordenar arrastrando la asa, con ratón o con el dedo. La fila sigue al
+  // cursor y las demás se acomodan con animación. Se escucha en la ventana:
+  // mover la fila en el DOM le quita la captura del puntero.
   function arrastrar(e, fila, l) {
+    if (e.button > 0) return;
     e.preventDefault();
     const caja = $("[data-opciones]");
     const filas = () => $$(".opcion-lista", caja);
     const desde = filas().indexOf(fila);
+    const y0 = e.clientY;
+    const base = fila.getBoundingClientRect().top;
     fila.classList.add("arrastrando");
-    try { fila.setPointerCapture(e.pointerId); } catch {}
+    document.body.classList.add("ordenando");
+
+    // FLIP: las que cambian de lugar se deslizan en vez de saltar
+    const deslizar = (cambio) => {
+      const otras = filas().filter((f) => f !== fila);
+      const antes = new Map(otras.map((f) => [f, f.getBoundingClientRect().top]));
+      cambio();
+      otras.forEach((f) => {
+        const d = antes.get(f) - f.getBoundingClientRect().top;
+        if (!d) return;
+        f.animate([{ transform: `translateY(${d}px)` }, { transform: "none" }], { duration: 220, easing: "cubic-bezier(.2,.8,.2,1)" });
+      });
+    };
     const mover = (ev) => {
-      const despues = filas().filter((f) => f !== fila).find((f) => ev.clientY < f.getBoundingClientRect().top + f.offsetHeight / 2);
-      if (despues) caja.insertBefore(fila, despues);
-      else caja.appendChild(fila);
+      const despues = filas().filter((f) => f !== fila).find((f) => ev.clientY < f.getBoundingClientRect().top + f.offsetHeight / 2) || null;
+      if (despues !== fila.nextElementSibling) deslizar(() => caja.insertBefore(fila, despues));
+      // la fila va pegada al dedo, aunque ya haya cambiado de lugar
+      const natural = fila.getBoundingClientRect().top - (parseFloat(fila.style.getPropertyValue("--dy")) || 0);
+      fila.style.setProperty("--dy", `${base + ev.clientY - y0 - natural}px`);
     };
     const soltar = () => {
+      removeEventListener("pointermove", mover);
+      removeEventListener("pointerup", soltar);
+      removeEventListener("pointercancel", soltar);
+      document.body.classList.remove("ordenando");
+      fila.style.removeProperty("--dy");
       fila.classList.remove("arrastrando");
-      fila.removeEventListener("pointermove", mover);
-      fila.removeEventListener("pointerup", soltar);
-      fila.removeEventListener("pointercancel", soltar);
       const hasta = filas().indexOf(fila);
       if (hasta === desde) return;
-      // los índices de la vista son los mismos que los de la lista: sin
-      // búsqueda la asa se ve y la tanda empieza en cero
       const [o] = l.opciones.splice(desde, 1);
       l.opciones.splice(hasta, 0, o);
       pintarOpciones();
       guardarListas("Orden guardado");
     };
-    fila.addEventListener("pointermove", mover);
-    fila.addEventListener("pointerup", soltar);
-    fila.addEventListener("pointercancel", soltar);
+    addEventListener("pointermove", mover);
+    addEventListener("pointerup", soltar);
+    addEventListener("pointercancel", soltar);
   }
 
   /* ============================================

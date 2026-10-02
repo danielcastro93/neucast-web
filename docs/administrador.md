@@ -179,7 +179,8 @@ sitio todavía no los lee; la API los guarda y los entrega igual:
   - `filtros` = las listas con `filtro: true`, menos `material`, `colores`,
     con `{ campo: id, nombre, opciones }`, en el orden de la pantalla.
   - `materiales` = las opciones de `material`; `gruposColor` = las de
-    `colores` (con `hex`).
+    `colores` (con `hex`). `filtrosFijos` = `{ material, color }` con el
+    `filtro` de esas dos listas: en `false` el sitio esconde su grupo.
   - `etiquetasMedida` = `{ id: nombre }` de `medidas`, y
     `etiquetasConstruccion` = `{ id: nombre }` de `partes`.
 

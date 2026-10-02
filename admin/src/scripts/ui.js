@@ -214,3 +214,8 @@ export function activarGlobos(scope = document) {
   });
 }
 addEventListener("scroll", ocultarGlobo, { passive: true, capture: true });
+
+// El bote de basura para el HTML que se pinta desde scripts (el mismo de
+// IconoAdmin): relleno, como el de Apple.
+export const ICONO_BASURA = (t = 16) =>
+  `<svg width="${t}" height="${t}" viewBox="0 0 20 20" aria-hidden="true"><path stroke="none" fill="currentColor" d="M8.6 2.5h2.8c.66 0 1.2.54 1.2 1.2v.8h3.15a.85.85 0 0 1 0 1.7H4.25a.85.85 0 0 1 0-1.7H7.4v-.8c0-.66.54-1.2 1.2-1.2Z"/><path stroke="none" fill="currentColor" fill-rule="evenodd" d="M5.3 7.4h9.4l-.66 8.36A1.9 1.9 0 0 1 12.15 17.5h-4.3a1.9 1.9 0 0 1-1.9-1.74L5.3 7.4Zm3.05 1.9a.65.65 0 0 0-.65.65v4.6a.65.65 0 0 0 1.3 0v-4.6a.65.65 0 0 0-.65-.65Zm3.3 0a.65.65 0 0 0-.65.65v4.6a.65.65 0 0 0 1.3 0v-4.6a.65.65 0 0 0-.65-.65Z"/></svg>`;

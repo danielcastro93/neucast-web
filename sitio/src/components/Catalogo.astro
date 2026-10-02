@@ -4,7 +4,7 @@
 import Icon from "@neucast/compartido/components/Icon.astro";
 import PiezaCard from "./PiezaCard.astro";
 import { categories, todosLosMuebles } from "../data/site.js";
-import { bloquesPara, filtros, gruposColor, materiales } from "../data/catalogo.js";
+import { bloquesPara, filtros, gruposColor, materiales, filtrosFijos } from "../data/catalogo.js";
 
 const {
   titulo,
@@ -33,7 +33,7 @@ const grupos = [
   },
   { campo: "material", nombre: "Material", cols: 2, opciones: materiales },
   ...filtros.map((g) => ({ ...g, cols: 2 })),
-];
+].filter((g) => filtrosFijos[g.campo] !== false);
 // qué bloques van y dónde lo decide el catálogo, no cada página: las reglas
 // están escritas junto a los datos, en src/data/catalogo.js
 const bloquesVisibles = bloquesPara(catActiva, piezas.length);

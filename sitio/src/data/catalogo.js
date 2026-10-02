@@ -49,6 +49,11 @@ export const materiales = [
 ];
 
 // Grupos de filtro del panel completo. `campo` es la propiedad del producto.
+// Color y material tienen su propio grupo en el panel de filtros. PARA EL
+// ADMINISTRADOR: en Listas se pueden apagar como filtro; la API manda aquí
+// `false` para esconder su grupo (el `filtro` de las listas colores y material).
+export const filtrosFijos = { color: true, material: true };
+
 export const filtros = [
   {
     campo: "uso",
