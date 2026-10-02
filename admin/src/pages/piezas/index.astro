@@ -1,0 +1,270 @@
+---
+// La lista de piezas: buscar, filtrar por categoría y estado, ordenar, y
+// entrar a editar. Las filas las pinta el navegador con lo que responde la API.
+import Admin from "../../layouts/Admin.astro";
+import IconoAdmin from "../../components/IconoAdmin.astro";
+const base = import.meta.env.BASE_URL;
+---
+<Admin titulo="Piezas" seccion="piezas">
+  <div class="cabecera">
+    <div class="cabecera-textos">
+      <h1 class="t-pantalla">Piezas</h1>
+      <p class="t-apoyo" data-resumen>Cargando el catálogo…</p>
+    </div>
+    <div class="cabecera-acciones">
+      <a class="boton boton--primario" href={`${base}piezas/editar/`}><IconoAdmin name="mas" size={16} />Nueva pieza</a>
+    </div>
+  </div>
+
+  <div class="tarjeta">
+    <div class="herramientas">
+      <div class="control--con-icono">
+        <IconoAdmin name="buscar" />
+        <input class="control" type="search" placeholder="Buscar por nombre, tipo o dirección" data-buscar aria-label="Buscar piezas" />
+      </div>
+      <select class="control" data-categoria aria-label="Categoría">
+        <option value="">Todas las categorías</option>
+      </select>
+      <div class="segmentos" role="group" aria-label="Estado" data-estados>
+        <button class="segmento" type="button" data-estado="" aria-pressed="true">Todas</button>
+        <button class="segmento" type="button" data-estado="publicada" aria-pressed="false">Publicadas</button>
+        <button class="segmento" type="button" data-estado="borrador" aria-pressed="false">Borradores</button>
+      </div>
+    </div>
+
+    <div class="tabla-envoltura">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th class="col-foto"></th>
+            <th aria-sort="ascending"><button type="button" data-orden="nombre">Pieza <IconoAdmin name="ordenar" size={12} /></button></th>
+            <th class="col-oculta-movil"><button type="button" data-orden="cat">Categoría <IconoAdmin name="ordenar" size={12} /></button></th>
+            <th class="col-oculta-movil">Acabados</th>
+            <th class="col-oculta-movil"><button type="button" data-orden="entrega">Disponibilidad <IconoAdmin name="ordenar" size={12} /></button></th>
+            <th>Estado</th>
+            <th class="col-oculta-movil"><button type="button" data-orden="actualizado">Cambiada <IconoAdmin name="ordenar" size={12} /></button></th>
+            <th class="col-acciones"></th>
+          </tr>
+        </thead>
+        <tbody data-filas>
+          {[1, 2, 3, 4, 5, 6].map(() => (
+            <tr aria-hidden="true">
+              <td class="col-foto"><div class="hueso" style="width:48px;height:48px;border-radius:10px"></div></td>
+              <td><div class="hueso" style="width:140px;height:14px"></div><div class="hueso" style="width:90px;height:11px;margin-top:6px"></div></td>
+              <td class="col-oculta-movil"><div class="hueso" style="width:110px;height:14px"></div></td>
+              <td class="col-oculta-movil"><div class="hueso" style="width:70px;height:14px"></div></td>
+              <td class="col-oculta-movil"><div class="hueso" style="width:90px;height:14px"></div></td>
+              <td><div class="hueso" style="width:80px;height:26px;border-radius:999px"></div></td>
+              <td class="col-oculta-movil"><div class="hueso" style="width:60px;height:14px"></div></td>
+              <td></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <div class="vacio" data-vacio hidden>
+      <IconoAdmin name="buscar" size={36} />
+      <b>Ninguna pieza coincide</b>
+      <p>Prueba con otra palabra o quita los filtros.</p>
+      <button class="boton boton--chico" type="button" data-limpiar>Quitar los filtros</button>
+    </div>
+    <div class="tabla-pie">
+      <span data-conteo></span>
+      <span class="t-mini">Haz clic en una fila para editarla</span>
+    </div>
+  </div>
+</Admin>
+
+<script>
+  import { listar, guardar, borrar } from "../../scripts/api.js";
+  import { medio } from "../../scripts/medios.js";
+  import { confirmar, avisar, fechaRelativa, escapar } from "../../scripts/ui.js";
+
+  const base = import.meta.env.BASE_URL;
+  const $ = (s, el = document) => el.querySelector(s);
+
+  let piezas = [];
+  let categorias = [];
+  let listas = null;
+  const filtro = { texto: "", cat: "", estado: "", orden: "nombre", dir: 1 };
+
+  const nombreCat = (slug) => categorias.find((c) => c.slug === slug)?.name || slug;
+  const nombreEntrega = (id) => listas?.filtros.find((f) => f.campo === "entrega")?.opciones.find((o) => o.id === id)?.nombre || id || "";
+  const colorHex = (id) => listas?.gruposColor.find((g) => g.id === id)?.hex || "#ccc";
+  const normal = (s) => (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+
+  function filtradas() {
+    const t = normal(filtro.texto);
+    return piezas
+      .filter((p) => !filtro.cat || p.cat === filtro.cat)
+      .filter((p) => !filtro.estado || p.estado === filtro.estado)
+      .filter((p) => !t || normal(`${p.nombre} ${p.tipo} ${p.slug} ${nombreCat(p.cat)}`).includes(t))
+      .sort((a, b) => {
+        const k = filtro.orden;
+        const va = k === "cat" ? nombreCat(a.cat) : k === "entrega" ? nombreEntrega(a.entrega) : a[k] || "";
+        const vb = k === "cat" ? nombreCat(b.cat) : k === "entrega" ? nombreEntrega(b.entrega) : b[k] || "";
+        return String(va).localeCompare(String(vb), "es") * filtro.dir;
+      });
+  }
+
+  function fila(p) {
+    const foto = p.img?.[0] ? `<img src="${escapar(medio(p.img[0]))}" alt="" loading="lazy" />` : "";
+    const colores = (p.colores || []).slice(0, 5).map((c) => `<span class="chip-color" title="${escapar(c)}" style="background:${colorHex(c)}"></span>`).join("");
+    return `
+      <tr data-slug="${escapar(p.slug)}" tabindex="0">
+        <td class="col-foto"><div class="miniatura">${foto}</div></td>
+        <td class="celda-nombre"><b>${escapar(p.nombre)}</b><span>${escapar(p.tipo)}${p.nuevo ? ' · <span class="estado estado--nuevo" style="height:18px;padding:0 7px;font-size:11px">Nuevo</span>' : ""}</span></td>
+        <td class="col-oculta-movil">${escapar(nombreCat(p.cat))}</td>
+        <td class="col-oculta-movil"><span style="display:inline-flex;gap:4px">${colores}</span></td>
+        <td class="col-oculta-movil">${escapar(nombreEntrega(p.entrega))}</td>
+        <td><span class="estado estado--${escapar(p.estado || "borrador")}">${p.estado === "publicada" ? "Publicada" : "Borrador"}</span></td>
+        <td class="col-oculta-movil t-mini">${escapar(fechaRelativa(p.actualizado))}</td>
+        <td class="col-acciones">
+          <div class="desplegable menu-fila" data-desplegable>
+            <button class="boton boton--chico boton--icono boton--texto" type="button" aria-label="Más acciones" aria-haspopup="menu" aria-expanded="false" data-desplegable-boton>
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="5" r="1.4"/><circle cx="10" cy="10" r="1.4"/><circle cx="10" cy="15" r="1.4"/></svg>
+            </button>
+            <div class="desplegable-menu" role="menu">
+              <a class="desplegable-item" role="menuitem" href="${base}piezas/editar/?slug=${encodeURIComponent(p.slug)}">Editar</a>
+              <button class="desplegable-item" role="menuitem" type="button" data-duplicar>Duplicar</button>
+              <button class="desplegable-item" role="menuitem" type="button" data-alternar>${p.estado === "publicada" ? "Pasar a borrador" : "Publicar"}</button>
+              <button class="desplegable-item desplegable-item--peligro" role="menuitem" type="button" data-borrar>Borrar</button>
+            </div>
+          </div>
+        </td>
+      </tr>`;
+  }
+
+  function pintar() {
+    const lista = filtradas();
+    const cuerpo = $("[data-filas]");
+    cuerpo.innerHTML = lista.map(fila).join("");
+    $("[data-vacio]").hidden = lista.length > 0;
+    $("[data-conteo]").textContent = `${lista.length} de ${piezas.length} ${piezas.length === 1 ? "pieza" : "piezas"}`;
+    document.querySelectorAll("th[data-th]").forEach((th) => th.removeAttribute("aria-sort"));
+    document.querySelectorAll("th").forEach((th) => {
+      const b = th.querySelector("[data-orden]");
+      if (!b) return;
+      if (b.dataset.orden === filtro.orden) th.setAttribute("aria-sort", filtro.dir > 0 ? "ascending" : "descending");
+      else th.removeAttribute("aria-sort");
+    });
+    cablearFilas(cuerpo);
+  }
+
+  function cablearFilas(cuerpo) {
+    cuerpo.querySelectorAll("tr[data-slug]").forEach((tr) => {
+      const ir = () => (location.href = `${base}piezas/editar/?slug=${encodeURIComponent(tr.dataset.slug)}`);
+      tr.addEventListener("click", (e) => {
+        if (e.target.closest("[data-desplegable]")) return;
+        ir();
+      });
+      tr.addEventListener("keydown", (e) => e.key === "Enter" && !e.target.closest("[data-desplegable]") && ir());
+
+      const d = tr.querySelector("[data-desplegable]");
+      const b = d.querySelector("[data-desplegable-boton]");
+      const alternar = (abrir) => {
+        d.classList.toggle("abierto", abrir);
+        b.setAttribute("aria-expanded", String(abrir));
+      };
+      b.addEventListener("click", (e) => {
+        e.stopPropagation();
+        document.querySelectorAll(".menu-fila.abierto").forEach((o) => o !== d && o.classList.remove("abierto"));
+        alternar(!d.classList.contains("abierto"));
+      });
+      const pieza = piezas.find((p) => p.slug === tr.dataset.slug);
+      d.querySelector("[data-duplicar]").addEventListener("click", async (e) => {
+        e.stopPropagation();
+        alternar(false);
+        const copia = { ...structuredClone(pieza), slug: `${pieza.slug}-copia`, nombre: `${pieza.nombre} (copia)`, estado: "borrador" };
+        delete copia.actualizado;
+        try {
+          await guardar("piezas", copia);
+          avisar(`Se duplicó ${pieza.nombre} como borrador`);
+          await cargar();
+          dispatchEvent(new CustomEvent("neucast:guardado"));
+        } catch (err) {
+          avisar(err.message, { tipo: "error" });
+        }
+      });
+      d.querySelector("[data-alternar]").addEventListener("click", async (e) => {
+        e.stopPropagation();
+        alternar(false);
+        const aPublicada = pieza.estado !== "publicada";
+        try {
+          await guardar("piezas", { ...pieza, _original: pieza.slug, estado: aPublicada ? "publicada" : "borrador" });
+          avisar(aPublicada ? `${pieza.nombre} pasó a pruebas como publicada` : `${pieza.nombre} ahora es borrador`);
+          await cargar();
+          dispatchEvent(new CustomEvent("neucast:guardado"));
+        } catch (err) {
+          const faltan = Object.values(err.campos || {});
+          avisar(faltan.length ? `${err.message}: ${faltan[0]}` : err.message, { tipo: "error" });
+        }
+      });
+      d.querySelector("[data-borrar]").addEventListener("click", async (e) => {
+        e.stopPropagation();
+        alternar(false);
+        const ok = await confirmar({
+          titulo: `Borrar ${pieza.nombre}`,
+          texto: "Desaparece su página, su ficha en PDF y su lugar en el catálogo, el buscador y los proyectos donde esté. Si solo quieres esconderla, pásala a borrador.",
+          accion: "Borrar la pieza",
+          peligro: true,
+        });
+        if (!ok) return;
+        try {
+          await borrar("piezas", pieza.slug);
+          avisar(`Se borró ${pieza.nombre}`);
+          await cargar();
+          dispatchEvent(new CustomEvent("neucast:guardado"));
+        } catch (err) {
+          avisar(err.message, { tipo: "error" });
+        }
+      });
+    });
+  }
+  document.addEventListener("click", () => document.querySelectorAll(".menu-fila.abierto").forEach((o) => o.classList.remove("abierto")));
+
+  async function cargar() {
+    [piezas, categorias, listas] = await Promise.all([listar("piezas"), listar("categorias"), listar("listas")]);
+    const sel = $("[data-categoria]");
+    if (sel.options.length === 1) {
+      for (const c of categorias) sel.insertAdjacentHTML("beforeend", `<option value="${escapar(c.slug)}">${escapar(c.name)}</option>`);
+    }
+    const publicadas = piezas.filter((p) => p.estado === "publicada").length;
+    $("[data-resumen]").textContent = `${piezas.length} piezas en ${categorias.length} categorías · ${publicadas} publicadas, ${piezas.length - publicadas} en borrador`;
+    pintar();
+  }
+
+  /* ---------- Controles ---------- */
+  $("[data-buscar]").addEventListener("input", (e) => { filtro.texto = e.target.value; pintar(); });
+  $("[data-categoria]").addEventListener("change", (e) => { filtro.cat = e.target.value; pintar(); });
+  $("[data-estados]").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-estado]");
+    if (!b) return;
+    filtro.estado = b.dataset.estado;
+    document.querySelectorAll("[data-estados] .segmento").forEach((s) => s.setAttribute("aria-pressed", String(s === b)));
+    pintar();
+  });
+  document.querySelectorAll("[data-orden]").forEach((b) =>
+    b.addEventListener("click", () => {
+      if (filtro.orden === b.dataset.orden) filtro.dir *= -1;
+      else { filtro.orden = b.dataset.orden; filtro.dir = 1; }
+      pintar();
+    })
+  );
+  $("[data-limpiar]").addEventListener("click", () => {
+    filtro.texto = ""; filtro.cat = ""; filtro.estado = "";
+    $("[data-buscar]").value = ""; $("[data-categoria]").value = "";
+    document.querySelectorAll("[data-estados] .segmento").forEach((s) => s.setAttribute("aria-pressed", String(!s.dataset.estado)));
+    pintar();
+  });
+
+  // Atajo: "/" lleva al buscador.
+  addEventListener("keydown", (e) => {
+    if (e.key === "/" && !["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement?.tagName)) {
+      e.preventDefault();
+      $("[data-buscar]").focus();
+    }
+  });
+
+  cargar().catch((e) => avisar(e.message || "No se pudo cargar el catálogo", { tipo: "error" }));
+</script>

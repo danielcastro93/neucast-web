@@ -1,0 +1,23 @@
+---
+// Un modal del administrador. Se abre con abrirModal(id) o con un botón
+// data-abre-modal="{id}", y cierra con Escape, el velo, la cruz o cualquier
+// [data-cierra-modal] dentro. El cableado vive en scripts/ui.js y lo hace el
+// molde una sola vez.
+//
+// Slots: el cuerpo (por defecto) y `pie` para los botones.
+import IconoAdmin from "./IconoAdmin.astro";
+const { id, titulo, texto, ancho = false } = Astro.props;
+---
+<dialog class:list={["modal", { "modal--ancho": ancho }]} id={id} aria-labelledby={`${id}-titulo`}>
+  <div class="modal-cabeza">
+    <div>
+      <h2 class="modal-titulo" id={`${id}-titulo`} data-titulo>{titulo}</h2>
+      <p class="modal-texto" data-texto>{texto}<slot name="texto" /></p>
+    </div>
+    <button class="modal-x" type="button" data-cierra-modal aria-label="Cerrar">
+      <IconoAdmin name="cerrar" size={16} />
+    </button>
+  </div>
+  {Astro.slots.has("default") && <div class="modal-cuerpo"><slot /></div>}
+  <div class="modal-pie"><slot name="pie" /></div>
+</dialog>

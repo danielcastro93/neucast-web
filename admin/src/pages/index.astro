@@ -1,0 +1,113 @@
+---
+// Entrar al administrador. Es la única pantalla sin el molde.
+import "@neucast/compartido/styles/global.css";
+import "../styles/admin.css";
+import Logo from "@neucast/compartido/components/Logo.astro";
+import IconoAdmin from "../components/IconoAdmin.astro";
+const base = import.meta.env.BASE_URL;
+---
+<!doctype html>
+<html lang="es-MX">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Entrar · Administrador de Neucast</title>
+    <link rel="icon" href={`${base}favicon.svg`} type="image/svg+xml" />
+  </head>
+  <body>
+    <div class="acceso">
+      <div class="acceso-foto" aria-hidden="true">
+        <img src={`${base}img/hero-oficina.jpg`} alt="" />
+        <div class="acceso-frase">
+          <span class="rotulo">Administrador</span>
+          <p>Lo que guardas aquí <span>es lo que ve la gente.</span></p>
+        </div>
+      </div>
+      <div class="acceso-panel">
+        <div class="acceso-caja">
+          <div class="acceso-logo"><Logo height={30} /></div>
+          <h1>Entra a tu cuenta</h1>
+          <p class="t-apoyo">Catálogo, proyectos, textos y métricas de neucast.com.mx.</p>
+
+          <form class="acceso-form" novalidate data-form>
+            <div class="campo">
+              <div class="campo-etiqueta"><label for="correo">Correo</label></div>
+              <input class="control" id="correo" name="correo" type="email" autocomplete="username" inputmode="email" spellcheck="false" required autofocus />
+            </div>
+            <div class="campo">
+              <div class="campo-etiqueta"><label for="clave">Contraseña</label></div>
+              <div class="campo-clave">
+                <input class="control" id="clave" name="clave" type="password" autocomplete="current-password" required />
+                <button class="ojo" type="button" data-ojo aria-label="Mostrar la contraseña" aria-pressed="false">
+                  <span data-ojo-abierto><IconoAdmin name="ojo" size={18} /></span>
+                  <span data-ojo-cerrado hidden><IconoAdmin name="ojoCerrado" size={18} /></span>
+                </button>
+              </div>
+            </div>
+            <div data-error hidden></div>
+            <button class="boton boton--primario boton--grande" type="submit" data-enviar>Entrar</button>
+          </form>
+
+          <p class="acceso-pie" data-pie>Solo para el equipo de Neucast. Si no tienes cuenta, pídesela a quien administra el sitio.</p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      import { entrar } from "../scripts/api.js";
+      import { iniciarSesion, sesionActual } from "../scripts/sesion.js";
+
+      const base = import.meta.env.BASE_URL;
+      const destino = () => {
+        const a = new URLSearchParams(location.search).get("a");
+        return a && a.startsWith("/") ? a : `${base}inicio/`;
+      };
+      if (sesionActual()) location.replace(destino());
+
+      const form = document.querySelector("[data-form]");
+      const error = document.querySelector("[data-error]");
+      const boton = document.querySelector("[data-enviar]");
+      const clave = document.getElementById("clave");
+
+      // Mostrar u ocultar la contraseña.
+      const ojo = document.querySelector("[data-ojo]");
+      ojo.addEventListener("click", () => {
+        const ver = clave.type === "password";
+        clave.type = ver ? "text" : "password";
+        ojo.setAttribute("aria-pressed", String(ver));
+        ojo.setAttribute("aria-label", ver ? "Ocultar la contraseña" : "Mostrar la contraseña");
+        document.querySelector("[data-ojo-abierto]").hidden = ver;
+        document.querySelector("[data-ojo-cerrado]").hidden = !ver;
+        clave.focus();
+      });
+
+      const mostrarError = (texto) => {
+        error.hidden = false;
+        error.className = "aviso-en-linea";
+        error.innerHTML = `<svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5 2.8 16h14.4L10 3.5Z"/><path d="M10 8.5v3.5M10 14.3v.2"/></svg><span></span>`;
+        error.querySelector("span").textContent = texto;
+        form.classList.remove("sacudida");
+        void form.offsetWidth;
+        form.classList.add("sacudida");
+      };
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const correo = form.correo.value.trim();
+        if (!correo || !clave.value) return mostrarError("Escribe tu correo y tu contraseña.");
+        boton.setAttribute("aria-busy", "true");
+        error.hidden = true;
+        try {
+          const sesion = await entrar(correo, clave.value);
+          iniciarSesion(sesion);
+          location.replace(destino());
+        } catch (err) {
+          mostrarError(err.message || "No se pudo entrar.");
+          boton.removeAttribute("aria-busy");
+          clave.select();
+        }
+      });
+    </script>
+  </body>
+</html>

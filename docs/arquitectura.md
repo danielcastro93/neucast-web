@@ -64,7 +64,7 @@ compartido/            el paquete @neucast/compartido, que usan sitio y admin
 ├── components/        Icon, Logo y PanelLateral
 └── scripts/           bloqueo-scroll.js
 
-admin/                 el frontend del administrador (por construir)
+admin/                 el frontend del administrador (ver admin/README.md)
 api/                   el backend y la API (de Amauri; hoy solo el contrato)
 docs/                  toda la documentación
 ```

@@ -13,7 +13,7 @@ Un solo repositorio con cuatro carpetas: `sitio/` (el sitio público),
 `compartido/` (tokens, estilos y componentes que usan el sitio y el
 administrador), `admin/` (el frontend del administrador, por construir) y
 `api/` (el backend y la API, de Amauri). Son workspaces de npm: los comandos se
-corren desde la raíz.
+corren desde la raíz. El administrador se explica en [`admin/README.md`](admin/README.md).
 
 ```bash
 npm install
@@ -22,6 +22,8 @@ npm run build    # compila a sitio/dist/
 npm run revisar  # revisa sitio/dist/: enlaces, SEO, encabezados y reglas del proyecto
 npm run fichas     # fichas técnicas en PDF, en una Mac
 npm run catalogos  # catálogos en PDF, en una Mac
+npm run dev:admin  # el administrador, en http://localhost:4322
+npm run semilla    # regenera los datos de prueba del administrador
 ```
 
 Node 22.12 o superior.

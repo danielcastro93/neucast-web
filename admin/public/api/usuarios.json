@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "nombre": "Daniel Castro",
+    "correo": "daniel@neucast.com.mx",
+    "clave": "neucast2026",
+    "rol": "administra"
+  },
+  {
+    "id": 2,
+    "nombre": "Gaby Castillo",
+    "correo": "gaby@neucast.com.mx",
+    "clave": "neucast2026",
+    "rol": "captura"
+  }
+]

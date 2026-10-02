@@ -7,7 +7,8 @@
   },
   "workspaces": [
     "sitio",
-    "compartido"
+    "compartido",
+    "admin"
   ],
   "scripts": {
     "dev": "npm run dev -w sitio",
@@ -15,7 +16,10 @@
     "preview": "npm run preview -w sitio",
     "revisar": "npm run revisar -w sitio",
     "fichas": "npm run fichas -w sitio",
-    "catalogos": "npm run catalogos -w sitio"
+    "catalogos": "npm run catalogos -w sitio",
+    "dev:admin": "npm run dev -w admin",
+    "build:admin": "npm run build -w admin",
+    "semilla": "npm run semilla -w admin"
   },
   "allowScripts": {
     "esbuild": true

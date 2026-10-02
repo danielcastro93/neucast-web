@@ -1,0 +1,275 @@
+{
+  "filtros": [
+    {
+      "campo": "uso",
+      "nombre": "Tipo de uso",
+      "opciones": [
+        {
+          "id": "direccion",
+          "nombre": "Dirección"
+        },
+        {
+          "id": "ejecutiva",
+          "nombre": "Ejecutiva"
+        },
+        {
+          "id": "operativa",
+          "nombre": "Operativa"
+        },
+        {
+          "id": "visita",
+          "nombre": "Visita"
+        },
+        {
+          "id": "colectividad",
+          "nombre": "Colectividad"
+        }
+      ]
+    },
+    {
+      "campo": "respaldo",
+      "nombre": "Respaldo",
+      "opciones": [
+        {
+          "id": "cabecera",
+          "nombre": "Con cabecera"
+        },
+        {
+          "id": "alto",
+          "nombre": "Alto"
+        },
+        {
+          "id": "bajo",
+          "nombre": "Bajo"
+        }
+      ]
+    },
+    {
+      "campo": "plazas",
+      "nombre": "Plazas",
+      "opciones": [
+        {
+          "id": "1",
+          "nombre": "1 plaza"
+        },
+        {
+          "id": "2",
+          "nombre": "2 plazas"
+        },
+        {
+          "id": "3",
+          "nombre": "3 plazas"
+        },
+        {
+          "id": "4",
+          "nombre": "4 o más"
+        }
+      ]
+    },
+    {
+      "campo": "brazos",
+      "nombre": "Descansabrazos",
+      "opciones": [
+        {
+          "id": "sin",
+          "nombre": "Sin brazos"
+        },
+        {
+          "id": "fijos",
+          "nombre": "Fijos"
+        },
+        {
+          "id": "ajustables",
+          "nombre": "Ajustables"
+        }
+      ]
+    },
+    {
+      "campo": "base",
+      "nombre": "Base",
+      "opciones": [
+        {
+          "id": "aluminio",
+          "nombre": "Aluminio pulido"
+        },
+        {
+          "id": "nylon",
+          "nombre": "Nylon"
+        },
+        {
+          "id": "trineo",
+          "nombre": "Trineo"
+        },
+        {
+          "id": "cantilever",
+          "nombre": "Cantilever"
+        },
+        {
+          "id": "patas",
+          "nombre": "Cuatro patas"
+        }
+      ]
+    },
+    {
+      "campo": "extras",
+      "nombre": "Características",
+      "opciones": [
+        {
+          "id": "apilable",
+          "nombre": "Apilable"
+        },
+        {
+          "id": "ruedas",
+          "nombre": "Con ruedas"
+        },
+        {
+          "id": "reclinable",
+          "nombre": "Reclinable"
+        },
+        {
+          "id": "modular",
+          "nombre": "Modular"
+        }
+      ]
+    },
+    {
+      "campo": "entrega",
+      "nombre": "Disponibilidad",
+      "opciones": [
+        {
+          "id": "inmediata",
+          "nombre": "Entrega inmediata"
+        },
+        {
+          "id": "10dias",
+          "nombre": "Hasta 10 días"
+        },
+        {
+          "id": "pedido",
+          "nombre": "Sobre pedido"
+        }
+      ]
+    }
+  ],
+  "materiales": [
+    {
+      "id": "smartmesh",
+      "nombre": "Malla SmartMesh"
+    },
+    {
+      "id": "e-fabric",
+      "nombre": "Tela E-Fabric"
+    },
+    {
+      "id": "technoleather",
+      "nombre": "Technoleather"
+    },
+    {
+      "id": "eco-leather",
+      "nombre": "Eco-Leather"
+    },
+    {
+      "id": "piel",
+      "nombre": "Piel genuina"
+    },
+    {
+      "id": "madera",
+      "nombre": "Madera"
+    },
+    {
+      "id": "metal",
+      "nombre": "Metal"
+    },
+    {
+      "id": "cristal",
+      "nombre": "Cristal"
+    }
+  ],
+  "gruposColor": [
+    {
+      "id": "negro",
+      "nombre": "Negro",
+      "hex": "#1D1D1B"
+    },
+    {
+      "id": "gris",
+      "nombre": "Gris",
+      "hex": "#8A8A87"
+    },
+    {
+      "id": "blanco",
+      "nombre": "Blanco",
+      "hex": "#EFEEE8"
+    },
+    {
+      "id": "beige",
+      "nombre": "Beige",
+      "hex": "#C9B99B"
+    },
+    {
+      "id": "cafe",
+      "nombre": "Café",
+      "hex": "#5A4032"
+    },
+    {
+      "id": "azul",
+      "nombre": "Azul",
+      "hex": "#2B3A67"
+    },
+    {
+      "id": "verde",
+      "nombre": "Verde",
+      "hex": "#4A5D3A"
+    },
+    {
+      "id": "rojo",
+      "nombre": "Rojo",
+      "hex": "#8C2F2F"
+    }
+  ],
+  "espacios": [
+    {
+      "id": "home-office",
+      "nombre": "Home office"
+    }
+  ],
+  "etiquetasMedida": {
+    "alto": "Altura total",
+    "largo": "Longitud",
+    "ancho": "Anchura",
+    "fondo": "Profundidad",
+    "diametro": "Diámetro",
+    "espesorCubierta": "Espesor de cubierta",
+    "alturaLibre": "Altura libre bajo cubierta",
+    "altoAsiento": "Altura del asiento",
+    "anchoAsiento": "Anchura del asiento",
+    "fondoAsiento": "Profundidad del asiento",
+    "altoRespaldo": "Altura del respaldo",
+    "brazoInterno": "Medida interna de brazos",
+    "brazoExterno": "Medida externa de brazos",
+    "cabecera": "Altura de cabecera",
+    "plazas": "Plazas",
+    "personas": "Personas",
+    "puestos": "Puestos de trabajo",
+    "puertas": "Puertas",
+    "gavetas": "Gavetas",
+    "entrepanos": "Entrepaños",
+    "apilables": "Piezas apilables",
+    "cargaEntrepano": "Carga por entrepaño",
+    "cargaGaveta": "Carga por gaveta",
+    "carga": "Carga máxima",
+    "peso": "Peso"
+  },
+  "etiquetasConstruccion": {
+    "tapiceria": "Tapicería",
+    "asiento": "Asiento",
+    "armazon": "Armazón",
+    "estructura": "Estructura",
+    "cubierta": "Cubierta",
+    "suspension": "Suspensión",
+    "base": "Base",
+    "patas": "Patas",
+    "ruedas": "Ruedas",
+    "acabado": "Acabado"
+  }
+}

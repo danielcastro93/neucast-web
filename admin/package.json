@@ -1,0 +1,19 @@
+{
+  "name": "@neucast/admin",
+  "private": true,
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev --port 4322",
+    "build": "astro build",
+    "preview": "astro preview --port 4322",
+    "semilla": "node scripts/semilla.mjs"
+  },
+  "dependencies": {
+    "@neucast/compartido": "*",
+    "astro": "^7.3.4"
+  }
+}

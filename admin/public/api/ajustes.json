@@ -1,0 +1,25 @@
+{
+  "nombre": "Neucast",
+  "dominio": "https://neucast.com.mx",
+  "whatsapp": "5215500000000",
+  "correo": "contacto.ventas@neucast.com.mx",
+  "social": {
+    "facebook": "https://www.facebook.com/neucast",
+    "instagram": "https://www.instagram.com/neucastoficial"
+  },
+  "descripcionMarca": "Neucast es una marca mexicana de mobiliario de diseño para espacios corporativos. Vendemos desde una pieza hasta el equipamiento completo de oficinas, salas de juntas, recepciones, cafeterías, áreas comunes y espacios comerciales. Envíos e instalación en todo México.",
+  "destacados": [
+    "silla-polanco",
+    "mesa-tempo",
+    "silla-nube",
+    "escritorio-eje",
+    "silla-orbita",
+    "librero-lineal",
+    "mesa-piedra",
+    "banca-brisa"
+  ],
+  "todosLosMuebles": {
+    "photo": "/img/cats/todos-los-muebles.jpg",
+    "alt": "Piso de oficina con escritorios, sillería, guardado y área lounge"
+  }
+}

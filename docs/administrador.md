@@ -19,7 +19,7 @@ Tiene dos partes:
 
 | Parte | Qué es | Estado |
 | --- | --- | --- |
-| **Frontend del administrador** | Un sitio aparte hecho en Astro, estático, en un subdominio tipo `admin.neucast.com.mx`. Vive en `admin/` de este mismo repositorio y reutiliza los tokens y componentes del sistema de diseño que están en `compartido/` (`global.css`, `Icon`, `Logo`, `PanelLateral`; lo demás sale ahí cuando el administrador lo pida) y habla con la API | Decidido, por construir |
+| **Frontend del administrador** | Un sitio aparte hecho en Astro, estático, en un subdominio tipo `admin.neucast.com.mx`. Vive en `admin/` de este mismo repositorio y reutiliza los tokens y componentes del sistema de diseño que están en `compartido/` (`global.css`, `Icon`, `Logo`, `PanelLateral`; lo demás sale ahí cuando el administrador lo pida) y habla con la API. Cómo está armado, la API simulada y las variables están en [`admin/README.md`](../admin/README.md) | En construcción: entrar, inicio, lista y edición de piezas (2 de octubre de 2026) |
 | **Backend y API** | Guarda los datos, recibe el formulario de contacto y dispara la publicación. Lo hace Amauri en `api/` de este repositorio | **Lenguaje por definir** (Node o PHP, con MySQL). Corre en el VPS, así que cualquiera de los dos sirve |
 
 El hospedaje es un VPS de Hostinger. Cómo se publica está en

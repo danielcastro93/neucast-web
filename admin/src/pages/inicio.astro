@@ -1,0 +1,138 @@
+---
+// Inicio: el estado del sitio de un vistazo y a dónde ir.
+import Admin from "../layouts/Admin.astro";
+import IconoAdmin from "../components/IconoAdmin.astro";
+const base = import.meta.env.BASE_URL;
+---
+<Admin titulo="Inicio" seccion="inicio">
+  <div class="cabecera">
+    <div class="cabecera-textos">
+      <h1 class="t-pantalla" data-saludo>Hola</h1>
+      <p class="t-apoyo" data-resumen>Cargando el estado del sitio…</p>
+    </div>
+    <div class="cabecera-acciones">
+      <a class="boton" href={`${base}piezas/editar/`}><IconoAdmin name="mas" size={16} />Nueva pieza</a>
+    </div>
+  </div>
+
+  <div class="rejilla rejilla--4" data-cifras>
+    {["Piezas publicadas", "Borradores", "Categorías", "Proyectos"].map((r) => (
+      <div class="tarjeta cifra">
+        <div class="cifra-rotulo">{r}</div>
+        <div class="cifra-valor"><span class="hueso" style="display:inline-block;width:48px;height:30px"></span></div>
+        <div class="cifra-nota"><span class="hueso" style="display:inline-block;width:120px;height:12px"></span></div>
+      </div>
+    ))}
+  </div>
+
+  <div class="rejilla rejilla--2" style="margin-top:var(--space-4)">
+    <div class="tarjeta">
+      <div class="tarjeta-cabeza">
+        <div>
+          <h2 class="t-seccion">Cambios en pruebas</h2>
+          <p class="t-mini">Lo guardado que todavía no está en producción</p>
+        </div>
+        <button class="boton boton--chico" type="button" data-abre-modal="modal-publicar">Publicar</button>
+      </div>
+      <ul class="lista-cambios" style="border:0;border-radius:0" data-pendientes>
+        <li><span class="hueso" style="width:60%;height:14px"></span></li>
+      </ul>
+    </div>
+    <div class="tarjeta">
+      <div class="tarjeta-cabeza">
+        <div>
+          <h2 class="t-seccion">Últimas piezas tocadas</h2>
+          <p class="t-mini">Por fecha de cambio</p>
+        </div>
+        <a class="boton boton--chico" href={`${base}piezas/`}>Ver todas</a>
+      </div>
+      <ul class="lista-cambios" style="border:0;border-radius:0" data-recientes>
+        <li><span class="hueso" style="width:50%;height:14px"></span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="tarjeta" style="margin-top:var(--space-4)" data-simulacion hidden>
+    <div class="tarjeta-cabeza">
+      <div>
+        <h2 class="t-seccion">Simulación de la API</h2>
+        <p class="t-mini">Mientras no exista la API real, lo que guardas vive en este navegador. Puedes volver a la semilla cuando quieras.</p>
+      </div>
+      <button class="boton boton--chico" type="button" data-restablecer><IconoAdmin name="refrescar" size={14} />Restablecer la simulación</button>
+    </div>
+  </div>
+</Admin>
+
+<script>
+  import { listar, esSimulada } from "../scripts/api.js";
+  import { restablecer } from "../scripts/api-simulada.js";
+  import { sesionActual } from "../scripts/sesion.js";
+  import { confirmar, avisar, fechaRelativa, escapar } from "../scripts/ui.js";
+
+  const base = import.meta.env.BASE_URL;
+  const sesion = sesionActual();
+  const hora = new Date().getHours();
+  const saludo = hora < 12 ? "Buenos días" : hora < 19 ? "Buenas tardes" : "Buenas noches";
+  document.querySelector("[data-saludo]").textContent = `${saludo}, ${sesion?.nombre?.split(" ")[0] || ""}`.trim();
+
+  const NOMBRES = { piezas: "pieza", categorias: "categoría", proyectos: "proyecto", ajustes: "ajustes", "home-office": "home office" };
+  const RUTA = { piezas: (id) => `${base}piezas/editar/?slug=${encodeURIComponent(id)}` };
+
+  async function pintar() {
+    const [piezas, categorias, proyectos, publicacion] = await Promise.all([
+      listar("piezas"), listar("categorias"), listar("proyectos"), listar("publicacion"),
+    ]);
+    const publicadas = piezas.filter((p) => p.estado === "publicada").length;
+    const borradores = piezas.length - publicadas;
+    const cifras = document.querySelectorAll("[data-cifras] .cifra");
+    const pon = (i, valor, nota) => {
+      cifras[i].querySelector(".cifra-valor").textContent = valor;
+      cifras[i].querySelector(".cifra-nota").textContent = nota;
+    };
+    pon(0, publicadas, `${piezas.filter((p) => p.nuevo).length} marcadas como nuevas`);
+    pon(1, borradores, borradores ? "Sin publicar todavía" : "Nada pendiente de terminar");
+    pon(2, categorias.length, `${categorias.filter((c) => piezas.some((p) => p.cat === c.slug)).length} con piezas`);
+    pon(3, proyectos.length, `${proyectos.filter((p) => p.destacado).length} en el home`);
+
+    const n = (publicacion.pendientes || []).length;
+    document.querySelector("[data-resumen]").textContent = n
+      ? `Hay ${n} ${n === 1 ? "cambio" : "cambios"} en el sitio de pruebas sin publicar.`
+      : `Producción está al día. Última publicación ${fechaRelativa(publicacion.produccion?.fecha)}.`;
+
+    const pend = document.querySelector("[data-pendientes]");
+    pend.innerHTML = n
+      ? publicacion.pendientes.slice().reverse().slice(0, 6).map((c) => {
+          const ruta = RUTA[c.coleccion]?.(c.id);
+          const nombre = escapar(c.nombre || c.id);
+          return `<li><span class="que">${escapar(NOMBRES[c.coleccion] || c.coleccion)}</span>${ruta && !c.borrado ? `<a href="${ruta}">${nombre}</a>` : `<span class="${c.borrado ? "borrado" : ""}">${nombre}</span>`}<span class="cuando">${escapar(fechaRelativa(c.fecha))}</span></li>`;
+        }).join("")
+      : `<li><span class="t-apoyo">Nada pendiente. Todo lo guardado ya está publicado.</span></li>`;
+
+    const rec = document.querySelector("[data-recientes]");
+    rec.innerHTML = piezas
+      .slice()
+      .sort((a, b) => (b.actualizado || "").localeCompare(a.actualizado || ""))
+      .slice(0, 6)
+      .map((p) => `<li><a href="${RUTA.piezas(p.slug)}"><b>${escapar(p.nombre)}</b> <span class="t-mini">${escapar(p.tipo)}</span></a><span class="cuando">${escapar(fechaRelativa(p.actualizado))}</span></li>`)
+      .join("");
+  }
+  pintar().catch((e) => avisar(e.message || "No se pudo cargar el inicio", { tipo: "error" }));
+  addEventListener("neucast:guardado", () => pintar().catch(() => {}));
+
+  if (esSimulada) {
+    const caja = document.querySelector("[data-simulacion]");
+    caja.hidden = false;
+    caja.querySelector("[data-restablecer]").addEventListener("click", async () => {
+      const ok = await confirmar({
+        titulo: "Restablecer la simulación",
+        texto: "Se borra todo lo que capturaste en este navegador y vuelven los datos del prototipo. No afecta al sitio.",
+        accion: "Restablecer",
+        peligro: true,
+      });
+      if (!ok) return;
+      restablecer();
+      avisar("La simulación volvió a la semilla");
+      setTimeout(() => location.reload(), 400);
+    });
+  }
+</script>

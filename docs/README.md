@@ -45,6 +45,8 @@ npm run build    # compila a sitio/dist/
 npm run revisar  # revisa sitio/dist/
 npm run fichas     # fichas técnicas en PDF (en una Mac)
 npm run catalogos  # catálogos en PDF (en una Mac)
+npm run dev:admin  # el administrador, en http://localhost:4322
+npm run semilla    # regenera los datos de prueba del administrador
 ```
 
 `revisar` comprueba enlaces, medidas de títulos y descripciones, títulos

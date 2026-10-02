@@ -1,0 +1,293 @@
+---
+// El molde de todas las pantallas del administrador (menos la de entrar).
+//
+// Pone la barra lateral plegable, la barra superior con el estado de
+// publicación y la cuenta, los dos modales que existen en todas las pantallas
+// (confirmar y publicar) y exige sesión antes de pintar nada.
+import "@neucast/compartido/styles/global.css";
+import "../styles/admin.css";
+import Logo from "@neucast/compartido/components/Logo.astro";
+import IconoAdmin from "../components/IconoAdmin.astro";
+import Modal from "../components/Modal.astro";
+
+const { titulo, seccion = "", migas = [], angosto = false } = Astro.props;
+const base = import.meta.env.BASE_URL;
+
+const grupos = [
+  {
+    rotulo: "Contenido",
+    items: [
+      { id: "inicio", nombre: "Inicio", icono: "inicio", ruta: "inicio/" },
+      { id: "piezas", nombre: "Piezas", icono: "piezas", ruta: "piezas/", cuenta: "piezas" },
+      { id: "categorias", nombre: "Categorías", icono: "categorias", ruta: "categorias/", cuenta: "categorias" },
+      { id: "proyectos", nombre: "Proyectos", icono: "proyectos", ruta: "proyectos/", cuenta: "proyectos" },
+      { id: "home-office", nombre: "Home office", icono: "casa", ruta: "home-office/" },
+    ],
+  },
+  {
+    rotulo: "Sitio",
+    items: [
+      { id: "paginas", nombre: "Páginas", icono: "paginas", ruta: "paginas/" },
+      { id: "legales", nombre: "Legales", icono: "legal", ruta: "legales/" },
+      { id: "listas", nombre: "Listas", icono: "listas", ruta: "listas/" },
+      { id: "ajustes", nombre: "Ajustes", icono: "ajustes", ruta: "ajustes/" },
+    ],
+  },
+  {
+    rotulo: "Seguimiento",
+    items: [
+      { id: "metricas", nombre: "Métricas", icono: "metricas", ruta: "metricas/" },
+      { id: "usuarios", nombre: "Usuarios", icono: "usuarios", ruta: "usuarios/" },
+    ],
+  },
+];
+---
+<!doctype html>
+<html lang="es-MX">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>{titulo} · Administrador de Neucast</title>
+    <link rel="icon" href={`${base}favicon.svg`} type="image/svg+xml" />
+    <link rel="icon" href={`${base}favicon.ico`} sizes="32x32" />
+    <!-- Antes de pintar: el estado de la barra lateral, para que no parpadee. -->
+    <script is:inline>
+      try {
+        if (localStorage.getItem("neucast-admin:sb") === "plegada") document.documentElement.dataset.sb = "plegada";
+        // Sin sesión no se pinta nada: a entrar, y de regreso a esta pantalla.
+        if (!sessionStorage.getItem("neucast-admin:sesion")) {
+          location.replace("/?a=" + encodeURIComponent(location.pathname + location.search));
+        }
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div class="app">
+      <div class="sb-velo" data-cierra-sb></div>
+      <aside class="sb" aria-label="Navegación del administrador">
+        <div class="sb-cabeza">
+          <a class="sb-logo" href={`${base}inicio/`} aria-label="Inicio del administrador">
+            <span class="sb-logo-completo"><Logo height={26} /></span>
+            <svg class="sb-logo-simbolo" width="30" height="26" viewBox="500 500 230 200" fill="var(--olive)" aria-hidden="true">
+              <path d="M625.9,655.2c-3.1,3.1-6.5,5.5-10.2,7.4-3.8,1.9-7.8,2.8-12.3,2.8s-8.7-1.4-11.8-4.1c-3.1-2.7-5.5-7.5-7.2-14.2l-9.2-35.1c-5.8-22.4-14.4-39.6-25.8-51.7-11.4-12-26.4-18.1-44.8-18.1s-30.5,5.9-42.2,17.6-17.7,29.9-17.7,54.7,2.1,27.2,6.4,41c4.3,13.7,9.8,24.7,16.6,32.8-2.7,3.7-6,6.6-9.7,8.7-3.7,2-7.8,3.1-12.3,3.1-9.9,0-18.6-8.1-26.1-24.4-7.5-16.3-11.3-37.1-11.3-62.6s4.1-42.1,12.3-59c8.2-17,19.4-30.2,33.8-39.7,14.3-9.5,30.9-14.3,49.6-14.3,28.7,0,51.9,8.7,69.6,26.2,17.7,17.5,31.1,43.9,39.9,79.1l12.3,49.9ZM676.3,660.8c-8.2,0-15.1-2.6-20.7-7.9-5.6-5.3-8.4-12.1-8.4-20.6s2.8-15.9,8.4-21.1c5.6-5.3,12.5-7.9,20.7-7.9s15,2.6,20.5,7.9c5.5,5.3,8.2,12.3,8.2,21.1s-2.7,15.4-8.2,20.6c-5.5,5.3-12.3,7.9-20.5,7.9Z"/>
+            </svg>
+          </a>
+        </div>
+        <nav class="sb-cuerpo">
+          {grupos.map((g) => (
+            <div class="sb-grupo">
+              <span class="sb-rotulo">{g.rotulo}</span>
+              {g.items.map((it) => (
+                <a
+                  class="sb-item"
+                  href={`${base}${it.ruta}`}
+                  data-nombre={it.nombre}
+                  aria-current={it.id === seccion ? "page" : undefined}
+                >
+                  <IconoAdmin name={it.icono} />
+                  <span>{it.nombre}</span>
+                  {it.cuenta && <span class="sb-cuenta" data-cuenta={it.cuenta} hidden></span>}
+                </a>
+              ))}
+            </div>
+          ))}
+        </nav>
+        <div class="sb-pie">
+          <button class="sb-plegar" type="button" data-plegar aria-label="Plegar la barra lateral">
+            <IconoAdmin name="plegar" />
+            <span>Plegar</span>
+          </button>
+        </div>
+      </aside>
+
+      <div class="principal">
+        <header class="barra" data-barra>
+          <button class="boton boton--icono boton--texto barra-menu" type="button" data-abre-sb aria-label="Abrir el menú">
+            <IconoAdmin name="menu" />
+          </button>
+          <nav class="barra-migas" aria-label="Ubicación">
+            {migas.map((m) => (
+              <>
+                <a href={`${base}${m.ruta}`}>{m.nombre}</a>
+                <IconoAdmin name="chevron" size={14} />
+              </>
+            ))}
+            <strong data-miga-actual>{titulo}</strong>
+          </nav>
+          <div class="barra-derecha">
+            <div class="publicacion" data-publicacion data-estado="aldia">
+              <span class="publicacion-punto"></span>
+              <span class="publicacion-texto" data-publicacion-texto>Todo publicado</span>
+              <button class="boton boton--primario" type="button" data-abre-modal="modal-publicar">Publicar</button>
+            </div>
+            <div class="desplegable" data-desplegable>
+              <button class="cuenta" type="button" aria-haspopup="menu" aria-expanded="false" data-desplegable-boton>
+                <span class="avatar" data-avatar>··</span>
+                <span class="cuenta-nombre" data-cuenta-nombre></span>
+                <IconoAdmin name="chevronAbajo" size={16} />
+              </button>
+              <div class="desplegable-menu" role="menu">
+                <div class="desplegable-cabeza"><b data-cuenta-nombre></b><span data-cuenta-correo></span></div>
+                <a class="desplegable-item" role="menuitem" href={`${base}usuarios/`}><IconoAdmin name="usuarios" size={16} />Mi cuenta</a>
+                <button class="desplegable-item" role="menuitem" type="button" data-ver-stg><IconoAdmin name="externo" size={16} />Ver el sitio de pruebas</button>
+                <button class="desplegable-item desplegable-item--peligro" role="menuitem" type="button" data-salir><IconoAdmin name="salir" size={16} />Cerrar sesión</button>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <main class:list={["contenido", { "contenido--angosto": angosto }]}>
+          <slot />
+        </main>
+      </div>
+    </div>
+
+    <Modal id="modal-confirmar" titulo="¿Seguro?" texto="">
+      <Fragment slot="pie">
+        <button class="boton" type="button" data-cierra-modal>Cancelar</button>
+        <button class="boton boton--primario" type="button" data-confirma>Confirmar</button>
+      </Fragment>
+    </Modal>
+
+    <Modal id="modal-publicar" titulo="Publicar en neucast.com.mx">
+      <Fragment slot="texto">Lo que está en el sitio de pruebas pasa a producción. Se compila el sitio, se generan los PDF y se revisa; si algo falla, no se publica.</Fragment>
+      <div data-publicar-cuerpo>
+        <ul class="lista-cambios" data-publicar-lista></ul>
+        <p class="t-mini" data-publicar-nota></p>
+      </div>
+      <Fragment slot="pie">
+        <span class="izquierda t-mini" data-publicar-ultima></span>
+        <button class="boton" type="button" data-cierra-modal>Todavía no</button>
+        <button class="boton boton--primario" type="button" data-publicar-ahora>
+          <IconoAdmin name="cohete" size={16} />Publicar ahora
+        </button>
+      </Fragment>
+    </Modal>
+
+    <script>
+      import { exigirSesion, cerrarSesion } from "../scripts/sesion.js";
+      import { listar, publicar } from "../scripts/api.js";
+      import { cablearModales, cerrarModal, avisar, fechaRelativa, escapar } from "../scripts/ui.js";
+
+      const sesion = exigirSesion();
+      const base = import.meta.env.BASE_URL;
+      const html = document.documentElement;
+
+      /* ---------- Cuenta ---------- */
+      if (sesion) {
+        const iniciales = sesion.nombre.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase();
+        document.querySelector("[data-avatar]").textContent = iniciales;
+        document.querySelectorAll("[data-cuenta-nombre]").forEach((e) => (e.textContent = sesion.nombre));
+        document.querySelector("[data-cuenta-correo]").textContent = sesion.correo;
+      }
+      document.querySelector("[data-salir]")?.addEventListener("click", () => {
+        cerrarSesion();
+        location.href = base;
+      });
+      document.querySelector("[data-ver-stg]")?.addEventListener("click", () => {
+        window.open(import.meta.env.PUBLIC_STG || "http://localhost:4321/", "_blank", "noopener");
+      });
+
+      /* ---------- Desplegables ---------- */
+      document.querySelectorAll("[data-desplegable]").forEach((d) => {
+        const b = d.querySelector("[data-desplegable-boton]");
+        const alternar = (abrir) => {
+          d.classList.toggle("abierto", abrir);
+          b.setAttribute("aria-expanded", String(abrir));
+        };
+        b.addEventListener("click", (e) => {
+          e.stopPropagation();
+          alternar(!d.classList.contains("abierto"));
+        });
+        document.addEventListener("click", (e) => {
+          if (!d.contains(e.target)) alternar(false);
+        });
+        addEventListener("keydown", (e) => e.key === "Escape" && alternar(false));
+      });
+
+      /* ---------- Barra lateral ---------- */
+      document.querySelector("[data-plegar]")?.addEventListener("click", () => {
+        const plegada = html.dataset.sb !== "plegada";
+        if (plegada) html.dataset.sb = "plegada";
+        else delete html.dataset.sb;
+        try { localStorage.setItem("neucast-admin:sb", plegada ? "plegada" : "abierta"); } catch {}
+      });
+      const abrirSb = (abrir) => {
+        if (abrir) html.dataset.sbMovil = "abierta";
+        else delete html.dataset.sbMovil;
+      };
+      document.querySelector("[data-abre-sb]")?.addEventListener("click", () => abrirSb(true));
+      document.querySelector("[data-cierra-sb]")?.addEventListener("click", () => abrirSb(false));
+      addEventListener("keydown", (e) => e.key === "Escape" && abrirSb(false));
+
+      /* ---------- La línea de la barra superior aparece con el scroll ---------- */
+      const barra = document.querySelector("[data-barra]");
+      const marcarScroll = () => barra.classList.toggle("con-scroll", scrollY > 8);
+      addEventListener("scroll", marcarScroll, { passive: true });
+      marcarScroll();
+
+      /* ---------- Conteos de la barra lateral ---------- */
+      for (const el of document.querySelectorAll("[data-cuenta]")) {
+        listar(el.dataset.cuenta).then((lista) => {
+          el.textContent = lista.length;
+          el.hidden = false;
+        }).catch(() => {});
+      }
+
+      /* ---------- Estado de publicación ---------- */
+      cablearModales();
+      const chip = document.querySelector("[data-publicacion]");
+      const texto = document.querySelector("[data-publicacion-texto]");
+      const lista = document.querySelector("[data-publicar-lista]");
+      const nota = document.querySelector("[data-publicar-nota]");
+      const ultima = document.querySelector("[data-publicar-ultima]");
+      const btnPublicar = document.querySelector("[data-publicar-ahora]");
+
+      const NOMBRES = { piezas: "pieza", categorias: "categoría", proyectos: "proyecto", ajustes: "ajustes", "home-office": "home office" };
+
+      async function pintarPublicacion() {
+        try {
+          const p = await listar("publicacion");
+          const n = (p.pendientes || []).length;
+          chip.dataset.estado = n ? "pendiente" : "aldia";
+          texto.innerHTML = n
+            ? `<b>${n} ${n === 1 ? "cambio" : "cambios"}</b> en pruebas`
+            : `Publicado ${escapar(fechaRelativa(p.produccion?.fecha))}`;
+          ultima.textContent = `Última publicación: ${fechaRelativa(p.produccion?.fecha)}${p.produccion?.por ? ", por " + p.produccion.por : ""}`;
+          lista.innerHTML = n
+            ? p.pendientes
+                .slice()
+                .reverse()
+                .map(
+                  (c) => `<li><span class="que">${escapar(NOMBRES[c.coleccion] || c.coleccion)}</span><span class="${c.borrado ? "borrado" : ""}">${escapar(c.nombre || c.id)}</span><span class="cuando">${escapar(fechaRelativa(c.fecha))}</span></li>`
+                )
+                .join("")
+            : "";
+          nota.textContent = n
+            ? "Conviene revisarlos primero en el sitio de pruebas."
+            : "No hay cambios pendientes: producción ya tiene lo mismo que pruebas.";
+          btnPublicar.disabled = !n;
+        } catch {
+          /* sin estado: la barra se queda como está */
+        }
+      }
+      pintarPublicacion();
+      addEventListener("neucast:guardado", pintarPublicacion);
+
+      btnPublicar?.addEventListener("click", async () => {
+        btnPublicar.setAttribute("aria-busy", "true");
+        try {
+          await publicar("produccion");
+          cerrarModal("modal-publicar");
+          avisar("Publicado en neucast.com.mx");
+          pintarPublicacion();
+        } catch (e) {
+          avisar(e.message || "No se pudo publicar", { tipo: "error" });
+        } finally {
+          btnPublicar.removeAttribute("aria-busy");
+        }
+      });
+    </script>
+  </body>
+</html>

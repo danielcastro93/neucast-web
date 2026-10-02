@@ -1,0 +1,830 @@
+---
+// Alta y edición de una pieza. Sin ?slug= es una pieza nueva.
+//
+// La pantalla con más campos del administrador. Las secciones siguen los tres
+// niveles aprobados: obligatorios para todas, obligatorios según la categoría
+// (el formulario los enseña al elegirla) y opcionales (la ficha técnica).
+import Admin from "../../layouts/Admin.astro";
+import IconoAdmin from "../../components/IconoAdmin.astro";
+import Modal from "../../components/Modal.astro";
+const base = import.meta.env.BASE_URL;
+
+const secciones = [
+  { id: "identidad", nombre: "Identidad" },
+  { id: "fotos", nombre: "Fotos" },
+  { id: "clasificacion", nombre: "Clasificación" },
+  { id: "ficha", nombre: "Ficha técnica" },
+  { id: "publicacion", nombre: "Publicación" },
+];
+---
+<Admin titulo="Pieza" seccion="piezas" migas={[{ nombre: "Piezas", ruta: "piezas/" }]}>
+  <div class="cabecera">
+    <div class="cabecera-textos">
+      <span class="rotulo" style="color:var(--ink-40)" data-cabecera-rotulo>Pieza</span>
+      <h1 class="t-pantalla" data-cabecera-titulo>Nueva pieza</h1>
+      <p class="t-apoyo" data-cabecera-nota></p>
+    </div>
+    <div class="cabecera-acciones">
+      <a class="boton" href="#" target="_blank" rel="noopener" data-ver-pruebas hidden><IconoAdmin name="externo" size={16} />Ver en pruebas</a>
+    </div>
+  </div>
+
+  <form class="formulario" novalidate data-form>
+    <nav class="formulario-indice" aria-label="Secciones">
+      {secciones.map((s) => (
+        <a href={`#${s.id}`} data-indice={s.id}><span class="punto"></span>{s.nombre}</a>
+      ))}
+    </nav>
+
+    <div class="formulario-secciones">
+      <!-- ============ Identidad ============ -->
+      <section class="tarjeta seccion" id="identidad">
+        <div class="tarjeta-cabeza">
+          <h2 class="t-seccion">Identidad</h2>
+          <p class="t-mini">Cómo se llama y dónde vive. Obligatorio para todas las piezas.</p>
+        </div>
+        <div class="tarjeta-cuerpo">
+          <div class="fila">
+            <div class="campo" data-campo="nombre">
+              <div class="campo-etiqueta"><label for="nombre">Nombre<span class="obligatorio">*</span></label><span class="campo-contador" data-contador="nombre"></span></div>
+              <input class="control" id="nombre" name="nombre" type="text" placeholder="Órbita" autocomplete="off" />
+              <p class="campo-ayuda">Solo el nombre propio, sin el tipo: "Órbita", no "Silla Órbita".</p>
+              <p class="campo-error" data-error></p>
+            </div>
+            <div class="campo" data-campo="tipo">
+              <div class="campo-etiqueta"><label for="tipo">Tipo de mueble<span class="obligatorio">*</span></label><span class="campo-contador" data-contador="tipo"></span></div>
+              <input class="control" id="tipo" name="tipo" type="text" placeholder="Silla operativa" list="tipos-conocidos" autocomplete="off" />
+              <datalist id="tipos-conocidos"></datalist>
+              <p class="campo-ayuda">Lo que es. Se lee encima del nombre y arma el título de la página.</p>
+              <p class="campo-error" data-error></p>
+            </div>
+          </div>
+          <div class="fila">
+            <div class="campo" data-campo="cat">
+              <div class="campo-etiqueta"><label for="cat">Categoría<span class="obligatorio">*</span></label></div>
+              <select class="control" id="cat" name="cat"><option value="">Elige una categoría</option></select>
+              <p class="campo-ayuda">Una sola. Define la dirección y qué campos de filtro se piden.</p>
+              <p class="campo-error" data-error></p>
+            </div>
+            <div class="campo" data-campo="slug">
+              <div class="campo-etiqueta">
+                <label for="slug">Dirección<span class="obligatorio">*</span></label>
+                <button class="boton boton--chico boton--texto" type="button" data-proponer-slug style="height:24px;padding:0 8px">Proponer</button>
+              </div>
+              <input class="control mono" id="slug" name="slug" type="text" placeholder="silla-orbita" spellcheck="false" autocomplete="off" />
+              <p class="campo-ayuda" data-ayuda-slug>Minúsculas, sin acentos, con guiones. Se propone sola a partir del tipo y el nombre.</p>
+              <p class="campo-ayuda mono" data-prefijo-slug></p>
+              <p class="campo-error" data-error></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ Fotos ============ -->
+      <section class="tarjeta seccion" id="fotos">
+        <div class="tarjeta-cabeza">
+          <h2 class="t-seccion">Fotos</h2>
+          <p class="t-mini">La primera es la principal: sale en la tarjeta del catálogo, en el buscador y en Google. Arrastra para cambiar el orden.</p>
+        </div>
+        <div class="tarjeta-cuerpo">
+          <div class="campo" data-campo="img">
+            <div class="galeria" data-galeria></div>
+            <p class="campo-error" data-error></p>
+          </div>
+          <div class="campo" data-campo="alt">
+            <div class="campo-etiqueta"><label for="alt">Texto alternativo de la foto principal<span class="obligatorio">*</span></label><span class="campo-contador" data-contador="alt"></span></div>
+            <input class="control" id="alt" name="alt" type="text" placeholder="Silla operativa Órbita negra con ruedas" />
+            <p class="campo-ayuda">Qué se ve en la foto, para quien no la ve y para Google. Conviene decir el tipo, el nombre y el acabado.</p>
+            <p class="campo-error" data-error></p>
+          </div>
+          <input type="file" accept="image/png,image/jpeg,image/webp" multiple hidden data-archivo />
+        </div>
+      </section>
+
+      <!-- ============ Clasificación ============ -->
+      <section class="tarjeta seccion" id="clasificacion">
+        <div class="tarjeta-cabeza">
+          <h2 class="t-seccion">Clasificación</h2>
+          <p class="t-mini">Lo que hace funcionar los filtros y el buscador. Son listas cerradas: si falta una opción, se agrega en Listas, no aquí.</p>
+        </div>
+        <div class="tarjeta-cuerpo">
+          <div class="fila">
+            <div class="campo" data-campo="material">
+              <div class="campo-etiqueta"><label for="material">Material<span class="obligatorio">*</span></label></div>
+              <select class="control" id="material" name="material"><option value="">Elige el material</option></select>
+              <p class="campo-error" data-error></p>
+            </div>
+            <div class="campo" data-campo="entrega">
+              <div class="campo-etiqueta"><label for="entrega">Disponibilidad<span class="obligatorio">*</span></label></div>
+              <select class="control" id="entrega" name="entrega"><option value="">Elige la disponibilidad</option></select>
+              <p class="campo-error" data-error></p>
+            </div>
+          </div>
+          <div class="campo" data-campo="colores">
+            <div class="campo-etiqueta"><span class="etiqueta">Acabados<span class="obligatorio">*</span></span><span class="campo-contador" data-contador-colores></span></div>
+            <div class="chips" data-chips="colores"></div>
+            <p class="campo-ayuda">Los grupos de color por los que se filtra. El nombre comercial de cada tela va en la ficha técnica.</p>
+            <p class="campo-error" data-error></p>
+          </div>
+          <div class="separador"></div>
+          <p class="t-apoyo" data-nota-categoria>Elige una categoría para ver qué campos de filtro aplican.</p>
+          <div data-filtros-categoria></div>
+        </div>
+      </section>
+
+      <!-- ============ Ficha técnica ============ -->
+      <section class="tarjeta seccion" id="ficha">
+        <div class="tarjeta-cabeza">
+          <h2 class="t-seccion">Ficha técnica</h2>
+          <p class="t-mini">El párrafo es obligatorio; lo demás se pinta solo si existe. Nada de medidas inventadas: si no hay dato confirmado, se deja vacío.</p>
+        </div>
+        <div class="tarjeta-cuerpo">
+          <div class="campo" data-campo="resumen">
+            <div class="campo-etiqueta"><label for="resumen">Párrafo descriptivo<span class="obligatorio">*</span></label><span class="campo-contador" data-contador="resumen"></span></div>
+            <textarea class="control" id="resumen" name="resumen" rows="4" placeholder="Respaldo de malla tensada de una pieza con cabecera regulable, pensada para la jornada completa…"></textarea>
+            <p class="campo-ayuda">La primera frase va en negro y es la descripción que sale en Google: tiene que defender sola a la pieza. Se escribe para quien compra para un espacio de trabajo: uso, resistencia y plazos, no decoración.</p>
+            <p class="campo-error" data-error></p>
+          </div>
+
+          <div class="campo">
+            <div class="campo-etiqueta"><span class="etiqueta">Destacados</span><span class="t-mini">hasta 3 frases cortas</span></div>
+            <div class="frases" data-frases="destacados"></div>
+            <p class="campo-ayuda">Se leen en el panel "Detalles del producto". El primero arma la meta descripción.</p>
+          </div>
+
+          <div class="separador"></div>
+
+          <div class="campo">
+            <div class="campo-etiqueta"><span class="etiqueta">Medidas</span><span class="t-mini">solo las que apliquen, con su unidad</span></div>
+            <div class="pares" data-pares="medidas"></div>
+          </div>
+
+          <div class="campo">
+            <div class="campo-etiqueta"><span class="etiqueta">Construcción</span><span class="t-mini">materiales de cada parte</span></div>
+            <div class="pares" data-pares="construccion"></div>
+            <p class="campo-ayuda">Las dos primeras que tengan dato arman el recuadro "Materiales" bajo la foto.</p>
+          </div>
+
+          <div class="separador"></div>
+
+          <div class="fila">
+            <div class="campo">
+              <div class="campo-etiqueta"><label for="mecanismo">Mecanismo</label><span class="t-mini">solo sillas</span></div>
+              <input class="control" id="mecanismo" name="mecanismo" type="text" placeholder="Synchro multiposiciones" />
+              <div class="frases" data-frases="ajustes" style="margin-top:8px"></div>
+              <p class="campo-ayuda">El nombre y la lista de ajustes.</p>
+            </div>
+            <div class="campo">
+              <div class="campo-etiqueta"><span class="etiqueta">Cuidados</span></div>
+              <div class="frases" data-frases="cuidados"></div>
+              <p class="campo-ayuda">Cómo se limpia y se mantiene. Los dos primeros arman el recuadro "Cuidados".</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ Colecciones y estado ============ -->
+      <section class="tarjeta seccion" id="publicacion">
+        <div class="tarjeta-cabeza">
+          <h2 class="t-seccion">Publicación</h2>
+          <p class="t-mini">En qué colecciones aparece además de su categoría, y si ya se puede ver.</p>
+        </div>
+        <div class="tarjeta-cuerpo">
+          <div class="fila">
+            <label class="interruptor">
+              <input type="checkbox" name="nuevo" />
+              <span class="interruptor-pista"></span>
+              <span class="interruptor-texto">Marcar como nueva<small>Pinta la etiqueta "Nuevo" en la tarjeta</small></span>
+            </label>
+            <div class="campo">
+              <div class="campo-etiqueta"><span class="etiqueta">Colecciones por espacio</span></div>
+              <div class="chips" data-chips="espacios"></div>
+              <p class="campo-ayuda">La pieza sigue en su categoría y además sale en estas páginas.</p>
+            </div>
+          </div>
+          <div class="separador"></div>
+          <div class="campo" data-campo="estado">
+            <div class="campo-etiqueta"><span class="etiqueta">Estado</span></div>
+            <div class="chips">
+              <label class="chip"><input type="radio" name="estado" value="borrador" /> Borrador</label>
+              <label class="chip"><input type="radio" name="estado" value="publicada" /> Publicada</label>
+            </div>
+            <p class="campo-ayuda">Un borrador se guarda sin revisar y no sale en pruebas ni en producción. Una pieza publicada tiene que traer todos los obligatorios.</p>
+          </div>
+        </div>
+      </section>
+
+      <div class="pie-fijo">
+        <span class="pie-fijo-estado" data-pie-estado>Sin cambios</span>
+        <a class="boton boton--texto" href={`${base}piezas/`} data-cancelar>Cancelar</a>
+        <button class="boton" type="button" data-guardar-borrador>Guardar como borrador</button>
+        <button class="boton boton--primario" type="submit" data-guardar><IconoAdmin name="check" size={16} />Guardar</button>
+      </div>
+    </div>
+  </form>
+
+  <Modal id="modal-foto" titulo="Agregar foto" texto="Sube un archivo o escribe la ruta de una foto que ya esté en el sitio.">
+    <div class="foto-agregar" data-zona-archivo tabindex="0" role="button">
+      <IconoAdmin name="subir" size={24} />
+      <span>Arrastra una foto o haz clic para elegirla</span>
+      <span class="t-mini">PNG con fondo transparente, JPG o WebP</span>
+    </div>
+    <div class="campo">
+      <div class="campo-etiqueta"><label for="ruta-foto">O la ruta en el sitio</label></div>
+      <input class="control mono" id="ruta-foto" type="text" placeholder="/img/products/silla-operativa-orbita.png" spellcheck="false" />
+    </div>
+    <Fragment slot="pie">
+      <button class="boton" type="button" data-cierra-modal>Cancelar</button>
+      <button class="boton boton--primario" type="button" data-agregar-ruta>Agregar</button>
+    </Fragment>
+  </Modal>
+
+  <Modal id="modal-salir" titulo="Tienes cambios sin guardar" texto="Si sales ahora se pierden. ¿Qué quieres hacer?">
+    <Fragment slot="pie">
+      <button class="boton boton--texto" type="button" data-salir-sin-guardar>Salir sin guardar</button>
+      <button class="boton boton--primario" type="button" data-cierra-modal>Seguir editando</button>
+    </Fragment>
+  </Modal>
+</Admin>
+
+<script>
+  import { obtener, listar, guardar } from "../../scripts/api.js";
+  import { medio } from "../../scripts/medios.js";
+  import { validarPieza, revisarTexto, revisarMedida, proponerSlug, limpiarSlug } from "../../scripts/validar.js";
+  import { piezaVacia, SEGUN_CATEGORIA, FILTROS_POR_CATEGORIA, MEDIDAS } from "../../scripts/esquemas/pieza.js";
+  import { abrirModal, cerrarModal, avisar, escapar, fechaRelativa } from "../../scripts/ui.js";
+
+  const base = import.meta.env.BASE_URL;
+  const $ = (s, el = document) => el.querySelector(s);
+  const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+  const form = $("[data-form]");
+
+  const slugInicial = new URLSearchParams(location.search).get("slug");
+  let pieza = piezaVacia();
+  let original = null; // el slug con el que se cargó, para renombrar
+  let listas, categorias;
+  let hayCambios = false;
+  let guardando = false;
+
+  /* ============================================
+     Carga
+     ============================================ */
+  async function cargar() {
+    [listas, categorias] = await Promise.all([listar("listas"), listar("categorias")]);
+    llenarSelectores();
+    if (slugInicial) {
+      try {
+        pieza = { ...piezaVacia(), ...(await obtener("piezas", slugInicial)) };
+        pieza.ficha = { ...piezaVacia().ficha, ...(pieza.ficha || {}) };
+        original = pieza.slug;
+      } catch {
+        avisar("No existe esa pieza", { tipo: "error" });
+        location.replace(`${base}piezas/`);
+        return;
+      }
+    }
+    pintar();
+    cablear();
+  }
+
+  function llenarSelectores() {
+    const cat = $("#cat");
+    for (const c of categorias) cat.insertAdjacentHTML("beforeend", `<option value="${escapar(c.slug)}">${escapar(c.name)}</option>`);
+    const mat = $("#material");
+    for (const m of listas.materiales) mat.insertAdjacentHTML("beforeend", `<option value="${escapar(m.id)}">${escapar(m.nombre)}</option>`);
+    const ent = $("#entrega");
+    for (const o of filtro("entrega").opciones) ent.insertAdjacentHTML("beforeend", `<option value="${escapar(o.id)}">${escapar(o.nombre)}</option>`);
+    $("[data-chips='colores']").innerHTML = listas.gruposColor
+      .map((g) => `<label class="chip"><input type="checkbox" name="colores" value="${escapar(g.id)}" /><span class="chip-color" style="background:${escapar(g.hex)}"></span>${escapar(g.nombre)}</label>`)
+      .join("");
+    $("[data-chips='espacios']").innerHTML = listas.espacios
+      .map((e) => `<label class="chip"><input type="checkbox" name="espacios" value="${escapar(e.id)}" />${escapar(e.nombre)}</label>`)
+      .join("");
+    $("[data-pares='medidas']").innerHTML = Object.entries(listas.etiquetasMedida)
+      .map(([k, v]) => `<div class="par"><label class="par-etiqueta" for="medida-${k}">${escapar(v)}</label><input class="control" id="medida-${k}" data-medida="${k}" type="text" placeholder="—" /></div>`)
+      .join("").replaceAll('placeholder="—"', 'placeholder="ej. 45 cm"');
+    $("[data-pares='construccion']").innerHTML = Object.entries(listas.etiquetasConstruccion)
+      .map(([k, v]) => `<div class="par" style="grid-template-columns:110px minmax(0,1fr)"><label class="par-etiqueta" for="constr-${k}">${escapar(v)}</label><input class="control" id="constr-${k}" data-construccion="${k}" type="text" /></div>`)
+      .join("");
+  }
+
+  const filtro = (campo) => listas.filtros.find((f) => f.campo === campo) || { opciones: [] };
+
+  /* ============================================
+     Pintar el formulario con la pieza
+     ============================================ */
+  function pintar() {
+    const nueva = !original;
+    $("[data-cabecera-rotulo]").textContent = nueva ? "Nueva pieza" : pieza.tipo || "Pieza";
+    $("[data-cabecera-titulo]").textContent = nueva ? "Nueva pieza" : pieza.nombre;
+    $("[data-cabecera-nota]").textContent = nueva
+      ? "Se guarda como borrador hasta que tenga todo lo obligatorio."
+      : `${pieza.estado === "publicada" ? "Publicada" : "Borrador"} · cambiada ${fechaRelativa(pieza.actualizado)}`;
+    $("[data-miga-actual]").textContent = nueva ? "Nueva pieza" : pieza.nombre;
+    document.title = `${nueva ? "Nueva pieza" : pieza.nombre} · Administrador de Neucast`;
+    const ver = $("[data-ver-pruebas]");
+    ver.hidden = nueva || pieza.estado !== "publicada";
+    ver.href = `${import.meta.env.PUBLIC_STG || "http://localhost:4321"}/muebles/${pieza.cat}/${pieza.slug}/`;
+
+    form.nombre.value = pieza.nombre || "";
+    form.tipo.value = pieza.tipo || "";
+    form.cat.value = pieza.cat || "";
+    form.slug.value = pieza.slug || "";
+    form.alt.value = pieza.alt || "";
+    form.material.value = pieza.material || "";
+    form.entrega.value = pieza.entrega || "";
+    form.nuevo.checked = !!pieza.nuevo;
+    $$("input[name='colores']").forEach((i) => (i.checked = (pieza.colores || []).includes(i.value)));
+    $$("input[name='espacios']").forEach((i) => (i.checked = (pieza.espacios || []).includes(i.value)));
+    $$("input[name='estado']").forEach((i) => (i.checked = i.value === (pieza.estado || "borrador")));
+    form.resumen.value = pieza.ficha?.resumen || "";
+    form.mecanismo.value = pieza.ficha?.mecanismo?.nombre || "";
+    $$("[data-medida]").forEach((i) => (i.value = pieza.ficha?.medidas?.[i.dataset.medida] || ""));
+    $$("[data-construccion]").forEach((i) => (i.value = pieza.ficha?.construccion?.[i.dataset.construccion] || ""));
+    pintarFrases("destacados", pieza.ficha?.destacados || [], 3);
+    pintarFrases("ajustes", pieza.ficha?.mecanismo?.ajustes || [], 8);
+    pintarFrases("cuidados", pieza.ficha?.cuidados || [], 6);
+    pintarGaleria();
+    pintarFiltrosCategoria();
+    pintarPrefijoSlug();
+    actualizarContadores();
+    actualizarIndice();
+  }
+
+  function pintarPrefijoSlug() {
+    const slug = limpiarSlug(form.slug.value) || "…";
+    $("[data-prefijo-slug]").textContent = `neucast.com.mx/muebles/${form.cat.value || "…"}/${slug}/`;
+  }
+
+  /* ---------- Los filtros que aplican a la categoría ---------- */
+  function pintarFiltrosCategoria() {
+    const cat = form.cat.value;
+    const caja = $("[data-filtros-categoria]");
+    const nota = $("[data-nota-categoria]");
+    if (!cat) { caja.innerHTML = ""; nota.hidden = false; return; }
+    nota.hidden = true;
+    const obligatorios = SEGUN_CATEGORIA[cat] || [];
+    const campos = FILTROS_POR_CATEGORIA[cat] || ["uso", "extras"];
+    const etiquetas = { uso: "Tipo de uso", respaldo: "Respaldo", brazos: "Descansabrazos", base: "Base", plazas: "Plazas", extras: "Características" };
+    caja.innerHTML = `<div class="fila">${campos
+      .map((campo) => {
+        const f = filtro(campo);
+        const oblig = campo === "uso" || obligatorios.includes(campo);
+        const multiple = campo === "extras";
+        const valor = pieza[campo];
+        const opciones = f.opciones
+          .map((o) => {
+            const marcado = multiple ? (valor || []).includes(o.id) : String(valor ?? "") === o.id;
+            return `<label class="chip"><input type="${multiple ? "checkbox" : "radio"}" name="${campo}" value="${escapar(o.id)}" ${marcado ? "checked" : ""} />${escapar(o.nombre)}</label>`;
+          })
+          .join("");
+        return `<div class="campo" data-campo="${campo}" style="${campo === "extras" ? "grid-column:1/-1" : ""}">
+          <div class="campo-etiqueta"><span class="etiqueta">${etiquetas[campo] || f.nombre}${oblig ? '<span class="obligatorio">*</span>' : ""}</span>${!oblig && !multiple ? '<button class="boton boton--chico boton--texto" type="button" data-quitar-radio="' + campo + '" style="height:24px;padding:0 8px">Ninguno</button>' : ""}</div>
+          <div class="chips">${opciones}</div>
+          <p class="campo-error" data-error></p>
+        </div>`;
+      })
+      .join("")}</div>`;
+    $$("[data-quitar-radio]", caja).forEach((b) =>
+      b.addEventListener("click", () => {
+        $$(`input[name='${b.dataset.quitarRadio}']`, caja).forEach((i) => (i.checked = false));
+        marcarCambio();
+      })
+    );
+  }
+
+  /* ---------- Listas de frases ---------- */
+  function pintarFrases(nombre, valores, max) {
+    const caja = $(`[data-frases='${nombre}']`);
+    const filas = [...valores];
+    if (filas.length < max) filas.push("");
+    caja.innerHTML = filas
+      .map((v, i) => `<div class="frase"><span class="frase-n">${i + 1}</span><input class="control" type="text" data-frase="${nombre}" value="${escapar(v)}" placeholder="${i === 0 ? "Escribe una frase corta" : ""}" /><button class="boton boton--chico boton--icono boton--texto" type="button" data-quitar-frase aria-label="Quitar" ${v ? "" : "style='visibility:hidden'"}>×</button></div>`)
+      .join("");
+    caja.dataset.max = max;
+    $$("[data-quitar-frase]", caja).forEach((b, i) =>
+      b.addEventListener("click", () => {
+        const actuales = leerFrases(nombre).filter((_, j) => j !== i);
+        pintarFrases(nombre, actuales, max);
+        marcarCambio();
+      })
+    );
+    $$("[data-frase]", caja).forEach((inp) =>
+      inp.addEventListener("input", () => {
+        // al escribir en la última fila libre, aparece otra (hasta el máximo)
+        const actuales = leerFrases(nombre);
+        const inputs = $$("[data-frase]", caja);
+        const ultimo = inputs[inputs.length - 1];
+        if (inp === ultimo && inp.value && inputs.length < max) {
+          pintarFrases(nombre, actuales, max);
+          $$("[data-frase]", caja)[actuales.length - 1]?.focus();
+          const el = $$("[data-frase]", caja)[actuales.length - 1];
+          if (el) el.setSelectionRange(el.value.length, el.value.length);
+        }
+      })
+    );
+  }
+  const leerFrases = (nombre) => $$(`[data-frase='${nombre}']`).map((i) => i.value.trim()).filter(Boolean);
+
+  /* ---------- Galería ---------- */
+  function pintarGaleria() {
+    const caja = $("[data-galeria]");
+    const fotos = pieza.img || [];
+    const alts = pieza.alts || [];
+    caja.innerHTML =
+      fotos
+        .map(
+          (ruta, i) => `
+      <div class="foto" draggable="true" data-i="${i}">
+        <div class="foto-marco">${ruta ? `<img src="${escapar(medio(ruta))}" alt="" />` : '<span class="vacia">Sin foto</span>'}</div>
+        ${i === 0 ? '<span class="foto-principal">Principal</span>' : ""}
+        <div class="foto-acciones">
+          ${i > 0 ? `<button class="boton boton--chico boton--icono" type="button" data-principal="${i}" aria-label="Hacer principal" title="Hacer principal"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4v12M6 8l4-4 4 4"/></svg></button>` : ""}
+          <button class="boton boton--chico boton--icono" type="button" data-quitar-foto="${i}" aria-label="Quitar la foto" title="Quitar"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="m5 5 10 10M15 5 5 15"/></svg></button>
+        </div>
+        <div class="foto-pie"><input class="control" type="text" data-alt-foto="${i}" value="${escapar(i === 0 ? pieza.alt || "" : alts[i] || "")}" placeholder="${i === 0 ? "El texto alternativo va abajo" : "Qué se ve en esta foto (opcional)"}" ${i === 0 ? "readonly tabindex='-1'" : ""} /></div>
+      </div>`
+        )
+        .join("") +
+      `<button class="foto-agregar" type="button" data-abrir-foto>
+        <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4v12M4 10h12"/></svg>
+        <span>Agregar foto</span>
+      </button>`;
+
+    $$("[data-quitar-foto]", caja).forEach((b) =>
+      b.addEventListener("click", () => {
+        const i = +b.dataset.quitarFoto;
+        pieza.img.splice(i, 1);
+        (pieza.alts || []).splice(i, 1);
+        pintarGaleria();
+        marcarCambio();
+      })
+    );
+    $$("[data-principal]", caja).forEach((b) =>
+      b.addEventListener("click", () => mover(+b.dataset.principal, 0))
+    );
+    $$("[data-alt-foto]", caja).forEach((inp) =>
+      inp.addEventListener("input", () => {
+        const i = +inp.dataset.altFoto;
+        if (i === 0) return;
+        pieza.alts = pieza.alts || [];
+        pieza.alts[i] = inp.value;
+        marcarCambio();
+      })
+    );
+    $("[data-abrir-foto]", caja).addEventListener("click", () => {
+      $("#ruta-foto").value = "";
+      abrirModal("modal-foto");
+    });
+
+    // arrastrar para ordenar
+    let desde = null;
+    $$(".foto", caja).forEach((el) => {
+      el.addEventListener("dragstart", (e) => {
+        desde = +el.dataset.i;
+        el.classList.add("arrastrando");
+        e.dataTransfer.effectAllowed = "move";
+      });
+      el.addEventListener("dragend", () => {
+        el.classList.remove("arrastrando");
+        $$(".foto.destino", caja).forEach((f) => f.classList.remove("destino"));
+      });
+      el.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        el.classList.add("destino");
+      });
+      el.addEventListener("dragleave", () => el.classList.remove("destino"));
+      el.addEventListener("drop", (e) => {
+        e.preventDefault();
+        const hasta = +el.dataset.i;
+        if (desde != null && desde !== hasta) mover(desde, hasta);
+      });
+    });
+  }
+  function mover(desde, hasta) {
+    const [f] = pieza.img.splice(desde, 1);
+    pieza.img.splice(hasta, 0, f);
+    pieza.alts = pieza.alts || [];
+    const [a] = pieza.alts.splice(desde, 1);
+    pieza.alts.splice(hasta, 0, a);
+    pintarGaleria();
+    marcarCambio();
+  }
+
+  // Subir archivos: en la simulación se guardan achicados como data URL para
+  // no llenar el localStorage; la API real los recibe como archivo.
+  const archivo = $("[data-archivo]");
+  const zona = $("[data-zona-archivo]");
+  zona.addEventListener("click", () => archivo.click());
+  zona.addEventListener("keydown", (e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), archivo.click()));
+  zona.addEventListener("dragover", (e) => { e.preventDefault(); zona.classList.add("sobre"); });
+  zona.addEventListener("dragleave", () => zona.classList.remove("sobre"));
+  zona.addEventListener("drop", (e) => {
+    e.preventDefault();
+    zona.classList.remove("sobre");
+    agregarArchivos(e.dataTransfer.files);
+  });
+  archivo.addEventListener("change", () => { agregarArchivos(archivo.files); archivo.value = ""; });
+
+  async function agregarArchivos(archivos) {
+    for (const f of archivos) {
+      if (!f.type.startsWith("image/")) continue;
+      try {
+        pieza.img.push(await achicar(f));
+      } catch {
+        avisar(`No se pudo leer ${f.name}`, { tipo: "error" });
+      }
+    }
+    cerrarModal("modal-foto");
+    pintarGaleria();
+    marcarCambio();
+    avisar(archivos.length === 1 ? "Foto agregada" : `${archivos.length} fotos agregadas`);
+  }
+  function achicar(f) {
+    return new Promise((ok, mal) => {
+      const img = new Image();
+      const url = URL.createObjectURL(f);
+      img.onload = () => {
+        const max = 1000;
+        const k = Math.min(1, max / Math.max(img.width, img.height));
+        const c = document.createElement("canvas");
+        c.width = Math.round(img.width * k);
+        c.height = Math.round(img.height * k);
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url);
+        ok(c.toDataURL(f.type === "image/png" ? "image/png" : "image/jpeg", 0.82));
+      };
+      img.onerror = mal;
+      img.src = url;
+    });
+  }
+  $("[data-agregar-ruta]").addEventListener("click", () => {
+    const ruta = $("#ruta-foto").value.trim();
+    if (!ruta) return $("#ruta-foto").focus();
+    pieza.img.push(ruta.startsWith("/") || /^https?:/.test(ruta) ? ruta : `/${ruta}`);
+    cerrarModal("modal-foto");
+    pintarGaleria();
+    marcarCambio();
+  });
+  $("#ruta-foto").addEventListener("keydown", (e) => e.key === "Enter" && (e.preventDefault(), $("[data-agregar-ruta]").click()));
+
+  /* ============================================
+     Leer el formulario a la pieza
+     ============================================ */
+  function leer() {
+    const radio = (n) => form.querySelector(`input[name='${n}']:checked`)?.value ?? null;
+    const marcados = (n) => $$(`input[name='${n}']:checked`).map((i) => i.value);
+    const pares = (attr) => Object.fromEntries($$(`[data-${attr}]`).map((i) => [i.dataset[attr], i.value.trim()]).filter(([, v]) => v));
+    const ajustes = leerFrases("ajustes");
+    const mecNombre = form.mecanismo.value.trim();
+    return {
+      ...pieza,
+      nombre: form.nombre.value.trim(),
+      tipo: form.tipo.value.trim(),
+      cat: form.cat.value,
+      slug: limpiarSlug(form.slug.value),
+      alt: form.alt.value.trim(),
+      material: form.material.value,
+      entrega: form.entrega.value,
+      colores: marcados("colores"),
+      espacios: marcados("espacios"),
+      nuevo: form.nuevo.checked,
+      uso: radio("uso") || "",
+      respaldo: radio("respaldo"),
+      brazos: radio("brazos"),
+      base: radio("base"),
+      plazas: radio("plazas"),
+      extras: marcados("extras"),
+      estado: radio("estado") || "borrador",
+      ficha: {
+        resumen: form.resumen.value.trim(),
+        destacados: leerFrases("destacados"),
+        medidas: pares("medida"),
+        construccion: pares("construccion"),
+        mecanismo: mecNombre || ajustes.length ? { nombre: mecNombre, ajustes } : null,
+        cuidados: leerFrases("cuidados"),
+      },
+    };
+  }
+
+  /* ============================================
+     Validación en vivo
+     ============================================ */
+  function ponerError(campo, mensaje) {
+    const caja = $(`[data-campo='${campo}']`);
+    if (!caja) return;
+    if (mensaje) {
+      caja.dataset.error = "1";
+      caja.querySelector("[data-error]").textContent = mensaje;
+    } else {
+      delete caja.dataset.error;
+    }
+  }
+  function limpiarErrores() {
+    $$("[data-campo]").forEach((c) => delete c.dataset.error);
+  }
+  function mostrarErrores(errores) {
+    limpiarErrores();
+    for (const [campo, msg] of Object.entries(errores)) ponerError(campo, msg);
+    actualizarIndice(errores);
+    const primero = $("[data-campo][data-error]");
+    if (primero) {
+      primero.scrollIntoView({ behavior: "smooth", block: "center" });
+      primero.querySelector("input,select,textarea")?.focus({ preventScroll: true });
+    }
+  }
+  const SECCION_DE = {
+    nombre: "identidad", tipo: "identidad", cat: "identidad", slug: "identidad",
+    img: "fotos", alt: "fotos",
+    material: "clasificacion", entrega: "clasificacion", colores: "clasificacion", uso: "clasificacion",
+    respaldo: "clasificacion", brazos: "clasificacion", base: "clasificacion", plazas: "clasificacion", extras: "clasificacion",
+    resumen: "ficha",
+  };
+  function actualizarIndice(errores) {
+    const conError = new Set(Object.keys(errores || {}).map((k) => SECCION_DE[k]));
+    const todos = validarPieza(leer(), listas);
+    const completas = new Set(["identidad", "fotos", "clasificacion", "ficha"]);
+    for (const k of Object.keys(todos)) completas.delete(SECCION_DE[k]);
+    $$("[data-indice]").forEach((a) => {
+      a.classList.toggle("con-error", conError.has(a.dataset.indice));
+      a.classList.toggle("completa", !conError.has(a.dataset.indice) && completas.has(a.dataset.indice));
+    });
+  }
+
+  function actualizarContadores() {
+    for (const campo of Object.keys(MEDIDAS)) {
+      const el = $(`[data-contador='${campo}']`);
+      const inp = form[campo];
+      if (!el || !inp) continue;
+      const n = inp.value.trim().length;
+      const m = MEDIDAS[campo];
+      el.textContent = n ? `${n} / ${m.max}` : `${m.min} a ${m.max}`;
+      el.classList.toggle("fuera", n > 0 && (n < m.min || n > m.max));
+    }
+    const c = $$("input[name='colores']:checked").length;
+    $("[data-contador-colores]").textContent = c ? `${c} ${c === 1 ? "elegido" : "elegidos"}` : "al menos uno";
+  }
+
+  /* ============================================
+     Cambios y guardado
+     ============================================ */
+  function marcarCambio() {
+    hayCambios = true;
+    $("[data-pie-estado]").innerHTML = "<b>Cambios sin guardar</b>";
+    actualizarContadores();
+    actualizarIndice();
+  }
+
+  function cablear() {
+    form.addEventListener("input", (e) => {
+      marcarCambio();
+      const campo = e.target.name || e.target.dataset.campo;
+      if (campo && $(`[data-campo='${campo}']`)?.dataset.error) ponerError(campo, null);
+    });
+    form.addEventListener("change", marcarCambio);
+
+    // la dirección se propone sola mientras la pieza es nueva y nadie la tocó
+    let slugTocado = !!original;
+    form.slug.addEventListener("input", () => (slugTocado = true));
+    const proponer = () => {
+      if (slugTocado) return;
+      form.slug.value = proponerSlug(form.tipo.value, form.nombre.value);
+    };
+    form.nombre.addEventListener("input", proponer);
+    form.tipo.addEventListener("input", proponer);
+    $("[data-proponer-slug]").addEventListener("click", () => {
+      form.slug.value = proponerSlug(form.tipo.value, form.nombre.value);
+      marcarCambio();
+    });
+    form.slug.addEventListener("input", pintarPrefijoSlug);
+    form.nombre.addEventListener("input", pintarPrefijoSlug);
+    form.tipo.addEventListener("input", pintarPrefijoSlug);
+    form.slug.addEventListener("blur", () => { form.slug.value = limpiarSlug(form.slug.value); pintarPrefijoSlug(); });
+    if (original) {
+      $("[data-ayuda-slug]").textContent = "Cambiarla rompe la dirección publicada: hay que redirigir la anterior.";
+    }
+
+    form.cat.addEventListener("change", () => {
+      pieza = { ...pieza, ...leer() };
+      pintarFiltrosCategoria();
+      pintarPrefijoSlug();
+    });
+
+    // validación suave al salir de un campo de texto
+    for (const campo of ["nombre", "tipo", "alt", "resumen"]) {
+      form[campo].addEventListener("blur", () => {
+        const v = form[campo].value;
+        ponerError(campo, v ? revisarTexto(v) || revisarMedida(campo, v) : null);
+      });
+    }
+
+    $("[data-guardar-borrador]").addEventListener("click", () => enviar("borrador"));
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      enviar();
+    });
+
+    // salir con cambios
+    const cancelar = $("[data-cancelar]");
+    cancelar.addEventListener("click", (e) => {
+      if (!hayCambios) return;
+      e.preventDefault();
+      abrirModal("modal-salir");
+    });
+    $("[data-salir-sin-guardar]").addEventListener("click", () => {
+      hayCambios = false;
+      location.href = cancelar.href;
+    });
+    addEventListener("beforeunload", (e) => {
+      if (hayCambios && !guardando) e.preventDefault();
+    });
+    // los enlaces de la barra lateral también preguntan
+    $$(".sb-item, .barra-migas a").forEach((a) =>
+      a.addEventListener("click", (e) => {
+        if (!hayCambios) return;
+        e.preventDefault();
+        cancelar.href = a.href;
+        abrirModal("modal-salir");
+      })
+    );
+
+    // el índice sigue a la sección visible
+    const secciones = $$(".seccion");
+    const obs = new IntersectionObserver(
+      (entradas) => {
+        const visible = entradas.filter((e) => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (!visible) return;
+        $$("[data-indice]").forEach((a) => a.classList.toggle("activo", a.dataset.indice === visible.target.id));
+      },
+      { rootMargin: "-20% 0px -60% 0px", threshold: [0, 0.25, 0.5, 1] }
+    );
+    secciones.forEach((s) => obs.observe(s));
+    $$("[data-indice]").forEach((a) =>
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        document.getElementById(a.dataset.indice)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      })
+    );
+
+    // Cmd/Ctrl + S guarda
+    addEventListener("keydown", (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        enviar();
+      }
+    });
+  }
+
+  async function enviar(forzarEstado) {
+    if (guardando) return;
+    const datos = leer();
+    if (forzarEstado) datos.estado = forzarEstado;
+    if (datos.estado !== "borrador") {
+      const errores = validarPieza(datos, listas);
+      if (Object.keys(errores).length) {
+        mostrarErrores(errores);
+        const n = Object.keys(errores).length;
+        avisar(`Faltan ${n} ${n === 1 ? "dato" : "datos"} para publicar. Puedes guardarla como borrador.`, { tipo: "alerta" });
+        return;
+      }
+    }
+    if (!datos.slug) datos.slug = proponerSlug(datos.tipo, datos.nombre) || `pieza-${Date.now()}`;
+    if (!datos.nombre) {
+      mostrarErrores({ nombre: "Ponle un nombre, aunque sea provisional" });
+      return;
+    }
+
+    guardando = true;
+    const botones = [$("[data-guardar]"), $("[data-guardar-borrador]")];
+    botones.forEach((b) => b.setAttribute("aria-busy", "true"));
+    try {
+      const guardada = await guardar("piezas", { ...datos, _original: original });
+      pieza = { ...piezaVacia(), ...guardada };
+      pieza.ficha = { ...piezaVacia().ficha, ...(pieza.ficha || {}) };
+      hayCambios = false;
+      limpiarErrores();
+      $("[data-pie-estado]").innerHTML = `Guardada <b>${escapar(fechaRelativa(pieza.actualizado))}</b>${pieza.estado === "publicada" ? " · ya está en pruebas" : " · como borrador"}`;
+      avisar(pieza.estado === "publicada" ? `${pieza.nombre} se guardó y ya está en pruebas` : `${pieza.nombre} se guardó como borrador`);
+      dispatchEvent(new CustomEvent("neucast:guardado"));
+      if (!original || original !== pieza.slug) {
+        original = pieza.slug;
+        history.replaceState(null, "", `${base}piezas/editar/?slug=${encodeURIComponent(pieza.slug)}`);
+      }
+      pintar();
+    } catch (err) {
+      if (err.campos && Object.keys(err.campos).length) mostrarErrores(err.campos);
+      avisar(err.message || "No se pudo guardar", { tipo: "error" });
+    } finally {
+      guardando = false;
+      botones.forEach((b) => b.removeAttribute("aria-busy"));
+    }
+  }
+
+  cargar().catch((e) => avisar(e.message || "No se pudo cargar la pieza", { tipo: "error" }));
+
+  // los tipos que ya existen, para sugerirlos al escribir
+  listar("piezas").then((todas) => {
+    const dl = $("#tipos-conocidos");
+    dl.innerHTML = [...new Set(todas.map((p) => p.tipo).filter(Boolean))].sort().map((t) => `<option value="${escapar(t)}"></option>`).join("");
+  }).catch(() => {});
+</script>
