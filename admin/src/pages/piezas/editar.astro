@@ -82,7 +82,7 @@ const secciones = [
             <div class="fila">
               <div class="campo" data-campo="cat">
                 <div class="campo-etiqueta"><label for="cat">Categoría<span class="obligatorio">*</span></label></div>
-                <select class="control" id="cat" name="cat"><option value="">Elige una categoría</option></select>
+                <select class="control" id="cat" name="cat"><option value="" hidden>Elige una categoría</option></select>
                 <p class="campo-ayuda">Una sola. Define la dirección y qué datos se piden más abajo.</p>
                 <p class="campo-error" data-error></p>
               </div>
@@ -142,12 +142,12 @@ const secciones = [
             <div class="fila">
               <div class="campo" data-campo="material">
                 <div class="campo-etiqueta"><label for="material">Material<span class="obligatorio">*</span></label></div>
-                <select class="control" id="material" name="material"><option value="">Elige el material principal</option></select>
+                <select class="control" id="material" name="material"><option value="" hidden>Elige el material principal</option></select>
                 <p class="campo-error" data-error></p>
               </div>
               <div class="campo" data-campo="entrega">
                 <div class="campo-etiqueta"><label for="entrega">Disponibilidad<span class="obligatorio">*</span></label></div>
-                <select class="control" id="entrega" name="entrega"><option value="">Elige en cuánto se entrega</option></select>
+                <select class="control" id="entrega" name="entrega"><option value="" hidden>Elige en cuánto se entrega</option></select>
                 <p class="campo-error" data-error></p>
               </div>
             </div>
@@ -437,9 +437,8 @@ const secciones = [
     for (const m of listas.materiales) $("#material").insertAdjacentHTML("beforeend", `<option value="${escapar(m.id)}">${escapar(m.nombre)}</option>`);
     $("#material").insertAdjacentHTML("beforeend", `<option value="__nuevo">Nuevo material…</option>`);
     let materialPrevio = "";
-    $("#material").addEventListener("focus", () => (materialPrevio = $("#material").value));
     $("#material").addEventListener("change", () => {
-      if ($("#material").value !== "__nuevo") return;
+      if ($("#material").value !== "__nuevo") return (materialPrevio = $("#material").value);
       $("#material").value = materialPrevio;
       pedirOpcion("material");
     });
@@ -474,6 +473,7 @@ const secciones = [
     form.slug.value = pieza.slug || "";
     form.alt.value = pieza.alt || "";
     form.material.value = pieza.material || "";
+    form.material.dispatchEvent(new Event("change"));
     form.entrega.value = pieza.entrega || "";
     form.nuevo.checked = !!pieza.nuevo;
     $$("input[name='espacios']").forEach((i) => (i.checked = (pieza.espacios || []).includes(i.value)));

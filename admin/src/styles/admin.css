@@ -266,6 +266,47 @@ select.control{
 .control--con-icono .control{padding-left:44px;}
 .control--con-icono > svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--ink-40);pointer-events:none;}
 
+/* ---------- Desplegable propio ----------
+   Ningún desplegable se ve como el del sistema: el <select> se queda
+   escondido y encima va este botón con su menú (scripts/desplegable.js). */
+.selector{position:relative;min-width:0;}
+.selector-nativo{position:absolute !important;inset:0;width:100%;height:100%;opacity:0;pointer-events:none;}
+.selector-boton{
+  display:flex;align-items:center;gap:10px;text-align:left;cursor:pointer;
+  background-image:none !important;padding-right:14px;
+}
+.selector-valor{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.selector-boton--vacio .selector-valor{color:rgba(29,29,27,.36);}
+.selector-flecha{flex:none;color:var(--etiqueta-2);transition:transform .3s var(--resorte);}
+.selector.abierto .selector-boton{background-color:var(--white);box-shadow:0 0 0 1.5px var(--olive),var(--anillo);}
+.selector.abierto .selector-flecha{transform:rotate(180deg);}
+.selector-menu{
+  position:absolute;left:0;right:0;top:calc(100% + 8px);z-index:60;
+  margin:0;padding:6px;list-style:none;
+  max-height:320px;overflow-y:auto;overscroll-behavior:contain;
+  border-radius:var(--r-3);
+  background:rgba(255,255,255,.94);
+  -webkit-backdrop-filter:var(--desenfoque);backdrop-filter:var(--desenfoque);
+  box-shadow:var(--sombra-2),0 0 0 1px var(--borde);
+  opacity:0;transform:translateY(-6px) scale(.96);transform-origin:top center;pointer-events:none;visibility:hidden;
+  transition:opacity .18s var(--ease),transform .35s var(--resorte),visibility 0s linear .2s;
+}
+.selector-menu:focus{outline:0;}
+.selector.arriba .selector-menu{top:auto;bottom:calc(100% + 8px);transform-origin:bottom center;transform:translateY(6px) scale(.96);}
+.selector.abierto .selector-menu{opacity:1;transform:none;pointer-events:auto;visibility:visible;transition-delay:0s;}
+.selector-opcion{
+  display:flex;align-items:center;gap:10px;min-height:40px;padding:8px 12px 8px 10px;border-radius:10px;
+  font-size:var(--t-llamada);color:var(--etiqueta);cursor:pointer;
+  transition:background .12s;
+}
+.selector-opcion.activa{background:var(--relleno);}
+.selector-opcion[aria-disabled="true"]{color:var(--etiqueta-3);cursor:default;}
+.selector-palomita{flex:none;color:var(--olive-deep);opacity:0;transform:scale(.6);transition:opacity .15s,transform .3s var(--resorte);}
+.selector-opcion[aria-selected="true"]{font-weight:600;}
+.selector-opcion[aria-selected="true"] .selector-palomita{opacity:1;transform:none;}
+.selector-opcion--accion{margin-top:6px;color:var(--olive-deep);font-weight:600;box-shadow:0 -6px 0 -5px var(--borde);}
+@media (prefers-reduced-motion:reduce){.selector-menu,.selector-flecha{transition:none;}}
+
 /* opciones de una lista cerrada: chips que se marcan */
 .chips{display:flex;flex-wrap:wrap;gap:var(--esp-chips);}
 .chip{

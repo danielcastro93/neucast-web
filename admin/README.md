@@ -98,6 +98,15 @@ pegado a lo más separado, siempre con estos tokens.
 | `--esp-campos` | 34 | un campo (o grupo de chips) y el siguiente |
 | `--esp-renglon` | 20 | arriba y abajo de cada renglón de tabla o lista |
 
+**Desplegables propios.** Ningún desplegable se ve como el del sistema:
+`scripts/desplegable.js` esconde cada `<select class="control">` y pone
+encima un botón con su menú (el mismo estilo que el de las acciones de cada
+renglón), con teclado, búsqueda por letra y palomita en la opción elegida.
+Se aplica solo a los que aparezcan después; en el HTML se sigue escribiendo
+un `<select>` normal. Una opción de relleno se marca `hidden` y una opción
+que es una acción lleva un valor que empieza con `__` (sale separada y en
+oliva, como "Nuevo material…").
+
 Campos rellenos sin contorno, botones en píldora, separadores finísimos y
 movimiento con resorte (`--resorte`) para todo lo que se presiona. Las
 reglas de teléfono están en `src/styles/componentes.css`.
