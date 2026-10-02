@@ -34,23 +34,25 @@ const secciones = [
       </div>
     </div>
 
-    <div class="formulario">
-      <aside class="formulario-lado">
-        <div class="avance" data-avance>
-          <div class="avance-cabeza">
-            <span class="avance-rotulo">Para publicar</span>
-            <span class="avance-cuenta" data-avance-cuenta>0 de 11</span>
-          </div>
-          <div class="avance-barra"><span data-avance-barra></span></div>
-          <p class="avance-nota" data-avance-nota>Faltan los datos obligatorios.</p>
-        </div>
-        <nav class="formulario-indice" aria-label="Secciones">
-          {secciones.map((s) => (
-            <a href={`#${s.id}`} data-indice={s.id}><span class="punto"></span>{s.nombre}</a>
-          ))}
-        </nav>
-      </aside>
+    <nav class="pasos-editor" aria-label="Pasos para dar de alta la pieza" data-avance>
+      <ol class="pasos-lista">
+        {secciones.map((sec, i) => (
+          <li>
+            <a href={`#${sec.id}`} data-indice={sec.id}>
+              <span class="paso-n"><span class="paso-num">{i + 1}</span><svg class="paso-check" width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 10.5 4 4 8-9"/></svg></span>
+              <span class="paso-nombre">{sec.nombre}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+      <div class="pasos-avance" title="Datos obligatorios capturados">
+        <span class="pasos-avance-barra"><span data-avance-barra></span></span>
+        <span class="pasos-avance-cuenta" data-avance-cuenta>0 de 11</span>
+      </div>
+      <p class="pasos-nota" data-avance-nota hidden></p>
+    </nav>
 
+    <div class="formulario">
       <div class="formulario-secciones">
         <!-- ============ Identidad ============ -->
         <section class="tarjeta seccion" id="identidad">
@@ -110,9 +112,10 @@ const secciones = [
           <div class="seccion-cuerpo">
             <div class="consejo">
               <IconoAdmin name="foto" size={18} />
-              <p><b>Recortes con fondo transparente</b> (PNG o WebP) para la principal: el sitio pone el mueble sobre un gris suave y con fondo blanco se vería un cuadro. Las de ambiente pueden ser JPG. Arrastra para cambiar el orden.</p>
+              <p><b>Recortes con fondo transparente</b> (PNG o WebP) para la principal: el sitio pone el mueble sobre un gris suave y con fondo blanco se vería un cuadro. Las de ambiente pueden ser JPG. Toca una foto para describirla; arrastra para cambiar el orden.</p>
             </div>
             <div class="campo" data-campo="img">
+              <div class="campo-etiqueta"><span class="etiqueta">Galería<span class="obligatorio">*</span></span><span class="campo-contador" data-fotos-cuenta></span></div>
               <div class="galeria" data-galeria></div>
               <p class="campo-error" data-error></p>
             </div>
@@ -321,6 +324,21 @@ const secciones = [
     </Fragment>
   </Modal>
 
+  <Modal id="modal-foto-detalle" titulo="Foto" ancho>
+    <div class="detalle-foto"><img data-detalle-img alt="" /></div>
+    <p class="consejo consejo--alerta" data-detalle-aviso hidden>Esta foto no tiene fondo transparente: sobre el gris del sitio se verá como un cuadro. Para la principal conviene un recorte en PNG o WebP.</p>
+    <div class="campo">
+      <div class="campo-etiqueta"><label for="detalle-alt">Texto alternativo</label></div>
+      <input class="control" id="detalle-alt" type="text" data-detalle-alt />
+      <p class="campo-ayuda">Qué se ve en la foto, para quien no la ve y para Google.</p>
+    </div>
+    <Fragment slot="pie">
+      <button class="boton boton--texto boton--texto-peligro izquierda" type="button" data-detalle-quitar><IconoAdmin name="basura" size={16} />Quitar</button>
+      <button class="boton" type="button" data-detalle-principal>Hacer principal</button>
+      <button class="boton boton--primario" type="button" data-detalle-listo>Listo</button>
+    </Fragment>
+  </Modal>
+
   <Modal id="modal-combina" titulo="Piezas que combinan" texto="Elige hasta 8. Salen en ese orden en el carrusel de la ficha." ancho>
     <div class="control--con-icono">
       <IconoAdmin name="buscar" />
@@ -350,7 +368,7 @@ const secciones = [
     piezaVacia, OBLIGATORIOS, SEGUN_CATEGORIA, FILTROS_POR_CATEGORIA, MEDIDAS, GRUPOS_MEDIDA, MEDIDAS_POR_CATEGORIA,
     EJEMPLO_MEDIDA, CONSTRUCCION_POR_CATEGORIA, EJEMPLO_CONSTRUCCION, MAX_COMBINA,
   } from "../../scripts/esquemas/pieza.js";
-  import { abrirModal, cerrarModal, avisar, escapar, fechaRelativa, activarGlobos } from "../../scripts/ui.js";
+  import { abrirModal, cerrarModal, avisar, escapar, fechaRelativa } from "../../scripts/ui.js";
 
   const base = import.meta.env.BASE_URL;
   const SITIO = (import.meta.env.PUBLIC_STG || "http://localhost:4321").replace(/\/+$/, "");
@@ -680,57 +698,38 @@ const secciones = [
   const leerFrases = (nombre) => $$(`[data-frase='${nombre}']`).map((i) => i.value.trim()).filter(Boolean);
   const leerPares = (attr) => Object.fromEntries($$(`[data-${attr}]`).map((i) => [i.dataset[attr], i.value.trim()]).filter(([, v]) => v));
 
-  /* ---------- Galería ---------- */
+  /* ---------- Galería ----------
+     La principal va grande; las demás, en miniaturas que caben de a muchas
+     (una pieza puede traer veinte). Cada foto se abre en un modal para su
+     texto alternativo, hacerla principal o quitarla. */
   const sinTransparencia = (ruta) => /\.jpe?g($|\?)/i.test(ruta) || /^data:image\/jpe?g/i.test(ruta);
   const ESTRELLA = '<svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="m10 2.5 2.3 4.9 5.2.6-3.9 3.6 1.1 5.2L10 14.1l-4.7 2.7 1.1-5.2L2.5 8l5.2-.6L10 2.5Z"/></svg>';
   function pintarGaleria() {
     const caja = $("[data-galeria]");
     const fotos = pieza.img || [];
+    const conAlt = (i) => (i === 0 ? !!form.alt.value.trim() : !!(pieza.alts?.[i] || "").trim());
     caja.innerHTML =
       fotos
         .map((ruta, i) => `
-      <div class="foto${i === 0 ? " foto--principal" : ""}" draggable="true" data-i="${i}">
-        <div class="foto-marco">
-          ${ruta ? `<img src="${escapar(medio(ruta))}" alt="" draggable="false" />` : '<span class="vacia">Sin foto</span>'}
-          <span class="foto-etiqueta">${i === 0 ? `${ESTRELLA}Principal` : `Foto ${i + 1}`}</span>
-          ${i === 0 && sinTransparencia(ruta) ? '<span class="foto-aviso">Sin fondo transparente</span>' : ""}
-          <div class="foto-acciones">
-            ${i > 0 ? `<button class="foto-boton" type="button" data-principal="${i}" aria-label="Hacer principal" data-globo="Hacer principal" data-globo-lado="arriba">${ESTRELLA.replace('width="12" height="12"', 'width="15" height="15"')}</button>` : ""}
-            <button class="foto-boton foto-boton--peligro" type="button" data-quitar-foto="${i}" aria-label="Quitar la foto" data-globo="Quitar" data-globo-lado="arriba"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h12M8 6V4.5A.5.5 0 0 1 8.5 4h3a.5.5 0 0 1 .5.5V6M6 6l.7 9.3a1 1 0 0 0 1 .7h4.6a1 1 0 0 0 1-.7L14 6"/></svg></button>
-          </div>
-        </div>
-        ${i === 0
-          ? `<p class="foto-pie foto-pie--nota">Su texto alternativo va abajo</p>`
-          : `<div class="foto-pie"><input class="control" type="text" data-alt-foto="${i}" value="${escapar(pieza.alts?.[i] || "")}" placeholder="Qué se ve, ej. ${escapar(pieza.nombre || "La silla")} en una sala de juntas" aria-label="Texto alternativo de la foto ${i + 1}" /></div>`}
-      </div>`)
+      <button type="button" class="foto${i === 0 ? " foto--principal" : ""}" draggable="true" data-i="${i}" aria-label="${i === 0 ? "Foto principal" : `Foto ${i + 1}`}: abrir">
+        <span class="foto-marco">${ruta ? `<img src="${escapar(medio(ruta))}" alt="" draggable="false" loading="lazy" />` : ""}</span>
+        <span class="foto-etiqueta">${i === 0 ? `${ESTRELLA}Principal` : i + 1}</span>
+        ${i === 0 && sinTransparencia(ruta) ? '<span class="foto-aviso">Sin fondo transparente</span>' : ""}
+        ${i > 0 && !conAlt(i) ? '<span class="foto-falta" title="Sin texto alternativo">Sin descripción</span>' : ""}
+      </button>`)
         .join("") +
-      `<button class="foto-agregar" type="button" data-abrir-foto>
-        <span class="foto-agregar-icono"><svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg></span>
-        <b>${fotos.length ? "Agregar otra foto" : "Agregar la foto principal"}</b>
-        <span class="t-mini">${fotos.length ? "De ambiente, de detalle o de otro ángulo" : "Un recorte con fondo transparente"}</span>
+      `<button class="foto-agregar${fotos.length ? "" : " foto-agregar--primera"}" type="button" data-abrir-foto>
+        <span class="foto-agregar-icono"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg></span>
+        <b>${fotos.length ? "Agregar" : "Agregar la foto principal"}</b>
+        ${fotos.length ? "" : '<span class="t-mini">Un recorte con fondo transparente</span>'}
       </button>`;
+    $("[data-fotos-cuenta]").textContent = fotos.length ? `${fotos.length} ${fotos.length === 1 ? "foto" : "fotos"}` : "";
 
-    $$("[data-quitar-foto]", caja).forEach((b) =>
-      b.addEventListener("click", () => {
-        const i = +b.dataset.quitarFoto;
-        pieza.img.splice(i, 1);
-        pieza.alts.splice(i, 1);
-        pintarGaleria();
-        marcarCambio();
-      })
-    );
-    $$("[data-principal]", caja).forEach((b) => b.addEventListener("click", () => mover(+b.dataset.principal, 0)));
-    $$("[data-alt-foto]", caja).forEach((inp) =>
-      inp.addEventListener("input", () => {
-        pieza.alts[+inp.dataset.altFoto] = inp.value;
-        marcarCambio();
-      })
-    );
+    $$(".foto", caja).forEach((el) => el.addEventListener("click", () => abrirFoto(+el.dataset.i)));
     $("[data-abrir-foto]", caja).addEventListener("click", () => {
       $("#ruta-foto").value = "";
       abrirModal("modal-foto");
     });
-    activarGlobos(caja);
 
     // arrastrar para ordenar
     let desde = null;
@@ -753,6 +752,57 @@ const secciones = [
       });
     });
   }
+
+  // El modal de una foto: vista grande, su texto alternativo y sus acciones.
+  let fotoAbierta = null;
+  function abrirFoto(i) {
+    fotoAbierta = i;
+    const ruta = pieza.img[i];
+    const principal = i === 0;
+    $("[data-detalle-img]").src = medio(ruta);
+    $("[data-detalle-img]").classList.toggle("recorte", principal);
+    $("#modal-foto-detalle [data-titulo]").textContent = principal ? "Foto principal" : `Foto ${i + 1} de ${pieza.img.length}`;
+    const alt = $("[data-detalle-alt]");
+    alt.value = principal ? form.alt.value : pieza.alts?.[i] || "";
+    alt.placeholder = principal ? "Ej. Silla operativa Órbita negra con respaldo de malla" : `Ej. ${pieza.nombre || "La silla"} en una sala de juntas`;
+    $("[data-detalle-principal]").hidden = principal;
+    $("[data-detalle-aviso]").hidden = !(principal && sinTransparencia(ruta));
+    abrirModal("modal-foto-detalle");
+  }
+  function guardarAltAbierta() {
+    if (fotoAbierta == null) return;
+    const v = $("[data-detalle-alt]").value;
+    if (fotoAbierta === 0) {
+      if (form.alt.value !== v) { form.alt.value = v; marcarCambio(); }
+    } else if ((pieza.alts[fotoAbierta] || "") !== v) {
+      pieza.alts[fotoAbierta] = v;
+      marcarCambio();
+    }
+  }
+  $("[data-detalle-listo]").addEventListener("click", () => {
+    guardarAltAbierta();
+    cerrarModal("modal-foto-detalle");
+    pintarGaleria();
+  });
+  $("#modal-foto-detalle").addEventListener("close", () => { guardarAltAbierta(); pintarGaleria(); fotoAbierta = null; });
+  $("[data-detalle-principal]").addEventListener("click", () => {
+    guardarAltAbierta();
+    const i = fotoAbierta;
+    cerrarModal("modal-foto-detalle");
+    fotoAbierta = null;
+    mover(i, 0);
+    avisar("Ahora es la foto principal. Revisa su texto alternativo.");
+  });
+  $("[data-detalle-quitar]").addEventListener("click", () => {
+    const i = fotoAbierta;
+    fotoAbierta = null;
+    cerrarModal("modal-foto-detalle");
+    pieza.img.splice(i, 1);
+    pieza.alts.splice(i, 1);
+    pintarGaleria();
+    marcarCambio();
+  });
+
   function mover(desde, hasta) {
     const [f] = pieza.img.splice(desde, 1);
     pieza.img.splice(hasta, 0, f);
@@ -1082,7 +1132,7 @@ const secciones = [
       let actual = secciones[0];
       for (const sec of secciones) if (sec.getBoundingClientRect().top <= corte) actual = sec;
       if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) actual = secciones.at(-1);
-      const indice = $(".formulario-indice");
+      const indice = $(".pasos-lista");
       $$("[data-indice]").forEach((a) => {
         const es = a.dataset.indice === actual.id;
         if (es && !a.classList.contains("activo") && indice.scrollWidth > indice.clientWidth) {

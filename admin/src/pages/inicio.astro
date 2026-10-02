@@ -27,10 +27,15 @@ const cifras = [
   <!-- ============ Publicación ============ -->
   <section class="tarjeta pub" data-pub data-estado="cargando" aria-labelledby="pub-titulo">
     <div class="pub-cabeza">
+      <div class="pub-icono" aria-hidden="true">
+        <svg class="pub-anillo" viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" /></svg>
+        <span class="pub-icono-espera"><IconoAdmin name="nube" size={26} /></span>
+        <span class="pub-icono-listo"><IconoAdmin name="check" size={26} /></span>
+      </div>
       <div class="pub-textos">
-        <span class="pub-rotulo"><span class="pulso"></span><span data-pub-rotulo>Publicación</span></span>
+        <span class="pub-rotulo" data-pub-rotulo>Publicación</span>
         <h2 class="pub-titulo" id="pub-titulo" data-pub-titulo><span class="hueso" style="display:inline-block;width:260px;height:26px"></span></h2>
-        <p class="t-apoyo" data-pub-nota></p>
+        <p class="pub-nota" data-pub-nota></p>
       </div>
       <div class="pub-acciones">
         <a class="boton" href="#" target="_blank" rel="noopener" data-ver-pruebas><IconoAdmin name="externo" size={16} />Ver en pruebas</a>
@@ -38,23 +43,24 @@ const cifras = [
       </div>
     </div>
 
-    <!-- el camino: lo guardado va a pruebas solo; producción espera el botón -->
-    <div class="ruta" aria-hidden="true">
-      <div class="ruta-paso ruta-paso--hecho">
-        <span class="ruta-nodo"><IconoAdmin name="check" size={14} /></span>
-        <span class="ruta-txt"><b>Guardado</b><small data-ruta-guardado>&nbsp;</small></span>
-      </div>
-      <span class="ruta-linea ruta-linea--llena"></span>
-      <div class="ruta-paso ruta-paso--hecho">
-        <span class="ruta-nodo"><IconoAdmin name="check" size={14} /></span>
-        <span class="ruta-txt"><b>Pruebas</b><small data-ruta-pruebas>&nbsp;</small></span>
-      </div>
-      <span class="ruta-linea" data-ruta-linea></span>
-      <div class="ruta-paso" data-ruta-produccion>
-        <span class="ruta-nodo"><IconoAdmin name="check" size={14} /><span class="ruta-espera"></span></span>
-        <span class="ruta-txt"><b>neucast.com.mx</b><small data-ruta-prod>&nbsp;</small></span>
-      </div>
-    </div>
+    <!-- el camino: lo guardado va a pruebas solo; el sitio público espera el botón -->
+    <ol class="ruta" aria-label="Camino de la publicación">
+      <li class="ruta-paso ruta-paso--hecho">
+        <span class="ruta-nodo"><IconoAdmin name="check" size={15} /></span>
+        <b>Guardado</b>
+        <small data-ruta-guardado>&nbsp;</small>
+      </li>
+      <li class="ruta-paso ruta-paso--hecho">
+        <span class="ruta-nodo"><IconoAdmin name="check" size={15} /></span>
+        <b>En pruebas</b>
+        <small data-ruta-pruebas>&nbsp;</small>
+      </li>
+      <li class="ruta-paso" data-ruta-produccion>
+        <span class="ruta-nodo"><IconoAdmin name="check" size={15} /><span class="ruta-espera"></span></span>
+        <b>neucast.com.mx</b>
+        <small data-ruta-prod>&nbsp;</small>
+      </li>
+    </ol>
 
     <ul class="lista-filas" data-pub-lista></ul>
   </section>
@@ -132,12 +138,12 @@ const cifras = [
     const n = p.pendientes.length;
     const caja = $("[data-pub]");
     caja.dataset.estado = n ? "pendiente" : "aldia";
-    $("[data-pub-rotulo]").textContent = n ? "Listo para publicar" : "Sitio al día";
+    $("[data-pub-rotulo]").textContent = n ? "En pruebas, sin publicar" : "Sitio al día";
     $("[data-pub-titulo]").textContent = n
-      ? `${n} ${n === 1 ? "cambio espera" : "cambios esperan"} en pruebas`
-      : "Producción tiene lo mismo que pruebas";
+      ? `${n} ${n === 1 ? "cambio espera" : "cambios esperan"} tu visto bueno`
+      : "Todo está publicado";
     $("[data-pub-nota]").textContent = n
-      ? "Revísalos en el sitio de pruebas y publícalos cuando estén bien."
+      ? "Revísalos en el sitio de pruebas y, cuando estén bien, publícalos en neucast.com.mx."
       : `Última publicación ${fechaRelativa(p.produccion?.fecha)}${p.produccion?.por ? `, por ${p.produccion.por}` : ""}.`;
     $("[data-pub-boton]").hidden = !n;
     $("[data-ruta-guardado]").textContent = n ? fechaRelativa(p.pendientes[0]?.fecha) : "Nada pendiente";
@@ -145,8 +151,6 @@ const cifras = [
     $("[data-ruta-prod]").textContent = n ? "Esperando que publiques" : fechaRelativa(p.produccion?.fecha);
     $("[data-ruta-produccion]").classList.toggle("ruta-paso--hecho", !n);
     $("[data-ruta-produccion]").classList.toggle("ruta-paso--espera", !!n);
-    $("[data-ruta-linea]").classList.toggle("ruta-linea--llena", !n);
-    $("[data-ruta-linea]").classList.toggle("ruta-linea--fluye", !!n);
     $("[data-pub-lista]").innerHTML = p.pendientes.slice(0, 5).map((c) => filaCambio(c, p.porSlug)).join("")
       + (n > 5 ? `<li class="renglon-mas">y ${n - 5} más</li>` : "");
     $("[data-resumen]").textContent = n

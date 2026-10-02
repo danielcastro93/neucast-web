@@ -109,7 +109,10 @@ const base = import.meta.env.BASE_URL;
 
   function fila(p) {
     const foto = p.img?.[0] ? `<img src="${escapar(medio(p.img[0]))}" alt="" loading="lazy" />` : "";
-    const colores = (p.colores || []).slice(0, 5).map((c) => `<span class="chip-color" title="${escapar(c)}" style="background:${colorHex(c)}"></span>`).join("");
+    // dos puntos de color y, si hay más, un círculo con cuántos faltan
+    const grupos = p.colores || [];
+    const colores = grupos.slice(0, 2).map((c) => `<span class="chip-color" title="${escapar(c)}" style="background:${colorHex(c)}"></span>`).join("")
+      + (grupos.length > 2 ? `<span class="chip-mas" title="${escapar(grupos.slice(2).join(", "))}">+${grupos.length - 2}</span>` : "");
     return `
       <tr data-slug="${escapar(p.slug)}" tabindex="0">
         <td class="col-foto"><div class="miniatura">${foto}</div></td>

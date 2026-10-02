@@ -6,6 +6,37 @@
    ============================================ */
 
 :root{
+  /* ============ Base de sistema ============
+     El administrador se arma como una app de Apple: escala tipográfica de
+     sistema, materiales translúcidos, rellenos en lugar de contornos,
+     separadores finísimos, radios concéntricos y movimiento con resorte.
+     Encima va Neucast: Helvetica Neue, la tinta y el oliva.
+
+     Tipografía (equivalencias con la escala de Apple) */
+  --t-titulo-grande:34px;   /* Large Title: el título de cada pantalla */
+  --t-titulo-1:28px;        /* Title 1: el estado principal de una tarjeta */
+  --t-titulo-2:22px;        /* Title 2: títulos de modal */
+  --t-titulo-3:19px;        /* Title 3: títulos de sección */
+  --t-encabezado:16px;      /* Headline: nombres en listas, en seminegrita */
+  --t-cuerpo:15px;          /* Body */
+  --t-llamada:14px;         /* Callout: botones, chips, menús */
+  --t-subtitulo:13px;       /* Subheadline: segundas líneas */
+  --t-nota:12px;            /* Footnote / Caption */
+  /* Etiquetas: la misma tinta en cuatro intensidades */
+  --etiqueta:var(--ink);
+  --etiqueta-2:rgba(29,29,27,.62);
+  --etiqueta-3:rgba(29,29,27,.40);
+  --etiqueta-4:rgba(29,29,27,.20);
+  /* Radios concéntricos: lo de dentro siempre más chico que lo de fuera */
+  --r-1:8px;--r-2:12px;--r-3:16px;--r-4:20px;--r-5:26px;
+  /* Materiales: superficies translúcidas que dejan pasar el color de abajo */
+  --material-grueso:rgba(255,255,255,.86);
+  --material:rgba(255,255,255,.72);
+  --material-fino:rgba(244,244,242,.72);
+  --desenfoque:saturate(180%) blur(20px);
+}
+
+:root{
   /* Registro "producto moderno" (Apple, Tesla): fondo gris casi neutro,
      superficies blancas sin contorno con sombra muy suave, líneas finísimas,
      radios grandes, campos rellenos, botones en píldora y movimiento con
@@ -46,10 +77,10 @@ body.no-scroll{position:fixed;width:100%;overflow:hidden;}
 ::selection{background:rgba(120,137,74,.22);}
 
 /* ---------- Tipografía propia del administrador ---------- */
-.t-pantalla{font-size:clamp(28px,3vw,40px);font-weight:700;letter-spacing:-.035em;line-height:1.08;}
-.t-seccion{font-size:19px;font-weight:700;letter-spacing:-.02em;line-height:1.25;}
-.t-apoyo{color:var(--ink-60);font-size:15px;line-height:1.5;}
-.t-mini{color:var(--ink-40);font-size:var(--fs-xs);}
+.t-pantalla{font-size:clamp(28px,2.6vw,var(--t-titulo-grande));font-weight:700;letter-spacing:-.035em;line-height:1.1;}
+.t-seccion{font-size:var(--t-titulo-3);font-weight:700;letter-spacing:-.02em;line-height:1.25;}
+.t-apoyo{color:var(--etiqueta-2);font-size:var(--t-cuerpo);line-height:1.5;}
+.t-mini{color:var(--etiqueta-3);font-size:var(--t-subtitulo);line-height:1.45;}
 .mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:13px;letter-spacing:0;}
 
 /* ============================================
@@ -200,20 +231,21 @@ body.no-scroll{position:fixed;width:100%;overflow:hidden;}
 .campo-ayuda{font-size:12.5px;color:var(--ink-40);line-height:1.5;}
 .campo-error{display:none;font-size:12.5px;font-weight:500;color:var(--peligro);line-height:1.45;}
 .campo[data-error] .campo-error{display:block;animation:entraPantalla .25s var(--ease);}
-.campo[data-error] .control{background:var(--peligro-suave);box-shadow:0 0 0 1.5px rgba(179,58,58,.45);}
+.campo[data-error] .control{background-color:var(--peligro-suave);box-shadow:0 0 0 1.5px rgba(179,58,58,.45);}
 
 /* Campos rellenos, sin contorno: se iluminan en blanco al enfocarse. */
 .control{
   width:100%;height:var(--control-h);padding:0 16px;border-radius:14px;
-  background:var(--relleno);border:0;
+  background-color:var(--relleno);border:0;
   font:inherit;font-size:15px;color:var(--ink);
   transition:background .2s var(--ease),box-shadow .2s var(--ease);
   appearance:none;-webkit-appearance:none;
 }
 .control::placeholder{color:rgba(29,29,27,.36);}
-@media (hover:hover){.control:hover{background:var(--relleno-2);}}
-.control:focus{outline:0;background:var(--white);box-shadow:0 0 0 1.5px var(--olive),var(--anillo);}
-.control[readonly]{background:transparent;box-shadow:inset 0 0 0 1px var(--borde);color:var(--ink-60);}
+/* background-color y no background: el atajo borra la flecha de los desplegables */
+@media (hover:hover){.control:hover{background-color:var(--relleno-2);}}
+.control:focus{outline:0;background-color:var(--white);box-shadow:0 0 0 1.5px var(--olive),var(--anillo);}
+.control[readonly]{background-color:transparent;box-shadow:inset 0 0 0 1px var(--borde);color:var(--ink-60);}
 .control[disabled]{color:var(--ink-40);cursor:not-allowed;}
 textarea.control{height:auto;min-height:120px;padding:14px 16px;line-height:1.55;resize:vertical;}
 select.control{
@@ -266,10 +298,13 @@ select.control{
 /* ============================================
    Tablas
    ============================================ */
-.herramientas{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:20px 24px;border-bottom:1px solid var(--borde);}
-.herramientas .control--con-icono{flex:1;min-width:220px;max-width:380px;}
+.herramientas{
+  display:grid;grid-template-columns:minmax(0,1.6fr) minmax(210px,1fr) auto;align-items:center;gap:12px;
+  padding:20px 24px;border-bottom:1px solid var(--borde);
+}
 .herramientas .control{height:44px;}
-.herramientas select.control{width:auto;min-width:160px;}
+.herramientas select.control{width:100%;}
+@media (max-width:900px){.herramientas{grid-template-columns:1fr 1fr;}.herramientas .segmentos{grid-column:1 / -1;}.herramientas .segmento{flex:1;}}
 .segmentos{display:inline-flex;padding:3px;border-radius:12px;background:rgba(118,118,128,.12);}
 .segmento{
   height:38px;padding:0 16px;border-radius:9px;font-size:13.5px;font-weight:600;color:var(--ink-60);
@@ -310,6 +345,10 @@ select.control{
   background:var(--info-suave);color:var(--olive-ink);font-size:11px;font-weight:600;letter-spacing:.02em;
 }
 .puntos-color{display:inline-flex;gap:5px;align-items:center;}
+.chip-mas{
+  display:inline-grid;place-items:center;min-width:16px;height:16px;padding:0 4px;border-radius:999px;
+  background:var(--relleno-2);color:var(--etiqueta-2);font-size:10px;font-weight:700;font-variant-numeric:tabular-nums;
+}
 .puntos-color .chip-color{width:16px;height:16px;}
 .solo-movil{display:none;}
 /* con la barra ancha, la fecha no cabe: es lo menos necesario para decidir */
@@ -378,7 +417,7 @@ dialog.modal.modal--cerrando::backdrop{animation:veloSale .24s var(--ease-salida
   dialog.modal[open],dialog.modal::backdrop,dialog.modal.modal--cerrando,dialog.modal.modal--cerrando::backdrop{animation:none;}
 }
 .modal-cabeza{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:30px 30px 0;}
-.modal-titulo{font-size:22px;font-weight:700;letter-spacing:-.025em;line-height:1.2;}
+.modal-titulo{font-size:var(--t-titulo-2);font-weight:700;letter-spacing:-.025em;line-height:1.2;}
 .modal-texto{margin-top:8px;color:var(--ink-60);font-size:15px;line-height:1.55;}
 .modal-texto:empty{display:none;}
 .modal-x{
