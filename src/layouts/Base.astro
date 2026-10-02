@@ -877,5 +877,25 @@ const chevron = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ari
         }
       }
     </script>
+    <!-- Cada página nueva abre arriba. Daniel lo vio en el celular: al
+         cambiar de sección desde el menú, la página nueva aparecía a la
+         altura donde iba la anterior. Solo aplica a una navegación nueva:
+         con "atrás" o "adelante" el navegador devuelve a donde estabas, que
+         es lo esperado, y un enlace a una sección (#algo) va a esa sección.
+         Si la persona ya empezó a moverse, no se le quita el control. -->
+    <script is:inline>
+      (() => {
+        const nav = performance.getEntriesByType("navigation")[0];
+        if (!nav || nav.type !== "navigate" || location.hash) return;
+        let tocado = false;
+        const marcar = () => { tocado = true; };
+        ["wheel", "touchstart", "keydown"].forEach((t) => addEventListener(t, marcar, { once: true, passive: true }));
+        const arriba = () => { if (!tocado && window.scrollY > 0) window.scrollTo(0, 0); };
+        arriba();
+        addEventListener("DOMContentLoaded", arriba, { once: true });
+        addEventListener("load", arriba, { once: true });
+        addEventListener("pageshow", (e) => { if (!e.persisted) arriba(); }, { once: true });
+      })();
+    </script>
   </body>
 </html>

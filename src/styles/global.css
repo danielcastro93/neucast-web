@@ -44,7 +44,7 @@
      Fluida: el primer valor manda en móvil, el tercero en escritorio.
      Jerarquía garantizada en todos los anchos:
      display > h1 > h2 > h3 > h4 > body. */
-  --fs-display:clamp(38px,6.4vw,72px);  /* H1 sobre foto: 72 en escritorio, 38 en teléfono */
+  --fs-display:clamp(38px,6.4vw,72px);  /* H1 sobre foto: 72 en escritorio */
   --fs-h1:clamp(27px,5vw,52px);         /* título de página / banner    */
   --fs-h2:clamp(25px,3.6vw,38px);       /* título de sección            */
   --fs-h3:clamp(20px,2.4vw,28px);       /* subtítulo dentro de sección  */
@@ -369,6 +369,19 @@ h1,h2,h3,h4,p{margin:0;}
   transition:opacity .4s var(--ease);
 }
 .open > .scrim{opacity:1;}
+
+/* ---------- H1 sobre foto en teléfono ----------
+   Crece con el ancho del celular hasta 38 px, pero nunca pasa de dos
+   renglones: medido con los títulos de home, proyectos, home office y
+   preguntas frecuentes de 320 a 430 px (2 de octubre de 2026). Si un título
+   nuevo trae una línea más larga que "como en la oficina", hay que volver a
+   medir o acortarla. */
+@media (max-width:639px){
+  :root{--fs-display:min(38px,8.7vw);}
+}
+@media (max-width:340px){
+  :root{--fs-display:8.3vw;}
+}
 
 /* ---------- Botones full-width en móvil ---------- */
 @media (max-width:639px){
