@@ -1,8 +1,133 @@
 {
-  "filtros": [
+  "listas": [
     {
-      "campo": "uso",
+      "id": "material",
+      "nombre": "Material",
+      "seleccion": "una",
+      "categorias": null,
+      "obligatoria": "todas",
+      "filtro": true,
+      "opciones": [
+        {
+          "id": "smartmesh",
+          "nombre": "Malla SmartMesh"
+        },
+        {
+          "id": "e-fabric",
+          "nombre": "Tela E-Fabric"
+        },
+        {
+          "id": "technoleather",
+          "nombre": "Technoleather"
+        },
+        {
+          "id": "eco-leather",
+          "nombre": "Eco-Leather"
+        },
+        {
+          "id": "piel",
+          "nombre": "Piel genuina"
+        },
+        {
+          "id": "madera",
+          "nombre": "Madera"
+        },
+        {
+          "id": "metal",
+          "nombre": "Metal"
+        },
+        {
+          "id": "cristal",
+          "nombre": "Cristal"
+        }
+      ],
+      "sistema": true,
+      "nota": "El material principal de cada pieza."
+    },
+    {
+      "id": "colores",
+      "nombre": "Grupos de color",
+      "seleccion": "varias",
+      "categorias": null,
+      "obligatoria": "todas",
+      "filtro": true,
+      "opciones": [
+        {
+          "id": "negro",
+          "nombre": "Negro",
+          "hex": "#1D1D1B"
+        },
+        {
+          "id": "gris",
+          "nombre": "Gris",
+          "hex": "#8A8A87"
+        },
+        {
+          "id": "blanco",
+          "nombre": "Blanco",
+          "hex": "#EFEEE8"
+        },
+        {
+          "id": "beige",
+          "nombre": "Beige",
+          "hex": "#C9B99B"
+        },
+        {
+          "id": "cafe",
+          "nombre": "Café",
+          "hex": "#5A4032"
+        },
+        {
+          "id": "azul",
+          "nombre": "Azul",
+          "hex": "#2B3A67"
+        },
+        {
+          "id": "verde",
+          "nombre": "Verde",
+          "hex": "#4A5D3A"
+        },
+        {
+          "id": "rojo",
+          "nombre": "Rojo",
+          "hex": "#8C2F2F"
+        }
+      ],
+      "sistema": true,
+      "color": true,
+      "nota": "Los grupos por los que se filtra. El nombre comercial de cada acabado se escribe en la pieza."
+    },
+    {
+      "id": "entrega",
+      "nombre": "Disponibilidad",
+      "seleccion": "una",
+      "categorias": null,
+      "obligatoria": "todas",
+      "filtro": true,
+      "opciones": [
+        {
+          "id": "inmediata",
+          "nombre": "Entrega inmediata"
+        },
+        {
+          "id": "10dias",
+          "nombre": "Hasta 10 días"
+        },
+        {
+          "id": "pedido",
+          "nombre": "Sobre pedido"
+        }
+      ],
+      "sistema": true,
+      "nota": "En cuánto se entrega. Sale en la ficha y en el recuadro de entrega."
+    },
+    {
+      "id": "uso",
       "nombre": "Tipo de uso",
+      "seleccion": "una",
+      "categorias": null,
+      "obligatoria": "todas",
+      "filtro": true,
       "opciones": [
         {
           "id": "direccion",
@@ -24,11 +149,24 @@
           "id": "colectividad",
           "nombre": "Colectividad"
         }
-      ]
+      ],
+      "sistema": true,
+      "nota": "Para qué se usa la pieza."
     },
     {
-      "campo": "respaldo",
+      "id": "respaldo",
       "nombre": "Respaldo",
+      "seleccion": "una",
+      "categorias": [
+        "sillas-ejecutivas",
+        "sillas-operativas",
+        "cafeterias"
+      ],
+      "obligatoria": [
+        "sillas-ejecutivas",
+        "sillas-operativas"
+      ],
+      "filtro": true,
       "opciones": [
         {
           "id": "cabecera",
@@ -45,30 +183,19 @@
       ]
     },
     {
-      "campo": "plazas",
-      "nombre": "Plazas",
-      "opciones": [
-        {
-          "id": "1",
-          "nombre": "1 plaza"
-        },
-        {
-          "id": "2",
-          "nombre": "2 plazas"
-        },
-        {
-          "id": "3",
-          "nombre": "3 plazas"
-        },
-        {
-          "id": "4",
-          "nombre": "4 o más"
-        }
-      ]
-    },
-    {
-      "campo": "brazos",
+      "id": "brazos",
       "nombre": "Descansabrazos",
+      "seleccion": "una",
+      "categorias": [
+        "sillas-ejecutivas",
+        "sillas-operativas",
+        "cafeterias"
+      ],
+      "obligatoria": [
+        "sillas-ejecutivas",
+        "sillas-operativas"
+      ],
+      "filtro": true,
       "opciones": [
         {
           "id": "sin",
@@ -85,8 +212,26 @@
       ]
     },
     {
-      "campo": "base",
+      "id": "base",
       "nombre": "Base",
+      "seleccion": "una",
+      "categorias": [
+        "sillas-ejecutivas",
+        "sillas-operativas",
+        "salas-de-juntas",
+        "escritorios",
+        "cafeterias",
+        "lounge-y-areas-comunes",
+        "exteriores"
+      ],
+      "obligatoria": [
+        "sillas-ejecutivas",
+        "sillas-operativas",
+        "cafeterias",
+        "salas-de-juntas",
+        "escritorios"
+      ],
+      "filtro": true,
       "opciones": [
         {
           "id": "aluminio",
@@ -111,8 +256,45 @@
       ]
     },
     {
-      "campo": "extras",
+      "id": "plazas",
+      "nombre": "Plazas",
+      "seleccion": "una",
+      "categorias": [
+        "cafeterias",
+        "lounge-y-areas-comunes",
+        "exteriores"
+      ],
+      "obligatoria": [
+        "lounge-y-areas-comunes",
+        "exteriores"
+      ],
+      "filtro": true,
+      "opciones": [
+        {
+          "id": "1",
+          "nombre": "1 plaza"
+        },
+        {
+          "id": "2",
+          "nombre": "2 plazas"
+        },
+        {
+          "id": "3",
+          "nombre": "3 plazas"
+        },
+        {
+          "id": "4",
+          "nombre": "4 o más"
+        }
+      ]
+    },
+    {
+      "id": "extras",
       "nombre": "Características",
+      "seleccion": "varias",
+      "categorias": null,
+      "obligatoria": [],
+      "filtro": true,
       "opciones": [
         {
           "id": "apilable",
@@ -130,101 +312,431 @@
           "id": "modular",
           "nombre": "Modular"
         }
+      ],
+      "nota": "Varias por pieza: apilable, con ruedas…"
+    }
+  ],
+  "medidas": [
+    {
+      "id": "alto",
+      "nombre": "Altura total",
+      "grupo": "generales",
+      "unidad": "cm",
+      "ejemplo": "118",
+      "categorias": null,
+      "rango": true
+    },
+    {
+      "id": "ancho",
+      "nombre": "Anchura",
+      "grupo": "generales",
+      "unidad": "cm",
+      "ejemplo": "68",
+      "categorias": null,
+      "rango": false
+    },
+    {
+      "id": "fondo",
+      "nombre": "Profundidad",
+      "grupo": "generales",
+      "unidad": "cm",
+      "ejemplo": "70",
+      "categorias": null,
+      "rango": false
+    },
+    {
+      "id": "largo",
+      "nombre": "Longitud",
+      "grupo": "generales",
+      "unidad": "cm",
+      "ejemplo": "240",
+      "categorias": null,
+      "rango": false
+    },
+    {
+      "id": "diametro",
+      "nombre": "Diámetro",
+      "grupo": "generales",
+      "unidad": "cm",
+      "ejemplo": "120",
+      "categorias": null,
+      "rango": false
+    },
+    {
+      "id": "peso",
+      "nombre": "Peso",
+      "grupo": "generales",
+      "unidad": "kg",
+      "ejemplo": "19",
+      "categorias": null,
+      "rango": false
+    },
+    {
+      "id": "altoAsiento",
+      "nombre": "Altura del asiento",
+      "grupo": "asiento",
+      "unidad": "cm",
+      "ejemplo": "45-55",
+      "categorias": [
+        "sillas-ejecutivas",
+        "sillas-operativas",
+        "cafeterias",
+        "lounge-y-areas-comunes",
+        "exteriores"
+      ],
+      "rango": true
+    },
+    {
+      "id": "anchoAsiento",
+      "nombre": "Anchura del asiento",
+      "grupo": "asiento",
+      "unidad": "cm",
+      "ejemplo": "50",
+      "categorias": [
+        "sillas-ejecutivas",
+        "sillas-operativas",
+        "cafeterias",
+        "lounge-y-areas-comunes",
+        "exteriores"
+      ],
+      "rango": false
+    },
+    {
+      "id": "fondoAsiento",
+      "nombre": "Profundidad del asiento",
+      "grupo": "asiento",
+      "unidad": "cm",
+      "ejemplo": "48",
+      "categorias": [
+        "sillas-ejecutivas",
+        "sillas-operativas",
+        "cafeterias",
+        "lounge-y-areas-comunes",
+        "exteriores"
+      ],
+      "rango": false
+    },
+    {
+      "id": "altoRespaldo",
+      "nombre": "Altura del respaldo",
+      "grupo": "asiento",
+      "unidad": "cm",
+      "ejemplo": "72",
+      "categorias": [
+        "sillas-ejecutivas",
+        "sillas-operativas",
+        "cafeterias",
+        "lounge-y-areas-comunes",
+        "exteriores"
+      ],
+      "rango": false
+    },
+    {
+      "id": "brazoInterno",
+      "nombre": "Medida interna de brazos",
+      "grupo": "asiento",
+      "unidad": "cm",
+      "ejemplo": "48",
+      "categorias": [
+        "sillas-ejecutivas",
+        "sillas-operativas",
+        "cafeterias",
+        "lounge-y-areas-comunes",
+        "exteriores"
+      ],
+      "rango": false
+    },
+    {
+      "id": "brazoExterno",
+      "nombre": "Medida externa de brazos",
+      "grupo": "asiento",
+      "unidad": "cm",
+      "ejemplo": "68",
+      "categorias": [
+        "sillas-ejecutivas",
+        "sillas-operativas",
+        "cafeterias",
+        "lounge-y-areas-comunes",
+        "exteriores"
+      ],
+      "rango": false
+    },
+    {
+      "id": "cabecera",
+      "nombre": "Altura de cabecera",
+      "grupo": "asiento",
+      "unidad": "cm",
+      "ejemplo": "26",
+      "categorias": [
+        "sillas-ejecutivas",
+        "sillas-operativas"
+      ],
+      "rango": false
+    },
+    {
+      "id": "espesorCubierta",
+      "nombre": "Espesor de cubierta",
+      "grupo": "cubierta",
+      "unidad": "mm",
+      "ejemplo": "25",
+      "categorias": [
+        "cafeterias",
+        "lounge-y-areas-comunes",
+        "exteriores",
+        "salas-de-juntas",
+        "escritorios"
+      ],
+      "rango": false
+    },
+    {
+      "id": "alturaLibre",
+      "nombre": "Altura libre bajo cubierta",
+      "grupo": "cubierta",
+      "unidad": "cm",
+      "ejemplo": "68",
+      "categorias": [
+        "escritorios",
+        "salas-de-juntas"
+      ],
+      "rango": false
+    },
+    {
+      "id": "plazas",
+      "nombre": "Plazas",
+      "grupo": "capacidad",
+      "unidad": "",
+      "ejemplo": "3",
+      "categorias": [
+        "lounge-y-areas-comunes",
+        "exteriores",
+        "cafeterias"
+      ],
+      "rango": false
+    },
+    {
+      "id": "personas",
+      "nombre": "Personas",
+      "grupo": "capacidad",
+      "unidad": "",
+      "ejemplo": "6-8",
+      "categorias": [
+        "salas-de-juntas",
+        "cafeterias",
+        "exteriores"
+      ],
+      "rango": true
+    },
+    {
+      "id": "puestos",
+      "nombre": "Puestos de trabajo",
+      "grupo": "capacidad",
+      "unidad": "",
+      "ejemplo": "4",
+      "categorias": [
+        "escritorios"
+      ],
+      "rango": false
+    },
+    {
+      "id": "apilables",
+      "nombre": "Piezas apilables",
+      "grupo": "capacidad",
+      "unidad": "",
+      "ejemplo": "6",
+      "categorias": [
+        "sillas-ejecutivas",
+        "sillas-operativas",
+        "cafeterias",
+        "exteriores"
+      ],
+      "rango": false
+    },
+    {
+      "id": "carga",
+      "nombre": "Carga máxima",
+      "grupo": "capacidad",
+      "unidad": "kg",
+      "ejemplo": "130",
+      "categorias": [
+        "sillas-ejecutivas",
+        "sillas-operativas",
+        "cafeterias",
+        "lounge-y-areas-comunes",
+        "exteriores"
+      ],
+      "rango": false
+    },
+    {
+      "id": "puertas",
+      "nombre": "Puertas",
+      "grupo": "guardado",
+      "unidad": "",
+      "ejemplo": "2",
+      "categorias": [
+        "almacenamiento"
+      ],
+      "rango": false
+    },
+    {
+      "id": "gavetas",
+      "nombre": "Gavetas",
+      "grupo": "guardado",
+      "unidad": "",
+      "ejemplo": "3",
+      "categorias": [
+        "almacenamiento"
+      ],
+      "rango": false
+    },
+    {
+      "id": "entrepanos",
+      "nombre": "Entrepaños",
+      "grupo": "guardado",
+      "unidad": "",
+      "ejemplo": "4",
+      "categorias": [
+        "almacenamiento"
+      ],
+      "rango": false
+    },
+    {
+      "id": "cargaEntrepano",
+      "nombre": "Carga por entrepaño",
+      "grupo": "guardado",
+      "unidad": "kg",
+      "ejemplo": "30",
+      "categorias": [
+        "almacenamiento"
+      ],
+      "rango": false
+    },
+    {
+      "id": "cargaGaveta",
+      "nombre": "Carga por gaveta",
+      "grupo": "guardado",
+      "unidad": "kg",
+      "ejemplo": "25",
+      "categorias": [
+        "almacenamiento"
+      ],
+      "rango": false
+    }
+  ],
+  "gruposMedida": [
+    {
+      "id": "generales",
+      "nombre": "Generales"
+    },
+    {
+      "id": "asiento",
+      "nombre": "Asiento y respaldo"
+    },
+    {
+      "id": "cubierta",
+      "nombre": "Cubierta"
+    },
+    {
+      "id": "capacidad",
+      "nombre": "Capacidad"
+    },
+    {
+      "id": "guardado",
+      "nombre": "Guardado"
+    }
+  ],
+  "partes": [
+    {
+      "id": "tapiceria",
+      "nombre": "Tapicería",
+      "ejemplo": "Malla sobre marco de nylon",
+      "categorias": [
+        "sillas-ejecutivas",
+        "sillas-operativas",
+        "cafeterias",
+        "lounge-y-areas-comunes"
       ]
     },
     {
-      "campo": "entrega",
-      "nombre": "Disponibilidad",
-      "opciones": [
-        {
-          "id": "inmediata",
-          "nombre": "Entrega inmediata"
-        },
-        {
-          "id": "10dias",
-          "nombre": "Hasta 10 días"
-        },
-        {
-          "id": "pedido",
-          "nombre": "Sobre pedido"
-        }
+      "id": "asiento",
+      "nombre": "Asiento",
+      "ejemplo": "Espuma inyectada de alta densidad",
+      "categorias": [
+        "sillas-ejecutivas",
+        "sillas-operativas",
+        "cafeterias",
+        "lounge-y-areas-comunes",
+        "exteriores"
       ]
-    }
-  ],
-  "materiales": [
-    {
-      "id": "smartmesh",
-      "nombre": "Malla SmartMesh"
     },
     {
-      "id": "e-fabric",
-      "nombre": "Tela E-Fabric"
+      "id": "armazon",
+      "nombre": "Armazón",
+      "ejemplo": "Madera de pino tratada",
+      "categorias": [
+        "lounge-y-areas-comunes"
+      ]
     },
     {
-      "id": "technoleather",
-      "nombre": "Technoleather"
+      "id": "estructura",
+      "nombre": "Estructura",
+      "ejemplo": "Acero con pintura electrostática",
+      "categorias": null
     },
     {
-      "id": "eco-leather",
-      "nombre": "Eco-Leather"
+      "id": "cubierta",
+      "nombre": "Cubierta",
+      "ejemplo": "Melamina de 25 mm",
+      "categorias": [
+        "cafeterias",
+        "lounge-y-areas-comunes",
+        "exteriores",
+        "salas-de-juntas",
+        "escritorios",
+        "almacenamiento"
+      ]
     },
     {
-      "id": "piel",
-      "nombre": "Piel genuina"
+      "id": "suspension",
+      "nombre": "Suspensión",
+      "ejemplo": "Cinchos elásticos",
+      "categorias": [
+        "lounge-y-areas-comunes"
+      ]
     },
     {
-      "id": "madera",
-      "nombre": "Madera"
+      "id": "base",
+      "nombre": "Base",
+      "ejemplo": "Aluminio pulido de cinco puntas",
+      "categorias": null
     },
     {
-      "id": "metal",
-      "nombre": "Metal"
+      "id": "patas",
+      "nombre": "Patas",
+      "ejemplo": "Madera maciza de encino",
+      "categorias": [
+        "lounge-y-areas-comunes"
+      ]
     },
     {
-      "id": "cristal",
-      "nombre": "Cristal"
-    }
-  ],
-  "gruposColor": [
-    {
-      "id": "negro",
-      "nombre": "Negro",
-      "hex": "#1D1D1B"
+      "id": "ruedas",
+      "nombre": "Ruedas",
+      "ejemplo": "Ruedas de 60 mm para piso duro",
+      "categorias": [
+        "sillas-ejecutivas",
+        "sillas-operativas"
+      ]
     },
     {
-      "id": "gris",
-      "nombre": "Gris",
-      "hex": "#8A8A87"
-    },
-    {
-      "id": "blanco",
-      "nombre": "Blanco",
-      "hex": "#EFEEE8"
-    },
-    {
-      "id": "beige",
-      "nombre": "Beige",
-      "hex": "#C9B99B"
-    },
-    {
-      "id": "cafe",
-      "nombre": "Café",
-      "hex": "#5A4032"
-    },
-    {
-      "id": "azul",
-      "nombre": "Azul",
-      "hex": "#2B3A67"
-    },
-    {
-      "id": "verde",
-      "nombre": "Verde",
-      "hex": "#4A5D3A"
-    },
-    {
-      "id": "rojo",
-      "nombre": "Rojo",
-      "hex": "#8C2F2F"
+      "id": "acabado",
+      "nombre": "Acabado",
+      "ejemplo": "Pintura electrostática negra",
+      "categorias": [
+        "cafeterias",
+        "exteriores",
+        "salas-de-juntas",
+        "escritorios",
+        "almacenamiento"
+      ]
     }
   ],
   "espacios": [
@@ -232,44 +744,5 @@
       "id": "home-office",
       "nombre": "Home office"
     }
-  ],
-  "etiquetasMedida": {
-    "alto": "Altura total",
-    "largo": "Longitud",
-    "ancho": "Anchura",
-    "fondo": "Profundidad",
-    "diametro": "Diámetro",
-    "espesorCubierta": "Espesor de cubierta",
-    "alturaLibre": "Altura libre bajo cubierta",
-    "altoAsiento": "Altura del asiento",
-    "anchoAsiento": "Anchura del asiento",
-    "fondoAsiento": "Profundidad del asiento",
-    "altoRespaldo": "Altura del respaldo",
-    "brazoInterno": "Medida interna de brazos",
-    "brazoExterno": "Medida externa de brazos",
-    "cabecera": "Altura de cabecera",
-    "plazas": "Plazas",
-    "personas": "Personas",
-    "puestos": "Puestos de trabajo",
-    "puertas": "Puertas",
-    "gavetas": "Gavetas",
-    "entrepanos": "Entrepaños",
-    "apilables": "Piezas apilables",
-    "cargaEntrepano": "Carga por entrepaño",
-    "cargaGaveta": "Carga por gaveta",
-    "carga": "Carga máxima",
-    "peso": "Peso"
-  },
-  "etiquetasConstruccion": {
-    "tapiceria": "Tapicería",
-    "asiento": "Asiento",
-    "armazon": "Armazón",
-    "estructura": "Estructura",
-    "cubierta": "Cubierta",
-    "suspension": "Suspensión",
-    "base": "Base",
-    "patas": "Patas",
-    "ruedas": "Ruedas",
-    "acabado": "Acabado"
-  }
+  ]
 }

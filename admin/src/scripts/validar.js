@@ -3,7 +3,8 @@
 // Devuelven un objeto { campo: mensaje }. Vacío quiere decir que todo pasa.
 // La API real tiene que volver a validar: esto es comodidad para quien
 // captura, no seguridad.
-import { OBLIGATORIOS, SEGUN_CATEGORIA, MEDIDAS, ETIQUETAS } from "./esquemas/pieza.js";
+import { OBLIGATORIOS, MEDIDAS, ETIQUETAS } from "./esquemas/pieza.js";
+import { aplica, esObligatoria } from "./listas.js";
 
 // Lo que no puede ir en ningún texto del sitio (regla 1 y regla 3).
 const PROHIBIDAS = /\b(fabricante|fabricamos|comercializadora|distribuidor|mayorista|proveedor)\b/i;
@@ -43,8 +44,13 @@ export function validarPieza(pieza, listas) {
   for (const campo of OBLIGATORIOS) {
     if (vacio(valor(campo))) errores[campo] = `Falta ${ETIQUETAS[campo]}`;
   }
-  for (const campo of SEGUN_CATEGORIA[pieza.cat] || []) {
-    if (vacio(pieza[campo])) errores[campo] = `Falta ${ETIQUETAS[campo]}: lo piden las piezas de esta categoría`;
+  // las listas obligatorias en la categoría de la pieza
+  for (const l of listas?.listas || []) {
+    if (l.id === "colores" || !aplica(l, pieza.cat) || !esObligatoria(l, pieza.cat)) continue;
+    if (vacio(pieza[l.id])) {
+      const donde = l.obligatoria === "todas" ? "" : ": lo piden las piezas de esta categoría";
+      errores[l.id] = `Falta ${l.nombre.toLowerCase()}${donde}`;
+    }
   }
 
   if (pieza.slug && !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(pieza.slug)) {
@@ -60,15 +66,16 @@ export function validarPieza(pieza, listas) {
   if (er && !errores.resumen) errores.resumen = er;
 
   // Las listas cerradas: un valor fuera de la lista rompe el filtro sin aviso.
-  if (listas) {
-    const ids = (lista) => new Set((lista || []).map((o) => o.id));
-    const deFiltro = (campo) => ids(listas.filtros.find((f) => f.campo === campo)?.opciones);
-    if (pieza.material && !ids(listas.materiales).has(pieza.material)) errores.material = "Material fuera de la lista";
-    if ((pieza.acabados || []).some((a) => a.grupo && !ids(listas.gruposColor).has(a.grupo))) errores.acabados = "Hay un acabado con un grupo de color fuera de la lista";
-    for (const campo of ["uso", "respaldo", "brazos", "base", "plazas", "entrega"]) {
-      if (!vacio(pieza[campo]) && !deFiltro(campo).has(String(pieza[campo]))) errores[campo] = "Valor fuera de la lista";
+  for (const l of listas?.listas || []) {
+    const ids = new Set(l.opciones.map((o) => o.id));
+    if (l.id === "colores") {
+      if (acabadosDe(pieza).some((a) => a.grupo && !ids.has(a.grupo))) errores.acabados = "Hay un acabado con un grupo de color fuera de la lista";
+      continue;
     }
-    if ((pieza.extras || []).some((x) => !deFiltro("extras").has(x))) errores.extras = "Hay una característica fuera de la lista";
+    const v = pieza[l.id];
+    if (vacio(v)) continue;
+    const fuera = Array.isArray(v) ? v.some((x) => !ids.has(String(x))) : !ids.has(String(v));
+    if (fuera) errores[l.id] = l.seleccion === "varias" ? `Hay una opción de ${l.nombre.toLowerCase()} fuera de la lista` : "Valor fuera de la lista";
   }
 
   return errores;

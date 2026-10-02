@@ -1,10 +1,19 @@
 ---
-// Listas: las opciones cerradas que se eligen en cada pieza (material,
-// colores, tipo de uso, respaldo, descansabrazos, base, plazas,
-// características y disponibilidad). Es el único lugar donde se dan de alta,
-// se renombran, se ordenan y se quitan. Se guarda solo, como los Ajustes.
+// Listas: todo lo que se elige o se mide en una pieza y que comparten todas.
+//
+// · Las listas de opciones (material, colores, tipo de uso, respaldo… y las
+//   que se creen): si se elige una opción o varias, en qué categorías
+//   aparecen, en cuáles son obligatorias, si filtran en el sitio, y sus
+//   opciones.
+// · Las medidas: nombre, unidad, si admiten rango, su grupo y en qué
+//   categorías se piden.
+// · Las partes de construcción: nombre, ejemplo y en qué categorías se piden.
+//
+// Con esto el catálogo crece a cualquier tipo de mueble sin tocar código.
+// Se guarda solo, como los Ajustes.
 import Admin from "../layouts/Admin.astro";
 import IconoAdmin from "../components/IconoAdmin.astro";
+import Modal from "../components/Modal.astro";
 import "../styles/editor.css";
 import "../styles/listas.css";
 ---
@@ -12,205 +21,474 @@ import "../styles/listas.css";
   <div class="cabecera">
     <div class="cabecera-textos">
       <h1 class="t-pantalla">Listas</h1>
-      <p class="t-apoyo">Las opciones que se eligen en cada pieza y con las que se filtra el catálogo. Lo que cambies aquí aparece en todas las piezas y sale a pruebas al momento.</p>
+      <p class="t-apoyo">Todo lo que se elige o se mide en una pieza. Lo que cambies aquí aparece en todas las piezas y sale a pruebas al momento.</p>
+    </div>
+    <div class="cabecera-acciones">
+      <button class="boton boton--primario" type="button" data-nueva-lista><IconoAdmin name="mas" size={16} />Nueva lista</button>
     </div>
   </div>
 
-  <div class="listas" data-listas data-vista="indice">
-    <nav class="listas-indice" aria-label="Listas">
-      <ul class="grupo-lista" data-indice></ul>
-    </nav>
+  <nav class="pestanas" aria-label="Listas" data-pestanas></nav>
 
-    <section class="listas-detalle" aria-live="polite">
-      <button class="listas-volver" type="button" data-volver><IconoAdmin name="chevronIzq" size={18} />Listas</button>
-      <header class="listas-cabeza">
-        <h2 class="t-seccion" data-titulo-lista>&nbsp;</h2>
-        <p class="t-mini" data-nota-lista></p>
-      </header>
+  <section class="tarjeta listas-panel" data-panel aria-live="polite"></section>
 
-      <ul class="grupo-lista opciones" data-opciones></ul>
+  <!-- Elegir categorías: dónde aparece o dónde es obligatoria -->
+  <Modal id="modal-categorias" titulo="Categorías">
+    <label class="interruptor" data-todas-caja>
+      <input type="checkbox" data-todas />
+      <span class="interruptor-pista"></span>
+      <span class="interruptor-texto">Todas las categorías<small>Incluye las que se creen después</small></span>
+    </label>
+    <ul class="grupo-lista lista-casillas" data-casillas></ul>
+    <Fragment slot="pie">
+      <button class="boton" type="button" data-cierra-modal>Cancelar</button>
+      <button class="boton boton--primario" type="button" data-categorias-listo>Listo</button>
+    </Fragment>
+  </Modal>
 
-      <form class="agregar-opcion" data-agregar novalidate>
-        <span class="agregar-color" data-agregar-color hidden>
-          <input type="color" value="#8A8A87" data-color-nuevo aria-label="Color" />
-        </span>
-        <input class="control" type="text" data-nombre-nuevo placeholder="Nueva opción" autocomplete="off" aria-label="Nombre de la opción nueva" />
-        <button class="boton boton--primario" type="submit"><IconoAdmin name="mas" size={16} />Agregar</button>
-      </form>
-      <p class="campo-error" data-error-nuevo hidden style="display:block"></p>
-      <p class="t-mini listas-pie">Arrastra para cambiar el orden: así salen en la pieza y en los filtros del sitio. Para cambiar un nombre, tócalo. Una opción que usa alguna pieza no se puede quitar hasta cambiar esas piezas.</p>
-    </section>
-  </div>
+  <!-- Nueva lista -->
+  <Modal id="modal-lista" titulo="Nueva lista" texto="Por ejemplo &quot;Capacidad&quot; para botes de basura o &quot;Tipo de luz&quot; para lámparas. Después eliges en qué categorías aparece.">
+    <div class="campo">
+      <div class="campo-etiqueta"><label for="lista-nombre">Nombre</label></div>
+      <input class="control" id="lista-nombre" type="text" placeholder="Ej. Tipo de luz" autocomplete="off" data-lista-nombre />
+      <p class="campo-error" data-lista-error hidden style="display:block"></p>
+    </div>
+    <div class="campo">
+      <div class="campo-etiqueta"><span class="etiqueta">En cada pieza se elige</span></div>
+      <div class="segmentos segmentos--ancho" role="group" data-lista-seleccion>
+        <button class="segmento" type="button" data-valor="una" aria-pressed="true">Una opción</button>
+        <button class="segmento" type="button" data-valor="varias" aria-pressed="false">Varias opciones</button>
+      </div>
+    </div>
+    <Fragment slot="pie">
+      <button class="boton" type="button" data-cierra-modal>Cancelar</button>
+      <button class="boton boton--primario" type="button" data-lista-crear>Crear lista</button>
+    </Fragment>
+  </Modal>
+
+  <!-- Medida: alta y edición -->
+  <Modal id="modal-medida" titulo="Medida">
+    <div class="campo">
+      <div class="campo-etiqueta"><label for="medida-nombre">Nombre</label></div>
+      <input class="control" id="medida-nombre" type="text" placeholder="Ej. Capacidad" autocomplete="off" data-medida-nombre />
+      <p class="campo-error" data-medida-error hidden style="display:block"></p>
+    </div>
+    <div class="fila">
+      <div class="campo">
+        <div class="campo-etiqueta"><label for="medida-unidad">Unidad</label></div>
+        <select class="control" id="medida-unidad" data-medida-unidad>
+          <option value="cm">Centímetros (cm)</option>
+          <option value="mm">Milímetros (mm)</option>
+          <option value="m">Metros (m)</option>
+          <option value="kg">Kilos (kg)</option>
+          <option value="g">Gramos (g)</option>
+          <option value="L">Litros (L)</option>
+          <option value="W">Watts (W)</option>
+          <option value="K">Grados Kelvin (K)</option>
+          <option value="">Sin unidad: es una cuenta</option>
+        </select>
+      </div>
+      <div class="campo">
+        <div class="campo-etiqueta"><label for="medida-grupo">Grupo</label></div>
+        <select class="control" id="medida-grupo" data-medida-grupo></select>
+      </div>
+    </div>
+    <label class="interruptor">
+      <input type="checkbox" data-medida-rango />
+      <span class="interruptor-pista"></span>
+      <span class="interruptor-texto">Admite rango<small>Para lo que se ajusta: se escribe 45-55 y sale "45 a 55"</small></span>
+    </label>
+    <div class="campo">
+      <div class="campo-etiqueta"><span class="etiqueta">Se pide en</span><span class="etiqueta-acciones"><button class="enlace-chico" type="button" data-medida-cats>Elegir</button></span></div>
+      <p class="t-apoyo" data-medida-cats-texto></p>
+    </div>
+    <Fragment slot="pie">
+      <button class="boton boton--texto boton--texto-peligro izquierda" type="button" data-medida-quitar>Quitar</button>
+      <button class="boton" type="button" data-cierra-modal>Cancelar</button>
+      <button class="boton boton--primario" type="button" data-medida-guardar>Guardar</button>
+    </Fragment>
+  </Modal>
+
+  <!-- Parte de construcción: alta y edición -->
+  <Modal id="modal-parte" titulo="Parte de construcción">
+    <div class="campo">
+      <div class="campo-etiqueta"><label for="parte-nombre">Nombre</label></div>
+      <input class="control" id="parte-nombre" type="text" placeholder="Ej. Pantalla" autocomplete="off" data-parte-nombre />
+      <p class="campo-error" data-parte-error hidden style="display:block"></p>
+    </div>
+    <div class="campo">
+      <div class="campo-etiqueta"><label for="parte-ejemplo">Ejemplo</label></div>
+      <input class="control" id="parte-ejemplo" type="text" placeholder="Ej. Acrílico opalino" autocomplete="off" data-parte-ejemplo />
+      <p class="campo-ayuda">Sale como ayuda gris en el campo de la pieza.</p>
+    </div>
+    <div class="campo">
+      <div class="campo-etiqueta"><span class="etiqueta">Se pide en</span><span class="etiqueta-acciones"><button class="enlace-chico" type="button" data-parte-cats>Elegir</button></span></div>
+      <p class="t-apoyo" data-parte-cats-texto></p>
+    </div>
+    <Fragment slot="pie">
+      <button class="boton boton--texto boton--texto-peligro izquierda" type="button" data-parte-quitar>Quitar</button>
+      <button class="boton" type="button" data-cierra-modal>Cancelar</button>
+      <button class="boton boton--primario" type="button" data-parte-guardar>Guardar</button>
+    </Fragment>
+  </Modal>
 </Admin>
 
 <script>
   import { listar, guardar } from "../scripts/api.js";
-  import { confirmar, avisar, escapar } from "../scripts/ui.js";
+  import { abrirModal, cerrarModal, confirmar, avisar, escapar } from "../scripts/ui.js";
   import { limpiarSlug } from "../scripts/validar.js";
+  import { idNuevo } from "../scripts/listas.js";
 
-  const base = import.meta.env.BASE_URL;
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
-  const caja = $("[data-listas]");
+  const sinAcentos = (t) => (t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  const TANDA = 60; // cuántas opciones se pintan de golpe; el resto con "Mostrar más"
+  // nombres que ya usa la pieza y no pueden ser id de una lista
+  const RESERVADOS = new Set(["nombre", "slug", "tipo", "cat", "img", "alts", "alt", "nuevo", "acabados", "espacios", "combina", "ficha", "estado", "actualizado"]);
 
-  // Qué listas hay, cómo se llaman aquí y qué campo de la pieza las usa.
-  const LISTAS = [
-    { id: "materiales", nombre: "Materiales", campo: "material", nota: "El material principal de cada pieza. Una sola opción por pieza." },
-    { id: "gruposColor", nombre: "Grupos de color", campo: "colores", color: true, nota: "Los grupos por los que se filtra. El nombre comercial de cada tela o acabado se escribe en la pieza; aquí va el color del círculo." },
-    { id: "uso", nombre: "Tipo de uso", campo: "uso", nota: "Para qué se usa la pieza. Obligatorio en todas." },
-    { id: "respaldo", nombre: "Respaldo", campo: "respaldo", nota: "Se pide en sillas." },
-    { id: "brazos", nombre: "Descansabrazos", campo: "brazos", nota: "Se pide en sillas." },
-    { id: "base", nombre: "Base", campo: "base", nota: "Se pide en sillas, mesas y escritorios." },
-    { id: "plazas", nombre: "Plazas", campo: "plazas", nota: "Se pide en sofás y bancas." },
-    { id: "extras", nombre: "Características", campo: "extras", nota: "Varias por pieza: apilable, con ruedas…" },
-    { id: "entrega", nombre: "Disponibilidad", campo: "entrega", nota: "En cuánto se entrega. Sale en la ficha y en el recuadro de entrega." },
-  ];
+  let listas = null, piezas = [], categorias = [];
+  let vista = "material";      // id de una lista, "medidas" o "partes"
+  let busqueda = "";
+  let mostradas = TANDA;
 
-  let listas = null;
-  let piezas = [];
-  let actual = LISTAS[0];
-
-  const opcionesDe = (l) =>
-    l.id === "materiales" ? listas.materiales
-    : l.id === "gruposColor" ? listas.gruposColor
-    : listas.filtros.find((f) => f.campo === l.id)?.opciones || [];
-
-  const usanOpcion = (l, id) =>
-    piezas.filter((p) => {
-      const v = l.campo === "colores" ? (p.acabados?.length ? p.acabados.map((a) => a.grupo) : p.colores) : p[l.campo];
-      return Array.isArray(v) ? v.includes(id) : String(v ?? "") === id;
-    });
-
-  /* ---------- Pintar ---------- */
-  function pintarIndice() {
-    $("[data-indice]").innerHTML = LISTAS.map((l) => `
-      <li><a class="fila-lista fila-lista--enlace${l === actual ? " activa" : ""}" href="#${l.id}" data-lista="${l.id}">
-        <span class="fila-lista-etiqueta">${escapar(l.nombre)}</span>
-        <span class="fila-lista-cuenta">${opcionesDe(l).length}</span>
-        <svg class="fila-lista-flecha" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 5 5 5-5 5"/></svg>
-      </a></li>`).join("");
-  }
-
-  function pintarDetalle() {
-    $("[data-titulo-lista]").textContent = actual.nombre;
-    $("[data-nota-lista]").textContent = actual.nota;
-    $("[data-agregar-color]").hidden = !actual.color;
-    $("[data-nombre-nuevo]").placeholder = actual.color ? "Nuevo grupo, ej. Naranja" : `Nueva opción de ${actual.nombre.toLowerCase()}`;
-    $("[data-error-nuevo]").hidden = true;
-    const ops = opcionesDe(actual);
-    $("[data-opciones]").innerHTML = ops.length
-      ? ops.map((o, i) => {
-          const n = usanOpcion(actual, o.id).length;
-          return `<li class="fila-lista opcion-lista" data-i="${i}">
-            <span class="opcion-asa" data-asa aria-label="Arrastrar para ordenar" title="Arrastrar para ordenar"><svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><circle cx="7.5" cy="5.5" r="1.3"/><circle cx="12.5" cy="5.5" r="1.3"/><circle cx="7.5" cy="10" r="1.3"/><circle cx="12.5" cy="10" r="1.3"/><circle cx="7.5" cy="14.5" r="1.3"/><circle cx="12.5" cy="14.5" r="1.3"/></svg></span>
-            ${actual.color ? `<label class="opcion-color" style="background:${escapar(o.hex)}"><input type="color" value="${escapar(o.hex)}" data-color aria-label="Color de ${escapar(o.nombre)}" /></label>` : ""}
-            <input class="fila-lista-control fila-lista-control--izq" type="text" value="${escapar(o.nombre)}" data-nombre aria-label="Nombre de la opción" />
-            <span class="opcion-uso${n ? "" : " opcion-uso--libre"}">${n ? `${n} ${n === 1 ? "pieza" : "piezas"}` : "sin usar"}</span>
-            <button class="fila-lista-quitar" type="button" data-quitar aria-label="Quitar ${escapar(o.nombre)}"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h12M8 6V4.5A.5.5 0 0 1 8.5 4h3a.5.5 0 0 1 .5.5V6M6 6l.7 9.3a1 1 0 0 0 1 .7h4.6a1 1 0 0 0 1-.7L14 6"/></svg></button>
-          </li>`;
-        }).join("")
-      : `<li class="fila-lista opciones-vacia">Todavía no hay opciones. Agrega la primera abajo.</li>`;
-    cablearOpciones();
-  }
-
-  function pintar() {
-    pintarIndice();
-    pintarDetalle();
-  }
+  /* ============================================
+     Datos y uso
+     ============================================ */
+  const laLista = () => listas.listas.find((l) => l.id === vista);
+  const nombreCat = (slug) => categorias.find((c) => c.slug === slug)?.name || slug;
+  const resumenCats = (cats, vacio = "Ninguna") => {
+    if (!cats) return "Todas las categorías";
+    if (!cats.length) return vacio;
+    const n = cats.map(nombreCat);
+    return n.length <= 3 ? n.join(", ") : `${n.slice(0, 2).join(", ")} y ${n.length - 2} más`;
+  };
+  const valoresDe = (p, l) => {
+    const v = l.id === "colores" ? (p.acabados?.length ? p.acabados.map((a) => a.grupo) : p.colores) : p[l.id];
+    return (Array.isArray(v) ? v : v == null || v === "" ? [] : [String(v)]).filter(Boolean);
+  };
+  const usanOpcion = (l, id) => piezas.filter((p) => valoresDe(p, l).includes(id));
+  const usanLista = (l) => piezas.filter((p) => valoresDe(p, l).length);
+  const usanMedida = (id) => piezas.filter((p) => p.ficha?.medidas?.[id]);
+  const usanParte = (id) => piezas.filter((p) => p.ficha?.construccion?.[id]);
+  const nombresDe = (ps) => ps.slice(0, 4).map((p) => p.nombre).join(", ") + (ps.length > 4 ? ` y ${ps.length - 4} más` : "");
 
   /* ---------- Guardar: cada cambio se guarda solo ---------- */
-  let guardando = Promise.resolve();
+  let cola = Promise.resolve();
   function guardarListas(mensaje) {
-    guardando = guardando.then(async () => {
+    cola = cola.then(async () => {
       try {
-        // lo local manda: la respuesta no sustituye a `listas`, para que una
-        // edición hecha mientras se guardaba no se pierda
-        await guardar("listas", listas);
+        await guardar("listas", listas); // lo local manda: no se sustituye con la respuesta
         dispatchEvent(new CustomEvent("neucast:guardado"));
         if (mensaje) avisar(mensaje);
       } catch (e) {
         avisar(e.message || "No se pudo guardar", { tipo: "error" });
       }
     });
-    return guardando;
+    return cola;
   }
 
-  /* ---------- Opciones: renombrar, color, quitar, ordenar ---------- */
+  /* ============================================
+     Pestañas
+     ============================================ */
+  function pintarPestanas() {
+    const tabs = [
+      ...listas.listas.map((l) => ({ id: l.id, nombre: l.nombre, n: l.opciones.length })),
+      { sep: true },
+      { id: "medidas", nombre: "Medidas", n: listas.medidas.length },
+      { id: "partes", nombre: "Partes de construcción", n: listas.partes.length },
+    ];
+    const caja = $("[data-pestanas]");
+    caja.innerHTML = tabs
+      .map((t) => t.sep
+        ? '<span class="pestana-sep" aria-hidden="true"></span>'
+        : `<a class="pestana${t.id === vista ? " activa" : ""}" href="#${escapar(t.id)}" data-vista="${escapar(t.id)}" ${t.id === vista ? 'aria-current="page"' : ""}>${escapar(t.nombre)}<span class="pestana-n">${t.n}</span></a>`)
+      .join("");
+    const activa = $(".pestana.activa", caja);
+    if (activa && caja.scrollWidth > caja.clientWidth) {
+      caja.scrollTo({ left: activa.offsetLeft - caja.clientWidth / 2 + activa.offsetWidth / 2, behavior: "smooth" });
+    }
+  }
+  $("[data-pestanas]").addEventListener("click", (e) => {
+    const a = e.target.closest("[data-vista]");
+    if (!a) return;
+    e.preventDefault();
+    ir(a.dataset.vista);
+  });
+  function ir(id, empujar = true) {
+    const existe = id === "medidas" || id === "partes" || listas.listas.some((l) => l.id === id);
+    vista = existe ? id : listas.listas[0].id;
+    busqueda = "";
+    mostradas = TANDA;
+    if (empujar) history.replaceState(null, "", `#${vista}`);
+    pintar();
+  }
+  addEventListener("hashchange", () => ir(location.hash.slice(1), false));
+
+  function pintar() {
+    pintarPestanas();
+    if (vista === "medidas") return pintarMedidas();
+    if (vista === "partes") return pintarPartes();
+    pintarLista();
+  }
+
+  /* ============================================
+     Una lista de opciones
+     ============================================ */
+  function pintarLista() {
+    const l = laLista();
+    const panel = $("[data-panel]");
+    const usadas = usanLista(l).length;
+    const sistema = !!l.sistema;
+    panel.innerHTML = `
+      <header class="panel-cabeza">
+        <div>
+          <h2 class="t-seccion">${escapar(l.nombre)}</h2>
+          <p class="t-mini">${escapar(l.nota || (l.seleccion === "varias" ? "En cada pieza se pueden elegir varias." : "En cada pieza se elige una."))}</p>
+        </div>
+      </header>
+
+      <div class="panel-bloque">
+        <span class="grupo-rotulo">Cómo funciona</span>
+        <ul class="grupo-lista ajustes-lista">
+          <li class="fila-lista">
+            <span class="fila-lista-etiqueta fila-lista-etiqueta--fija">Nombre</span>
+            <input class="fila-lista-control fila-lista-control--izq" type="text" value="${escapar(l.nombre)}" data-cfg-nombre aria-label="Nombre de la lista" />
+          </li>
+          <li class="fila-lista">
+            <span class="fila-lista-etiqueta">En cada pieza se elige</span>
+            ${sistema
+              ? `<span class="fila-lista-valor">${l.seleccion === "varias" ? "Varias opciones" : "Una opción"}</span>`
+              : `<div class="segmentos" role="group" data-cfg-seleccion>
+                  <button class="segmento" type="button" data-valor="una" aria-pressed="${l.seleccion !== "varias"}">Una</button>
+                  <button class="segmento" type="button" data-valor="varias" aria-pressed="${l.seleccion === "varias"}">Varias</button>
+                </div>`}
+          </li>
+          <li class="fila-lista${sistema ? "" : " fila-lista--enlace"}" ${sistema ? "" : 'data-cfg-cats="categorias" tabindex="0" role="button"'}>
+            <span class="fila-lista-etiqueta">Aparece en</span>
+            <span class="fila-lista-valor">${escapar(resumenCats(l.categorias))}</span>
+            ${sistema ? "" : '<svg class="fila-lista-flecha" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 5 5 5-5 5"/></svg>'}
+          </li>
+          <li class="fila-lista${sistema ? "" : " fila-lista--enlace"}" ${sistema ? "" : 'data-cfg-cats="obligatoria" tabindex="0" role="button"'}>
+            <span class="fila-lista-etiqueta">Obligatoria en</span>
+            <span class="fila-lista-valor">${escapar(l.obligatoria === "todas" ? "Todas las categorías" : resumenCats(l.obligatoria, "Ninguna: es opcional"))}</span>
+            ${sistema ? "" : '<svg class="fila-lista-flecha" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 5 5 5-5 5"/></svg>'}
+          </li>
+          <li class="fila-lista">
+            <span class="fila-lista-etiqueta">Filtra en el catálogo del sitio<small class="fila-lista-sub">Aparece en el panel de filtros de /muebles/</small></span>
+            <label class="interruptor interruptor--solo">
+              <input type="checkbox" data-cfg-filtro ${l.filtro ? "checked" : ""} ${sistema ? "disabled" : ""} aria-label="Filtra en el catálogo del sitio" />
+              <span class="interruptor-pista"></span>
+            </label>
+          </li>
+        </ul>
+        ${sistema ? '<p class="t-mini panel-nota">Esta lista la usa todo el catálogo: se pueden cambiar su nombre y sus opciones, pero no dónde aparece ni si es obligatoria.</p>' : ""}
+      </div>
+
+      <div class="panel-bloque">
+        <div class="opciones-cabeza">
+          <span class="grupo-rotulo">Opciones <span class="opciones-cuenta" data-cuenta></span></span>
+          ${l.opciones.length > 8 ? `<div class="control--con-icono opciones-buscar"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="9" cy="9" r="5.5"/><path d="M13.2 13.2 17 17"/></svg><input class="control" type="search" placeholder="Buscar en ${escapar(l.nombre.toLowerCase())}" value="${escapar(busqueda)}" data-buscar aria-label="Buscar opciones" /></div>` : ""}
+        </div>
+        <ul class="grupo-lista opciones" data-opciones></ul>
+        <button class="boton boton--suave mostrar-mas" type="button" data-mas hidden></button>
+        <form class="agregar-opcion" data-agregar novalidate>
+          ${l.color ? '<span class="agregar-color" style="background:#8A8A87"><input type="color" value="#8A8A87" data-color-nuevo aria-label="Color" /></span>' : ""}
+          <input class="control" type="text" data-nombre-nuevo placeholder="${l.color ? "Nuevo grupo, ej. Naranja" : `Nueva opción de ${escapar(l.nombre.toLowerCase())}`}" autocomplete="off" aria-label="Nombre de la opción nueva" />
+          <button class="boton boton--primario" type="submit"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg>Agregar</button>
+        </form>
+        <p class="campo-error" data-error-nuevo hidden style="display:block"></p>
+        <p class="t-mini panel-nota">Arrastra la asa para ordenar: así salen en la pieza y en los filtros del sitio. Para cambiar un nombre, tócalo. Una opción en uso no se puede quitar hasta cambiar las piezas que la usan.</p>
+      </div>
+
+      ${sistema ? "" : `<div class="panel-pie">
+        <button class="boton boton--texto boton--texto-peligro" type="button" data-quitar-lista>Eliminar la lista</button>
+        <span class="t-mini">${usadas ? `La usan ${usadas} ${usadas === 1 ? "pieza" : "piezas"}` : "Ninguna pieza la usa"}</span>
+      </div>`}`;
+    pintarOpciones();
+    cablearLista();
+  }
+
+  function filtradas(l) {
+    const t = sinAcentos(busqueda.trim());
+    return l.opciones.map((o, i) => ({ o, i })).filter(({ o }) => !t || sinAcentos(o.nombre).includes(t));
+  }
+
+  function pintarOpciones() {
+    const l = laLista();
+    const lista = filtradas(l);
+    const visibles = lista.slice(0, mostradas);
+    $("[data-cuenta]").textContent = busqueda ? `· ${lista.length} de ${l.opciones.length}` : `· ${l.opciones.length}`;
+    $("[data-opciones]").innerHTML = visibles.length
+      ? visibles.map(({ o, i }) => {
+          const n = usanOpcion(l, o.id).length;
+          return `<li class="fila-lista opcion-lista" data-i="${i}">
+            <span class="opcion-asa" data-asa ${busqueda ? 'hidden' : ""} aria-label="Arrastrar para ordenar" title="Arrastrar para ordenar"><svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><circle cx="7.5" cy="5.5" r="1.3"/><circle cx="12.5" cy="5.5" r="1.3"/><circle cx="7.5" cy="10" r="1.3"/><circle cx="12.5" cy="10" r="1.3"/><circle cx="7.5" cy="14.5" r="1.3"/><circle cx="12.5" cy="14.5" r="1.3"/></svg></span>
+            ${l.color ? `<label class="opcion-color" style="background:${escapar(o.hex || "#ccc")}"><input type="color" value="${escapar(o.hex || "#cccccc")}" data-color aria-label="Color de ${escapar(o.nombre)}" /></label>` : ""}
+            <input class="fila-lista-control fila-lista-control--izq" type="text" value="${escapar(o.nombre)}" data-nombre aria-label="Nombre de la opción" />
+            <span class="opcion-uso${n ? "" : " opcion-uso--libre"}">${n ? `${n} ${n === 1 ? "pieza" : "piezas"}` : "sin usar"}</span>
+            <button class="fila-lista-quitar" type="button" data-quitar aria-label="Quitar ${escapar(o.nombre)}"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h12M8 6V4.5A.5.5 0 0 1 8.5 4h3a.5.5 0 0 1 .5.5V6M6 6l.7 9.3a1 1 0 0 0 1 .7h4.6a1 1 0 0 0 1-.7L14 6"/></svg></button>
+          </li>`;
+        }).join("")
+      : `<li class="fila-lista opciones-vacia">${busqueda ? "Ninguna opción coincide." : "Todavía no hay opciones. Agrega la primera abajo."}</li>`;
+    const resto = lista.length - visibles.length;
+    const mas = $("[data-mas]");
+    mas.hidden = resto <= 0;
+    mas.textContent = `Mostrar ${Math.min(TANDA, resto)} más de ${resto}`;
+    cablearOpciones();
+  }
+
+  function cablearLista() {
+    const l = laLista();
+    const nombre = $("[data-cfg-nombre]");
+    nombre.addEventListener("blur", () => {
+      const v = nombre.value.trim().replace(/\s+/g, " ");
+      if (!v || v === l.nombre) return (nombre.value = l.nombre);
+      if (listas.listas.some((x) => x !== l && sinAcentos(x.nombre) === sinAcentos(v))) {
+        avisar("Ya hay otra lista con ese nombre", { tipo: "alerta" });
+        return (nombre.value = l.nombre);
+      }
+      l.nombre = v; // el id no cambia: las piezas la siguen encontrando
+      pintarPestanas();
+      $(".panel-cabeza .t-seccion").textContent = v;
+      guardarListas(`La lista ahora se llama "${v}"`);
+    });
+    nombre.addEventListener("keydown", (e) => e.key === "Enter" && (e.preventDefault(), nombre.blur()));
+
+    $("[data-cfg-seleccion]")?.addEventListener("click", async (e) => {
+      const b = e.target.closest("[data-valor]");
+      if (!b || b.dataset.valor === l.seleccion) return;
+      if (b.dataset.valor === "una") {
+        const conVarias = piezas.filter((p) => Array.isArray(p[l.id]) && p[l.id].length > 1);
+        if (conVarias.length) {
+          await confirmar({ titulo: "Hay piezas con varias opciones", texto: `${nombresDe(conVarias)} tienen más de una. Déjales una sola y después cambia la lista a "una opción".`, accion: "Entendido" });
+          return;
+        }
+      }
+      l.seleccion = b.dataset.valor;
+      pintarLista();
+      guardarListas(l.seleccion === "varias" ? "Ahora se pueden elegir varias" : "Ahora se elige una sola");
+    });
+
+    $$("[data-cfg-cats]").forEach((fila) => {
+      const abrir = () => elegirCategorias(fila.dataset.cfgCats);
+      fila.addEventListener("click", abrir);
+      fila.addEventListener("keydown", (e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), abrir()));
+    });
+
+    $("[data-cfg-filtro]").addEventListener("change", (e) => {
+      l.filtro = e.target.checked;
+      guardarListas(l.filtro ? "Filtra en el catálogo del sitio" : "Ya no filtra en el catálogo");
+    });
+
+    const buscar = $("[data-buscar]");
+    buscar?.addEventListener("input", () => {
+      busqueda = buscar.value;
+      mostradas = TANDA;
+      pintarOpciones();
+    });
+    $("[data-mas]").addEventListener("click", () => {
+      mostradas += TANDA;
+      pintarOpciones();
+    });
+
+    $("[data-color-nuevo]")?.addEventListener("input", (e) => (e.target.parentElement.style.background = e.target.value));
+    $("[data-agregar]").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const campo = $("[data-nombre-nuevo]");
+      const error = $("[data-error-nuevo]");
+      const nombreN = campo.value.trim().replace(/\s+/g, " ");
+      if (!nombreN) return campo.focus();
+      if (l.opciones.some((o) => sinAcentos(o.nombre) === sinAcentos(nombreN))) {
+        error.textContent = "Esa opción ya está en la lista.";
+        error.hidden = false;
+        return;
+      }
+      error.hidden = true;
+      const nueva = { id: idNuevo(nombreN, l.opciones, limpiarSlug), nombre: nombreN };
+      if (l.color) nueva.hex = $("[data-color-nuevo]").value.toUpperCase();
+      l.opciones.push(nueva);
+      campo.value = "";
+      busqueda = "";
+      mostradas = Math.max(mostradas, l.opciones.length);
+      pintarPestanas();
+      pintarOpciones();
+      guardarListas(`Se agregó "${nombreN}"`);
+      campo.focus();
+    });
+
+    $("[data-quitar-lista]")?.addEventListener("click", async () => {
+      const usan = usanLista(l);
+      if (usan.length) {
+        await confirmar({ titulo: `"${l.nombre}" está en uso`, texto: `La usan ${usan.length} ${usan.length === 1 ? "pieza" : "piezas"}: ${nombresDe(usan)}. Quítasela a esas piezas y después podrás eliminarla.`, accion: "Entendido" });
+        return;
+      }
+      const ok = await confirmar({ titulo: `Eliminar "${l.nombre}"`, texto: "Ninguna pieza la usa. Deja de aparecer en las piezas y en los filtros del sitio.", accion: "Eliminar", peligro: true });
+      if (!ok) return;
+      listas.listas = listas.listas.filter((x) => x !== l);
+      guardarListas(`Se eliminó "${l.nombre}"`);
+      ir(listas.listas[0].id);
+    });
+  }
+
   function cablearOpciones() {
+    const l = laLista();
     $$(".opcion-lista").forEach((fila) => {
       const i = +fila.dataset.i;
       const nombre = $("[data-nombre]", fila);
-      const original = opcionesDe(actual)[i].nombre;
-      const confirmarNombre = () => {
-        const ops = opcionesDe(actual);
+      nombre.addEventListener("blur", () => {
+        const o = l.opciones[i];
         const v = nombre.value.trim().replace(/\s+/g, " ");
-        if (!v) { nombre.value = original; return; }
-        if (v === ops[i].nombre) return;
-        if (ops.some((o, j) => j !== i && o.nombre.toLowerCase() === v.toLowerCase())) {
+        if (!v) return (nombre.value = o.nombre);
+        if (v === o.nombre) return;
+        if (l.opciones.some((x, j) => j !== i && sinAcentos(x.nombre) === sinAcentos(v))) {
           avisar("Ya hay otra opción con ese nombre", { tipo: "alerta" });
-          nombre.value = ops[i].nombre;
-          return;
+          return (nombre.value = o.nombre);
         }
-        ops[i].nombre = v; // el id no cambia: las piezas la siguen encontrando
+        o.nombre = v; // el id no cambia
         guardarListas(`Ahora se llama "${v}"`);
-        pintarIndice();
-      };
-      nombre.addEventListener("blur", confirmarNombre);
+      });
       nombre.addEventListener("keydown", (e) => {
         if (e.key === "Enter") { e.preventDefault(); nombre.blur(); }
-        if (e.key === "Escape") { nombre.value = opcionesDe(actual)[i].nombre; nombre.blur(); }
+        if (e.key === "Escape") { nombre.value = l.opciones[i].nombre; nombre.blur(); }
       });
       const color = $("[data-color]", fila);
       color?.addEventListener("input", () => (color.parentElement.style.background = color.value));
       color?.addEventListener("change", () => {
-        const o = opcionesDe(actual)[i];
-        o.hex = color.value.toUpperCase();
-        guardarListas(`Se cambió el color de ${o.nombre}`);
+        l.opciones[i].hex = color.value.toUpperCase();
+        guardarListas(`Se cambió el color de ${l.opciones[i].nombre}`);
       });
-      $("[data-quitar]", fila).addEventListener("click", () => quitar(i));
-      $("[data-asa]", fila).addEventListener("pointerdown", (e) => arrastrar(e, fila));
+      $("[data-quitar]", fila).addEventListener("click", () => quitarOpcion(l, i));
+      $("[data-asa]", fila).addEventListener("pointerdown", (e) => arrastrar(e, fila, l));
     });
   }
 
-  async function quitar(i) {
-    const ops = opcionesDe(actual);
-    const o = ops[i];
-    const usan = usanOpcion(actual, o.id);
+  async function quitarOpcion(l, i) {
+    const o = l.opciones[i];
+    const usan = usanOpcion(l, o.id);
     if (usan.length) {
-      const nombres = usan.slice(0, 4).map((p) => p.nombre).join(", ") + (usan.length > 4 ? ` y ${usan.length - 4} más` : "");
-      await confirmar({
-        titulo: `"${o.nombre}" está en uso`,
-        texto: `La usan ${usan.length} ${usan.length === 1 ? "pieza" : "piezas"}: ${nombres}. Cámbialas a otra opción y después podrás quitarla.`,
-        accion: "Entendido",
-      });
+      await confirmar({ titulo: `"${o.nombre}" está en uso`, texto: `La usan ${usan.length} ${usan.length === 1 ? "pieza" : "piezas"}: ${nombresDe(usan)}. Cámbialas a otra opción y después podrás quitarla.`, accion: "Entendido" });
       return;
     }
-    const ok = await confirmar({
-      titulo: `Quitar "${o.nombre}"`,
-      texto: "Ninguna pieza la usa. Deja de aparecer en las piezas y en los filtros del sitio.",
-      accion: "Quitar",
-      peligro: true,
-    });
+    const ok = await confirmar({ titulo: `Quitar "${o.nombre}"`, texto: "Ninguna pieza la usa. Deja de aparecer en las piezas y en los filtros del sitio.", accion: "Quitar", peligro: true });
     if (!ok) return;
-    ops.splice(i, 1);
-    pintar();
+    l.opciones.splice(i, 1);
+    pintarPestanas();
+    pintarOpciones();
     guardarListas(`Se quitó "${o.nombre}"`);
   }
 
   // Ordenar arrastrando la asa: funciona con ratón y con el dedo.
-  function arrastrar(e, fila) {
+  function arrastrar(e, fila, l) {
     e.preventDefault();
-    const lista = $("[data-opciones]");
-    const filas = () => $$(".opcion-lista", lista);
+    const caja = $("[data-opciones]");
+    const filas = () => $$(".opcion-lista", caja);
     const desde = filas().indexOf(fila);
     fila.classList.add("arrastrando");
-    fila.setPointerCapture(e.pointerId);
+    try { fila.setPointerCapture(e.pointerId); } catch {}
     const mover = (ev) => {
-      const y = ev.clientY;
-      const otras = filas().filter((f) => f !== fila);
-      const despues = otras.find((f) => y < f.getBoundingClientRect().top + f.offsetHeight / 2);
-      if (despues) lista.insertBefore(fila, despues);
-      else lista.appendChild(fila);
+      const despues = filas().filter((f) => f !== fila).find((f) => ev.clientY < f.getBoundingClientRect().top + f.offsetHeight / 2);
+      if (despues) caja.insertBefore(fila, despues);
+      else caja.appendChild(fila);
     };
     const soltar = () => {
       fila.classList.remove("arrastrando");
@@ -219,10 +497,11 @@ import "../styles/listas.css";
       fila.removeEventListener("pointercancel", soltar);
       const hasta = filas().indexOf(fila);
       if (hasta === desde) return;
-      const ops = opcionesDe(actual);
-      const [o] = ops.splice(desde, 1);
-      ops.splice(hasta, 0, o);
-      pintarDetalle();
+      // los índices de la vista son los mismos que los de la lista: sin
+      // búsqueda la asa se ve y la tanda empieza en cero
+      const [o] = l.opciones.splice(desde, 1);
+      l.opciones.splice(hasta, 0, o);
+      pintarOpciones();
       guardarListas("Orden guardado");
     };
     fila.addEventListener("pointermove", mover);
@@ -230,54 +509,267 @@ import "../styles/listas.css";
     fila.addEventListener("pointercancel", soltar);
   }
 
-  /* ---------- Agregar ---------- */
-  $("[data-agregar]").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const campo = $("[data-nombre-nuevo]");
-    const error = $("[data-error-nuevo]");
-    const nombre = campo.value.trim().replace(/\s+/g, " ");
-    if (!nombre) { campo.focus(); return; }
-    const ops = opcionesDe(actual);
-    if (ops.some((o) => o.nombre.toLowerCase() === nombre.toLowerCase())) {
-      error.textContent = "Esa opción ya está en la lista.";
-      error.hidden = false;
+  /* ============================================
+     Elegir categorías (para listas, medidas y partes)
+     ============================================ */
+  let alElegir = null;
+  function abrirCategorias({ titulo, texto, valor, permitirTodas = true, opcionesCats = null }, listo) {
+    $("#modal-categorias [data-titulo]").textContent = titulo;
+    $("#modal-categorias [data-texto]").textContent = texto || "";
+    const todas = $("[data-todas]");
+    $("[data-todas-caja]").hidden = !permitirTodas;
+    todas.checked = permitirTodas && valor === null;
+    const cats = opcionesCats || categorias.map((c) => c.slug);
+    $("[data-casillas]").innerHTML = cats
+      .map((slug) => `<li><label class="fila-lista casilla">
+        <input type="checkbox" value="${escapar(slug)}" ${valor === null || (valor || []).includes(slug) ? "checked" : ""} />
+        <span class="casilla-marca" aria-hidden="true"></span>
+        <span class="fila-lista-etiqueta">${escapar(nombreCat(slug))}</span>
+      </label></li>`)
+      .join("") || '<li class="fila-lista opciones-vacia">No hay categorías donde aparezca.</li>';
+    const sincronizar = () => $("[data-casillas]").classList.toggle("bloqueada", todas.checked);
+    todas.onchange = () => {
+      if (todas.checked) $$("[data-casillas] input").forEach((i) => (i.checked = true));
+      sincronizar();
+    };
+    sincronizar();
+    alElegir = () => listo(todas.checked ? null : $$("[data-casillas] input:checked").map((i) => i.value));
+    abrirModal("modal-categorias");
+  }
+  $("[data-categorias-listo]").addEventListener("click", () => {
+    alElegir?.();
+    cerrarModal("modal-categorias");
+  });
+
+  function elegirCategorias(que) {
+    const l = laLista();
+    if (que === "categorias") {
+      abrirCategorias({ titulo: `Dónde aparece "${l.nombre}"`, texto: "Las piezas de estas categorías la ven en su formulario.", valor: l.categorias }, (v) => {
+        l.categorias = v;
+        // lo obligatorio no puede salirse de donde aparece
+        if (Array.isArray(l.obligatoria) && v) l.obligatoria = l.obligatoria.filter((c) => v.includes(c));
+        pintarLista();
+        guardarListas("Se guardó dónde aparece");
+      });
+    } else {
+      abrirCategorias({
+        titulo: `Dónde es obligatoria "${l.nombre}"`,
+        texto: "En estas categorías no se puede publicar una pieza sin elegirla.",
+        valor: l.obligatoria === "todas" ? null : l.obligatoria,
+        permitirTodas: !l.categorias,
+        opcionesCats: l.categorias,
+      }, (v) => {
+        l.obligatoria = v === null ? "todas" : v;
+        pintarLista();
+        guardarListas("Se guardó dónde es obligatoria");
+      });
+    }
+  }
+
+  /* ============================================
+     Medidas
+     ============================================ */
+  function pintarMedidas() {
+    const panel = $("[data-panel]");
+    panel.innerHTML = `
+      <header class="panel-cabeza">
+        <div>
+          <h2 class="t-seccion">Medidas</h2>
+          <p class="t-mini">Lo que se mide en una pieza, con su unidad. Cada categoría pide las suyas; las demás quedan a la mano en "Más medidas".</p>
+        </div>
+        <button class="boton boton--primario" type="button" data-nueva-medida><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg>Nueva medida</button>
+      </header>
+      ${listas.gruposMedida.map((g) => {
+        const ms = listas.medidas.filter((m) => m.grupo === g.id);
+        if (!ms.length) return "";
+        return `<div class="panel-bloque">
+          <span class="grupo-rotulo">${escapar(g.nombre)}</span>
+          <ul class="grupo-lista">${ms.map((m) => `
+            <li><button class="fila-lista fila-lista--enlace fila-boton" type="button" data-medida="${escapar(m.id)}">
+              <span class="fila-lista-etiqueta">${escapar(m.nombre)}</span>
+              <span class="pastilla">${m.unidad ? escapar(m.unidad) : "cuenta"}${m.rango ? " · rango" : ""}</span>
+              <span class="fila-lista-valor fila-lista-valor--corto">${escapar(resumenCats(m.categorias))}</span>
+              <svg class="fila-lista-flecha" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 5 5 5-5 5"/></svg>
+            </button></li>`).join("")}</ul>
+        </div>`;
+      }).join("")}`;
+    $$("[data-medida]").forEach((b) => b.addEventListener("click", () => editarMedida(b.dataset.medida)));
+    $("[data-nueva-medida]").addEventListener("click", () => editarMedida(null));
+  }
+
+  let medidaAbierta = null, medidaCats = null;
+  function editarMedida(id) {
+    const m = id ? listas.medidas.find((x) => x.id === id) : null;
+    medidaAbierta = m;
+    medidaCats = m ? m.categorias : null;
+    $("#modal-medida [data-titulo]").textContent = m ? m.nombre : "Nueva medida";
+    $("[data-medida-nombre]").value = m?.nombre || "";
+    $("[data-medida-error]").hidden = true;
+    $("[data-medida-grupo]").innerHTML = listas.gruposMedida.map((g) => `<option value="${escapar(g.id)}">${escapar(g.nombre)}</option>`).join("");
+    $("[data-medida-grupo]").value = m?.grupo || listas.gruposMedida[0].id;
+    $("[data-medida-unidad]").value = m ? m.unidad : "cm";
+    $("[data-medida-rango]").checked = !!m?.rango;
+    $("[data-medida-cats-texto]").textContent = resumenCats(medidaCats);
+    const usan = m ? usanMedida(m.id) : [];
+    $("[data-medida-quitar]").hidden = !m;
+    $("[data-medida-quitar]").dataset.usan = usan.length;
+    abrirModal("modal-medida");
+  }
+  $("[data-medida-cats]").addEventListener("click", () => {
+    cerrarModal("modal-medida");
+    setTimeout(() => abrirCategorias({ titulo: "Dónde se pide esta medida", valor: medidaCats }, (v) => {
+      medidaCats = v;
+      $("[data-medida-cats-texto]").textContent = resumenCats(v);
+      setTimeout(() => abrirModal("modal-medida"), 280);
+    }), 280);
+  });
+  $("[data-medida-guardar]").addEventListener("click", () => {
+    const nombre = $("[data-medida-nombre]").value.trim().replace(/\s+/g, " ");
+    const error = $("[data-medida-error]");
+    if (!nombre) { error.textContent = "Escribe el nombre."; error.hidden = false; return; }
+    if (listas.medidas.some((x) => x !== medidaAbierta && sinAcentos(x.nombre) === sinAcentos(nombre))) {
+      error.textContent = "Ya hay una medida con ese nombre."; error.hidden = false; return;
+    }
+    const datos = { nombre, unidad: $("[data-medida-unidad]").value, grupo: $("[data-medida-grupo]").value, rango: $("[data-medida-rango]").checked, categorias: medidaCats };
+    if (medidaAbierta) Object.assign(medidaAbierta, datos);
+    else listas.medidas.push({ id: idNuevo(nombre, listas.medidas, limpiarSlug), ejemplo: "", ...datos });
+    cerrarModal("modal-medida");
+    pintar();
+    guardarListas(medidaAbierta ? `Se guardó "${nombre}"` : `Se agregó la medida "${nombre}"`);
+  });
+  $("[data-medida-quitar]").addEventListener("click", async () => {
+    const m = medidaAbierta;
+    const usan = usanMedida(m.id);
+    cerrarModal("modal-medida");
+    if (usan.length) {
+      await confirmar({ titulo: `"${m.nombre}" está en uso`, texto: `La tienen ${usan.length} ${usan.length === 1 ? "pieza" : "piezas"}: ${nombresDe(usan)}. Bórrala de esas fichas y después podrás quitarla.`, accion: "Entendido" });
       return;
     }
-    error.hidden = true;
-    let id = limpiarSlug(nombre) || `opcion-${ops.length + 1}`;
-    for (let n = 2; ops.some((o) => o.id === id); n++) id = `${limpiarSlug(nombre)}-${n}`;
-    const nueva = { id, nombre };
-    if (actual.color) nueva.hex = $("[data-color-nuevo]").value.toUpperCase();
-    ops.push(nueva);
-    campo.value = "";
+    if (!(await confirmar({ titulo: `Quitar "${m.nombre}"`, texto: "Ninguna pieza la tiene capturada.", accion: "Quitar", peligro: true }))) return;
+    listas.medidas = listas.medidas.filter((x) => x !== m);
     pintar();
-    guardarListas(`Se agregó "${nombre}"`);
-    campo.focus();
+    guardarListas(`Se quitó "${m.nombre}"`);
   });
-  $("[data-color-nuevo]").addEventListener("input", (e) => (e.target.parentElement.style.background = e.target.value));
 
-  /* ---------- Navegación entre listas ---------- */
-  function abrirLista(id, empujar = true) {
-    actual = LISTAS.find((l) => l.id === id) || LISTAS[0];
-    if (empujar) history.replaceState(null, "", `#${actual.id}`);
-    caja.dataset.vista = "detalle";
-    pintar();
+  /* ============================================
+     Partes de construcción
+     ============================================ */
+  function pintarPartes() {
+    const panel = $("[data-panel]");
+    panel.innerHTML = `
+      <header class="panel-cabeza">
+        <div>
+          <h2 class="t-seccion">Partes de construcción</h2>
+          <p class="t-mini">De qué está hecha cada parte de la pieza. Cada categoría pide las suyas.</p>
+        </div>
+        <button class="boton boton--primario" type="button" data-nueva-parte><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg>Nueva parte</button>
+      </header>
+      <div class="panel-bloque">
+        <ul class="grupo-lista">${listas.partes.map((p) => `
+          <li><button class="fila-lista fila-lista--enlace fila-boton" type="button" data-parte="${escapar(p.id)}">
+            <span class="fila-lista-etiqueta">${escapar(p.nombre)}</span>
+            <span class="fila-lista-valor fila-lista-valor--corto">${escapar(resumenCats(p.categorias))}</span>
+            <svg class="fila-lista-flecha" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 5 5 5-5 5"/></svg>
+          </button></li>`).join("")}</ul>
+      </div>`;
+    $$("[data-parte]").forEach((b) => b.addEventListener("click", () => editarParte(b.dataset.parte)));
+    $("[data-nueva-parte]").addEventListener("click", () => editarParte(null));
   }
-  $("[data-indice]").addEventListener("click", (e) => {
-    const a = e.target.closest("[data-lista]");
-    if (!a) return;
-    e.preventDefault();
-    abrirLista(a.dataset.lista);
-  });
-  $("[data-volver]").addEventListener("click", () => (caja.dataset.vista = "indice"));
-  addEventListener("hashchange", () => abrirLista(location.hash.slice(1), false));
 
-  async function cargar() {
-    [listas, piezas] = await Promise.all([listar("listas"), listar("piezas")]);
-    const inicial = location.hash.slice(1);
-    actual = LISTAS.find((l) => l.id === inicial) || LISTAS[0];
-    if (inicial) caja.dataset.vista = "detalle";
+  let parteAbierta = null, parteCats = null;
+  function editarParte(id) {
+    const p = id ? listas.partes.find((x) => x.id === id) : null;
+    parteAbierta = p;
+    parteCats = p ? p.categorias : null;
+    $("#modal-parte [data-titulo]").textContent = p ? p.nombre : "Nueva parte";
+    $("[data-parte-nombre]").value = p?.nombre || "";
+    $("[data-parte-ejemplo]").value = p?.ejemplo || "";
+    $("[data-parte-error]").hidden = true;
+    $("[data-parte-cats-texto]").textContent = resumenCats(parteCats);
+    $("[data-parte-quitar]").hidden = !p;
+    abrirModal("modal-parte");
+  }
+  $("[data-parte-cats]").addEventListener("click", () => {
+    cerrarModal("modal-parte");
+    setTimeout(() => abrirCategorias({ titulo: "Dónde se pide esta parte", valor: parteCats }, (v) => {
+      parteCats = v;
+      $("[data-parte-cats-texto]").textContent = resumenCats(v);
+      setTimeout(() => abrirModal("modal-parte"), 280);
+    }), 280);
+  });
+  $("[data-parte-guardar]").addEventListener("click", () => {
+    const nombre = $("[data-parte-nombre]").value.trim().replace(/\s+/g, " ");
+    const error = $("[data-parte-error]");
+    if (!nombre) { error.textContent = "Escribe el nombre."; error.hidden = false; return; }
+    if (listas.partes.some((x) => x !== parteAbierta && sinAcentos(x.nombre) === sinAcentos(nombre))) {
+      error.textContent = "Ya hay una parte con ese nombre."; error.hidden = false; return;
+    }
+    const datos = { nombre, ejemplo: $("[data-parte-ejemplo]").value.trim(), categorias: parteCats };
+    if (parteAbierta) Object.assign(parteAbierta, datos);
+    else listas.partes.push({ id: idNuevo(nombre, listas.partes, limpiarSlug), ...datos });
+    cerrarModal("modal-parte");
     pintar();
+    guardarListas(parteAbierta ? `Se guardó "${nombre}"` : `Se agregó la parte "${nombre}"`);
+  });
+  $("[data-parte-quitar]").addEventListener("click", async () => {
+    const p = parteAbierta;
+    const usan = usanParte(p.id);
+    cerrarModal("modal-parte");
+    if (usan.length) {
+      await confirmar({ titulo: `"${p.nombre}" está en uso`, texto: `La tienen ${usan.length} ${usan.length === 1 ? "pieza" : "piezas"}: ${nombresDe(usan)}. Bórrala de esas fichas y después podrás quitarla.`, accion: "Entendido" });
+      return;
+    }
+    if (!(await confirmar({ titulo: `Quitar "${p.nombre}"`, texto: "Ninguna pieza la tiene capturada.", accion: "Quitar", peligro: true }))) return;
+    listas.partes = listas.partes.filter((x) => x !== p);
+    pintar();
+    guardarListas(`Se quitó "${p.nombre}"`);
+  });
+
+  /* ============================================
+     Nueva lista
+     ============================================ */
+  let seleccionNueva = "una";
+  $("[data-nueva-lista]").addEventListener("click", () => {
+    $("[data-lista-nombre]").value = "";
+    $("[data-lista-error]").hidden = true;
+    seleccionNueva = "una";
+    $$("[data-lista-seleccion] .segmento").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.valor === "una")));
+    abrirModal("modal-lista");
+  });
+  $("[data-lista-seleccion]").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-valor]");
+    if (!b) return;
+    seleccionNueva = b.dataset.valor;
+    $$("[data-lista-seleccion] .segmento").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+  });
+  function crearLista() {
+    const nombre = $("[data-lista-nombre]").value.trim().replace(/\s+/g, " ");
+    const error = $("[data-lista-error]");
+    if (!nombre) { error.textContent = "Escribe el nombre de la lista."; error.hidden = false; return; }
+    if (listas.listas.some((l) => sinAcentos(l.nombre) === sinAcentos(nombre))) {
+      error.textContent = "Ya hay una lista con ese nombre."; error.hidden = false; return;
+    }
+    let id = idNuevo(nombre, listas.listas, limpiarSlug);
+    if (RESERVADOS.has(id)) id = idNuevo(`${nombre} lista`, listas.listas, limpiarSlug);
+    // aparece en todas, no es obligatoria y filtra: se ajusta después
+    listas.listas.push({ id, nombre, seleccion: seleccionNueva, categorias: null, obligatoria: [], filtro: true, opciones: [] });
+    cerrarModal("modal-lista");
+    ir(id);
+    guardarListas(`Se creó la lista "${nombre}". Agrega sus opciones y elige dónde aparece.`);
+    setTimeout(() => $("[data-nombre-nuevo]")?.focus(), 350);
+  }
+  $("[data-lista-crear]").addEventListener("click", crearLista);
+  $("[data-lista-nombre]").addEventListener("keydown", (e) => e.key === "Enter" && (e.preventDefault(), crearLista()));
+
+  /* ============================================
+     Arranque
+     ============================================ */
+  async function cargar() {
+    [listas, piezas, categorias] = await Promise.all([listar("listas"), listar("piezas"), listar("categorias")]);
+    const inicial = location.hash.slice(1);
+    // los enlaces viejos (#materiales, #gruposColor) siguen llevando a su lista
+    const alias = { materiales: "material", gruposColor: "colores" };
+    ir(alias[inicial] || inicial || listas.listas[0].id, false);
   }
   cargar().catch((e) => avisar(e.message || "No se pudieron cargar las listas", { tipo: "error" }));
 </script>

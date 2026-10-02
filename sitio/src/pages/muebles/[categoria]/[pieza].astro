@@ -42,6 +42,9 @@ const entrega = nombreOpcion("entrega", pieza.entrega);
 const pdf = fichaPdf(pieza);
 const conPlano = Boolean(ficha.medidas && Object.keys(ficha.medidas).length);
 
+// Las listas que ya tienen su lugar en la ficha.
+const CAMPOS_CONOCIDOS = new Set(["uso", "respaldo", "plazas", "brazos", "base", "extras", "entrega"]);
+
 // Lo que se ve sin abrir nada: cuatro datos que de verdad deciden.
 const clave = [
   { etiqueta: "Categoría", valor: categoria.name, enlace: `/muebles/${pieza.cat}/` },
@@ -51,6 +54,14 @@ const clave = [
   { etiqueta: "Respaldo", valor: nombreOpcion("respaldo", pieza.respaldo) },
   { etiqueta: "Plazas", valor: pieza.plazas ? `${pieza.plazas}${pieza.plazas === "4" ? " o más" : ""}` : null },
   { etiqueta: "Descansabrazos", valor: nombreOpcion("brazos", pieza.brazos) },
+  // PARA EL ADMINISTRADOR: las listas que se creen después (capacidad, tipo de
+  // luz…) salen aquí con su nombre, después de las de siempre.
+  ...filtros
+    .filter((g) => !CAMPOS_CONOCIDOS.has(g.campo))
+    .map((g) => ({
+      etiqueta: g.nombre,
+      valor: [pieza[g.campo]].flat().map((id) => nombreOpcion(g.campo, id)).filter(Boolean).join(", "),
+    })),
 ].filter((d) => d.valor);
 
 const caracteristicas = (pieza.extras || [])

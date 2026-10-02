@@ -12,6 +12,7 @@
 //
 // Las fotos llegan ya achicadas (fotos.py); aquí solo se colocan.
 import { ESTILOS, logo, esc, telefono } from "./plantilla.mjs";
+import { otrasListas } from "./otras-listas.mjs";
 
 const ESTILOS_CATALOGO = `
 /* portada */
@@ -141,6 +142,7 @@ export function hojasDeCatalogo({ categoria, piezas, fotoPortada, fotos, context
       ["Respaldo", nombreOpcion("respaldo", p.respaldo)],
       ["Descansabrazos", nombreOpcion("brazos", p.brazos)],
       ["Plazas", p.plazas ? `${p.plazas}${p.plazas === "4" ? " o más" : ""}` : null],
+    ...otrasListas(p),
     ].filter(([, v]) => v);
     const medidas = Object.entries(etiquetasMedida)
       .filter(([k]) => f.medidas?.[k])

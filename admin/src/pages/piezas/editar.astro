@@ -135,25 +135,25 @@ const secciones = [
             <span class="seccion-n">3</span>
             <div>
               <h2 class="t-seccion">Clasificación</h2>
-              <p class="t-mini">Lo que hace funcionar los filtros y el buscador. Son listas cerradas: si falta una opción, se da de alta en <a class="enlace" href={`${base}listas/`} target="_blank" rel="noopener">Listas</a>.</p>
+              <p class="t-mini">Lo que hace funcionar los filtros y el buscador. Son listas cerradas: si falta una opción, se da de alta en <a class="enlace" href={`${base}listas/`} data-sale>Listas</a>.</p>
             </div>
           </div>
           <div class="seccion-cuerpo">
             <div class="fila">
               <div class="campo" data-campo="material">
-                <div class="campo-etiqueta"><label for="material">Material<span class="obligatorio">*</span></label><span class="etiqueta-acciones"><a class="enlace-chico" href={`${base}listas/#materiales`} target="_blank" rel="noopener">Editar lista</a></span></div>
+                <div class="campo-etiqueta"><label for="material">Material<span class="obligatorio">*</span></label></div>
                 <select class="control" id="material" name="material"><option value="" hidden>Elige el material principal</option></select>
                 <p class="campo-error" data-error></p>
               </div>
               <div class="campo" data-campo="entrega">
-                <div class="campo-etiqueta"><label for="entrega">Disponibilidad<span class="obligatorio">*</span></label><span class="etiqueta-acciones"><a class="enlace-chico" href={`${base}listas/#entrega`} target="_blank" rel="noopener">Editar lista</a></span></div>
+                <div class="campo-etiqueta"><label for="entrega">Disponibilidad<span class="obligatorio">*</span></label></div>
                 <select class="control" id="entrega" name="entrega"><option value="" hidden>Elige en cuánto se entrega</option></select>
                 <p class="campo-error" data-error></p>
               </div>
             </div>
 
             <div class="campo" data-campo="acabados">
-              <div class="campo-etiqueta"><span class="etiqueta">Acabados<span class="obligatorio">*</span></span><span class="etiqueta-acciones"><span class="campo-contador" data-contador-acabados></span><a class="enlace-chico" href={`${base}listas/#gruposColor`} target="_blank" rel="noopener">Editar colores</a></span></div>
+              <div class="campo-etiqueta"><span class="etiqueta">Acabados<span class="obligatorio">*</span></span><span class="etiqueta-acciones"><span class="campo-contador" data-contador-acabados></span></span></div>
               <p class="campo-ayuda campo-ayuda--arriba">Cada acabado lleva su nombre comercial (el de la tela o el color) y el grupo de color por el que se filtra: nadie busca "plumbago", busca "azul".</p>
               <div class="acabados" data-acabados></div>
               <button class="boton boton--suave boton--agregar" type="button" data-agregar-acabado><IconoAdmin name="mas" size={16} />Agregar acabado</button>
@@ -369,9 +369,9 @@ const secciones = [
   import { medio } from "../../scripts/medios.js";
   import { validarPieza, revisarTexto, revisarMedida, proponerSlug, limpiarSlug, acabadosDe } from "../../scripts/validar.js";
   import {
-    piezaVacia, OBLIGATORIOS, SEGUN_CATEGORIA, FILTROS_POR_CATEGORIA, MEDIDAS, GRUPOS_MEDIDA, MEDIDAS_POR_CATEGORIA,
-    EJEMPLO_MEDIDA, UNIDAD_MEDIDA, CONTEOS, CONSTRUCCION_POR_CATEGORIA, EJEMPLO_CONSTRUCCION, MAX_COMBINA,
+    piezaVacia, OBLIGATORIOS, MEDIDAS, MAX_COMBINA,
   } from "../../scripts/esquemas/pieza.js";
+  import { opciones, nombreOpcion as nombreDe, listasDeChips, obligatoriasDe, medidasDe, partesDe, medida as medidaDe, esConteo, esObligatoria, CONTROL_PROPIO } from "../../scripts/listas.js";
   import { abrirModal, cerrarModal, avisar, escapar, fechaRelativa } from "../../scripts/ui.js";
 
   const base = import.meta.env.BASE_URL;
@@ -390,8 +390,7 @@ const secciones = [
   let verTodasMedidas = false;
   let verTodaConstruccion = false;
 
-  const filtro = (campo) => listas.filtros.find((f) => f.campo === campo) || { opciones: [] };
-  const nombreOpcion = (campo, id) => filtro(campo).opciones.find((o) => o.id === id)?.nombre || "";
+  const nombreOpcion = (id, valor) => nombreDe(listas, id, valor);
   const nombreCat = (slug) => categorias.find((c) => c.slug === slug)?.name || "";
   const X = '<svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="m5 5 10 10M15 5 5 15"/></svg>';
 
@@ -421,8 +420,8 @@ const secciones = [
 
   function llenarSelectores() {
     for (const c of categorias) $("#cat").insertAdjacentHTML("beforeend", `<option value="${escapar(c.slug)}">${escapar(c.name)}</option>`);
-    for (const m of listas.materiales) $("#material").insertAdjacentHTML("beforeend", `<option value="${escapar(m.id)}">${escapar(m.nombre)}</option>`);
-    for (const o of filtro("entrega").opciones) $("#entrega").insertAdjacentHTML("beforeend", `<option value="${escapar(o.id)}">${escapar(o.nombre)}</option>`);
+    for (const m of opciones(listas, "material")) $("#material").insertAdjacentHTML("beforeend", `<option value="${escapar(m.id)}">${escapar(m.nombre)}</option>`);
+    for (const o of opciones(listas, "entrega")) $("#entrega").insertAdjacentHTML("beforeend", `<option value="${escapar(o.id)}">${escapar(o.nombre)}</option>`);
     $("[data-chips='espacios']").innerHTML = listas.espacios
       .map((e) => `<label class="chip"><input type="checkbox" name="espacios" value="${escapar(e.id)}" />${escapar(e.nombre)}</label>`)
       .join("");
@@ -502,29 +501,27 @@ const secciones = [
     );
   }
 
+  // Las listas de la categoría que se eligen con chips, en su orden: una
+  // opción (radio) o varias (casillas), obligatorias o no, según sus datos.
   function pintarFiltrosCategoria() {
     const cat = form.cat.value;
     const caja = $("[data-filtros-categoria]");
     $("[data-nota-categoria]").hidden = !!cat;
     if (!cat) { caja.innerHTML = ""; return; }
-    const obligatorios = SEGUN_CATEGORIA[cat] || [];
-    const campos = FILTROS_POR_CATEGORIA[cat] || ["uso", "extras"];
-    const etiquetas = { uso: "Tipo de uso", respaldo: "Respaldo", brazos: "Descansabrazos", base: "Base", plazas: "Plazas", extras: "Características" };
-    caja.innerHTML = `<div class="filtros-categoria">${campos
-      .map((campo) => {
-        const f = filtro(campo);
-        const oblig = campo === "uso" || obligatorios.includes(campo);
-        const multiple = campo === "extras";
-        const valor = pieza[campo];
-        const opciones = f.opciones
+    caja.innerHTML = `<div class="filtros-categoria">${listasDeChips(listas, cat)
+      .map((l) => {
+        const oblig = esObligatoria(l, cat);
+        const multiple = l.seleccion === "varias";
+        const valor = pieza[l.id];
+        const chips = l.opciones
           .map((o) => {
             const marcado = multiple ? (valor || []).includes(o.id) : String(valor ?? "") === o.id;
-            return `<label class="chip"><input type="${multiple ? "checkbox" : "radio"}" name="${campo}" value="${escapar(o.id)}" ${marcado ? "checked" : ""} />${escapar(o.nombre)}</label>`;
+            return `<label class="chip"><input type="${multiple ? "checkbox" : "radio"}" name="${escapar(l.id)}" value="${escapar(o.id)}" data-lista="${escapar(l.id)}" ${marcado ? "checked" : ""} />${escapar(o.nombre)}</label>`;
           })
           .join("");
-        return `<div class="campo" data-campo="${campo}">
-          <div class="campo-etiqueta"><span class="etiqueta">${etiquetas[campo] || f.nombre}${oblig ? '<span class="obligatorio">*</span>' : ""}</span>${multiple ? '<span class="etiqueta-nota">las que apliquen</span>' : ""}<span class="etiqueta-acciones">${!multiple && !oblig ? `<button class="enlace-chico" type="button" data-quitar-radio="${campo}">Ninguno</button>` : ""}${enlaceLista(campo)}</span></div>
-          <div class="chips">${opciones}</div>
+        return `<div class="campo" data-campo="${escapar(l.id)}">
+          <div class="campo-etiqueta"><span class="etiqueta">${escapar(l.nombre)}${oblig ? '<span class="obligatorio">*</span>' : ""}</span>${multiple ? '<span class="etiqueta-nota">las que apliquen</span>' : ""}<span class="etiqueta-acciones">${!multiple && !oblig ? `<button class="enlace-chico" type="button" data-quitar-radio="${escapar(l.id)}">Ninguno</button>` : ""}</span></div>
+          <div class="chips">${chips || '<span class="t-mini">Esta lista todavía no tiene opciones.</span>'}</div>
           <p class="campo-error" data-error></p>
         </div>`;
       })
@@ -538,10 +535,7 @@ const secciones = [
   }
 
   /* ---------- Las listas se administran en Listas ----------
-     Cada lista de la pieza lleva su enlace. Se abre en otra pestaña para no
-     perder lo capturado, y al volver a esta se releen las listas. */
-  const enlaceLista = (id) =>
-    `<a class="enlace-chico" href="${base}listas/#${id}" target="_blank" rel="noopener">Editar lista</a>`;
+     Si se cambian en otra pestaña, al volver a esta se releen. */
   document.addEventListener("visibilitychange", async () => {
     if (document.visibilityState !== "visible" || !listas) return;
     try {
@@ -550,49 +544,56 @@ const secciones = [
       pieza = { ...pieza, ...leer() };
       listas = nuevas;
       const mat = form.material.value, ent = form.entrega.value;
-      $("#material").innerHTML = '<option value="" hidden>Elige el material principal</option>' + listas.materiales.map((m) => `<option value="${escapar(m.id)}">${escapar(m.nombre)}</option>`).join("");
-      $("#entrega").innerHTML = '<option value="" hidden>Elige en cuánto se entrega</option>' + filtro("entrega").opciones.map((o) => `<option value="${escapar(o.id)}">${escapar(o.nombre)}</option>`).join("");
+      $("#material").innerHTML = '<option value="" hidden>Elige el material principal</option>' + opciones(listas, "material").map((m) => `<option value="${escapar(m.id)}">${escapar(m.nombre)}</option>`).join("");
+      $("#entrega").innerHTML = '<option value="" hidden>Elige en cuánto se entrega</option>' + opciones(listas, "entrega").map((o) => `<option value="${escapar(o.id)}">${escapar(o.nombre)}</option>`).join("");
       form.material.value = mat;
       form.entrega.value = ent;
       pintarAcabados();
-      pintarFiltrosCategoria();
+      pintarCategoria();
       avisar("Las listas se actualizaron");
     } catch {}
   });
 
-  /* ---------- Medidas en grupos ---------- */
+  /* ---------- Medidas en grupos ----------
+     Qué medidas pide cada categoría, su unidad y su grupo vienen de las
+     listas. Las de otras categorías quedan detrás de "Más medidas"; una
+     medida con dato capturado se enseña siempre. */
   function pintarMedidas() {
     const caja = $("[data-medidas]");
     const actuales = { ...(pieza.ficha?.medidas || {}), ...leerPares("medida") };
-    const propios = MEDIDAS_POR_CATEGORIA[form.cat.value] || ["generales"];
-    const grupos = GRUPOS_MEDIDA.filter((g) => verTodasMedidas || propios.includes(g.id) || g.claves.some((k) => actuales[k]));
-    caja.innerHTML = grupos
-      .map((g) => `
+    const propias = new Set(medidasDe(listas, form.cat.value).map((m) => m.id));
+    const visibles = listas.medidas.filter((m) => verTodasMedidas || propias.has(m.id) || actuales[m.id]);
+    caja.innerHTML = listas.gruposMedida
+      .map((g) => ({ g, ms: visibles.filter((m) => m.grupo === g.id) }))
+      .filter(({ ms }) => ms.length)
+      .map(({ g, ms }) => `
         <div class="grupo-medidas">
           <span class="grupo-rotulo">${escapar(g.nombre)}</span>
-          <div class="grupo-lista grupo-lista--dos">${g.claves
-            .filter((k) => listas.etiquetasMedida[k])
-            .map((k) => `<label class="fila-lista"><span class="fila-lista-etiqueta">${escapar(listas.etiquetasMedida[k])}</span><input class="fila-lista-control fila-lista-control--numero" data-medida="${k}" type="text" value="${escapar(aCampo(k, actuales[k]))}" placeholder="${escapar(EJEMPLO_MEDIDA[k] || "")}" inputmode="${CONTEOS.has(k) ? "numeric" : "decimal"}" autocomplete="off" />${UNIDAD_MEDIDA[k] ? `<span class="fila-lista-unidad">${UNIDAD_MEDIDA[k]}</span>` : ""}</label>`)
+          <div class="grupo-lista grupo-lista--dos">${ms
+            .map((m) => `<label class="fila-lista"><span class="fila-lista-etiqueta">${escapar(m.nombre)}</span><input class="fila-lista-control fila-lista-control--numero" data-medida="${escapar(m.id)}" type="text" value="${escapar(aCampo(m.id, actuales[m.id]))}" placeholder="${escapar(m.ejemplo || "")}" inputmode="${esConteo(m) ? "numeric" : "decimal"}" autocomplete="off" />${m.unidad ? `<span class="fila-lista-unidad">${escapar(m.unidad)}</span>` : ""}</label>`)
             .join("")}</div>
         </div>`)
       .join("");
-    const ocultos = GRUPOS_MEDIDA.length - grupos.length;
+    const ocultas = listas.medidas.length - visibles.length;
     const mas = $("[data-mas-medidas]");
-    mas.hidden = !ocultos && !verTodasMedidas;
-    mas.textContent = verTodasMedidas ? "Solo las de esta categoría" : `Más medidas (${ocultos} ${ocultos === 1 ? "grupo" : "grupos"})`;
+    mas.hidden = !ocultas && !verTodasMedidas;
+    mas.textContent = verTodasMedidas ? "Solo las de esta categoría" : `Más medidas (${ocultas})`;
   }
 
   // Lo guardado ("45 a 55 cm") se edita como "45-55"; al guardar regresa
   // a su forma con la unidad.
   function aCampo(k, valor) {
     if (!valor) return "";
-    return String(valor).replace(/\s*(cm|mm|kg)\.?\s*$/i, "").replace(/\s+a\s+/g, "-").trim();
+    const u = medidaDe(listas, k)?.unidad;
+    const sinUnidad = u ? String(valor).replace(new RegExp("\\s*" + u + "\\.?\\s*$", "i"), "") : String(valor);
+    return sinUnidad.replace(/\s+a\s+/g, "-").trim();
   }
   function aDato(k, campo) {
     const v = (campo || "").trim().replace(/-+$/, "").replace(/^-+/, "");
     if (!v) return "";
     const partes = v.split("-").map((x) => x.trim()).filter(Boolean);
-    const unidad = UNIDAD_MEDIDA[k] ? ` ${UNIDAD_MEDIDA[k]}` : "";
+    const u = medidaDe(listas, k)?.unidad;
+    const unidad = u ? ` ${u}` : "";
     return `${partes.join(" a ")}${unidad}`;
   }
   // Solo números: enteros en los conteos; decimales y un guion de rango en
@@ -600,9 +601,11 @@ const secciones = [
   function filtrarMedida(inp) {
     const k = inp.dataset.medida;
     let v = inp.value;
-    if (CONTEOS.has(k)) v = v.replace(/\D/g, "");
+    const m = medidaDe(listas, k);
+    if (esConteo(m) && !m?.rango) v = v.replace(/\D/g, "");
+    else if (!m?.rango) v = v.replace(/,/g, ".").replace(/[^\d.]/g, "").replace(/(\..*)\./g, "$1");
     else {
-      v = v.replace(/,/g, ".").replace(/[^\d.\-]/g, "");
+      v = esConteo(m) ? v.replace(/[^\d\-]/g, "") : v.replace(/,/g, ".").replace(/[^\d.\-]/g, "");
       const [a, ...resto] = v.split("-");
       v = resto.length ? `${a}-${resto.join("").replace(/-/g, "")}` : a;
       v = v.split("-").map((n) => n.replace(/(\..*)\./g, "$1")).join("-");
@@ -613,13 +616,12 @@ const secciones = [
   function pintarConstruccion() {
     const caja = $("[data-partes]");
     const actuales = { ...(pieza.ficha?.construccion || {}), ...leerPares("construccion") };
-    const todasLas = Object.keys(listas.etiquetasConstruccion);
-    const propias = CONSTRUCCION_POR_CATEGORIA[form.cat.value] || todasLas;
-    const claves = todasLas.filter((k) => verTodaConstruccion || propias.includes(k) || actuales[k]);
-    caja.innerHTML = claves
-      .map((k) => `<label class="fila-lista"><span class="fila-lista-etiqueta fila-lista-etiqueta--fija">${escapar(listas.etiquetasConstruccion[k])}</span><input class="fila-lista-control fila-lista-control--izq" data-construccion="${k}" type="text" value="${escapar(actuales[k] || "")}" placeholder="Ej. ${escapar(EJEMPLO_CONSTRUCCION[k] || "")}" /></label>`)
+    const propias = new Set(partesDe(listas, form.cat.value).map((p) => p.id));
+    const visibles = listas.partes.filter((p) => verTodaConstruccion || propias.has(p.id) || actuales[p.id]);
+    caja.innerHTML = visibles
+      .map((p) => `<label class="fila-lista"><span class="fila-lista-etiqueta fila-lista-etiqueta--fija">${escapar(p.nombre)}</span><input class="fila-lista-control fila-lista-control--izq" data-construccion="${escapar(p.id)}" type="text" value="${escapar(actuales[p.id] || "")}" placeholder="${p.ejemplo ? `Ej. ${escapar(p.ejemplo)}` : ""}" /></label>`)
       .join("");
-    const ocultas = todasLas.length - claves.length;
+    const ocultas = listas.partes.length - visibles.length;
     const mas = $("[data-mas-construccion]");
     mas.hidden = !ocultas && !verTodaConstruccion;
     mas.textContent = verTodaConstruccion ? "Solo las de esta categoría" : `Más partes (${ocultas})`;
@@ -636,11 +638,11 @@ const secciones = [
             <button class="fila-lista-quitar" type="button" data-quitar-acabado aria-label="Quitar este acabado">${X}</button>
           </div>
           <div class="acabado-grupos" role="radiogroup" aria-label="Grupo de color del acabado ${i + 1}">
-            ${listas.gruposColor.map((g) => `<label class="color" title="${escapar(g.nombre)}">
+            ${opciones(listas, "colores").map((g) => `<label class="color" title="${escapar(g.nombre)}">
               <input type="radio" name="grupo-${i}" value="${escapar(g.id)}" data-acabado-grupo ${g.id === a.grupo ? "checked" : ""} aria-label="${escapar(g.nombre)}" />
               <span class="color-muestra" style="background:${escapar(g.hex)}"></span>
             </label>`).join("")}
-            <span class="acabado-grupo-nombre" data-grupo-nombre>${escapar(listas.gruposColor.find((g) => g.id === a.grupo)?.nombre || "Elige su color")}</span>
+            <span class="acabado-grupo-nombre" data-grupo-nombre>${escapar(opciones(listas, "colores").find((g) => g.id === a.grupo)?.nombre || "Elige su color")}</span>
           </div>
         </div>`)
       .join("");
@@ -648,7 +650,7 @@ const secciones = [
       const i = +fila.dataset.i;
       $$("[data-acabado-grupo]", fila).forEach((r) =>
         r.addEventListener("change", () => {
-          $("[data-grupo-nombre]", fila).textContent = listas.gruposColor.find((g) => g.id === r.value)?.nombre || "";
+          $("[data-grupo-nombre]", fila).textContent = opciones(listas, "colores").find((g) => g.id === r.value)?.nombre || "";
         })
       );
       $("[data-quitar-acabado]", fila).addEventListener("click", () => {
@@ -956,12 +958,12 @@ const secciones = [
       colores: [...new Set(acabados.map((a) => a.grupo).filter(Boolean))],
       espacios: marcados("espacios"),
       nuevo: form.nuevo.checked,
-      uso: radio("uso") || "",
-      respaldo: radio("respaldo"),
-      brazos: radio("brazos"),
-      base: radio("base"),
-      plazas: radio("plazas"),
-      extras: marcados("extras"),
+      // cada lista de chips con su id; las que no aplican a la categoría se vacían
+      ...Object.fromEntries(
+        listas.listas
+          .filter((l) => !CONTROL_PROPIO.has(l.id))
+          .map((l) => [l.id, l.seleccion === "varias" ? marcados(l.id) : radio(l.id) || (l.id === "uso" ? "" : null)])
+      ),
       estado: radio("estado") || "borrador",
       ficha: {
         ...pieza.ficha,
@@ -1009,16 +1011,17 @@ const secciones = [
   const SECCION_DE = {
     nombre: "identidad", tipo: "identidad", cat: "identidad", slug: "identidad",
     img: "fotos", alt: "fotos",
-    material: "clasificacion", entrega: "clasificacion", acabados: "clasificacion", uso: "clasificacion",
-    respaldo: "clasificacion", brazos: "clasificacion", base: "clasificacion", plazas: "clasificacion", extras: "clasificacion",
+    acabados: "clasificacion",
     resumen: "ficha",
   };
-  const CON_OBLIGATORIOS = new Set(Object.values(SECCION_DE));
+  // todo lo que no está arriba es una lista: va en Clasificación
+  const seccionDe = (k) => SECCION_DE[k] || "clasificacion";
+  const CON_OBLIGATORIOS = new Set([...Object.values(SECCION_DE), "clasificacion"]);
   function actualizarIndice(erroresMostrados) {
     const datos = leer();
     const todos = validarPieza(datos, listas);
-    const conError = new Set(Object.keys(erroresMostrados || {}).map((k) => SECCION_DE[k]));
-    const incompletas = new Set(Object.keys(todos).map((k) => SECCION_DE[k]));
+    const conError = new Set(Object.keys(erroresMostrados || {}).map(seccionDe));
+    const incompletas = new Set(Object.keys(todos).map(seccionDe));
     $$("[data-indice]").forEach((a) => {
       const id = a.dataset.indice;
       a.classList.toggle("con-error", conError.has(id));
@@ -1026,7 +1029,7 @@ const secciones = [
     });
 
     // el avance: cuántos obligatorios (de todas y de la categoría) ya están
-    const requeridos = [...OBLIGATORIOS, ...(SEGUN_CATEGORIA[datos.cat] || [])];
+    const requeridos = [...OBLIGATORIOS, ...obligatoriasDe(listas, datos.cat).filter((id) => id !== "colores")];
     const faltan = requeridos.filter((k) => todos[k]);
     const hechos = requeridos.length - faltan.length;
     $("[data-avance-cuenta]").textContent = `${hechos} de ${requeridos.length}`;
@@ -1180,7 +1183,7 @@ const secciones = [
       abrirModal("modal-salir");
     };
     cancelar.addEventListener("click", (e) => preguntar(e, cancelar.href));
-    $$(".bl-nav a, .barra-migas a, .barra-marca, .bl-marca").forEach((a) => a.addEventListener("click", (e) => preguntar(e, a.href)));
+    $$(".bl-nav a, .barra-migas a, .barra-marca, .bl-marca, [data-sale]").forEach((a) => a.addEventListener("click", (e) => preguntar(e, a.href)));
     $("[data-salir-sin-guardar]").addEventListener("click", () => {
       hayCambios = false;
       location.href = destino;

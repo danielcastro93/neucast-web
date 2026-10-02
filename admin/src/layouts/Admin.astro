@@ -74,7 +74,7 @@ const simbolo = "M625.9,655.2c-3.1,3.1-6.5,5.5-10.2,7.4-3.8,1.9-7.8,2.8-12.3,2.8
         if (localStorage.getItem("neucast-admin:sb") === "plegada") document.documentElement.dataset.sb = "plegada";
         if (localStorage.getItem("neucast-admin:bl") === "oscura") document.documentElement.dataset.bl = "oscura";
         // Sin sesión no se pinta nada: a entrar, y de regreso a esta pantalla.
-        if (!sessionStorage.getItem("neucast-admin:sesion")) {
+        if (!localStorage.getItem("neucast-admin:sesion")) {
           location.replace("/?a=" + encodeURIComponent(location.pathname + location.search));
         }
       } catch (e) {}

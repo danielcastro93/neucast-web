@@ -25,15 +25,16 @@ admin/
 │   │   ├── index.astro        entrar
 │   │   ├── inicio.astro       estado del sitio y accesos rápidos
 │   │   ├── piezas/            lista y edición de piezas
-│   │   └── listas.astro       las listas cerradas: materiales, colores, uso, respaldo, base…
+│   │   └── listas.astro       listas configurables, medidas y partes: crecen a cualquier tipo de mueble
 │   ├── components/            Modal, IconoAdmin
 │   ├── scripts/
 │   │   ├── api.js             la única cara de la API para las pantallas
 │   │   ├── api-simulada.js    hoy: JSON de semilla más localStorage
 │   │   ├── api-real.js        después: fetch a la API de Amauri, mismas funciones
-│   │   ├── sesion.js          la sesión (sessionStorage)
+│   │   ├── sesion.js          la sesión (localStorage: la comparten las pestañas)
 │   │   ├── validar.js         las reglas de los tres niveles y las medidas de texto
-│   │   ├── esquemas/pieza.js  qué campos tiene una pieza y cuáles son obligatorios por categoría
+│   │   ├── esquemas/pieza.js  los campos fijos de una pieza y sus medidas de texto
+│   │   ├── listas.js          cómo se leen las listas: dónde aparecen y dónde son obligatorias
 │   │   ├── medios.js          de dónde se cargan las fotos
 │   │   └── ui.js              avisos, modales, fechas
 │   └── styles/admin.css       lo propio del administrador, encima de compartido/global.css

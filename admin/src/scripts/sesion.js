@@ -1,21 +1,22 @@
-// La sesión del administrador vive en sessionStorage: se va al cerrar la
-// pestaña, que es lo que se espera de una herramienta de trabajo.
+// La sesión del administrador vive en localStorage: la comparten todas las
+// pestañas del navegador (abrir un enlace en otra no vuelve a pedir la
+// contraseña) y se va al salir desde el menú de la cuenta.
 const LLAVE = "neucast-admin:sesion";
 
 export function sesionActual() {
   try {
-    return JSON.parse(sessionStorage.getItem(LLAVE) || "null");
+    return JSON.parse(localStorage.getItem(LLAVE) || "null");
   } catch {
     return null;
   }
 }
 
 export function iniciarSesion(datos) {
-  sessionStorage.setItem(LLAVE, JSON.stringify(datos));
+  localStorage.setItem(LLAVE, JSON.stringify(datos));
 }
 
 export function cerrarSesion() {
-  sessionStorage.removeItem(LLAVE);
+  localStorage.removeItem(LLAVE);
 }
 
 // Las pantallas del administrador la llaman al arrancar: sin sesión, a entrar.

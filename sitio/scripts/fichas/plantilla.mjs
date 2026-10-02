@@ -15,6 +15,7 @@
 // hojas de varias piezas con una portada delante.
 import fs from "node:fs";
 import path from "node:path";
+import { otrasListas } from "./otras-listas.mjs";
 
 const RAIZ = path.resolve(path.dirname(new URL(import.meta.url).pathname), "../..");
 const PUBLICO = path.join(RAIZ, "public");
@@ -160,6 +161,7 @@ export function hojasDeFicha({ pieza, ficha, contexto }) {
     ["Respaldo", nombreOpcion("respaldo", pieza.respaldo)],
     ["Descansabrazos", nombreOpcion("brazos", pieza.brazos)],
     ["Plazas", pieza.plazas ? `${pieza.plazas}${pieza.plazas === "4" ? " o más" : ""}` : null],
+    ...otrasListas(pieza),
   ].filter(([, v]) => v);
 
   const medidas = Object.entries(etiquetasMedida).filter(([k]) => f.medidas?.[k]).map(([k, e]) => [e, f.medidas[k]]);

@@ -68,9 +68,17 @@ const base = import.meta.env.BASE_URL;
       <p>Prueba con otra palabra o quita los filtros.</p>
       <button class="boton boton--chico" type="button" data-limpiar>Quitar los filtros</button>
     </div>
-    <div class="tabla-pie">
-      <span data-conteo></span>
-      <span class="t-mini">Haz clic en una fila para editarla</span>
+    <div class="tabla-pie paginador" data-paginador>
+      <span class="paginador-conteo" data-conteo></span>
+      <nav class="paginador-paginas" aria-label="Páginas" data-paginas></nav>
+      <div class="paginador-por">
+        <label for="por-pagina">Por página</label>
+        <select class="control" id="por-pagina" data-por>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+      </div>
     </div>
   </div>
 </Admin>
@@ -78,6 +86,7 @@ const base = import.meta.env.BASE_URL;
 <script>
   import { listar, guardar, borrar } from "../../scripts/api.js";
   import { medio } from "../../scripts/medios.js";
+  import { opciones, nombreOpcion } from "../../scripts/listas.js";
   import { confirmar, avisar, fechaRelativa, escapar } from "../../scripts/ui.js";
 
   const base = import.meta.env.BASE_URL;
@@ -87,10 +96,20 @@ const base = import.meta.env.BASE_URL;
   let categorias = [];
   let listas = null;
   const filtro = { texto: "", cat: "", estado: "", orden: "nombre", dir: 1 };
+  // Paginador: con miles de piezas no se pintan todas. La página y el tamaño
+  // van en la dirección para que al volver del editor se quede donde estaba.
+  // Con la API real la página la corta el servidor (docs/administrador.md).
+  const POR = [25, 50, 100];
+  const params = new URLSearchParams(location.search);
+  let pagina = Math.max(1, parseInt(params.get("pagina"), 10) || 1);
+  let porPagina = POR.includes(+params.get("por")) ? +params.get("por") : (() => {
+    try { return POR.includes(+localStorage.getItem("neucast-admin:por-pagina")) ? +localStorage.getItem("neucast-admin:por-pagina") : 50; } catch { return 50; }
+  })();
+  const miles = (n) => n.toLocaleString("es-MX");
 
   const nombreCat = (slug) => categorias.find((c) => c.slug === slug)?.name || slug;
-  const nombreEntrega = (id) => listas?.filtros.find((f) => f.campo === "entrega")?.opciones.find((o) => o.id === id)?.nombre || id || "";
-  const colorHex = (id) => listas?.gruposColor.find((g) => g.id === id)?.hex || "#ccc";
+  const nombreEntrega = (id) => (listas ? nombreOpcion(listas, "entrega", id) : "") || id || "";
+  const colorHex = (id) => (listas ? opciones(listas, "colores").find((g) => g.id === id)?.hex : null) || "#ccc";
   const normal = (s) => (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
   function filtradas() {
@@ -140,10 +159,23 @@ const base = import.meta.env.BASE_URL;
 
   function pintar() {
     const lista = filtradas();
+    const total = lista.length;
+    const paginas = Math.max(1, Math.ceil(total / porPagina));
+    pagina = Math.min(pagina, paginas);
+    const desde = (pagina - 1) * porPagina;
     const cuerpo = $("[data-filas]");
-    cuerpo.innerHTML = lista.map(fila).join("");
-    $("[data-vacio]").hidden = lista.length > 0;
-    $("[data-conteo]").textContent = `${lista.length} de ${piezas.length} ${piezas.length === 1 ? "pieza" : "piezas"}`;
+    cuerpo.innerHTML = lista.slice(desde, desde + porPagina).map(fila).join("");
+    $("[data-vacio]").hidden = total > 0;
+    $("[data-paginador]").hidden = total === 0;
+    const filtrando = total !== piezas.length;
+    $("[data-conteo]").innerHTML = total <= porPagina
+      ? `${miles(total)} ${total === 1 ? "pieza" : "piezas"}${filtrando ? ` de ${miles(piezas.length)}` : ""}`
+      : `<b>${miles(desde + 1)}–${miles(Math.min(desde + porPagina, total))}</b> de ${miles(total)}${filtrando ? ` <span class="paginador-de">(de ${miles(piezas.length)})</span>` : ""}`;
+    pintarPaginas(paginas);
+    const u = new URL(location.href);
+    pagina > 1 ? u.searchParams.set("pagina", pagina) : u.searchParams.delete("pagina");
+    porPagina !== 50 ? u.searchParams.set("por", porPagina) : u.searchParams.delete("por");
+    history.replaceState(null, "", u);
     document.querySelectorAll("th[data-th]").forEach((th) => th.removeAttribute("aria-sort"));
     document.querySelectorAll("th").forEach((th) => {
       const b = th.querySelector("[data-orden]");
@@ -153,6 +185,40 @@ const base = import.meta.env.BASE_URL;
     });
     cablearFilas(cuerpo);
   }
+
+  // ‹ 1 … 4 5 6 … 20 ›: siempre la primera, la última y dos alrededor de la actual
+  function pintarPaginas(paginas) {
+    const nav = $("[data-paginas]");
+    if (paginas <= 1) return (nav.innerHTML = "");
+    const nums = [...new Set([1, pagina - 1, pagina, pagina + 1, paginas])].filter((n) => n >= 1 && n <= paginas).sort((a, b) => a - b);
+    const flecha = (n, etiqueta, d) => `<button class="paginador-boton paginador-flecha" type="button" data-pagina="${n}" aria-label="${etiqueta}" ${n < 1 || n > paginas ? "disabled" : ""}><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg></button>`;
+    let html = flecha(pagina - 1, "Página anterior", "m12.5 5-5 5 5 5");
+    nums.forEach((n, i) => {
+      if (i && n - nums[i - 1] > 1) html += `<span class="paginador-salto" aria-hidden="true">…</span>`;
+      html += `<button class="paginador-boton${n === pagina ? " activo" : ""}" type="button" data-pagina="${n}" ${n === pagina ? 'aria-current="page"' : ""} aria-label="Página ${n}">${miles(n)}</button>`;
+    });
+    html += flecha(pagina + 1, "Página siguiente", "m7.5 5 5 5-5 5");
+    nav.innerHTML = html;
+  }
+  $("[data-paginas]").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-pagina]");
+    if (!b || b.disabled) return;
+    irAPagina(+b.dataset.pagina);
+  });
+  function irAPagina(n) {
+    pagina = n;
+    pintar();
+    const tarjeta = $(".tarjeta");
+    if (tarjeta.getBoundingClientRect().top < 0) tarjeta.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  $("[data-por]").value = String(porPagina);
+  $("[data-por]").addEventListener("change", (e) => {
+    const primera = (pagina - 1) * porPagina; // se queda en la página que tiene la misma primera pieza
+    porPagina = +e.target.value;
+    try { localStorage.setItem("neucast-admin:por-pagina", porPagina); } catch {}
+    pagina = Math.floor(primera / porPagina) + 1;
+    pintar();
+  });
 
   function cablearFilas(cuerpo) {
     cuerpo.querySelectorAll("tr[data-slug]").forEach((tr) => {
@@ -238,24 +304,26 @@ const base = import.meta.env.BASE_URL;
   }
 
   /* ---------- Controles ---------- */
-  $("[data-buscar]").addEventListener("input", (e) => { filtro.texto = e.target.value; pintar(); });
-  $("[data-categoria]").addEventListener("change", (e) => { filtro.cat = e.target.value; pintar(); });
+  $("[data-buscar]").addEventListener("input", (e) => { filtro.texto = e.target.value; pagina = 1; pintar(); });
+  $("[data-categoria]").addEventListener("change", (e) => { filtro.cat = e.target.value; pagina = 1; pintar(); });
   $("[data-estados]").addEventListener("click", (e) => {
     const b = e.target.closest("[data-estado]");
     if (!b) return;
     filtro.estado = b.dataset.estado;
     document.querySelectorAll("[data-estados] .segmento").forEach((s) => s.setAttribute("aria-pressed", String(s === b)));
+    pagina = 1;
     pintar();
   });
   document.querySelectorAll("[data-orden]").forEach((b) =>
     b.addEventListener("click", () => {
       if (filtro.orden === b.dataset.orden) filtro.dir *= -1;
       else { filtro.orden = b.dataset.orden; filtro.dir = 1; }
+      pagina = 1;
       pintar();
     })
   );
   $("[data-limpiar]").addEventListener("click", () => {
-    filtro.texto = ""; filtro.cat = ""; filtro.estado = "";
+    filtro.texto = ""; filtro.cat = ""; filtro.estado = ""; pagina = 1;
     $("[data-buscar]").value = ""; $("[data-categoria]").value = "";
     document.querySelectorAll("[data-estados] .segmento").forEach((s) => s.setAttribute("aria-pressed", String(!s.dataset.estado)));
     pintar();
@@ -270,7 +338,7 @@ const base = import.meta.env.BASE_URL;
   });
 
   // ?estado=borrador llega desde la cifra de borradores del inicio
-  const estadoInicial = new URLSearchParams(location.search).get("estado");
+  const estadoInicial = params.get("estado");
   if (estadoInicial === "borrador" || estadoInicial === "publicada") {
     filtro.estado = estadoInicial;
     document.querySelectorAll("[data-estados] .segmento").forEach((s) => s.setAttribute("aria-pressed", String(s.dataset.estado === estadoInicial)));

@@ -4,7 +4,7 @@
 // El carrusel de fotos NO lleva flechas debajo de la imagen: en táctil se pasa
 // con el dedo y en escritorio las flechas aparecen sobre la foto, a los lados,
 // solo al acercar el cursor. Así la cuadrícula se mantiene limpia.
-import { gruposColor, materiales } from "../data/catalogo.js";
+import { gruposColor, materiales, filtros } from "../data/catalogo.js";
 import Icon from "@neucast/compartido/components/Icon.astro";
 
 // `ancho` convierte la card en pieza de carrusel (el home). Sin él, la card
@@ -50,6 +50,14 @@ const datos = {
   "data-entrega": pieza.entrega,
   "data-nuevo": pieza.nuevo ? "1" : "0",
 };
+// PARA EL ADMINISTRADOR: las listas que se creen en el administrador y filtren
+// en el sitio llegan en `filtros` con su `campo`; la pieza trae su valor con
+// ese mismo nombre (texto o arreglo). Aquí se vuelven atributo para el filtro.
+for (const { campo } of filtros) {
+  if (`data-${campo}` in datos) continue;
+  const v = pieza[campo];
+  datos[`data-${campo}`] = Array.isArray(v) ? v.join(" ") : v || "";
+}
 ---
 <article class:list={["pz", { "pz--rail": ancho }]} style={ancho ? `--pz-w:${ancho}` : undefined} {...datos} data-mp-scope>
   <div class="pz-marco">

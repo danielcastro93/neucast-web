@@ -117,7 +117,7 @@ export async function borrar(coleccion, id) {
 export async function publicar(destino) {
   await espera(900);
   const estado = await cargar("publicacion");
-  const sesion = JSON.parse(sessionStorage.getItem("neucast-admin:sesion") || "{}");
+  const sesion = JSON.parse(localStorage.getItem("neucast-admin:sesion") || "{}");
   const marca = { fecha: new Date().toISOString(), por: sesion.nombre || "Simulación" };
   if (destino === "produccion") {
     estado.produccion = marca;
@@ -151,7 +151,7 @@ export async function entrar(correo, clave) {
 
 export function restablecer() {
   Object.keys(localStorage)
-    .filter((k) => k.startsWith("neucast-admin:"))
+    .filter((k) => k.startsWith("neucast-admin:") && k !== "neucast-admin:sesion")
     .forEach((k) => localStorage.removeItem(k));
   cache.clear();
 }

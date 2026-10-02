@@ -148,15 +148,55 @@ sitio todavía no los lee; la API los guarda y los entrega igual:
   grupo de `gruposColor`. `colores` (lo que filtra el sitio) se sigue
   entregando y es la lista de grupos sin repetir: el administrador la deriva
   al guardar. Cuando la ficha enseñe los nombres comerciales, los lee de aquí.
-- Las **listas cerradas crecen desde el administrador**, en la pantalla
-  Listas: se agregan opciones (con un `id` sin acentos que ya no cambia), se
-  renombran, se ordenan y se quitan si ninguna pieza las usa. Por eso, al conectar, `filtros`, `materiales` y `gruposColor`
-  tienen que venir de la API y no de `catalogo.js`: si no, la opción nueva no
-  aparece en el panel de filtros del sitio, y el orden de la lista es el
-  orden en que el sitio enseña las opciones.
+- Las **listas son configurables desde el administrador**, en la pantalla
+  Listas, para que el catálogo crezca a cualquier tipo de mueble (un bote de
+  basura con "Capacidad", una lámpara con "Tipo de luz") sin tocar código. Se
+  guardan como un solo recurso, `listas`:
+
+  ```js
+  {
+    listas: [{
+      id: "capacidad",            // sin acentos; ya no cambia. Es el nombre del campo en la pieza
+      nombre: "Capacidad",
+      seleccion: "una",           // "una" (texto) o "varias" (arreglo)
+      categorias: ["botes"],      // dónde aparece; null = todas, también las futuras
+      obligatoria: ["botes"],     // "todas" o las categorías donde no se publica sin ella
+      filtro: true,               // si sale en el panel de filtros de /muebles/
+      sistema: false,             // material, colores, entrega y uso: no se borran
+      opciones: [{ id: "20-litros", nombre: "20 litros", hex: "#…" /* solo colores */ }],
+    }],
+    medidas: [{ id: "alto", nombre: "Altura", grupo: "caja", unidad: "cm", // "" = cuenta (plazas)
+                rango: true, ejemplo: "", categorias: null }],
+    gruposMedida: [{ id: "caja", nombre: "Caja" }],
+    partes: [{ id: "estructura", nombre: "Estructura", ejemplo: "Acero", categorias: null }],
+    espacios: [...],
+  }
+  ```
+
+  La pieza guarda el valor de cada lista con el `id` de la lista, igual que
+  hoy `uso` o `respaldo`. Al conectar, **el sitio deja de leer las listas de
+  `catalogo.js` y `fichas.js`**: la API las deriva de este recurso.
+  - `filtros` = las listas con `filtro: true`, menos `material`, `colores`,
+    con `{ campo: id, nombre, opciones }`, en el orden de la pantalla.
+  - `materiales` = las opciones de `material`; `gruposColor` = las de
+    `colores` (con `hex`).
+  - `etiquetasMedida` = `{ id: nombre }` de `medidas`, y
+    `etiquetasConstruccion` = `{ id: nombre }` de `partes`.
+
+  El sitio ya está listo para listas nuevas: la tarjeta pone `data-{id}` para
+  el filtro, y la ficha y los PDF enseñan la lista con su nombre después de
+  las de siempre. El orden de cada lista es el orden en que el sitio enseña
+  las opciones. La API no debe dejar borrar una opción, una lista, una medida
+  o una parte que alguna pieza use (el administrador ya lo revisa).
 - Las **medidas** se capturan como número con su unidad fija (cm, mm, kg) o
   como conteo entero (plazas, personas, puertas…). Se siguen guardando como
   texto con la forma de hoy: `"84 cm"`, `"45 a 55 cm"`, `"6"`.
+- **El listado de piezas va paginado** (25, 50 o 100 por página), pensado
+  para cientos de miles de piezas. En la simulación se corta en el
+  navegador; con la API real lo corta el servidor:
+  `GET /piezas?pagina=2&por=50&q=texto&cat=slug&estado=borrador&orden=nombre&dir=asc`
+  responde `{ piezas: [...], total: 1234 }`. La búsqueda, la categoría, el
+  estado y el orden se aplican antes de cortar.
 - `combina` es la selección manual de "Piezas que combinan" (hasta ocho, en
   orden). Si viene vacía, el sitio sigue calculándolas solo: primero las de la
   misma categoría y después el resto. Cuando se conecte, la ficha usa esta

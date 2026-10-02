@@ -728,7 +728,7 @@ const bloquesVisibles = bloquesPara(catActiva, piezas.length);
     // campo basta con cumplir UNA de las opciones marcadas
     const pasa = (tarjeta, sel) =>
       Object.entries(sel).every(([campo, valores]) => {
-        const dato = (tarjeta.dataset[campo] || "").split(" ").filter(Boolean);
+        const dato = (tarjeta.getAttribute(`data-${campo}`) || "").split(" ").filter(Boolean);
         return valores.some((v) => dato.includes(v));
       });
 
@@ -739,7 +739,7 @@ const bloquesVisibles = bloquesPara(catActiva, piezas.length);
       const otros = { ...sel };
       delete otros[campo];
       return tarjetas.filter(
-        (t) => pasa(t, otros) && (t.dataset[campo] || "").split(" ").includes(valor)
+        (t) => pasa(t, otros) && (t.getAttribute(`data-${campo}`) || "").split(" ").includes(valor)
       ).length;
     };
 

@@ -302,3 +302,33 @@ a.renglon:focus-visible{outline-offset:-3px;}
 }
 @keyframes hojaSube{from{transform:translateY(100%);}to{transform:none;}}
 @keyframes hojaBaja{to{transform:translateY(100%);}}
+
+/* ============================================
+   Paginador (pie de las tablas largas)
+   ============================================ */
+.paginador{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:var(--space-4);font-size:var(--t-subtitulo);color:var(--etiqueta-2);}
+.paginador[hidden]{display:none;}
+.paginador-conteo{font-variant-numeric:tabular-nums;}
+.paginador-conteo b{font-weight:600;color:var(--etiqueta);}
+.paginador-de{color:var(--etiqueta-3);}
+.paginador-paginas{display:flex;align-items:center;gap:4px;}
+.paginador-boton{
+  min-width:36px;height:36px;padding:0 10px;border-radius:999px;display:inline-grid;place-items:center;
+  font-size:var(--t-llamada);font-weight:500;color:var(--etiqueta-2);font-variant-numeric:tabular-nums;
+  transition:background .2s var(--ease),color .2s,transform .2s var(--resorte);
+}
+@media (hover:hover){.paginador-boton:not(:disabled):not(.activo):hover{background:var(--relleno);color:var(--etiqueta);}}
+.paginador-boton:active:not(:disabled){transform:scale(.94);}
+.paginador-boton.activo{background:var(--ink);color:var(--white);font-weight:600;}
+.paginador-boton:disabled{opacity:.3;cursor:default;}
+.paginador-boton:focus-visible{outline:0;box-shadow:var(--anillo);}
+.paginador-flecha{padding:0;}
+.paginador-salto{min-width:20px;text-align:center;color:var(--etiqueta-3);}
+.paginador-por{justify-self:end;display:flex;align-items:center;gap:10px;white-space:nowrap;}
+.paginador-por .selector{width:84px;}
+.paginador-por .selector-boton{height:36px;padding-inline:14px 10px;font-size:var(--t-llamada);}
+@media (max-width:760px){
+  .paginador{grid-template-columns:1fr auto;padding:16px 18px;}
+  .paginador-paginas{grid-column:1 / -1;grid-row:1;justify-content:center;}
+  .paginador-boton{min-width:40px;height:40px;}
+}
