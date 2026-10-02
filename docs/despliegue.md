@@ -7,7 +7,7 @@ qué decisiones quedan abiertas y qué hay que dejar cerrado antes de producció
 
 ## 1. Qué es lo que se publica
 
-El sitio es **estático**. `npm run build` deja en `dist/` una carpeta de HTML,
+El sitio es **estático**. `npm run build` deja en `sitio/dist/` una carpeta de HTML,
 CSS, JavaScript, imágenes y PDF. No hay servidor de aplicación, ni base de
 datos, ni nada que ejecutar del lado del sitio público: se sirven archivos.
 
@@ -65,7 +65,7 @@ Pasos, en orden:
 2. **Revisar qué hay publicado hoy en el dominio raíz** antes de retirar el
    WordPress: si alguna dirección existe y está indexada, hay que redirigirla
    en vez de dejarla en 404.
-3. **Retirar el WordPress** y dejar el dominio raíz libre para `dist/`.
+3. **Retirar el WordPress** y dejar el dominio raíz libre para `sitio/dist/`.
 4. Contratar el VPS y crear los subdominios del administrador, de la API y de
    pruebas (`stg.`).
 
@@ -86,10 +86,10 @@ chicos) donde viva todo:
 
 | En el VPS | Qué hace |
 | --- | --- |
-| Nginx | Sirve `neucast.com.mx` (los archivos de `dist/`), `admin.` y `preview.`, con certificados Let's Encrypt |
+| Nginx | Sirve `neucast.com.mx` (los archivos de `sitio/dist/`), `admin.` y `preview.`, con certificados Let's Encrypt |
 | La API y su base de datos | El backend del administrador, en el lenguaje que defina el desarrollador (Node o PHP), con MySQL o MariaDB |
 | Node y Chrome sin interfaz | Compilan el sitio y generan los PDF cuando el administrador publica |
-| Un repositorio Git privado | El código del sitio y del administrador, con copia en la Mac de Daniel |
+| Un repositorio Git privado | El código entero (`sitio/`, `compartido/`, `admin/`, `api/` y `docs/` en un solo repositorio), con copia en la Mac de Daniel |
 | Copias de seguridad | De la base de datos, las fotos y los PDF, programadas en el mismo servidor |
 
 Un VPS chico alcanza de sobra: el sitio público es estático y la compilación
@@ -137,7 +137,7 @@ El servidor de Neucast
         ↓ npm run build     (consulta la API y compila Astro con esos datos)
         ↓ fichas y catálogos en PDF de lo que cambió
         ↓ npm run revisar   (si algo falla, no se publica)
-Copia dist/ a la carpeta que sirve neucast.com.mx
+Copia sitio/dist/ a la carpeta que sirve neucast.com.mx
 ```
 
 **El paso de revisión no es opcional.** `npm run revisar` recorre el sitio
@@ -176,7 +176,7 @@ tres.
   en `www.neucast.com.mx` y redirigir la otra de forma permanente. El sitio
   declara sus canónicas **con diagonal final**; la configuración del servidor
   tiene que respetar eso o se duplican las páginas a ojos de Google.
-- **`site.domain` en `src/data/site.js` tiene que coincidir exactamente** con la
+- **`site.domain` en `sitio/src/data/site.js` tiene que coincidir exactamente** con la
   dirección elegida, con `https://` y sin diagonal final. Si queda mal, quedan
   mal las canónicas, el mapa del sitio y todas las direcciones absolutas de
   golpe. Es el dato más caro de equivocar.
@@ -228,7 +228,7 @@ sitio no usa cookies. Ver `pendientes.md`.
 
 - **Mapa del sitio y `robots.txt`** se generan de las mismas listas que generan
   las páginas: si la API entrega bien los datos, se actualizan solos.
-- **Canónicas y etiqueta `robots` por página**, en `src/layouts/Base.astro`. Las
+- **Canónicas y etiqueta `robots` por página**, en `sitio/src/layouts/Base.astro`. Las
   páginas que no se indexan lo declaran.
 - **Datos estructurados** de cada pieza, categoría y proyecto.
 - **50 páginas, 46 indexables, sin enlaces rotos.**
@@ -241,12 +241,12 @@ sitio no usa cookies. Ver `pendientes.md`.
 - Nada más del lado del sitio público: no hay base de datos ni proceso que
   mantener vivo. La base y el proceso son de la API del administrador.
 - Para generar los PDF a mano: una Mac (por la Helvetica Neue), Chrome y
-  Python con Pillow (`scripts/fichas/fotos.py` achica las fotos de los
+  Python con Pillow (`sitio/scripts/fichas/fotos.py` achica las fotos de los
   catálogos).
 
 ```bash
 npm install
 npm run dev      # http://localhost:4321
-npm run build    # compila a dist/
-npm run revisar  # revisa dist/
+npm run build    # compila a sitio/dist/
+npm run revisar  # revisa sitio/dist/
 ```

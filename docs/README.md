@@ -5,6 +5,12 @@ espacios corporativos. Astro 7, estático, preparado para que el contenido venga
 de un administrador propio: un sitio Astro aparte que habla con una API. Ya no
 se usa WordPress.
 
+El repositorio tiene cuatro carpetas: `sitio/` (el sitio público),
+`compartido/` (tokens, estilos y componentes que comparten sitio y
+administrador), `admin/` (el frontend del administrador, por construir) y
+`api/` (el backend, de Amauri; su `README` dice dónde está el contrato). El
+árbol completo está en [arquitectura.md](arquitectura.md), apartado 2.
+
 ## Por dónde empezar
 
 **Si vienes a construir o conectar el administrador, lee estos tres en este
@@ -35,8 +41,8 @@ El front está terminado: **50 páginas, 46 indexables, sin enlaces rotos.**
 ```bash
 npm install
 npm run dev      # http://localhost:4321
-npm run build    # compila a dist/
-npm run revisar  # revisa dist/
+npm run build    # compila a sitio/dist/
+npm run revisar  # revisa sitio/dist/
 npm run fichas     # fichas técnicas en PDF (en una Mac)
 npm run catalogos  # catálogos en PDF (en una Mac)
 ```

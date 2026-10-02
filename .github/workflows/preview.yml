@@ -3,7 +3,7 @@
 # Es una copia para revisar, no el sitio de producción. Va con noindex y con un
 # robots.txt que cierra todo, para que no compita con neucast.com.mx.
 #
-# El sitio real se publica en Hostinger subiendo la carpeta dist/ tal cual sale
+# El sitio real se publica en Hostinger subiendo la carpeta sitio/dist/ tal cual sale
 # de `npm run build`, sin el paso de preview.
 name: Vista previa
 
@@ -34,10 +34,11 @@ jobs:
       - run: npm run build
       - run: npm run revisar
       - name: Ajustar para la subcarpeta de Pages
+        working-directory: sitio
         run: node scripts/preparar-preview.mjs "/${{ github.event.repository.name }}"
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: sitio/dist
 
   publicar:
     needs: compilar

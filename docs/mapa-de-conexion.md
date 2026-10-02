@@ -17,7 +17,7 @@ del cliente.
 - **En el administrador**: qué hay que crear para que lo administre el cliente.
 - **Fijo**: está escrito en el código a propósito. Ver el apartado 12.
 
-Los archivos de datos son `src/data/site.js`, `catalogo.js`, `fichas.js`,
+Los archivos de datos son `sitio/src/data/site.js`, `catalogo.js`, `fichas.js`,
 `proyectos.js` y `homeOffice.js`. Cuando la tabla dice "site.js" se refiere a ese archivo.
 
 ---
@@ -53,7 +53,7 @@ cada botón.
 | Categorías | Las ocho tarjetas con foto y nombre | `site.js` → `categories` (`name`, `photo`, `alt`) | Tabla de categorías |
 | Piezas destacadas | El carrusel de piezas | `site.js` → `destacados`, una lista de ocho `slug` | **Un selector de piezas ordenable.** Ver el apartado 4 |
 | Proyecto destacado | Foto con puntos sobre las piezas | `proyectos.js` → el **primer** proyecto del arreglo | Marcar un proyecto como destacado, o respetar el orden |
-| Editorial | Texto, video y enlace a Nosotros | Fijos y `public/video/` | Fijo |
+| Editorial | Texto, video y enlace a Nosotros | Fijos y `sitio/public/video/` | Fijo |
 | Cierre | Bloque final con foto y botones | Fijo | Fijo |
 
 **Ojo con las piezas destacadas.** `destacados` guarda `slug`, no objetos. Si el
@@ -114,7 +114,7 @@ La pantalla con más campos del sitio. Se lee de arriba abajo.
 | Todas las fotos de la pieza | `catalogo.js` → `pieza.img[]`, un arreglo | Galería de imágenes. La **primera es la principal** y sale recortada |
 | Texto alternativo de la primera foto | `pieza.alt` | Campo de la pieza |
 | Texto alternativo del resto | Se arma solo: `"{nombre} en uso"` | Conviene un alt por imagen |
-| El video del final de la galería | `public/video/editorial-neucast.mp4`, el mismo para todas | Fijo hoy. Si se quiere uno por pieza, es un campo más |
+| El video del final de la galería | `sitio/public/video/editorial-neucast.mp4`, el mismo para todas | Fijo hoy. Si se quiere uno por pieza, es un campo más |
 | Los puntos bajo el carrusel en teléfono | Se cuentan solos | — |
 
 **La regla de los puntos.** Con muchas fotos no se pintan muchos puntos: se
@@ -152,7 +152,7 @@ ser listas cerradas (selectores), nunca un campo de texto.
 | Detalles del producto | `fichas.js` → `resumen` y `destacados[]` |
 | Dimensiones | `fichas.js` → `medidas{}` y el croquis, que se dibuja solo con las medidas |
 | Materiales y cuidados | `fichas.js` → `construccion{}`, `mecanismo{}` y `cuidados[]` |
-| Descargas | `public/fichas/` |
+| Descargas | `sitio/public/fichas/` |
 
 `etiquetasMedida` y `etiquetasConstruccion`, al final de `fichas.js`, traducen
 cada clave a lo que se lee en pantalla. **Si el administrador agrega una clave nueva hay
@@ -259,7 +259,7 @@ El formulario trae un **campo trampa** llamado `sitio_web`, invisible para una
 persona. Si llega con contenido, es un robot: hay que descartar ese envío en el
 servidor sin responder nada.
 
-**Hoy no manda nada.** `SIMULAR_ENVIO = true` en `src/pages/contacto.astro`: el
+**Hoy no manda nada.** `SIMULAR_ENVIO = true` en `sitio/src/pages/contacto.astro`: el
 formulario valida, enseña la pantalla de gracias y se queda ahí. Hay que ponerlo
 en `false` y apuntar `ENDPOINT` a la API.
 
@@ -285,12 +285,12 @@ las revise un abogado.** Ver `pendientes.md`.
 
 | Dónde | Hoy | Al conectar |
 | --- | --- | --- |
-| Producto | `public/img/products/` | Vienen del administrador |
-| Categorías | `public/img/cats/` | Vienen del administrador |
-| Proyectos | `public/img/` | Vienen del administrador |
-| Secciones fijas (hero, nosotros, contacto, 404) | `public/img/` | **Se quedan en el repositorio** |
-| Video | `public/video/` | Se queda |
-| Fichas y catálogos en PDF | `public/fichas/`, `public/catalogos/` | Se generan al publicar |
+| Producto | `sitio/public/img/products/` | Vienen del administrador |
+| Categorías | `sitio/public/img/cats/` | Vienen del administrador |
+| Proyectos | `sitio/public/img/` | Vienen del administrador |
+| Secciones fijas (hero, nosotros, contacto, 404) | `sitio/public/img/` | **Se quedan en el repositorio** |
+| Video | `sitio/public/video/` | Se queda |
+| Fichas y catálogos en PDF | `sitio/public/fichas/`, `sitio/public/catalogos/` | Se generan al publicar |
 
 **Cada imagen necesita su texto alternativo.** No es un extra: es lo que lee
 Google y lo que oye quien navega con lector de pantalla. La regla es describir lo
@@ -335,7 +335,7 @@ No hay que conectar nada de esto, pero conviene saber que existe:
   bytes por pieza, así que 500 piezas son unos 115 KB, que el navegador solo
   descarga la primera vez que alguien abre el buscador.
 - **Las canónicas** y la etiqueta `robots` de cada página viven en
-  `src/layouts/Base.astro`.
+  `sitio/src/layouts/Base.astro`.
 - **Los datos estructurados** de cada pieza, categoría y proyecto.
 - **Las migas de pan.**
 - **"Piezas que combinan"** y **"Otros proyectos"**.
@@ -369,13 +369,13 @@ escrita en el mensaje, y el formulario de contacto, que la manda en el campo
   pieza cambia de nombre o se da de baja, la copia de quien ya la tenía en su
   lista no se entera hasta que la quite. No es grave, pero conviene saberlo.
 - Se vacía sola cuando la solicitud se envía por el formulario.
-- El código vive en `src/scripts/proyecto.js` y `src/components/MiProyecto.astro`.
+- El código vive en `sitio/src/scripts/proyecto.js` y `sitio/src/components/MiProyecto.astro`.
 
 **El buscador** abre una capa a pantalla completa desde la lupa del encabezado (o con "/" y
 Ctrl/Cmd+K en escritorio). Busca en piezas, categorías y proyectos al teclear,
 desde dos letras, sin importar acentos ni mayúsculas, y entiende singular, plural y género:
 "sillas negras" encuentra sillas de color "Negro". No hay servidor de búsqueda:
-lee `buscar.json` (apartado 10). Vive en `src/components/Buscador.astro`. Con
+lee `buscar.json` (apartado 10). Vive en `sitio/src/components/Buscador.astro`. Con
 el campo vacío propone el tipo de mueble con más piezas de cada categoría y
 las categorías con foto; todo sale del catálogo, nada se captura aparte.
 
@@ -393,7 +393,7 @@ valores). Una silla operativa es de Sillas operativas y también de home office.
 | Qué se ve | Sale de | En el administrador |
 | --- | --- | --- |
 | Piezas para tu home office | Piezas con `espacios` que incluye `home-office` | Casilla "Home office" en la pieza |
-| Sets para empezar | `src/data/homeOffice.js` → `sets` | Nombre, texto corto y de dos a cuatro piezas elegidas de una lista. Un set con menos de dos piezas publicadas no sale |
+| Sets para empezar | `sitio/src/data/homeOffice.js` → `sets` | Nombre, texto corto y de dos a cuatro piezas elegidas de una lista. Un set con menos de dos piezas publicadas no sale |
 | Ideas para armar tu espacio | `homeOffice.js` → `ideas` | Título, texto y foto. Sin cifras que no estén confirmadas |
 | Fotos de cabecera, portada y cierre | `homeOffice.js` → `homeOffice` | Tres imágenes |
 
@@ -409,7 +409,7 @@ valor a la lista de `espacios` y una página igual.
 
 `/recursos/` sale de las categorías: cada una con su foto, su número de
 piezas y su catálogo. Una categoría sin PDF todavía no aparece. Las hojas y el
-peso que dice cada botón se leen del archivo (`src/data/pdfs.js`).
+peso que dice cada botón se leen del archivo (`sitio/src/data/pdfs.js`).
 
 | Qué se descarga | De dónde sale | En el administrador |
 | --- | --- | --- |
@@ -431,7 +431,7 @@ Helvetica Neue; ver [despliegue.md](despliegue.md), apartado 3).
 | Los filtros y sus opciones | Una opción nueva sin su regla de filtrado deja piezas fuera sin avisar. Se agregan en código, con su etiqueta y su valor |
 | Los textos de nosotros, contacto y legales | Cambian una vez al año y son los que sostienen el posicionamiento |
 | Las preguntas frecuentes | Alimentan el esquema de Google |
-| Los colores, la tipografía, las medidas | Viven en `src/styles/global.css`. Cambiar un valor ahí cambia el sitio entero |
+| Los colores, la tipografía, las medidas | Viven en `compartido/styles/global.css`. Cambiar un valor ahí cambia el sitio entero |
 | Los bloques editoriales del catálogo | Ver el apartado 11 |
 
 ---

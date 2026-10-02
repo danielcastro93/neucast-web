@@ -5,15 +5,21 @@ espacios corporativos.
 
 **Vista previa:** https://danielcastro93.github.io/neucast-web/
 
-Astro 7, estático. El contenido vive en `src/data/` y está preparado para venir
+Astro 7, estático. El contenido vive en `sitio/src/data/` y está preparado para venir
 de un administrador propio: un sitio Astro aparte que habla con una API (ya no
 se usa WordPress).
+
+Un solo repositorio con cuatro carpetas: `sitio/` (el sitio público),
+`compartido/` (tokens, estilos y componentes que usan el sitio y el
+administrador), `admin/` (el frontend del administrador, por construir) y
+`api/` (el backend y la API, de Amauri). Son workspaces de npm: los comandos se
+corren desde la raíz.
 
 ```bash
 npm install
 npm run dev      # http://localhost:4321
-npm run build    # compila a dist/
-npm run revisar  # revisa dist/: enlaces, SEO, encabezados y reglas del proyecto
+npm run build    # compila a sitio/dist/
+npm run revisar  # revisa sitio/dist/: enlaces, SEO, encabezados y reglas del proyecto
 npm run fichas     # fichas técnicas en PDF, en una Mac
 npm run catalogos  # catálogos en PDF, en una Mac
 ```

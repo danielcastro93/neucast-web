@@ -42,7 +42,7 @@ Sillas ejecutivas · Sillas operativas · Salas de juntas · Escritorios ·
 Cafeterías · Lounge y áreas comunes · Almacenamiento · Exteriores
 
 Son las que existen como página y como filtro. Cada una vive en
-`categories`, dentro de `src/data/site.js`, con su foto y sus textos de
+`categories`, dentro de `sitio/src/data/site.js`, con su foto y sus textos de
 posicionamiento.
 
 ### Atributos por familia
@@ -80,7 +80,7 @@ comercial se mapea a un **grupo de color** filtrable (negro, gris, blanco, azul,
 verde, rojo, café, beige, amarillo) y el nombre comercial se guarda para la
 ficha de la pieza.
 
-Los grupos están en `gruposColor`, dentro de `src/data/catalogo.js`. El campo
+Los grupos están en `gruposColor`, dentro de `sitio/src/data/catalogo.js`. El campo
 `colores` de cada pieza lleva ids de esa lista, nunca nombres comerciales.
 
 ## 4. Familias de tapicería
@@ -131,7 +131,7 @@ entrega rápida y conviene poder verlos solos.
 
 **Cada filtro sale de un campo, nunca del texto libre**, o el filtrado no es
 fiable. Los valores posibles están declarados en `filtros`, `materiales` y
-`gruposColor`, dentro de `src/data/catalogo.js`. Si la API del administrador
+`gruposColor`, dentro de `sitio/src/data/catalogo.js`. Si la API del administrador
 manda un valor que no esté en la lista, la pieza desaparece al filtrar por ese
 campo, así que en el administrador tienen que ser listas cerradas (selectores),
 nunca texto libre.

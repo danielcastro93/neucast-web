@@ -1,0 +1,246 @@
+---
+// Home office: colección por espacio.
+//
+// Las piezas no se capturan aquí: salen del catálogo, de las que traen
+// "home-office" en `espacios`. Sets, ideas y fotos viven en
+// src/data/homeOffice.js. Se llega desde el menú de Muebles, el home, el
+// buscador y el footer.
+import Destacado from "../components/Destacado.astro";
+import Base from "../layouts/Base.astro";
+import Icon from "@neucast/compartido/components/Icon.astro";
+import PageHero from "../components/PageHero.astro";
+import SectionHead from "../components/SectionHead.astro";
+import PiezaCard from "../components/PiezaCard.astro";
+import CierreCta from "../components/CierreCta.astro";
+import { site, waLink } from "../data/site.js";
+import { rutaPieza } from "../data/catalogo.js";
+import { homeOffice, sets, ideas, piezasHomeOffice } from "../data/homeOffice.js";
+import { migas } from "../data/migas.js";
+
+const title = "Muebles para home office: sillas, escritorios y sets | Neucast";
+const description =
+  "Sillas, escritorios y almacenamiento para trabajar desde casa como en la oficina. Sets listos, ideas para armar tu espacio y cotización para tu equipo.";
+
+const schema = [{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  name: "Home office",
+  url: `${site.domain}${homeOffice.ruta}`,
+  description,
+  inLanguage: "es-MX",
+  isPartOf: { "@id": `${site.domain}/#organizacion` },
+}, migas([["Muebles", "/muebles/"], ["Home office", homeOffice.ruta]])];
+
+const waEquipo = waLink("Hola, quiero cotizar mobiliario de home office para mi equipo.");
+---
+<Base title={title} description={description} image={homeOffice.hero.img} schema={schema}>
+  <PageHero
+    image={homeOffice.hero.img}
+    alt={homeOffice.hero.alt}
+    eyebrow="Home office"
+    titulo={["Trabaja en casa", "como en la oficina"]}
+  />
+
+  <Destacado
+    arriba="clamp(56px,8vw,112px)"
+    lineas={["Sillas, escritorios y almacenamiento con la misma calidad que ponemos en un piso corporativo.", "Arma tu espacio pieza por pieza o empieza con un set."]}
+  />
+
+  <!-- ============ SETS ============ -->
+  {sets.length > 0 && (
+  <section class="ho-sec">
+    <div class="container">
+      <div class="reveal">
+        <SectionHead title="Sets para empezar" />
+      </div>
+      <div class="ho-sets">
+        {sets.map((s) => (
+          <article class="ho-set reveal" data-mp-set-scope>
+            <div class="ho-set-fotos" aria-hidden="true">
+              {s.piezas.map((p) => (
+                <a
+                  class="ho-set-foto"
+                  href={rutaPieza(p)}
+                  tabindex="-1"
+                  data-mp-set-item
+                  data-slug={p.slug}
+                  data-nombre={p.nombre}
+                  data-tipo={p.tipo}
+                  data-ruta={rutaPieza(p)}
+                >
+                  <img src={p.img[0]} alt="" loading="lazy" />
+                </a>
+              ))}
+            </div>
+            <div class="ho-set-txt">
+              <h3 class="ho-set-nombre">{s.nombre}</h3>
+              <p class="ho-set-desc">{s.texto}</p>
+              <ul class="ho-set-lista">
+                {s.piezas.map((p) => (
+                  <li><a href={rutaPieza(p)}><span class="ho-set-tipo">{p.tipo}</span> {p.nombre}</a></li>
+                ))}
+              </ul>
+            </div>
+            <button class="pill pill--primary ho-set-btn" type="button" data-mp-set aria-pressed="false">
+              <span class="ho-set-ico ho-set-ico--mas"><Icon name="mas" size={15} /></span>
+              <span class="ho-set-ico ho-set-ico--ok"><Icon name="check" size={15} /></span>
+              <span data-mp-set-texto>Agregar el set a mi proyecto</span>
+            </button>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+  )}
+
+  <!-- ============ PIEZAS ============ -->
+  {piezasHomeOffice.length > 0 && (
+  <section class="ho-sec">
+    <div class="container">
+      <div class="reveal">
+        <SectionHead title="Piezas para tu home office" />
+      </div>
+      <div class="ho-piezas">
+        {piezasHomeOffice.map((p) => <PiezaCard pieza={p} nivel={3} />)}
+      </div>
+    </div>
+  </section>
+  )}
+
+  <!-- ============ IDEAS ============ -->
+  {ideas.length > 0 && (
+  <section class="ho-sec">
+    <div class="container">
+      <div class="reveal">
+        <SectionHead title="Ideas para armar tu espacio" />
+      </div>
+      <div class="ho-ideas">
+        {ideas.map((idea) => (
+          <article class="ho-idea reveal">
+            <span class="ho-idea-foto"><img src={idea.img} alt={idea.alt} loading="lazy" /></span>
+            <h3 class="ho-idea-ttl">{idea.titulo}</h3>
+            <p class="ho-idea-txt">{idea.texto}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+  )}
+
+  <!-- ============ PARA EMPRESAS ============ -->
+  <section class="ho-sec">
+    <div class="container">
+      <div class="ho-equipo reveal">
+        <span class="ho-equipo-foto">
+          <img src={homeOffice.portada.img} alt={homeOffice.portada.alt} loading="lazy" />
+        </span>
+        <div class="ho-equipo-txt">
+          <p class="rotulo">Para empresas</p>
+          <h2 class="display t-h2 ho-equipo-ttl">Equipa el home office de tu equipo</h2>
+          <p class="ho-equipo-p">
+            Si tu equipo trabaja desde casa todo o parte de la semana, armamos contigo
+            un set por puesto y te lo cotizamos completo en una sola propuesta. Tú nos
+            dices cuántas personas son y qué necesita cada una.
+          </p>
+          <div class="ho-equipo-ctas">
+            <a class="pill pill--primary" href={waEquipo} target="_blank" rel="noopener">
+              Cotizar para mi equipo <Icon name="arrow" size={14} />
+            </a>
+            <a class="pill pill--ghost" href="/contacto/">Pedir cotización por correo</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <CierreCta
+    eyebrow="Cuéntanos qué necesitas"
+    lineas={["Tu home office", "empieza con un mensaje"]}
+    img={homeOffice.cierre}
+    mensaje="Hola, quiero cotizar mobiliario para home office."
+  />
+
+  <style>
+
+    .ho-sec{margin-top:var(--section-y);}
+
+    /* ---------- sets ---------- */
+    .ho-sets{display:grid;gap:18px;}
+    /* en teléfono y tableta, una fila que se pasa con el dedo: apilados, los
+       tres sets ocupaban casi tres pantallas */
+    @media (max-width:899px){
+      .ho-sets{
+        display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;
+        scroll-snap-type:x mandatory;overscroll-behavior-x:contain;
+        margin-inline:calc(var(--gutter) * -1);padding-inline:var(--gutter);
+        scroll-padding-inline:var(--gutter);
+      }
+      .ho-sets::-webkit-scrollbar{display:none;}
+      .ho-set{flex:none;width:min(84vw,380px);scroll-snap-align:start;}
+    }
+    @media (min-width:900px){.ho-sets{grid-template-columns:repeat(3,1fr);gap:20px;}}
+    .ho-set{
+      display:flex;flex-direction:column;gap:20px;
+      padding:clamp(16px,1.6vw,22px);border-radius:var(--radius);
+      background:var(--paper-soft);
+    }
+    /* las tres piezas lado a lado, sobre el mismo gris que en el catálogo */
+    .ho-set-fotos{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+    .ho-set-foto{
+      display:block;aspect-ratio:1;border-radius:var(--radius-sm);overflow:hidden;
+      background:var(--cemento-suave);
+    }
+    .ho-set-foto img{width:100%;height:100%;object-fit:contain;padding:12%;transition:transform .5s var(--ease);}
+    @media (hover:hover){.ho-set-foto:hover img{transform:scale(1.05);}}
+    .ho-set-txt{flex:1;display:flex;flex-direction:column;gap:10px;}
+    .ho-set-nombre{font-size:var(--fs-h4);font-weight:700;letter-spacing:-.01em;line-height:1.2;}
+    .ho-set-desc{font-size:var(--fs-sm);color:var(--ink-60);}
+    .ho-set-lista{list-style:none;margin:6px 0 0;padding:0;border-top:1px solid var(--line);}
+    .ho-set-lista li{border-bottom:1px solid var(--line);}
+    .ho-set-lista a{
+      display:flex;align-items:baseline;gap:8px;min-height:44px;padding:11px 0;
+      font-size:var(--fs-sm);font-weight:600;color:var(--ink);
+    }
+    @media (hover:hover){.ho-set-lista a:hover{color:var(--olive-deep);}}
+    .ho-set-tipo{font-weight:400;color:var(--ink-60);}
+    .ho-set-btn{width:100%;justify-content:center;gap:8px;}
+    .ho-set-ico{display:flex;}
+    .ho-set-ico--ok{display:none;}
+    .ho-set-btn.mp-dentro{background:var(--white);color:var(--ink);border-color:var(--ink);}
+    .ho-set-btn.mp-dentro .ho-set-ico--mas{display:none;}
+    .ho-set-btn.mp-dentro .ho-set-ico--ok{display:flex;}
+
+    /* ---------- piezas ---------- */
+    .ho-piezas{display:grid;grid-template-columns:repeat(2,1fr);gap:28px 12px;}
+    /* tres columnas aun en escritorio grande: la colección es corta y en
+       cuatro dejaba una pieza sola en la última fila */
+    @media (min-width:760px){.ho-piezas{grid-template-columns:repeat(3,1fr);gap:40px 18px;}}
+
+    /* ---------- ideas ---------- */
+    .ho-ideas{display:grid;gap:40px;}
+    @media (min-width:760px){.ho-ideas{grid-template-columns:repeat(2,1fr);gap:56px clamp(20px,3vw,40px);}}
+    .ho-idea{display:flex;flex-direction:column;}
+    .ho-idea-foto{display:block;aspect-ratio:3/2;border-radius:var(--radius);overflow:hidden;background:var(--cemento-suave);}
+    .ho-idea-foto img{width:100%;height:100%;object-fit:cover;}
+    .ho-idea-ttl{margin-top:18px;font-size:var(--fs-h4);font-weight:700;letter-spacing:-.01em;line-height:1.2;}
+    .ho-idea-txt{margin-top:8px;color:var(--ink-60);max-width:560px;}
+
+    /* ---------- para empresas ---------- */
+    .ho-equipo{
+      display:grid;border-radius:var(--radius);overflow:hidden;background:var(--cemento-claro);
+    }
+    @media (min-width:900px){.ho-equipo{grid-template-columns:minmax(0,1fr) minmax(0,1fr);}}
+    .ho-equipo-foto{display:block;aspect-ratio:4/3;}
+    @media (min-width:900px){.ho-equipo-foto{aspect-ratio:auto;min-height:100%;}}
+    .ho-equipo-foto img{width:100%;height:100%;object-fit:cover;}
+    .ho-equipo-txt{
+      display:flex;flex-direction:column;align-items:flex-start;justify-content:center;
+      padding:clamp(24px,4vw,56px);
+    }
+    .ho-equipo-txt .rotulo{color:var(--olive-ink);}
+    .ho-equipo-ttl{margin:12px 0 14px;}
+    .ho-equipo-p{color:var(--ink-60);max-width:520px;}
+    .ho-equipo-ctas{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px;}
+    @media (max-width:639px){.ho-equipo-ctas{width:100%;flex-direction:column;}}
+  </style>
+</Base>

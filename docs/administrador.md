@@ -19,28 +19,28 @@ Tiene dos partes:
 
 | Parte | Qué es | Estado |
 | --- | --- | --- |
-| **Frontend del administrador** | Un sitio aparte hecho en Astro, estático, en un subdominio tipo `admin.neucast.com.mx`. Reutiliza los tokens y componentes del sistema de diseño de este repositorio (`src/styles/global.css` y `src/components/`) y habla con la API | Decidido |
-| **Backend y API** | Guarda los datos, recibe el formulario de contacto y dispara la publicación | **Por definir con el desarrollador.** Si trabaja en PHP: Laravel con MySQL en Hostinger. Si trabaja en Node: primero confirmar que el plan de Hostinger lo acepte |
+| **Frontend del administrador** | Un sitio aparte hecho en Astro, estático, en un subdominio tipo `admin.neucast.com.mx`. Vive en `admin/` de este mismo repositorio y reutiliza los tokens y componentes del sistema de diseño que están en `compartido/` (`global.css`, `Icon`, `Logo`, `PanelLateral`; lo demás sale ahí cuando el administrador lo pida) y habla con la API | Decidido, por construir |
+| **Backend y API** | Guarda los datos, recibe el formulario de contacto y dispara la publicación. Lo hace Amauri en `api/` de este repositorio | **Lenguaje por definir** (Node o PHP, con MySQL). Corre en el VPS, así que cualquiera de los dos sirve |
 
-El hospedaje es Hostinger (plan Business Web Hosting). Cómo se publica está en
+El hospedaje es un VPS de Hostinger. Cómo se publica está en
 [despliegue.md](despliegue.md).
 
 ---
 
 ## 1. La idea en una frase
 
-Hoy el contenido vive en archivos de JavaScript dentro de `src/data/`. Cada uno
+Hoy el contenido vive en archivos de JavaScript dentro de `sitio/src/data/`. Cada uno
 exporta arreglos de objetos planos. **Conectar el administrador es cambiar de
 dónde sale ese arreglo, no cambiar las páginas.**
 
 Si `piezas` sigue siendo un arreglo de objetos con los mismos campos, no importa
 si viene de un archivo o de una API: las páginas se compilan igual. **El
-contrato de datos es la forma que tienen hoy los objetos de `src/data/*.js`, y
+contrato de datos es la forma que tienen hoy los objetos de `sitio/src/data/*.js`, y
 la API tiene que entregar exactamente esas formas.**
 
 ```
 ANTES                          DESPUÉS
-src/data/catalogo.js           src/data/catalogo.js
+sitio/src/data/catalogo.js           sitio/src/data/catalogo.js
   export const piezas = [...]    const res = await fetch(`${API}/piezas`)
                                  export const piezas = await res.json()
 ```
@@ -49,7 +49,7 @@ src/data/catalogo.js           src/data/catalogo.js
 API.)
 
 El sitio es **estático**: se compila con `npm run build` y se publica la carpeta
-`dist/`. Las llamadas a la API ocurren **en la compilación**, no en el navegador
+`sitio/dist/`. Las llamadas a la API ocurren **en la compilación**, no en el navegador
 del visitante. Eso significa que:
 
 - La API no necesita estar disponible para que el sitio funcione.
@@ -81,7 +81,7 @@ que el resto.
 
 ## 3. Los archivos de datos
 
-### 3.1 `src/data/site.js`: datos de la empresa
+### 3.1 `sitio/src/data/site.js`: datos de la empresa
 
 Lo usa el encabezado, el pie, los botones de WhatsApp y el esquema
 `Organization` que va en las 50 páginas.
@@ -104,7 +104,7 @@ En el administrador, los datos de la empresa son **una pantalla de ajustes**
 **Cuidado con `site.domain`.** Si queda mal, quedan mal las canónicas, el mapa
 del sitio y el `robots.txt` de golpe. Es el dato más caro de equivocar.
 
-### 3.2 `src/data/catalogo.js`: el catálogo
+### 3.2 `sitio/src/data/catalogo.js`: el catálogo
 
 Es el archivo más grande y el que más importa conectar. Exporta:
 
@@ -147,7 +147,7 @@ En el administrador esto es la **tabla de piezas**. La categoría es una
 referencia a la tabla de categorías; los campos de filtro, `colores`,
 `material` y `espacios` son listas cerradas.
 
-### 3.3 `src/data/fichas.js`: las fichas técnicas
+### 3.3 `sitio/src/data/fichas.js`: las fichas técnicas
 
 Una entrada por pieza, con la misma `slug`. Cada ficha tiene:
 
@@ -187,7 +187,7 @@ Los tres recuadros bajo la foto (**Entrega e instalación**, **Materiales**,
 arriba. No hay texto escrito a mano por pieza, y el recuadro cuyo dato falte
 simplemente no se pinta.
 
-### 3.4 `src/data/proyectos.js`: los proyectos
+### 3.4 `sitio/src/data/proyectos.js`: los proyectos
 
 Cada proyecto tiene una cabecera de datos y una **secuencia de bloques**, que es
 lo que hace que la página se lea como un relato y no como una plantilla.
@@ -235,7 +235,7 @@ de bloques**, donde cada bloque elige su tipo y pide solo los campos de ese
 tipo. Es lo más laborioso de construir y lo que más rinde: es lo que evita que
 todos los proyectos se vean iguales.
 
-### 3.5 `src/data/homeOffice.js`: la colección por espacio
+### 3.5 `sitio/src/data/homeOffice.js`: la colección por espacio
 
 Las piezas de home office no se capturan aquí: aparecen porque traen
 `home-office` en su campo `espacios` (apartado 3.2). Lo que sí vive aquí:
@@ -249,11 +249,11 @@ Las piezas de home office no se capturan aquí: aparecen porque traen
 El detalle pantalla por pantalla está en
 [mapa-de-conexion.md](mapa-de-conexion.md), apartado 11c.
 
-### 3.6 `src/data/pdfs.js`: los PDF
+### 3.6 `sitio/src/data/pdfs.js`: los PDF
 
-No se captura nada. Lee de `public/` si existe la ficha o el catálogo en PDF y
+No se captura nada. Lee de `sitio/public/` si existe la ficha o el catálogo en PDF y
 saca del archivo las hojas y el peso. Un catálogo propio del cliente va en
-`public/catalogos/propios/` con el mismo nombre que el generado y se descarga
+`sitio/public/catalogos/propios/` con el mismo nombre que el generado y se descarga
 ese en su lugar. Cómo se generan está en [despliegue.md](despliegue.md).
 
 ---
@@ -288,7 +288,7 @@ en contra de Neucast.
 2. **Nunca se inventan cifras.** Ni de clientes, ni de años, ni de metros. Si no
    hay dato confirmado, no va.
 3. **Sin guiones largos** en el texto visible. Se revisa con una búsqueda sobre
-   `dist/` antes de publicar.
+   `sitio/dist/` antes de publicar.
 4. **Los botones dicen la acción concreta**, no "ver más".
 5. **Todo lo que se superpone difumina el fondo**, no solo lo oscurece.
 
@@ -299,7 +299,7 @@ en contra de Neucast.
 Por orden de urgencia:
 
 1. **El formulario de contacto.** Hoy `SIMULAR_ENVIO = true` en
-   `src/pages/contacto.astro`: el formulario valida, enseña la pantalla de
+   `sitio/src/pages/contacto.astro`: el formulario valida, enseña la pantalla de
    gracias y **no manda nada**. Hay que poner `false` y apuntar `ENDPOINT` a la
    ruta de contacto de la API del administrador. Sin esto el sitio pierde
    solicitudes en silencio, que es el peor error posible aquí.
@@ -351,14 +351,14 @@ La lista completa y al día está en [pendientes.md](pendientes.md).
 
 ## 7. Cosas que conviene no tocar
 
-- **`src/styles/global.css`**: las variables de diseño. Cambiar un valor aquí
-  cambia el sitio entero, que es justo para lo que sirve, pero hay que saberlo.
-  El frontend del administrador las reutiliza, así que un cambio aquí también
-  se nota allá.
+- **`compartido/`**: las variables de diseño (`styles/global.css`), los
+  íconos, el logotipo y el cajón lateral. Cambiar un valor aquí cambia el sitio
+  entero, que es justo para lo que sirve, pero hay que saberlo. El frontend del
+  administrador usa lo mismo, así que un cambio aquí también se nota allá.
 - **La generación de `sitemap.xml` y `robots.txt`**: salen de las mismas listas
   que generan las páginas. Si la API entrega bien los datos, se actualizan
   solos.
-- **Las canónicas y el `robots` de cada página**: viven en `src/layouts/Base.astro`
+- **Las canónicas y el `robots` de cada página**: viven en `sitio/src/layouts/Base.astro`
   y ya están resueltos. Las páginas que no se indexan lo declaran con la
   propiedad `noindex`.
 - **Los componentes compartidos** (`VisorGaleria`, `PanelLateral`,

@@ -4,22 +4,28 @@ Cómo está armado el front. Si vienes a conectar el administrador (propio,
 hecho desde cero; ya no se usa WordPress), lee primero
 [administrador.md](administrador.md) y usa este como referencia.
 
+El repositorio tiene cuatro carpetas de primer nivel: `sitio/` (el sitio
+público, que describe este documento), `compartido/` (los tokens, estilos y
+componentes que usan el sitio y el administrador), `admin/` (el frontend del
+administrador, por construir) y `api/` (el backend, de Amauri). Los comandos
+se corren desde la raíz: su `package.json` los manda al paquete que toca.
+
 ---
 
 ## 1. Qué es esto
 
 Un sitio **estático** hecho con Astro 7. No hay servidor, no hay base de datos
 en producción, no hay JavaScript de framework: se compila a HTML y se publica la
-carpeta `dist/`.
+carpeta `sitio/dist/`.
 
 ```bash
 npm install      # una vez
 npm run dev      # servidor local en http://localhost:4321
-npm run build    # compila a dist/
-npm run preview  # sirve dist/ para revisarlo antes de publicar
-npm run revisar  # revisa dist/ (ver el apartado 8)
-npm run fichas     # fichas técnicas en PDF, a public/fichas/ (en una Mac)
-npm run catalogos  # catálogos en PDF, a public/catalogos/ (en una Mac)
+npm run build    # compila a sitio/dist/
+npm run preview  # sirve sitio/dist/ para revisarlo antes de publicar
+npm run revisar  # revisa sitio/dist/ (ver el apartado 8)
+npm run fichas     # fichas técnicas en PDF, a sitio/public/fichas/ (en una Mac)
+npm run catalogos  # catálogos en PDF, a sitio/public/catalogos/ (en una Mac)
 ```
 
 Node 22.12 o superior.
@@ -29,31 +35,47 @@ Node 22.12 o superior.
 ## 2. El árbol
 
 ```
-src/
-├── data/          el contenido. Es lo que va a entregar la API del administrador
-├── layouts/       Base.astro: cabeza, encabezado, pie y capas comunes
-├── components/    piezas reutilizables
-├── pages/         una por ruta; los corchetes generan varias
-├── scripts/       JavaScript compartido del navegador (Mi proyecto, bloqueo de scroll)
-└── styles/        global.css: las variables de diseño
+sitio/                 el sitio público
+├── src/
+│   ├── data/          el contenido. Es lo que va a entregar la API del administrador
+│   ├── layouts/       Base.astro: cabeza, encabezado, pie y capas comunes
+│   ├── components/    piezas reutilizables del sitio
+│   ├── pages/         una por ruta; los corchetes generan varias
+│   └── scripts/       JavaScript del navegador propio del sitio (Mi proyecto)
+├── scripts/
+│   ├── revisar.mjs    la revisión de dist/ (apartado 8)
+│   ├── fichas/        la generación de fichas y catálogos en PDF (apartado 5c)
+│   └── entregables/   los PDF, Excel y Word que se mandan al cliente y al equipo
+├── public/
+│   ├── img/           fotos
+│   │   ├── cats/      una por categoría
+│   │   ├── products/  fotos de pieza (hoy son demostraciones)
+│   │   └── nosotros/  las de la página de nosotros
+│   ├── video/         clips y sus carteles
+│   ├── fichas/        PDF de ficha técnica, neucast-{slug}.pdf
+│   ├── catalogos/     PDF de catálogo por categoría y general
+│   │   └── propios/   catálogos que pase el cliente; sustituyen al generado
+│   └── favicon.*
+├── astro.config.mjs
+└── dist/              lo que sale de npm run build (no va al repositorio)
 
-scripts/
-├── revisar.mjs    la revisión de dist/ (apartado 8)
-└── fichas/        la generación de fichas y catálogos en PDF (apartado 5c)
+compartido/            el paquete @neucast/compartido, que usan sitio y admin
+├── styles/global.css  las variables de diseño y las utilidades
+├── components/        Icon, Logo y PanelLateral
+└── scripts/           bloqueo-scroll.js
 
-public/
-├── img/           fotos
-│   ├── cats/      una por categoría
-│   ├── products/  fotos de pieza (hoy son demostraciones)
-│   └── nosotros/  las de la página de nosotros
-├── video/         clips y sus carteles
-├── fichas/        PDF de ficha técnica, neucast-{slug}.pdf
-├── catalogos/     PDF de catálogo por categoría y general
-│   └── propios/   catálogos que pase el cliente; sustituyen al generado
-└── favicon.*
-
-docs/              toda la documentación
+admin/                 el frontend del administrador (por construir)
+api/                   el backend y la API (de Amauri; hoy solo el contrato)
+docs/                  toda la documentación
 ```
+
+Los paquetes son workspaces de npm: un solo `node_modules` y un solo
+`package-lock.json` en la raíz. El sitio importa lo compartido por nombre de
+paquete (`import Icon from "@neucast/compartido/components/Icon.astro"`), así
+que lo que sale a `compartido/` no cambia de ruta al moverse de sitio. La regla
+para sacar algo ahí es la misma que para los componentes: sale cuando lo
+necesita un segundo lugar, y mientras no lo pida el administrador se queda en
+`sitio/`.
 
 ---
 
@@ -83,7 +105,7 @@ docs/              toda la documentación
 50 páginas HTML, 46 indexables.
 
 Las rutas con corchetes usan `getStaticPaths()`, que recorre las listas de
-`src/data/`. Agregar una pieza al arreglo agrega su página, su entrada en el
+`sitio/src/data/`. Agregar una pieza al arreglo agrega su página, su entrada en el
 mapa del sitio y sus enlaces, sin tocar nada más.
 
 ---
@@ -129,14 +151,15 @@ a moverse con la rueda, el dedo o el teclado.
 | `CursorAmpliar.astro` | ficha de pieza, proyecto | La pastilla "Ampliar" que sigue al cursor |
 | `EscenaHotspots.astro` | home, proyectos | Foto con puntos sobre las piezas |
 | `EscenasCarrusel.astro` | proyectos | Varias escenas, con su pie dentro de la foto |
-| `PanelLateral.astro` | ficha de pieza, Mi proyecto | El cajón lateral que entra por la derecha con el fondo difuminado. Tiene un slot `pie` para lo que va fijo abajo, fuera de la zona que se desplaza (lo usa Mi proyecto para sus dos salidas) |
+| `PanelLateral.astro` (en `compartido/`) | ficha de pieza, Mi proyecto | El cajón lateral que entra por la derecha con el fondo difuminado. Tiene un slot `pie` para lo que va fijo abajo, fuera de la zona que se desplaza (lo usa Mi proyecto para sus dos salidas) |
 | `Buscador.astro` | todas, desde `Base.astro` | La capa del buscador a pantalla completa. Lee `/buscar.json` la primera vez que se abre |
 | `MiProyecto.astro` | todas, desde `Base.astro` | El panel de Mi proyecto y el cableado de los botones de agregar |
 | `Destacado.astro` | proyectos, detalle de proyecto, home office, nosotros | La frase grande centrada en dos tonos: primera línea en tinta, las siguientes en gris |
 | `CierreCta.astro` | home, detalle de proyecto, home office | El bloque de cierre con foto de fondo, de orilla a orilla |
 | `VideoFrame.astro` | nosotros, ficha de pieza | Video con su cartel |
 | `LegalDoc.astro` | aviso, términos | El molde de las páginas legales |
-| `WaButton.astro`, `Icon.astro`, `Logo.astro` | varias | Piezas chicas |
+| `WaButton.astro` | varias | El botón de WhatsApp |
+| `Icon.astro`, `Logo.astro` (en `compartido/`) | varias | Los íconos y el logotipo |
 
 Cuando algo se usa en dos páginas, sale a componente. Es la razón por la que
 existen `VisorGaleria`, `CursorAmpliar`, `CierreCta` y `EscenasCarrusel`: los
@@ -149,15 +172,15 @@ lo mismo.
 
 | Archivo | Qué tiene |
 | --- | --- |
-| `src/data/site.js` | Datos de la empresa, las categorías, las destacadas del home |
-| `src/data/catalogo.js` | Las piezas, los filtros y los bloques editoriales. Cada pieza trae `espacios`, la lista cerrada de colecciones por espacio en las que aparece además de su categoría (hoy solo `home-office`) |
-| `src/data/fichas.js` | Las fichas técnicas, una por pieza |
-| `src/data/proyectos.js` | Los proyectos y sus bloques |
-| `src/data/homeOffice.js` | La colección por espacio de home office: fotos de la página, `sets` e `ideas`. Las piezas no se capturan aquí: salen de las que traen `home-office` en `espacios` |
-| `src/data/pdfs.js` | Averigua si existe la ficha o el catálogo en PDF y lee del archivo sus hojas y su peso. Si hay un catálogo en `public/catalogos/propios/` con el mismo nombre, se descarga ese en lugar del generado |
-| `src/pages/buscar.json.js` | El índice del buscador, generado de las mismas listas que las páginas |
-| `src/scripts/proyecto.js` | La lista de Mi proyecto en el navegador (`localStorage`, llave `neucast:proyecto`): leer, agregar, quitar, cambiar cantidad, vaciar, armar el mensaje de WhatsApp y el evento de cambio |
-| `src/scripts/bloqueo-scroll.js` | Fija el body mientras hay una capa abierta y lo devuelve a su sitio al cerrar, contando cuántas capas lo pidieron |
+| `sitio/src/data/site.js` | Datos de la empresa, las categorías, las destacadas del home |
+| `sitio/src/data/catalogo.js` | Las piezas, los filtros y los bloques editoriales. Cada pieza trae `espacios`, la lista cerrada de colecciones por espacio en las que aparece además de su categoría (hoy solo `home-office`) |
+| `sitio/src/data/fichas.js` | Las fichas técnicas, una por pieza |
+| `sitio/src/data/proyectos.js` | Los proyectos y sus bloques |
+| `sitio/src/data/homeOffice.js` | La colección por espacio de home office: fotos de la página, `sets` e `ideas`. Las piezas no se capturan aquí: salen de las que traen `home-office` en `espacios` |
+| `sitio/src/data/pdfs.js` | Averigua si existe la ficha o el catálogo en PDF y lee del archivo sus hojas y su peso. Si hay un catálogo en `sitio/public/catalogos/propios/` con el mismo nombre, se descarga ese en lugar del generado |
+| `sitio/src/pages/buscar.json.js` | El índice del buscador, generado de las mismas listas que las páginas |
+| `sitio/src/scripts/proyecto.js` | La lista de Mi proyecto en el navegador (`localStorage`, llave `neucast:proyecto`): leer, agregar, quitar, cambiar cantidad, vaciar, armar el mensaje de WhatsApp y el evento de cambio |
+| `compartido/scripts/bloqueo-scroll.js` | Fija el body mientras hay una capa abierta y lo devuelve a su sitio al cerrar, contando cuántas capas lo pidieron |
 
 El detalle de Mi proyecto, el buscador, home office y recursos, pantalla por
 pantalla, está en [mapa-de-conexion.md](mapa-de-conexion.md), apartados 11b,
@@ -165,14 +188,14 @@ pantalla, está en [mapa-de-conexion.md](mapa-de-conexion.md), apartados 11b,
 
 ---
 
-## 5c. Los PDF: `scripts/fichas/`
+## 5c. Los PDF: `sitio/scripts/fichas/`
 
 | Archivo | Qué hace |
 | --- | --- |
 | `plantilla.mjs` | Arma el HTML de una ficha técnica con los datos del catálogo y de las fichas |
-| `generar.mjs` | Imprime las fichas a PDF con Chrome sin interfaz. `npm run fichas` las deja en `public/fichas/` |
+| `generar.mjs` | Imprime las fichas a PDF con Chrome sin interfaz. `npm run fichas` las deja en `sitio/public/fichas/` |
 | `catalogo.mjs` | La plantilla de los catálogos: por categoría y general |
-| `catalogos.mjs` | Genera los catálogos. `npm run catalogos` los deja en `public/catalogos/` |
+| `catalogos.mjs` | Genera los catálogos. `npm run catalogos` los deja en `sitio/public/catalogos/` |
 | `fotos.py` | Achica las fotos para los catálogos (Python con Pillow) |
 
 Hoy se corren a mano **en una Mac**, porque la plantilla usa Helvetica Neue y
@@ -184,7 +207,7 @@ de publicación (ver [despliegue.md](despliegue.md), apartado 3).
 ## 6. Los estilos
 
 No hay framework de CSS. Cada componente lleva sus estilos con ámbito propio, y
-`src/styles/global.css` tiene:
+`compartido/styles/global.css` tiene:
 
 - **Las variables**: color, tipografía, espaciado, curvas de animación. Cambiar
   una aquí cambia el sitio entero.
@@ -236,7 +259,7 @@ Están automatizadas:
 npm run build && npm run revisar
 ```
 
-`scripts/revisar.mjs` recorre `dist/` y comprueba:
+`sitio/scripts/revisar.mjs` recorre `sitio/dist/` y comprueba:
 
 1. **Enlaces**: ningún `href` interno sin página, ninguna ancla sin destino,
    ningún archivo que no exista.

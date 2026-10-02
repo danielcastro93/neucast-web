@@ -37,7 +37,7 @@ flujo de publicación, en `despliegue.md`.
 - [ ] **Confirmar con el cliente dónde está su correo** (cree que en GoDaddy):
       buzón de las solicitudes y cuenta desde la que manda el servidor.
 - [ ] **El paso a producción en el VPS**: compilar con los datos de la
-      API, generar los PDF, pasar `npm run revisar` y subir `dist/` por SSH.
+      API, generar los PDF, pasar `npm run revisar` y subir `sitio/dist/` por SSH.
 
 ## Páginas
 
@@ -66,7 +66,7 @@ generan las páginas.
 
 Ninguno conocido: las 26 fichas de pieza y las cinco páginas de proyectos ya
 existen. Conviene repetir la auditoría antes de publicar: recorrer los `href`
-del build y comprobar que cada ruta existe en `dist/`.
+del build y comprobar que cada ruta existe en `sitio/dist/`.
 
 ## Buscador
 
@@ -77,13 +77,13 @@ porqué está en `mapa-de-conexion.md`, apartado 11b.
 ## Fichas técnicas y catálogos en PDF
 
 **Plantilla aprobada** por Daniel el 30 de septiembre de 2026 como base para
-todas las fichas. Vive en `scripts/fichas/`: `plantilla.mjs` arma el HTML de
+todas las fichas. Vive en `sitio/scripts/fichas/`: `plantilla.mjs` arma el HTML de
 una ficha con los datos y `generar.mjs` lo imprime a PDF con Chrome sin
 interfaz.
 
 ```bash
-npm run fichas                                  # todas, a public/fichas/
-node scripts/fichas/generar.mjs <carpeta> [slug ...]   # solo algunas
+npm run fichas                                  # todas, a sitio/public/fichas/
+node sitio/scripts/fichas/generar.mjs <carpeta> [slug ...]   # solo algunas
 ```
 
 Una o dos hojas por pieza: la primera siempre (foto, nombre, párrafo,
@@ -91,7 +91,7 @@ acabados, datos principales, destacados y foto de ambiente); la segunda solo
 si hay medidas, construcción, mecanismo o cuidados.
 
 **Ya se descargan desde la ficha** (30 de septiembre). Los PDF están
-versionados en `public/fichas/neucast-{slug}.pdf` y el panel de Descargas de
+versionados en `sitio/public/fichas/neucast-{slug}.pdf` y el panel de Descargas de
 cada pieza enlaza al suyo, con el número de hojas y el peso leídos del archivo.
 Si una pieza no tiene PDF, la opción de Descargas no aparece. **Cada vez que
 cambien los datos de una pieza o la plantilla hay que volver a correr
@@ -109,13 +109,13 @@ la ficha web.
    con el título) y `/muebles/` enlaza el general. Por decisión de Daniel, ni
    la página ni las categorías dicen hojas, peso ni número de piezas, y el
    enlace del footer y del menú dice "Catálogos", en la columna de Muebles. Se generan
-   con `npm run catalogos` (en una Mac, como las fichas) en `public/catalogos/`.
+   con `npm run catalogos` (en una Mac, como las fichas) en `sitio/public/catalogos/`.
    Formato aprobado: dos piezas por hoja, sin foto de ambiente, con fotos
-   achicadas por `scripts/fichas/fotos.py` (Python con Pillow). Medido: unos
+   achicadas por `sitio/scripts/fichas/fotos.py` (Python con Pillow). Medido: unos
    35 KB por pieza (100 piezas, unos 3.4 MB; 200, unos 6.8 MB); el general en
    rejilla, unos 11 KB por pieza. Si una categoría pasa de unas 150 piezas,
    conviene partir su catálogo por tipo de mueble. Un catálogo que pase el
-   cliente va en `public/catalogos/propios/` con el mismo nombre y se descarga
+   cliente va en `sitio/public/catalogos/propios/` con el mismo nombre y se descarga
    ese en lugar del generado. **Al cambiar el catálogo hay que correr
    `npm run catalogos` y subir los PDF**, igual que con las fichas.
 3. **Tipografía en el servidor de compilación.** La plantilla usa Helvetica
@@ -133,7 +133,7 @@ Las fotos de **Nosotros** y **Preguntas frecuentes** son de stock de
 [Pexels](https://www.pexels.com) (licencia libre, sin atribución obligatoria).
 Se descargaron, recortaron y optimizaron dentro del repo. Se reemplazan por
 fotografía propia de Neucast cuando exista: basta sustituir el archivo con el
-mismo nombre en `public/img/nosotros/` y `public/img/faq-hero.jpg`.
+mismo nombre en `sitio/public/img/nosotros/` y `sitio/public/img/faq-hero.jpg`.
 
 **Línea visual.** Dos reglas para elegir foto en Nosotros:
 
@@ -164,7 +164,7 @@ mismo nombre en `public/img/nosotros/` y `public/img/faq-hero.jpg`.
 
 La página de contacto no tiene foto propia: como imagen para compartir
 (Open Graph) usa la que trae `Base.astro` por omisión,
-`public/img/hero-oficina.jpg`. El `contacto-hero.jpg` (Pexels 14002100) que
+`sitio/public/img/hero-oficina.jpg`. El `contacto-hero.jpg` (Pexels 14002100) que
 listaba esta tabla no existe en el repositorio.
 
 Las de **home office** son de posicionamiento: no hay todavía fotografía de
@@ -177,10 +177,10 @@ Videos (Pexels): `oficina-neucast.mp4` 8347237, `editorial-neucast.mp4` 7533208.
 ## Imágenes
 
 ### Dónde viven
-- **Fijas del diseño** (hero, editorial, CTA, fotos de espacios): `public/img/`.
+- **Fijas del diseño** (hero, editorial, CTA, fotos de espacios): `sitio/public/img/`.
   Se suben al hosting tal cual. Para actualizar una, se reemplaza el archivo
   **con el mismo nombre** y listo.
-- **De catálogo** (piezas, categorías, proyectos): hoy están en `public/img/`
+- **De catálogo** (piezas, categorías, proyectos): hoy están en `sitio/public/img/`
   como demo; vendrán del administrador y el `src` saldrá de su API.
 
 ### Nombres y alt (SEO)
@@ -193,13 +193,13 @@ Videos (Pexels): `oficina-neucast.mp4` 8347237, `editorial-neucast.mp4` 7533208.
 
 ### Optimización pendiente
 Hoy las imágenes se sirven tal cual (JPG comprimido). Cuando lleguen las fotos
-reales conviene mover las fijas a `src/assets/` y usar el componente `<Image>`
+reales conviene mover las fijas a `sitio/src/assets/` y usar el componente `<Image>`
 de Astro: genera WebP/AVIF y `srcset` automáticamente. El flujo de "reemplazar
-por nombre" se mantiene igual (se edita el archivo en `src/assets/`).
+por nombre" se mantiene igual (se edita el archivo en `sitio/src/assets/`).
 
 ## Componentes reutilizables
 
-En `src/components/`:
+En `sitio/src/components/`:
 - `Logo.astro`: logotipo (acepta `height` y `mono`)
 - `Icon.astro`: iconos del sitio (`arrow`, `chevron`, `chevronLeft`, `whatsapp`)
 - `WaButton.astro`: botón de WhatsApp con mensaje precargado y variantes
@@ -208,7 +208,7 @@ En `src/components/`:
 - `PiezaCard.astro`: card de pieza
 - `CategoryCard.astro`: card de categoría
 
-En `src/layouts/Base.astro`: header, menú lateral, footer, burbuja de WhatsApp
+En `sitio/src/layouts/Base.astro`: header, menú lateral, footer, burbuja de WhatsApp
 y los observadores de animación. **Toda página nueva parte de este layout** y
 hereda header, footer y comportamiento sin repetir código.
 
@@ -218,7 +218,7 @@ El flujo está completo de punta a punta (validación, estado de envío, redirec
 a `/gracias/`), pero **la llamada al servidor está simulada** para que el
 prototipo se pueda enseñar al cliente.
 
-En `src/pages/contacto.astro`, al inicio del `<script>`:
+En `sitio/src/pages/contacto.astro`, al inicio del `<script>`:
 
 ```js
 const SIMULAR_ENVIO = true;   // ← poner en false
@@ -350,7 +350,7 @@ corren sobre el DOM, tendrán que viajar en la consulta.
 
 ### Las especificaciones de la ficha son de maqueta
 
-`src/data/fichas.js` tiene las 26 fichas completas: medidas, construcción,
+`sitio/src/data/fichas.js` tiene las 26 fichas completas: medidas, construcción,
 mecanismo y cuidados. **Ninguno de esos valores está confirmado contra un
 catálogo.** Se escribieron para poder ver la ficha llena y, sobre todo, para
 dejar por escrito qué campos tiene que traer el administrador.
@@ -372,7 +372,7 @@ También falta:
 
 ### Material para los bloques editoriales por categoría
 
-Las reglas ya están escritas en `src/data/catalogo.js` y el mecanismo funciona,
+Las reglas ya están escritas en `sitio/src/data/catalogo.js` y el mecanismo funciona,
 pero hoy solo `/muebles/` muestra bloques: las categorías no llegan al mínimo de
 12 piezas y, sobre todo, **falta material propio de cada una**.
 
@@ -410,12 +410,12 @@ cliente que todavía no tenemos: domicilio, teléfono fijo y horario. `WebSite`
 además solo tiene sentido cuando el sitio tenga buscador propio.
 
 También hay que sustituir en `Organization` el correo y las redes, que hoy son
-los simulados de `src/data/site.js`, y cambiar el logo: hoy apunta al favicon
+los simulados de `sitio/src/data/site.js`, y cambiar el logo: hoy apunta al favicon
 SVG y debería ser una imagen cuadrada de al menos 112 px.
 
 ## Datos que hay que pedirle al cliente al final
 
-Todo esto está simulado en `src/data/site.js` o marcado entre corchetes en las
+Todo esto está simulado en `sitio/src/data/site.js` o marcado entre corchetes en las
 páginas legales. Son los últimos huecos antes de publicar.
 
 - [ ] **Correo de contacto real.** Hoy `contacto.ventas@neucast.com.mx`, sin
@@ -436,7 +436,7 @@ páginas legales. Son los últimos huecos antes de publicar.
 ## Proyectos: los cuatro casos son de maqueta
 
 La sección está construida (`/proyectos/` y cuatro páginas de detalle), pero
-**todo el contenido de `src/data/proyectos.js` está inventado**: los sectores,
+**todo el contenido de `sitio/src/data/proyectos.js` está inventado**: los sectores,
 las ciudades, los años, las cifras y los textos. Se escribieron para poder ver
 la sección completa y para dejar por escrito qué campos tiene que traer el
 administrador. Antes de publicar hay que sustituirlos por casos reales.
@@ -504,10 +504,10 @@ página en el catálogo y competirían por la misma búsqueda.
 ## Antes de publicar
 
 - [ ] **Poner `SIMULAR_ENVIO = false` y conectar el `ENDPOINT` del formulario**
-      en `src/pages/contacto.astro`. Hoy valida, enseña la pantalla de gracias y
+      en `sitio/src/pages/contacto.astro`. Hoy valida, enseña la pantalla de gracias y
       no manda nada. Es lo más caro de olvidar: el sitio pierde solicitudes sin
       avisar.
-- [ ] Número de WhatsApp y correo reales en `src/data/site.js` (hoy simulados).
+- [ ] Número de WhatsApp y correo reales en `sitio/src/data/site.js` (hoy simulados).
       El número lo usan 269 enlaces del sitio.
 - [ ] Contenido real: catálogo, fichas técnicas y proyectos
 - [ ] Fotos reales de producto y de proyecto

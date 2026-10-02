@@ -1,6 +1,6 @@
 # Design system: Neucast
 
-Fuente de verdad: `src/styles/global.css`. Este documento explica cómo usarlo.
+Fuente de verdad: `compartido/styles/global.css`. Este documento explica cómo usarlo.
 
 **Regla base:** ningún componente inventa tamaños. Si necesitas un tamaño de texto,
 usas una clase de nivel (`.t-h2`); si necesitas un color, usas un token (`var(--olive)`).
@@ -497,7 +497,7 @@ logo sale blanco sobre blanco cuando se abre el panel.
   y liso detrás de los muebles. El arena se retiró por completo el 30 de
   septiembre de 2026. La etiqueta "Nuevo" va blanca con la tinta, en
   mayúsculas espaciadas.
-- El grano es `public/img/grano.png` (7 KB) en la clase `.grano`, en una capa
+- El grano es `sitio/public/img/grano.png` (7 KB) en la clase `.grano`, en una capa
   que no recibe toques; `.grano--oscuro` lo pone en modo aclarar para fondos
   oscuros. Nunca detrás de fotos de producto: compite con el borde del mueble.
 - Radio: `--radius` (12px) en media y contenedores, `--radius-sm` (8px) en elementos chicos.

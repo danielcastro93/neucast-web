@@ -11,7 +11,7 @@ Resumen de decisiones aprobadas/propuestas. Propuesta completa: https://claude.a
 - Hosting: se barajó Vercel o Cloudflare Pages y **se decidió Hostinger** (plan
   Business Web Hosting, ya pagado), para no sumar un proveedor más. El dominio
   se pasa a Hostinger. La compilación vive en el propio servidor de Neucast y lo que sube a
-  Hostinger es `dist/`. Ver `despliegue.md`.
+  Hostinger es `sitio/dist/`. Ver `despliegue.md`.
 - Administración del contenido: **administrador propio**, hecho desde cero. El
   frontend es un sitio Astro estático aparte (subdominio tipo
   admin.neucast.com.mx) que habla con una API; el backend está por definir con
@@ -43,7 +43,7 @@ Resumen de decisiones aprobadas/propuestas. Propuesta completa: https://claude.a
 Overlay más fuerte en hero; botón Cotiza del header en verde WhatsApp al hacer scroll (glass blanco sobre hero); FAB WhatsApp rediseñada (gradiente, ping periódico, tooltip glass en hover desktop); carruseles alineados al gutter (scroll-padding-left); cards de categoría sin cursor-zoom ni flechas + controles prev/next; nombre de pieza es enlace al detalle; degradado fuerte en caption de proyectos; tabs de espacios sin sticky en desktop (sticky solo mobile) + título/sub explicativos; CTA final con imagen sillones-concreto y botón verde WhatsApp; footer rediseñado (tagline serif grande + pill WA, wordmark gigante watermark, redes en iconos); botones full-width en mobile; hotspots con coordenadas duales desktop/mobile (--dx/--dy vs --mx/--my) y contenedor .proj-canvas separado del caption; menú móvil nuevo: hoja blanca tipo app con filas de categorías (thumb+chevron) estilo BoConcept. OJO: el header con backdrop-filter es containing block de sus hijos fixed: el menú usa height calc(100dvh - header) en vez de inset.
 
 ## Ronda de feedback 2 (24 ago 2026): aplicada
-Copy hero ampliado ("espacios corporativos completos: de la recepción a la cafetería"); UX anti-saturación de CTAs: la burbuja WhatsApp se oculta (IntersectionObserver + [data-hides-fab]) cuando el CTA final o el footer están en viewport; subrayado animado izq→der en nav del header; cards de categoría ahora con FOTO completa (public/img/cats/*.jpg, recortes cuadrados de resources: campo `photo` en categories, `img` sigue siendo el recorte PNG para piezas); degradado de carruseles más marcado y en AMBOS lados (el izquierdo solo aparece con scroll, clase .rail-scrolled); más degradado en caption de proyectos + FIX: caption con pointer-events:none en desktop (bloqueaba los clics a hotspots); CTA con object-position 72% (sillones completos); footer: correo visible como texto, .ft-social con margin-right 84px para no chocar con la burbuja; menú móvil = drawer lateral izquierdo (fuera del header, body-level) con scrim, top bar logo+X, drill-down "Muebles" → segunda vista con ‹Atrás y filas foto+nombre (patrón BoConcept), track 200% translateX. Logo gigante watermark del footer: Daniel aún indeciso, se queda por ahora. Generación de imágenes IA: Adobe/Canva MCP requieren OAuth (no autorizado aún): por ahora fotos de stock de resources.
+Copy hero ampliado ("espacios corporativos completos: de la recepción a la cafetería"); UX anti-saturación de CTAs: la burbuja WhatsApp se oculta (IntersectionObserver + [data-hides-fab]) cuando el CTA final o el footer están en viewport; subrayado animado izq→der en nav del header; cards de categoría ahora con FOTO completa (sitio/public/img/cats/*.jpg, recortes cuadrados de resources: campo `photo` en categories, `img` sigue siendo el recorte PNG para piezas); degradado de carruseles más marcado y en AMBOS lados (el izquierdo solo aparece con scroll, clase .rail-scrolled); más degradado en caption de proyectos + FIX: caption con pointer-events:none en desktop (bloqueaba los clics a hotspots); CTA con object-position 72% (sillones completos); footer: correo visible como texto, .ft-social con margin-right 84px para no chocar con la burbuja; menú móvil = drawer lateral izquierdo (fuera del header, body-level) con scrim, top bar logo+X, drill-down "Muebles" → segunda vista con ‹Atrás y filas foto+nombre (patrón BoConcept), track 200% translateX. Logo gigante watermark del footer: Daniel aún indeciso, se queda por ahora. Generación de imágenes IA: Adobe/Canva MCP requieren OAuth (no autorizado aún): por ahora fotos de stock de resources.
 
 ## Ronda de feedback 3 (24 ago 2026): aplicada
 - **Copy/SEO**: hero sub = "Mobiliario de oficina de diseño para recepciones, salas de juntas, cafeterías y áreas comunes. Envíos a todo México." (head keyword + categorías + alcance). Title SEO = "Muebles para oficina y mobiliario corporativo de diseño | Neucast". **REGLA: nunca usar guion largo () en copy visible.** Verificado: 0 en el HTML de build.
@@ -103,15 +103,15 @@ Bugs corregidos en la misma ronda:
   quitar el gutter duplicado (`.cta` ya tiene margen propio + `.container` interno repetía el padding).
 
 ## Ronda 8 (24 ago 2026): limpieza, componentes y 404
-- **Limpieza**: se borraron 5 imágenes sin usar (~1.4 MB), `src/assets-logo-alterno.svg` y los `.DS_Store`.
+- **Limpieza**: se borraron 5 imágenes sin usar (~1.4 MB), `sitio/src/assets-logo-alterno.svg` y los `.DS_Store`.
   Imágenes recomprimidas y hero redimensionado a 1920px: de 6.1 MB a **4.2 MB**.
 - **Nombres SEO**: los PNG de producto pasaron de numéricos (`1244742.png`) a descriptivos
-  (`silla-ejecutiva-aria.png`). Todos los `alt` son ahora campos editables en `src/data/site.js`
+  (`silla-ejecutiva-aria.png`). Todos los `alt` son ahora campos editables en `sitio/src/data/site.js`
   (así el cliente los controlará desde el CMS). Verificado: 36 imágenes, 0 rotas, 0 sin alt.
-- **Componentes reutilizables** en `src/components/`: `Icon`, `WaButton`, `SectionHead`,
+- **Componentes reutilizables** en `sitio/src/components/`: `Icon`, `WaButton`, `SectionHead`,
   `ProductCard`, `CategoryCard` (+ `Logo` que ya existía). La home se refactorizó para usarlos
   y se eliminó el CSS duplicado. Las siguientes páginas parten de estos.
-- **404 lista** (`src/pages/404.astro`): usa la animación de pintado, propone ir al inicio,
+- **404 lista** (`sitio/src/pages/404.astro`): usa la animación de pintado, propone ir al inicio,
   cotizar por WhatsApp y 4 categorías; rejilla decorativa que se arma al cargar (solo ≥1100px).
 - **Buscador: descartado en fase 1** (catálogo chico). Si más adelante se necesita → Pagefind
   (índice estático en el build, sin servidor ni costo). Documentado en `pendientes.md`.
@@ -226,7 +226,7 @@ origen de la pieza simplemente no se aborda. Se habla de "nuestro catálogo", "n
 "nuestras piezas".
 
 Términos **prohibidos** en copy visible: comercializadora, fabricante, proveedor, distribuidor,
-"marcas distintas", "de su fabricante". Se comprueba sobre `dist/` con `npm run revisar`.
+"marcas distintas", "de su fabricante". Se comprueba sobre `sitio/dist/` con `npm run revisar`.
 
 Cambios concretos:
 - Manifiesto de Nosotros reducido a **dos párrafos** (antes tres) y reescrito. Entradilla nueva
@@ -285,8 +285,8 @@ hotspots, tabs de espacios, bloque editorial, CTA final animado y footer.
 
 **Siguiente: Fase 2**, el listado de categorías (`/muebles/`), la página de
 categoría y el detalle de pieza. El mapa completo de páginas faltantes está en
-[pendientes.md](pendientes.md). Los componentes reutilizables ya están listos en `src/components/`
-y toda página nueva parte de `src/layouts/Base.astro`.
+[pendientes.md](pendientes.md). Los componentes reutilizables ya están listos en `sitio/src/components/`
+y toda página nueva parte de `sitio/src/layouts/Base.astro`.
 
 ## Fases
 1. ✅ Design system + Home navegable + 404: **terminada y aprobada**
@@ -353,14 +353,14 @@ hecho desde cero, por dos razones:
   espacio y PDF que se regeneran al publicar. En WordPress todo eso se arma con
   plugins y se queda atado a su forma de guardar los datos; en un administrador
   propio la base se diseña para esto.
-- **El contrato ya existe.** La forma de los datos de `src/data/*.js` es el
+- **El contrato ya existe.** La forma de los datos de `sitio/src/data/*.js` es el
   contrato: la API tiene que entregar exactamente esas formas, y el sitio no
   cambia.
 
 **2 de octubre de 2026: el frontend del administrador será en Astro.** Un sitio
 aparte, estático, en un subdominio tipo `admin.neucast.com.mx`, que habla con
 la API. Se eligió Astro para **reutilizar el sistema de diseño** de este
-repositorio (`src/styles/global.css` y `src/components/`): el cliente edita en
+repositorio (`compartido/styles/global.css` y `sitio/src/components/`): el cliente edita en
 una herramienta que se ve y se comporta como su sitio, y no hay un segundo
 sistema de diseño que mantener.
 
@@ -373,7 +373,7 @@ Lo que queda decidido y lo que no:
   PHP, Laravel con MySQL en Hostinger. Si es Node, primero confirmar que el plan
   de Hostinger lo acepte.
 - **Publicación:** se guarda en el administrador, la API encola una
-  publicación en el propio servidor, se compila Astro con los datos de la API y `dist/` se copia a
+  publicación en el propio servidor, se compila Astro con los datos de la API y `sitio/dist/` se copia a
   Hostinger. En ese mismo paso se generan las fichas técnicas y los catálogos
   en PDF. Mientras no exista el administrador, los PDF se generan en una Mac
   con `npm run fichas` y `npm run catalogos`, por la Helvetica Neue, que Linux

@@ -1,0 +1,7 @@
+{
+  "name": "@neucast/compartido",
+  "private": true,
+  "type": "module",
+  "version": "0.0.1",
+  "description": "Tokens, estilos, componentes y utilidades que usan el sitio y el administrador"
+}

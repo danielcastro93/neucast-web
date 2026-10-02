@@ -1,21 +1,21 @@
 {
-  "name": "neucast-paginaweb",
+  "name": "neucast",
+  "private": true,
   "type": "module",
-  "version": "0.0.1",
   "engines": {
     "node": ">=22.12.0"
   },
+  "workspaces": [
+    "sitio",
+    "compartido"
+  ],
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro",
-    "revisar": "node scripts/revisar.mjs",
-    "fichas": "node scripts/fichas/generar.mjs public/fichas",
-    "catalogos": "node scripts/fichas/catalogos.mjs public/catalogos"
-  },
-  "dependencies": {
-    "astro": "^7.3.4"
+    "dev": "npm run dev -w sitio",
+    "build": "npm run build -w sitio",
+    "preview": "npm run preview -w sitio",
+    "revisar": "npm run revisar -w sitio",
+    "fichas": "npm run fichas -w sitio",
+    "catalogos": "npm run catalogos -w sitio"
   },
   "allowScripts": {
     "esbuild": true

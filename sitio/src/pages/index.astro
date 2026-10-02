@@ -1,0 +1,318 @@
+---
+import Base from "../layouts/Base.astro";
+import SectionHead from "../components/SectionHead.astro";
+import PiezaCard from "../components/PiezaCard.astro";
+import CategoryCard from "../components/CategoryCard.astro";
+import WaButton from "../components/WaButton.astro";
+import Icon from "@neucast/compartido/components/Icon.astro";
+import VideoFrame from "../components/VideoFrame.astro";
+import { site, categories, destacados, waLink } from "../data/site.js";
+import { proyectoDestacado, escenaDeHome } from "../data/proyectos.js";
+import EscenaHotspots from "../components/EscenaHotspots.astro";
+import CierreCta from "../components/CierreCta.astro";
+import { buscarPieza } from "../data/catalogo.js";
+import { homeOffice, sets as setsHomeOffice } from "../data/homeOffice.js";
+
+const piezasDestacadas = destacados.map(buscarPieza).filter(Boolean);
+
+// El sitio como entidad, con su buscador: Google puede ofrecer la caja de
+// búsqueda en el resultado del home. La dirección /?q= abre el buscador con
+// el texto escrito (ver Buscador.astro).
+const sitioWeb = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": `${site.domain}/#sitio`,
+  name: site.name,
+  url: site.domain,
+  inLanguage: "es-MX",
+  publisher: { "@id": `${site.domain}/#organizacion` },
+  potentialAction: {
+    "@type": "SearchAction",
+    target: { "@type": "EntryPoint", urlTemplate: `${site.domain}/?q={search_term_string}` },
+    "query-input": "required name=search_term_string",
+  },
+};
+const escenaHome = proyectoDestacado ? escenaDeHome(proyectoDestacado) : null;
+const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+---
+<Base overlayHeader={true} schema={sitioWeb}>
+  <!-- ============ HERO ============ -->
+  <section class="hero" data-hides-fab>
+    <img class="hero-img" src="/img/hero-oficina.jpg" alt="Oficina corporativa amueblada por Neucast con escritorios y sillería de diseño" fetchpriority="high" />
+    <div class="hero-shade" aria-hidden="true"></div>
+    <div class="hero-content container">
+      <p class="rotulo hero-eyebrow"><span class="rise" style="--delay:.85s">Mobiliario corporativo de diseño</span></p>
+      <h1 class="display t-display hero-title">
+        <span class="paint-line" style="--i:0">Espacios de trabajo</span>{' '}
+        <span class="paint-line" style="--i:1">que la gente disfruta</span>
+      </h1>
+      <p class="hero-sub fade-in" style="--delay:1s">Mobiliario de oficina de diseño para recepciones, salas de juntas, cafeterías y áreas comunes. Envíos a todo México.</p>
+      <div class="hero-ctas fade-in" style="--delay:1.12s">
+        <a class="pill" href="/muebles/">Explora el catálogo <Fragment set:html={arrow} /></a>
+        <a class="pill pill--glass" href={waLink("Hola, quiero cotizar un proyecto de mobiliario.")} target="_blank" rel="noopener">Cotiza tu proyecto</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CATEGORÍAS ============ -->
+  {/* Las secciones que se alimentan de una lista desaparecen si la lista está
+      vacía, en vez de enseñar una cabecera con nada debajo. Importa mientras se
+      carga el catálogo desde el administrador: el home se ve bien desde el primer día. */}
+  {categories.length > 0 && (
+  <section class="cats" id="muebles">
+    <div class="container reveal">
+      <SectionHead title="¿Qué estás buscando?" rail="catRail" />
+    </div>
+    <div class="rail rail-mask reveal reveal-d1" id="catRail">
+      {categories.map((c) => <CategoryCard category={c} />)}
+    </div>
+  </section>
+  )}
+
+  <!-- ============ PIEZAS DESTACADAS ============ -->
+  {piezasDestacadas.length > 0 && (
+  <section class="prods">
+    <div class="container reveal">
+      <SectionHead title="Piezas destacadas" rail="prodRail" />
+    </div>
+    <div class="rail rail-mask reveal reveal-d1" id="prodRail">
+      {piezasDestacadas.map((p) => <PiezaCard pieza={p} ancho="min(64vw,300px)" />)}
+    </div>
+  </section>
+  )}
+
+  <!-- ============ PROYECTO DESTACADO + HOTSPOTS ============ -->
+  {proyectoDestacado && (
+  <section class="proj" id="proyectos">
+    <div class="container">
+      <div class="reveal">
+        <SectionHead title="Proyectos reales" linkHref="/proyectos/" linkLabel="Ver todos los proyectos" />
+      </div>
+    </div>
+    <!-- fuera del contenedor: desde 900 px la foto va de orilla a orilla -->
+    <figure class="proj-stage grano reveal reveal-d1">
+        <EscenaHotspots
+          img={escenaHome.img}
+          alt={escenaHome.alt}
+          hotspots={escenaHome.hotspots}
+        />
+        <figcaption class="proj-caption">
+          <p class="rotulo">{proyectoDestacado.espacio} · {proyectoDestacado.ciudad}</p>
+          <h3 class="display t-h3 proj-name">{proyectoDestacado.nombre}</h3>
+          <p class="proj-intro">{proyectoDestacado.resumen}</p>
+          <a class="pill pill--ghost proj-link" href={`/proyectos/${proyectoDestacado.slug}/`}>
+            Recorrer el proyecto <Fragment set:html={arrow} />
+          </a>
+        </figcaption>
+    </figure>
+  </section>
+  )}
+
+  <!-- ============ HOME OFFICE ============ -->
+  <section class="ho">
+    <div class="container">
+      <a class="ho-card reveal" href={homeOffice.ruta}>
+        <span class="ho-media">
+          <img src={homeOffice.portada.img} alt={homeOffice.portada.alt} loading="lazy" />
+        </span>
+        <span class="ho-copy">
+          <span class="rotulo ho-rotulo">Home office</span>
+          <span class="display t-h2 ho-title">Trabaja desde casa como en la oficina</span>
+          <span class="ho-text">
+            Sillas, escritorios y almacenamiento para armar tu espacio en casa, con
+            {setsHomeOffice.length > 0 ? " sets listos para empezar e" : ""} ideas para acomodarlo.
+            Y si es para todo tu equipo, lo cotizamos completo.
+          </span>
+          <span class="pill pill--ghost ho-cta">Armar mi home office <Fragment set:html={arrow} /></span>
+        </span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ============ EDITORIAL / NOSOTROS ============ -->
+  <section class="edit grano grano--oscuro" id="nosotros">
+    <div class="container edit-grid">
+      <div class="edit-media reveal">
+        <VideoFrame
+          src="/video/editorial-neucast.mp4"
+          poster="/video/editorial-neucast-poster.jpg"
+          alt="Detalle de la costura y el canto de un sillón de piel"
+          ratio="4/3"
+        />
+      </div>
+      <div class="edit-copy reveal reveal-d1">
+        <p class="rotulo">La idea es simple</p>
+        <h2 class="display t-h2 edit-title">El mobiliario correcto cambia cómo trabaja tu equipo</h2>
+        <p class="edit-text">
+          En Neucast seleccionamos muebles para oficina que resisten el uso corporativo
+          diario y los convertimos en espacios completos: desde una sala de juntas hasta
+          la cafetería entera. Tú nos cuentas cómo trabaja tu equipo; nosotros lo amueblamos.
+        </p>
+        <ul class="edit-points">
+          <li>Envíos e instalación en todo México</li>
+          <li>Acompañamiento de diseño sin costo</li>
+          <li>Cotización directa por WhatsApp</li>
+        </ul>
+        <a class="pill pill--ghost" href="/nosotros/">Conoce Neucast <Fragment set:html={arrow} /></a>
+      </div>
+    </div>
+  </section>
+
+  <CierreCta />
+
+  <style>
+    /* cabeceras, cards y controles viven en sus componentes */
+    section{margin-top:var(--section-y);}
+
+    /* ---------- Hero ---------- */
+    .hero{
+      position:relative;margin-top:0;
+      height:min(100svh,900px);min-height:540px;
+      display:flex;align-items:flex-end;
+    }
+    .hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+    .hero-shade{
+      position:absolute;inset:0;
+      background:
+        linear-gradient(to top,rgba(15,15,12,.82) 0%,rgba(15,15,12,.46) 40%,rgba(15,15,12,.14) 72%),
+        linear-gradient(to bottom,rgba(15,15,12,.34),rgba(15,15,12,0) 26%),
+        rgba(15,15,12,.16);
+    }
+    .hero-content{
+      position:relative;width:100%;color:#fff;
+      padding-bottom:clamp(36px,7vh,84px);
+      text-shadow:0 1px 22px rgba(0,0,0,.28);
+    }
+    .hero-ctas{text-shadow:none;}
+    .hero-content h1{margin:10px 0 14px;}
+    /* el hero anima al cargar, sin esperar scroll */
+    .hero-content{--play:running;}
+    /* el matiz va en el color, no en opacity, para no pelear con la animación de entrada */
+    /* ancho pensado para que el texto caiga en dos renglones en escritorio */
+    .hero-sub{font-size:var(--fs-body-lg);color:rgba(255,255,255,.92);max-width:60ch;}
+    .hero-ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px;}
+    .hero .pill--glass{color:#fff;background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.35);}
+    @media (hover:hover){.hero .pill--glass:hover{background:rgba(255,255,255,.26);}}
+
+    /* ---------- Proyecto + hotspots ----------
+       En teléfono es una tarjeta clara, la misma que el menú de escritorio usa
+       para "proyectos ya instalados": fondo arena, la foto dentro con su
+       esquina redondeada y el texto debajo. De 900 para arriba el texto se
+       monta sobre la foto, y ahí sí pide el velo oscuro. */
+    /* En teléfono también a todo lo ancho: la foto de orilla a orilla y el
+       texto debajo, sobre blanco y alineado con el resto de la página. Antes
+       fue una tarjeta gris con la foto adentro. */
+    .proj-stage{position:relative;margin:0;padding:0;}
+    .proj-stage::before{display:none;}
+    /* Los puntos van por encima del degradado del texto. La regla general de
+       .grano le daba a la escena su propia capa (z-index 1) y el pie, que
+       viene después, la tapaba con todo y puntos. Sin esa capa, la foto queda
+       debajo del degradado y los puntos (z-index 3) encima. */
+    .proj-stage > :global(.esc){z-index:auto;}
+    .proj-caption{z-index:1;}
+    /* el radio va en la foto y no en su caja: la caja no puede recortar,
+       porque las tarjetas de los puntos se salen de la imagen */
+    .proj-caption{
+      position:relative;
+      display:flex;flex-direction:column;
+      padding:18px var(--gutter) 0;color:var(--ink);
+    }
+    /* Todo el bloque de texto lleva al proyecto, no solo la pastilla: en una
+       tarjeta la gente toca el título o la descripción. El enlace estira una
+       capa invisible sobre el pie, que en teléfono va debajo de la foto y no
+       pisa los puntos. De 900 para arriba el pie se monta sobre la imagen, así
+       que ahí la capa no va: taparía los puntos. */
+    .proj-link::after{content:"";position:absolute;inset:0;}
+    .proj-caption :global(.rotulo){color:var(--olive-ink);}
+    .proj-name{margin:6px 0 8px;}
+    .proj-intro{font-size:14.5px;color:var(--ink-60);}
+    /* Botón secundario en los dos tamaños, como los otros bloques de sección
+       del home ("Armar mi home office", "Conoce Neucast"): sobre blanco va de
+       contorno y sobre la foto, de vidrio. El alto es el de todas las .pill. */
+    .proj-link{margin-top:18px;align-self:flex-start;gap:8px;}
+    @media (hover:hover){.proj-link:hover{background:var(--ink);color:var(--white);border-color:var(--ink);}}
+
+    @media (min-width:900px){
+      /* el mismo oscuro que "La idea es simple": un solo oscuro en todo el home */
+      /* a todo lo ancho, sin esquinas: la foto que más vende pide escala. La
+         escena tiene proporción fija, así que los puntos no se mueven. */
+      .proj-stage{background:var(--cemento-oscuro);padding:0;overflow:hidden;margin:0;border-radius:0;}
+      .proj-stage :global(.esc) > :global(img){border-radius:0;}
+      .proj-caption{
+        /* el texto se alinea con el borde del contenido de la página */
+        position:absolute;left:0;right:0;bottom:0;
+        padding:140px max(var(--gutter), calc((100% - var(--container)) / 2 + var(--gutter))) clamp(36px,4vw,56px);
+        color:#fff;align-items:flex-start;
+        background:linear-gradient(to top,rgba(15,15,12,.92) 0%,rgba(15,15,12,.62) 48%,rgba(15,15,12,0) 100%);
+        /* El velo no debe bloquear los clics a los puntos que tiene debajo,
+           pero lo que va dentro sí tiene que poder tocarse: sin esta segunda
+           mitad, el enlace de recorrer el proyecto no respondía. */
+        pointer-events:none;
+      }
+      .proj-caption a{pointer-events:auto;}
+      .proj-caption :global(.rotulo){color:#fff;}
+      .proj-intro{max-width:560px;color:rgba(255,255,255,.9);}
+      .proj-link{
+        margin-top:22px;color:#fff;
+        background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.35);
+        -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+      }
+      .proj-link::after{content:none;}
+      @media (hover:hover){.proj-link:hover{background:rgba(255,255,255,.28);color:#fff;border-color:rgba(255,255,255,.5);}}
+    }
+
+
+    /* ---------- Editorial ---------- */
+    /* cemento oscuro con el texto en blanco: prueba pedida por el cliente
+       a partir de su referencia */
+    .edit{background:var(--cemento-oscuro);color:var(--white);padding-block:clamp(56px,8vw,110px);}
+    .edit :global(.rotulo){color:rgba(255,255,255,.72);}
+    .edit-grid{display:grid;grid-template-columns:1fr;gap:clamp(28px,5vw,72px);align-items:center;}
+    .edit-copy{order:1;}
+    .edit-media{order:2;}
+    /* texto a la izquierda y video a la derecha en escritorio, y texto arriba
+       en teléfono. Estuvo invertido; regresó así cuando entró el bloque de
+       home office arriba, que ya pone la foto a la izquierda: dos bloques
+       seguidos con la imagen del mismo lado se leían repetidos. */
+    @media (min-width:900px){
+      .edit-grid{grid-template-columns:1fr 1fr;}
+    }
+    
+    .edit-title{margin:10px 0 16px;}
+    .edit-text{color:rgba(255,255,255,.8);max-width:52ch;}
+    .edit-points{list-style:none;padding:0;margin:22px 0 28px;display:flex;flex-direction:column;gap:10px;}
+    .edit-points li{display:flex;align-items:center;gap:12px;font-size:15px;}
+    .edit-points li::before{
+      content:"";width:6px;height:6px;border-radius:50%;background:var(--olive);flex:none;
+    }
+    /* la píldora fantasma hereda el negro de la tinta y sobre el cemento
+       oscuro desaparecía: texto y borde en blanco */
+    .edit .pill--ghost{color:var(--white);border-color:currentColor;}
+    @media (hover:hover){.edit .pill--ghost:hover{background:rgba(255,255,255,.14);}}
+    /* el verde oliva se apaga sobre oscuro; el salvia sí se lee */
+    .edit .edit-points li::before{background:var(--sage);}
+
+  
+    /* ---------- Home office ---------- */
+    .ho-card{
+      display:grid;border-radius:var(--radius);overflow:hidden;
+      background:var(--paper-soft);color:var(--ink);
+    }
+    @media (min-width:900px){.ho-card{grid-template-columns:minmax(0,7fr) minmax(0,5fr);}}
+    .ho-media{display:block;aspect-ratio:4/3;overflow:hidden;}
+    @media (min-width:900px){.ho-media{aspect-ratio:auto;min-height:480px;}}
+    .ho-media img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease);}
+    @media (hover:hover){.ho-card:hover .ho-media img{transform:scale(1.03);}}
+    .ho-copy{
+      display:flex;flex-direction:column;align-items:flex-start;justify-content:center;
+      padding:clamp(24px,4vw,56px);
+    }
+    .ho-rotulo{color:var(--olive-ink);}
+    .ho-title{margin:12px 0 14px;}
+    .ho-text{color:var(--ink-60);max-width:460px;}
+    .ho-cta{margin-top:26px;}
+    @media (max-width:639px){.ho-cta{width:100%;}}
+    @media (hover:hover){.ho-card:hover .ho-cta{background:var(--ink);color:var(--white);border-color:var(--ink);}}
+</style>
+
+</Base>
