@@ -34,12 +34,15 @@
 .pub-icono-listo{background:var(--ok-suave);color:var(--ok);opacity:0;transform:scale(.6);}
 .pub[data-estado="aldia"] .pub-icono-espera{opacity:0;transform:scale(.6);}
 .pub[data-estado="aldia"] .pub-icono-listo{opacity:1;transform:none;}
-.pub-anillo{position:absolute;inset:0;width:64px;height:64px;transform:rotate(-90deg);}
+.pub-anillo{position:absolute;inset:0;width:64px;height:64px;}
 .pub-anillo circle{
   fill:none;stroke:var(--olive);stroke-width:2.5;stroke-linecap:round;
   stroke-dasharray:60 130;opacity:0;transition:opacity .3s;
 }
-.pub[data-estado="pendiente"] .pub-anillo{animation:gira 1.6s linear infinite;}
+/* gira desde cero y sin transform propio: si arranca girado, al cerrar
+   cada vuelta brinca de regreso y se ve que se corta */
+.pub[data-estado="pendiente"] .pub-anillo{animation:vuelta 1.4s linear infinite;}
+@keyframes vuelta{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
 .pub[data-estado="pendiente"] .pub-anillo circle{opacity:1;}
 .pub-textos{display:flex;flex-direction:column;gap:4px;min-width:0;}
 .pub-rotulo{font-size:var(--t-subtitulo);font-weight:600;color:var(--ok);}
@@ -73,13 +76,18 @@
   background:var(--white);color:var(--etiqueta-3);box-shadow:0 1px 3px rgba(0,0,0,.08);
   transition:background .3s var(--ease),color .3s var(--ease);
 }
-.ruta-nodo svg{opacity:0;transform:scale(.5);transition:opacity .25s var(--ease),transform .45s var(--resorte);}
+.ruta-nodo > svg{opacity:0;transform:scale(.5);transition:opacity .25s var(--ease),transform .45s var(--resorte);}
 .ruta-paso--hecho .ruta-nodo{background:var(--ok);color:var(--white);}
-.ruta-paso--hecho .ruta-nodo svg{opacity:1;transform:none;}
-.ruta-espera{display:none;position:absolute;inset:-5px;border-radius:50%;border:2px solid var(--olive);animation:late 1.8s var(--ease) infinite;}
-.ruta-paso--espera .ruta-nodo{background:var(--white);box-shadow:0 0 0 2px var(--olive);}
-.ruta-paso--espera .ruta-nodo::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--olive);}
-.ruta-paso--espera .ruta-espera{display:block;}
+.ruta-paso--hecho .ruta-nodo > svg{opacity:1;transform:none;}
+.ruta-reloj{position:absolute;inset:0;display:none;place-items:center;}
+.ruta-espera{
+  display:none;position:absolute;inset:0;border-radius:50%;z-index:-1;
+  background:var(--olive);opacity:.28;animation:halo 2s var(--ease) infinite;
+}
+@keyframes halo{0%{transform:scale(1);opacity:.32;}70%,100%{transform:scale(1.9);opacity:0;}}
+.ruta-paso--espera .ruta-nodo{background:var(--info-suave);color:var(--olive-ink);box-shadow:none;isolation:isolate;}
+.ruta-paso--espera .ruta-nodo > svg{display:none;}
+.ruta-paso--espera .ruta-reloj,.ruta-paso--espera .ruta-espera{display:grid;}
 .ruta-paso--espera small{color:var(--olive-deep);font-weight:600;}
 
 .pub .lista-filas{border-top:1px solid var(--borde);}
@@ -93,6 +101,7 @@
 
 @media (prefers-reduced-motion:reduce){
   .pub-anillo,.pulso::after,.ruta-espera,.ruta-paso:last-child::before{animation:none !important;}
+  .ruta-espera{display:none !important;}
 }
 
 /* ---------- La tira de cifras ----------
