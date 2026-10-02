@@ -393,3 +393,8 @@ datos, la compilación y los PDF. Firebase y similares quedaron descartados
 por los PDF, el cobro por uso y la dependencia del proveedor. La vista previa
 de GitHub Pages sigue solo hasta que exista el VPS. Detalle en
 `docs/despliegue.md`.
+
+Ese mismo día se cerró: VPS de Hostinger (KVM 1 para arrancar), el plan
+Business Web Hosting se conserva para correo y respaldo, entorno de pruebas
+`stg.neucast.com.mx` en el mismo VPS con noindex y contraseña, y el correo por
+confirmar (el cliente cree que está en GoDaddy).

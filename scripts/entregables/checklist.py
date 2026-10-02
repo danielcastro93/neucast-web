@@ -42,6 +42,7 @@ FILAS = [
     ("Decisiones", "¿Pueden enviar muestras de acabados?", "Si sí, se agrega una tarjeta de muestras antes del pie de página.", "Gabriela"),
     ("Decisiones", "¿Tienen modelos 3D o una foto por color de las piezas?", "Fase 2: ver la pieza en el espacio con la cámara y selector de acabados.", "Gabriela"),
     ("Accesos", "Acceso a Hostinger y al registro del dominio neucast.com.mx", "Para publicar el sitio y apuntar el dominio.", "Gabriela"),
+    ("Accesos", "¿Dónde está su correo? (¿GoDaddy?) y acceso a la cuenta de contacto.ventas", "Define a qué buzón llegan las solicitudes y desde qué cuenta las manda el sitio.", "Gabriela"),
     ("Accesos", "Cuenta de Google de la empresa", "Para dar de alta Search Console y, si se decide, analítica.", "Gabriela y Mich"),
 ]
 

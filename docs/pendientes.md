@@ -31,7 +31,12 @@ flujo de publicación, en `despliegue.md`.
 - [ ] **Pasar el dominio `neucast.com.mx` a Hostinger** y retirar el WordPress
       que hoy está instalado para ese dominio, revisando antes si alguna
       dirección publicada está indexada.
-- [ ] **Montar el VPS de Hostinger y el paso a producción ahí** (sin GitHub): compilar con los datos de la
+- [ ] **Contratar el VPS de Hostinger (KVM 1) y montar ahí producción y
+      `stg.neucast.com.mx`** (sin GitHub). El plan Business Web Hosting se
+      queda para correo y respaldo.
+- [ ] **Confirmar con el cliente dónde está su correo** (cree que en GoDaddy):
+      buzón de las solicitudes y cuenta desde la que manda el servidor.
+- [ ] **El paso a producción en el VPS**: compilar con los datos de la
       API, generar los PDF, pasar `npm run revisar` y subir `dist/` por SSH.
 
 ## Páginas

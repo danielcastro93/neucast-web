@@ -30,7 +30,10 @@ mandan sobre todo lo demás:
 
 | Pieza | Dónde | Estado |
 | --- | --- | --- |
-| Plan de Hostinger | Business Web Hosting | Contratado |
+| Plan de Hostinger | Business Web Hosting. Se conserva (correo y respaldo); el sitio no lo usa | Contratado |
+| VPS de Hostinger | KVM 1 para arrancar (se puede subir de plan sin mover nada). Precios en https://www.hostinger.com/mx/vps-hosting | **Por contratar** |
+| Entorno de pruebas | `stg.neucast.com.mx`, en el mismo VPS, con noindex y contraseña | Decidido el 2 de octubre de 2026, por montar |
+| Correo | El cliente cree que su correo está en GoDaddy. Hay que confirmarlo: define desde dónde manda el formulario y a dónde llegan las solicitudes | **Por confirmar con el cliente** |
 | Dominio `neucast.com.mx` | Hay que pasarlo a Hostinger | **Pendiente** |
 | El sitio público | Hostinger, en el dominio raíz | Decidido |
 | Frontend del administrador | Hostinger, sitio Astro estático aparte en un subdominio tipo `admin.neucast.com.mx` | Decidido, por construir |
@@ -51,9 +54,9 @@ retirar en vez de moverlo** a un subdominio. El esquema final es:
   editar. No tiene cara al público y no se indexa.
 - **La API** vive en el mismo servidor, en su propio subdominio o ruta. La
   consultan el administrador, la compilación y el formulario de contacto.
-- **`preview.neucast.com.mx`** (opcional) sirve la vista previa con `noindex`,
-  para revisar cambios antes de publicarlos. Sustituye a la vista previa de
-  GitHub Pages, que se apaga al migrar.
+- **`stg.neucast.com.mx`** es el entorno de pruebas: una copia del sitio con
+  `noindex` y contraseña, para revisar cambios antes de publicarlos.
+  Sustituye a la vista previa de GitHub Pages, que se apaga al migrar.
 
 Pasos, en orden:
 
@@ -63,7 +66,8 @@ Pasos, en orden:
    WordPress: si alguna dirección existe y está indexada, hay que redirigirla
    en vez de dejarla en 404.
 3. **Retirar el WordPress** y dejar el dominio raíz libre para `dist/`.
-4. Crear los subdominios del administrador, de la API y de la vista previa.
+4. Contratar el VPS y crear los subdominios del administrador, de la API y de
+   pruebas (`stg.`).
 
 ### Infraestructura propia, sin GitHub
 
@@ -92,9 +96,25 @@ Un VPS chico alcanza de sobra: el sitio público es estático y la compilación
 corre solo cuando alguien publica. El precio exacto del plan se consulta en
 el panel de Hostinger antes de contratar.
 
-**Qué pasa con el plan Business Web Hosting.** Puede quedarse para el correo
-y como respaldo, o cancelarse cuando el VPS esté en marcha. Es una decisión de
-costo del cliente; el sitio no lo necesita.
+**El plan Business Web Hosting se queda** (decisión de Daniel, 2 de octubre de
+2026), para el correo y como respaldo. El sitio no lo usa. Lo único nuevo que
+se compra es el VPS.
+
+**El entorno de pruebas vive en el mismo VPS.** `stg.neucast.com.mx` sirve una
+segunda copia del sitio compilada con los mismos datos, cerrada a Google con
+`noindex` y con contraseña para que no la vea nadie de fuera. El flujo que
+conviene: todo lo que se guarda en el administrador se publica primero en
+pruebas de forma automática, y un botón "Publicar" lo pasa a producción. Así
+el cliente revisa antes de que lo vea el público y no hace falta un segundo
+servidor. Si algún día el administrador crece mucho, se separa en otro VPS,
+pero para arrancar no hace falta.
+
+**El correo.** El cliente cree que su correo está en GoDaddy; hay que
+confirmarlo. Importa por dos cosas: a qué buzón llegan las solicitudes del
+formulario, y desde qué cuenta las manda el servidor. Si el correo está en
+GoDaddy, el servidor puede enviar por el SMTP de esa cuenta con su contraseña
+de aplicación, o por un servicio de envío con plan gratuito. Sin esto resuelto
+el formulario no puede salir del modo de prueba.
 
 **Firebase y similares quedan descartados.** Resuelven base de datos y
 hospedaje, pero no corren Chrome para los PDF, cobran por uso y amarran el
