@@ -10,7 +10,7 @@ Resumen de decisiones aprobadas/propuestas. Propuesta completa: https://claude.a
 - Frontend: **Astro** (estático) + GSAP/View Transitions. Dominio neucast.com.mx.
 - Hosting: se barajó Vercel o Cloudflare Pages y **se decidió Hostinger** (plan
   Business Web Hosting, ya pagado), para no sumar un proveedor más. El dominio
-  se pasa a Hostinger. La compilación vive en GitHub Actions y lo que sube a
+  se pasa a Hostinger. La compilación vive en el propio servidor de Neucast y lo que sube a
   Hostinger es `dist/`. Ver `despliegue.md`.
 - Administración del contenido: **administrador propio**, hecho desde cero. El
   frontend es un sitio Astro estático aparte (subdominio tipo
@@ -372,8 +372,8 @@ Lo que queda decidido y lo que no:
 - **Backend y API: por definir** según el lenguaje del desarrollador. Si es
   PHP, Laravel con MySQL en Hostinger. Si es Node, primero confirmar que el plan
   de Hostinger lo acepte.
-- **Publicación:** se guarda en el administrador, la API dispara GitHub
-  Actions, se compila Astro con los datos de la API y `dist/` se sube a
+- **Publicación:** se guarda en el administrador, la API encola una
+  publicación en el propio servidor, se compila Astro con los datos de la API y `dist/` se copia a
   Hostinger. En ese mismo paso se generan las fichas técnicas y los catálogos
   en PDF. Mientras no exista el administrador, los PDF se generan en una Mac
   con `npm run fichas` y `npm run catalogos`, por la Helvetica Neue, que Linux
@@ -382,3 +382,14 @@ Lo que queda decidido y lo que no:
   de Mi proyecto) viaja en el mismo envío.
 
 Detalle en [administrador.md](administrador.md) y [despliegue.md](despliegue.md).
+
+## Infraestructura propia, sin GitHub (2 de octubre de 2026)
+
+Daniel decidió que nada del proyecto viva en GitHub: ni el código, ni la
+compilación, ni la vista previa. Todo queda en infraestructura de Neucast en
+Hostinger. Como el plan compartido no corre Node ni Chrome, la propuesta es un
+VPS de Hostinger que sirva el sitio, el administrador, la API, la base de
+datos, la compilación y los PDF. Firebase y similares quedaron descartados
+por los PDF, el cobro por uso y la dependencia del proveedor. La vista previa
+de GitHub Pages sigue solo hasta que exista el VPS. Detalle en
+`docs/despliegue.md`.

@@ -35,8 +35,8 @@ mandan sobre todo lo demás:
 | El sitio público | Hostinger, en el dominio raíz | Decidido |
 | Frontend del administrador | Hostinger, sitio Astro estático aparte en un subdominio tipo `admin.neucast.com.mx` | Decidido, por construir |
 | Backend y API del administrador | Hostinger. Si es PHP: Laravel con MySQL. Si es Node: confirmar antes que el plan lo acepte | **Por definir con el desarrollador** |
-| Compilación y publicación | GitHub Actions | La vista previa ya funciona; falta el paso a producción |
-| Código | GitHub | Listo |
+| Compilación y publicación | En el propio servidor de Neucast (VPS de Hostinger) | Por montar |
+| Código | En el servidor de Neucast, con copia en la Mac de Daniel. Nada en GitHub | Decidido el 2 de octubre de 2026 |
 
 ### Antes que nada: el dominio y el WordPress que ya está instalado
 
@@ -49,9 +49,11 @@ retirar en vez de moverlo** a un subdominio. El esquema final es:
 - **`admin.neucast.com.mx`** (o el subdominio que se prefiera) sirve el
   frontend del administrador, también estático. Solo lo usa el cliente para
   editar. No tiene cara al público y no se indexa.
-- **La API** vive donde la ponga el desarrollador dentro de Hostinger (puede
-  ser otro subdominio o una ruta del mismo). La consultan el administrador, la
-  compilación y el formulario de contacto.
+- **La API** vive en el mismo servidor, en su propio subdominio o ruta. La
+  consultan el administrador, la compilación y el formulario de contacto.
+- **`preview.neucast.com.mx`** (opcional) sirve la vista previa con `noindex`,
+  para revisar cambios antes de publicarlos. Sustituye a la vista previa de
+  GitHub Pages, que se apaga al migrar.
 
 Pasos, en orden:
 
@@ -61,44 +63,47 @@ Pasos, en orden:
    WordPress: si alguna dirección existe y está indexada, hay que redirigirla
    en vez de dejarla en 404.
 3. **Retirar el WordPress** y dejar el dominio raíz libre para `dist/`.
-4. Crear el subdominio del administrador y, si hace falta, el de la API.
+4. Crear los subdominios del administrador, de la API y de la vista previa.
 
-### Todo en Hostinger
+### Infraestructura propia, sin GitHub
 
-El sitio público, el administrador y la API se quedan en Hostinger, junto al
-dominio. Un solo proveedor y una sola factura.
+**Decisión de Daniel (2 de octubre de 2026): nada del proyecto vive en GitHub.**
+Ni el código, ni la compilación, ni la vista previa. Todo queda en
+infraestructura de Neucast, en Hostinger, que ya es el proveedor del dominio y
+del hospedaje.
 
-**El sitio público funciona sin ningún truco.** Son archivos estáticos: HTML,
-CSS, JavaScript, imágenes y PDF. No necesita PHP, ni Node, ni base de datos
-corriendo del lado del servidor. Lo único que hace falta es que alguien sirva
-esos archivos, y eso lo hace cualquier hospedaje.
+**Lo que hace falta y el plan compartido no da.** El sitio público son
+archivos estáticos y los sirve cualquier hospedaje. Pero compilarlo necesita
+Node, y generar las fichas y los catálogos en PDF necesita Chrome sin
+interfaz. El plan Business Web Hosting es hospedaje compartido: corre PHP y
+MySQL y da SSH, pero no corre Node de forma permanente ni Chrome. Por eso la
+propuesta es **un VPS de Hostinger** (servidor Linux propio, de los planes
+chicos) donde viva todo:
 
-**Lo que hay que resolver es dónde se compila.** El sitio se compila con Node, y
-un hospedaje compartido no siempre trae ese proceso. La forma limpia, y la que
-ya está medio armada en el repositorio, es que **la compilación ocurra en GitHub
-y lo que suba a Hostinger sea el resultado**:
+| En el VPS | Qué hace |
+| --- | --- |
+| Nginx | Sirve `neucast.com.mx` (los archivos de `dist/`), `admin.` y `preview.`, con certificados Let's Encrypt |
+| La API y su base de datos | El backend del administrador, en el lenguaje que defina el desarrollador (Node o PHP), con MySQL o MariaDB |
+| Node y Chrome sin interfaz | Compilan el sitio y generan los PDF cuando el administrador publica |
+| Un repositorio Git privado | El código del sitio y del administrador, con copia en la Mac de Daniel |
+| Copias de seguridad | De la base de datos, las fotos y los PDF, programadas en el mismo servidor |
 
-```
-GitHub Actions
-  npm ci
-  npm run build      → deja dist/ (con los datos que da la API)
-  npm run revisar    → si falla, no sube nada
-  sube dist/ a Hostinger por SSH → public_html
-```
+Un VPS chico alcanza de sobra: el sitio público es estático y la compilación
+corre solo cuando alguien publica. El precio exacto del plan se consulta en
+el panel de Hostinger antes de contratar.
 
-**El plan contratado es Business Web Hosting, que incluye acceso SSH**, así que
-la subida va por SSH y no por FTP. Es preferible: se puede sincronizar solo lo
-que cambió, se autentica con llave en vez de contraseña, y la llave se guarda
-como secreto del repositorio.
+**Qué pasa con el plan Business Web Hosting.** Puede quedarse para el correo
+y como respaldo, o cancelarse cuando el VPS esté en marcha. Es una decisión de
+costo del cliente; el sitio no lo necesita.
 
-Hostinger también tiene integración con Git en el panel. Sirve para traer el
-repositorio, pero hay que comprobar si compila o solo copia archivos: lo que se
-publica es `dist/`, no el código. Si solo copia, no sirve para esto.
+**Firebase y similares quedan descartados.** Resuelven base de datos y
+hospedaje, pero no corren Chrome para los PDF, cobran por uso y amarran el
+proyecto a un proveedor. Con el VPS todo está en un solo lugar y se puede
+mover entero a otro proveedor copiando el servidor.
 
-Ya existe `.github/workflows/preview.yml`, que compila, pasa la revisión y
-publica la vista previa. Para producción es el mismo archivo cambiando el último
-paso: en vez de publicar en GitHub Pages, subir `dist/` a `public_html`. Las
-credenciales van como secretos del repositorio, nunca escritas en el archivo.
+**Mientras el VPS no exista**, la vista previa sigue en GitHub Pages y los PDF
+se generan en la Mac con `npm run fichas` y `npm run catalogos`. Al migrar se
+apaga la vista previa de GitHub y se borra el repositorio de ahí.
 
 **El certificado.** Hostinger da Let's Encrypt gratis y lo renueva solo, para el
 dominio y para cada subdominio. Hay que activarlo en todos y forzar HTTPS.
@@ -107,12 +112,12 @@ dominio y para cada subdominio. Hay que activarlo en todos y forzar HTTPS.
 
 ```
 El cliente guarda en el administrador
-        ↓ la API avisa a GitHub (repository_dispatch)
-GitHub Actions
+        ↓ la API encola una publicación (en el mismo servidor)
+El servidor de Neucast
         ↓ npm run build     (consulta la API y compila Astro con esos datos)
         ↓ fichas y catálogos en PDF de lo que cambió
         ↓ npm run revisar   (si algo falla, no se publica)
-Sube dist/ a Hostinger
+Copia dist/ a la carpeta que sirve neucast.com.mx
 ```
 
 **El paso de revisión no es opcional.** `npm run revisar` recorre el sitio
@@ -122,26 +127,16 @@ saltado o una página fuera del mapa del sitio. Es la red que atrapa lo que el
 cliente escriba mal desde el administrador. Conviene que una compilación que no
 pase la revisión **no llegue a producción**.
 
-**El aviso a GitHub.** Al guardar, la API llama a la API de GitHub
-(`repository_dispatch`) con un token de acceso guardado como secreto del lado
-del servidor, nunca en el navegador. Conviene agrupar los avisos para que
-guardar cinco veces seguidas no dispare cinco compilaciones.
+**La publicación es una tarea del propio servidor.** La API guarda el cambio
+y deja una tarea en cola; un proceso del mismo servidor la toma, compila, genera
+los PDF, pasa la revisión y, solo si todo pasó, sustituye la carpeta pública
+de un golpe (compila en una carpeta aparte y cambia el enlace al final), así el
+sitio nunca se ve a medias. El administrador muestra el estado de la última
+publicación y el error, si lo hubo.
 
-**Los PDF.** Las fichas técnicas y los catálogos por categoría se generan en el
-mismo paso de publicación, para que nunca se queden atrás de la ficha web. Hay
-una condición: la plantilla usa **Helvetica Neue**, que viene en Mac pero no en
-Linux, que es donde corre GitHub Actions. Para automatizarlo hay que licenciar
-la fuente para ese uso o elegir una alternativa muy parecida. **Mientras no
-exista el administrador**, los PDF se generan a mano en una Mac:
-
-```bash
-npm run fichas      # fichas técnicas, a public/fichas/
-npm run catalogos   # catálogos por categoría y general, a public/catalogos/
-```
-
-y se suben al repositorio con el resto del sitio.
-
----
+**Dos publicaciones seguidas no se pisan.** La cola las ejecuta una por una, y
+si el cliente guarda tres piezas en un minuto, se compila una sola vez con las
+tres.
 
 ## 4. Lo que hay que dejar cerrado antes de producción
 
@@ -179,7 +174,8 @@ y se suben al repositorio con el resto del sitio.
 - **La lectura de la API, sin escritura para el público.** Lo que consulta la
   compilación no necesita escribir nada; escribir pide sesión del
   administrador. La única ruta pública que recibe datos es la del formulario.
-- **El token de GitHub** que dispara la publicación vive solo en el servidor.
+- **La cola de publicación** solo la dispara la API desde el propio servidor;
+  nadie la puede llamar desde fuera.
 
 ### El formulario
 

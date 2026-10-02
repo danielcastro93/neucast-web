@@ -31,7 +31,7 @@ flujo de publicación, en `despliegue.md`.
 - [ ] **Pasar el dominio `neucast.com.mx` a Hostinger** y retirar el WordPress
       que hoy está instalado para ese dominio, revisando antes si alguna
       dirección publicada está indexada.
-- [ ] **El paso a producción en GitHub Actions**: compilar con los datos de la
+- [ ] **Montar el VPS de Hostinger y el paso a producción ahí** (sin GitHub): compilar con los datos de la
       API, generar los PDF, pasar `npm run revisar` y subir `dist/` por SSH.
 
 ## Páginas
@@ -96,7 +96,7 @@ la ficha web.
 **Lo que falta:**
 
 1. Generarlos al publicar en vez de a mano, para que nunca se desfasen: en el
-   mismo paso de GitHub Actions que compila el sitio. Depende del punto 3 (la
+   mismo paso que compila el sitio en el servidor de Neucast. Depende del punto 3 (la
    letra) y del administrador propio, que es quien sabrá qué pieza cambió.
 2. ~~El catálogo por categoría~~ **Hecho el 2 de octubre de 2026.** Página
    `/recursos/` con el catálogo general y uno por categoría; cada categoría
@@ -115,7 +115,7 @@ la ficha web.
    `npm run catalogos` y subir los PDF**, igual que con las fichas.
 3. **Tipografía en el servidor de compilación.** La plantilla usa Helvetica
    Neue, que en Mac viene instalada pero en Linux no. Para que el PDF salga
-   igual al compilar en GitHub Actions hay que licenciar la fuente para ese
+   igual al compilar en el servidor (Linux) hay que licenciar la fuente para ese
    uso o elegir una alternativa muy parecida.
 4. ~~Peso~~ Resuelto en los catálogos con fotos achicadas (punto 2). Las
    fichas individuales siguen con las fotos completas, como se aprobaron.

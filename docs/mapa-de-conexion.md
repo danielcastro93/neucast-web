@@ -418,7 +418,7 @@ peso que dice cada botón se leen del archivo (`src/data/pdfs.js`).
 | Ficha técnica | Generada de la pieza | Nada que capturar |
 
 Cuando exista el administrador, la generación pasa al momento de publicar,
-dentro del mismo paso de GitHub Actions que compila el sitio: cambia una pieza,
+dentro del mismo paso que compila el sitio en el servidor de Neucast: cambia una pieza,
 se regeneran su ficha, el catálogo de su categoría y el general. Mientras
 tanto se generan en una Mac con `npm run fichas` y `npm run catalogos` (por la
 Helvetica Neue; ver [despliegue.md](despliegue.md), apartado 3).
@@ -449,5 +449,5 @@ una palabra que no va, una imagen de compartir que no es absoluta, datos
 estructurados rotos o una página fuera del mapa del sitio.
 
 **Conviene correrlo en cada publicación desde el administrador**. El flujo de vista
-previa en GitHub Actions ya lo corre, y el de producción tiene que hacerlo igual. Es lo que avisa de que
+previa ya lo corre al compilar, y el de producción tiene que hacerlo igual. Es lo que avisa de que
 alguien escribió un texto demasiado largo o dejó un enlace muerto.

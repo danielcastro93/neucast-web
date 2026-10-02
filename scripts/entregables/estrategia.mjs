@@ -273,18 +273,19 @@ const comoEsta = `
   <div class="sec">
     <p class="rotulo">06</p>
     <h2 class="h">Lo que sigue: cómo está hecho el sitio y qué falta</h2>
-    <p class="t">El sitio es estático, hecho con Astro 7. El contenido vive hoy en archivos de datos dentro del código; esos archivos son el contrato que el administrador tiene que llenar. La vista previa se publica sola en GitHub Pages con cada cambio; la producción se publicará en Hostinger.</p>
+    <p class="t">El sitio es estático, hecho con Astro 7. El contenido vive hoy en archivos de datos dentro del código; esos archivos son el contrato que el administrador tiene que llenar. Toda la infraestructura será propia, en Hostinger: nada del proyecto vive en GitHub. La vista previa actual en GitHub Pages es provisional y se apaga al migrar.</p>
   </div>
   <div class="dos">
     <div class="caja"><p class="rotulo">El administrador</p><ul class="lista">
       <li>Frontend en Astro, como sitio aparte (por ejemplo admin.neucast.com.mx), reutilizando los tokens y componentes del sistema de diseño de Neucast.</li>
-      <li>Backend y API por definir con el desarrollador: Laravel con MySQL si trabaja en PHP; si es Node, confirmar primero que el plan de Hostinger lo acepte.</li>
-      <li>Flujo de publicación: se guarda en el administrador, la API dispara GitHub Actions, se compila el sitio con los datos de la API, se generan fichas y catálogos en PDF, se revisa y se sube a Hostinger.</li>
+      <li>Infraestructura: un VPS de Hostinger con el sitio, el administrador, la API, la base de datos, la compilación con Node y Chrome para los PDF, el código en un repositorio privado y las copias de seguridad. El plan compartido no corre Node ni Chrome.</li>
+      <li>Backend y API por definir con el desarrollador (Node o PHP con MySQL); en el VPS cualquiera de los dos corre.</li>
+      <li>Flujo de publicación: se guarda en el administrador, la API encola una publicación en el propio servidor, se compila el sitio con los datos de la API, se generan fichas y catálogos en PDF, se revisa y se copia a la carpeta pública.</li>
       <li>El formulario de contacto lo recibe la API, con la lista de Mi proyecto en el mismo envío.</li>
       <li>Pendiente: licenciar Helvetica Neue para generar los PDF en el servidor, o elegir una alternativa muy parecida. Mientras, se generan en una Mac.</li>
     </ul></div>
     <div class="caja"><p class="rotulo">Dominio, hospedaje y legales</p><ul class="lista">
-      <li>Pasar neucast.com.mx a Hostinger y retirar el WordPress que hoy está instalado ahí.</li>
+      <li>Pasar neucast.com.mx a Hostinger, contratar el VPS y retirar el WordPress que hoy está instalado ahí. Decidir si el plan compartido se queda para correo o se cancela.</li>
       <li>Certificado, redirecciones a https y a la versión con o sin www, y robots sin bloqueo en producción.</li>
       <li>Alta en Search Console con la cuenta de Google de la empresa.</li>
       <li>Aviso de privacidad y términos: revisión del abogado del cliente. Hoy el sitio no usa cookies ni analítica; Mi proyecto usa almacenamiento local, que es funcional. Si se agrega analítica, hace falta aviso de consentimiento.</li>

@@ -54,7 +54,7 @@ del visitante. Eso significa que:
 
 - La API no necesita estar disponible para que el sitio funcione.
 - Publicar un cambio requiere volver a compilar. Al guardar en el administrador,
-  la API dispara la compilación en GitHub Actions.
+  la API encola una publicación que corre en el propio servidor de Neucast (ver `docs/despliegue.md`).
 - No hay que preocuparse por la velocidad de la API ni por protegerla del
   tráfico público de lectura.
 
