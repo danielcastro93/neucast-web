@@ -6,8 +6,6 @@
    ============================================ */
 
 :root{
-  --sb-ancha:252px;
-  --sb-angosta:72px;
   --barra-h:64px;
   --fondo-app:#F6F5F2;          /* el gris muy claro del sitio, para que el blanco de las tarjetas respire */
   --tarjeta:var(--white);
@@ -48,93 +46,7 @@ body.no-scroll{position:fixed;width:100%;overflow:hidden;}
 /* ============================================
    El cascarón
    ============================================ */
-.app{display:grid;grid-template-columns:var(--sb-ancha) 1fr;min-height:100vh;transition:grid-template-columns .32s var(--ease);}
-html[data-sb="plegada"] .app{grid-template-columns:var(--sb-angosta) 1fr;}
-@media (prefers-reduced-motion:reduce){.app{transition:none;}}
-
-/* ---------- Barra lateral ---------- */
-.sb{
-  position:sticky;top:0;height:100vh;z-index:40;
-  display:flex;flex-direction:column;
-  background:var(--white);border-right:1px solid var(--borde);
-  overflow:hidden;
-}
-.sb-cabeza{
-  flex:none;display:flex;align-items:center;gap:12px;
-  height:var(--barra-h);padding:0 16px 0 20px;
-}
-.sb-logo{display:flex;align-items:center;flex:none;height:28px;}
-.sb-logo svg{height:26px;width:auto;}
-.sb-logo-simbolo{display:none;}
-.sb-cuerpo{flex:1;overflow-y:auto;overflow-x:hidden;padding:8px 12px 16px;scrollbar-width:thin;}
-.sb-grupo{margin-top:18px;}
-.sb-grupo:first-child{margin-top:6px;}
-.sb-rotulo{
-  display:block;padding:0 12px 8px;
-  font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-40);
-  white-space:nowrap;transition:opacity .2s;
-}
-.sb-item{
-  position:relative;display:flex;align-items:center;gap:12px;
-  height:40px;padding:0 12px;border-radius:10px;
-  color:var(--ink-60);font-size:var(--fs-sm);font-weight:500;
-  white-space:nowrap;
-  transition:background .18s,color .18s;
-}
-.sb-item svg{flex:none;width:20px;height:20px;color:var(--ink-40);transition:color .18s;}
-.sb-item span{overflow:hidden;text-overflow:ellipsis;transition:opacity .2s;}
-@media (hover:hover){
-  .sb-item:hover{background:var(--paper-soft);color:var(--ink);}
-  .sb-item:hover svg{color:var(--ink);}
-}
-.sb-item[aria-current="page"]{background:var(--paper);color:var(--ink);font-weight:600;}
-.sb-item[aria-current="page"] svg{color:var(--olive-deep);}
-.sb-item[aria-current="page"]::before{
-  content:"";position:absolute;left:-12px;top:10px;bottom:10px;width:3px;border-radius:0 3px 3px 0;background:var(--olive);
-}
-.sb-cuenta{
-  display:inline-flex;align-items:center;justify-content:center;
-  min-width:22px;height:22px;padding:0 7px;margin-left:auto;border-radius:999px;
-  background:var(--paper);color:var(--ink-60);font-size:12px;font-weight:600;
-}
-.sb-pie{flex:none;padding:12px;border-top:1px solid var(--borde);}
-.sb-plegar{
-  display:flex;align-items:center;gap:12px;width:100%;
-  height:40px;padding:0 12px;border-radius:10px;
-  color:var(--ink-40);font-size:var(--fs-xs);font-weight:500;white-space:nowrap;
-  transition:background .18s,color .18s;
-}
-.sb-plegar svg{flex:none;width:20px;height:20px;transition:transform .32s var(--ease);}
-@media (hover:hover){.sb-plegar:hover{background:var(--paper-soft);color:var(--ink);}}
-
-/* plegada: solo íconos, con el nombre en una burbuja al pasar el cursor */
-html[data-sb="plegada"] .sb-cabeza{padding:0 0 0 22px;}
-/* plegada no necesita scroll y la burbuja con el nombre sale por fuera */
-html[data-sb="plegada"] .sb,html[data-sb="plegada"] .sb-cuerpo{overflow:visible;}
-html[data-sb="plegada"] .sb-logo-completo{display:none;}
-html[data-sb="plegada"] .sb-logo-simbolo{display:block;}
-html[data-sb="plegada"] .sb-rotulo{opacity:0;height:0;padding:0;overflow:hidden;margin-bottom:8px;}
-html[data-sb="plegada"] .sb-grupo{margin-top:8px;padding-top:8px;border-top:1px solid var(--borde);}
-html[data-sb="plegada"] .sb-grupo:first-child{border-top:0;}
-html[data-sb="plegada"] .sb-item{justify-content:center;padding:0;}
-html[data-sb="plegada"] .sb-item span,
-html[data-sb="plegada"] .sb-cuenta,
-html[data-sb="plegada"] .sb-plegar span{display:none;}
-html[data-sb="plegada"] .sb-plegar{justify-content:center;padding:0;}
-html[data-sb="plegada"] .sb-plegar svg{transform:rotate(180deg);}
-html[data-sb="plegada"] .sb-item::after{
-  content:attr(data-nombre);
-  position:absolute;left:calc(100% + 14px);top:50%;transform:translateY(-50%) translateX(-4px);
-  padding:6px 10px;border-radius:8px;
-  background:var(--ink);color:var(--white);font-size:12px;font-weight:500;letter-spacing:.01em;
-  white-space:nowrap;pointer-events:none;opacity:0;
-  transition:opacity .15s,transform .15s var(--ease);
-  box-shadow:var(--sombra-2);z-index:5;
-}
-@media (hover:hover){
-  html[data-sb="plegada"] .sb-item:hover::after{opacity:1;transform:translateY(-50%) translateX(0);}
-}
-.sb-velo{display:none;}
+.app{min-height:100vh;}
 
 /* ---------- Barra superior ---------- */
 .principal{min-width:0;display:flex;flex-direction:column;}
@@ -170,19 +82,7 @@ html[data-sb="plegada"] .sb-item::after{
 .publicacion-texto b{color:var(--ink);font-weight:600;}
 .publicacion .boton{height:30px;padding:0 14px;font-size:12px;}
 
-.cuenta{
-  display:flex;align-items:center;gap:10px;height:40px;padding:0 6px 0 6px;border-radius:999px;
-  transition:background .18s;
-}
-@media (hover:hover){.cuenta:hover{background:rgba(29,29,27,.05);}}
-.avatar{
-  width:30px;height:30px;border-radius:50%;flex:none;
-  display:flex;align-items:center;justify-content:center;
-  background:var(--ink);color:var(--white);font-size:12px;font-weight:600;letter-spacing:.02em;
-}
-.cuenta-nombre{font-size:var(--fs-sm);font-weight:500;}
-
-/* el menú que cuelga de la cuenta */
+/* menú que cuelga de un botón (las acciones de cada fila) */
 .desplegable{position:relative;}
 .desplegable-menu{
   position:absolute;right:0;top:calc(100% + 8px);min-width:220px;
@@ -556,7 +456,7 @@ dialog.modal.modal--cerrando::backdrop{animation:veloSale .24s var(--ease-salida
 .modal-pie .izquierda{margin-right:auto;}
 
 /* resumen de lo que se va a publicar */
-.lista-cambios{display:flex;flex-direction:column;border:1px solid var(--borde);border-radius:12px;overflow:hidden;}
+.lista-cambios{margin:0;padding:0;display:flex;flex-direction:column;border:1px solid var(--borde);border-radius:12px;overflow:hidden;}
 .lista-cambios li{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--borde);font-size:var(--fs-sm);list-style:none;}
 .lista-cambios li:last-child{border-bottom:0;}
 .lista-cambios .que{color:var(--ink-40);font-size:12px;min-width:76px;text-transform:capitalize;}
@@ -631,32 +531,7 @@ dialog.modal.modal--cerrando::backdrop{animation:veloSale .24s var(--ease-salida
    Teléfono y tableta
    ============================================ */
 @media (max-width:1024px){
-  .app,html[data-sb="plegada"] .app{grid-template-columns:1fr;}
-  .sb{
-    position:fixed;top:0;left:0;bottom:0;width:var(--sb-ancha);
-    transform:translateX(-100%);transition:transform .32s var(--ease);
-    box-shadow:none;
-  }
-  html[data-sb-movil="abierta"] .sb{transform:none;box-shadow:var(--sombra-modal);}
-  /* en teléfono nunca se pliega: siempre con nombres */
-  html[data-sb="plegada"] .sb-logo-completo{display:block;}
-  html[data-sb="plegada"] .sb-logo-simbolo{display:none;}
-  html[data-sb="plegada"] .sb-cabeza{padding:0 16px 0 20px;}
-  html[data-sb="plegada"] .sb-rotulo{opacity:1;height:auto;padding:0 12px 8px;overflow:visible;margin:0;}
-  html[data-sb="plegada"] .sb-grupo{margin-top:18px;padding-top:0;border-top:0;}
-  html[data-sb="plegada"] .sb-item{justify-content:flex-start;padding:0 12px;}
-  html[data-sb="plegada"] .sb-item span,html[data-sb="plegada"] .sb-cuenta{display:block;}
-  html[data-sb="plegada"] .sb-item::after{display:none;}
-  .sb-pie{display:none;}
-  .sb-velo{
-    display:block;position:fixed;inset:0;z-index:39;
-    background:rgba(20,19,17,.4);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
-    opacity:0;pointer-events:none;transition:opacity .3s var(--ease);
-  }
-  html[data-sb-movil="abierta"] .sb-velo{opacity:1;pointer-events:auto;}
   .barra{padding:0 var(--space-4);gap:10px;}
-  .barra-menu{display:flex;}
-  .cuenta-nombre{display:none;}
   .publicacion-texto{display:none;}
   .publicacion{padding-left:10px;}
   .contenido{padding:var(--space-4) var(--space-4) var(--space-7);}

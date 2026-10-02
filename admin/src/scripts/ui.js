@@ -141,3 +141,76 @@ export function fechaRelativa(iso) {
 
 export const escapar = (s) =>
   String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+
+/* ---------- El globo ----------
+   Uno solo, flotante en <body>, para los elementos con data-globo. Los que
+   llevan data-globo-solo="angosta" solo lo enseñan con la barra lateral
+   angosta: con la barra ancha el nombre ya está escrito al lado del ícono y
+   repetirlo estorba. */
+let globo = null;
+const elGlobo = () => {
+  if (!globo) {
+    globo = document.createElement("div");
+    globo.className = "globo";
+    globo.setAttribute("role", "presentation");
+    document.body.appendChild(globo);
+  }
+  return globo;
+};
+
+// El mismo criterio que el CSS: escritorio es tener ratón, no tener ancho.
+export const ESCRITORIO = "(min-width: 72em) and (hover: hover) and (pointer: fine)";
+const barraAngosta = () =>
+  document.documentElement.dataset.sb === "plegada" && matchMedia(ESCRITORIO).matches;
+
+export function mostrarGlobo(el) {
+  const texto = el.dataset.globo;
+  if (!texto) return;
+  if (el.dataset.globoSolo === "angosta" && !barraAngosta()) return;
+
+  const g = elGlobo();
+  g.textContent = texto;
+  g.dataset.lado = el.dataset.globoLado || "derecha";
+  g.classList.add("visible");
+  const r = el.getBoundingClientRect();
+  const gr = g.getBoundingClientRect();
+  if (g.dataset.lado === "arriba") {
+    g.style.left = Math.max(8, Math.min(innerWidth - gr.width - 8, r.left + r.width / 2 - gr.width / 2)) + "px";
+    g.style.top = Math.max(8, r.top - gr.height - 10) + "px";
+    return;
+  }
+  // Dentro de la barra el globo se separa del BORDE de la barra, no del
+  // ícono: los enlaces no llegan a la orilla y quedaba pegado al canto.
+  const barra = el.closest(".bl");
+  let minimo = 0;
+  if (barra) {
+    minimo = barra.getBoundingClientRect().right + 16;
+    // La bolita sobresale del canto: un globo a su altura se le montaba
+    // encima. Solo en ese caso se corre lo necesario para pasarla.
+    const bolita = barra.querySelector(".bl-colapsar");
+    if (bolita && el !== bolita) {
+      const c = bolita.getBoundingClientRect();
+      const alto = r.top + r.height / 2 - gr.height / 2;
+      if (alto < c.bottom + 8 && alto + gr.height > c.top - 8) minimo = c.right + 12;
+    }
+  }
+  g.style.left = Math.min(innerWidth - gr.width - 8, Math.max(minimo, r.right + 12)) + "px";
+  g.style.top = Math.max(8, r.top + r.height / 2 - gr.height / 2) + "px";
+}
+
+export function ocultarGlobo() {
+  globo?.classList.remove("visible");
+}
+
+export function activarGlobos(scope = document) {
+  scope.querySelectorAll("[data-globo]").forEach((el) => {
+    if (el.dataset.globoListo) return;
+    el.dataset.globoListo = "1";
+    el.addEventListener("mouseenter", () => mostrarGlobo(el));
+    el.addEventListener("focus", () => mostrarGlobo(el));
+    el.addEventListener("mouseleave", ocultarGlobo);
+    el.addEventListener("blur", ocultarGlobo);
+    el.addEventListener("click", ocultarGlobo);
+  });
+}
+addEventListener("scroll", ocultarGlobo, { passive: true, capture: true });

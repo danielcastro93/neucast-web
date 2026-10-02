@@ -1,11 +1,14 @@
 ---
 // El molde de todas las pantallas del administrador (menos la de entrar).
 //
-// Pone la barra lateral plegable, la barra superior con el estado de
-// publicación y la cuenta, los dos modales que existen en todas las pantallas
-// (confirmar y publicar) y exige sesión antes de pintar nada.
+// Pone la barra lateral (la misma pieza que Capital Trip: grupos plegables,
+// orillas difuminadas, la bolita para hacerla angosta, globos con el nombre
+// y la cuenta abajo), la barra superior con el estado de publicación, los
+// dos modales que existen en todas las pantallas (confirmar y publicar) y
+// exige sesión antes de pintar nada.
 import "@neucast/compartido/styles/global.css";
 import "../styles/admin.css";
+import "../styles/barra-lateral.css";
 import Logo from "@neucast/compartido/components/Logo.astro";
 import IconoAdmin from "../components/IconoAdmin.astro";
 import Modal from "../components/Modal.astro";
@@ -13,14 +16,15 @@ import Modal from "../components/Modal.astro";
 const { titulo, seccion = "", migas = [], angosto = false } = Astro.props;
 const base = import.meta.env.BASE_URL;
 
+// Inicio va suelto arriba; lo demás, en grupos que se pliegan.
+const inicio = { id: "inicio", nombre: "Inicio", icono: "inicio", ruta: "inicio/" };
 const grupos = [
   {
     rotulo: "Contenido",
     items: [
-      { id: "inicio", nombre: "Inicio", icono: "inicio", ruta: "inicio/" },
-      { id: "piezas", nombre: "Piezas", icono: "piezas", ruta: "piezas/", cuenta: "piezas" },
-      { id: "categorias", nombre: "Categorías", icono: "categorias", ruta: "categorias/", cuenta: "categorias" },
-      { id: "proyectos", nombre: "Proyectos", icono: "proyectos", ruta: "proyectos/", cuenta: "proyectos" },
+      { id: "piezas", nombre: "Piezas", icono: "piezas", ruta: "piezas/", punto: "borradores" },
+      { id: "categorias", nombre: "Categorías", icono: "categorias", ruta: "categorias/" },
+      { id: "proyectos", nombre: "Proyectos", icono: "proyectos", ruta: "proyectos/" },
       { id: "home-office", nombre: "Home office", icono: "casa", ruta: "home-office/" },
     ],
   },
@@ -30,17 +34,27 @@ const grupos = [
       { id: "paginas", nombre: "Páginas", icono: "paginas", ruta: "paginas/" },
       { id: "legales", nombre: "Legales", icono: "legal", ruta: "legales/" },
       { id: "listas", nombre: "Listas", icono: "listas", ruta: "listas/" },
-      { id: "ajustes", nombre: "Ajustes", icono: "ajustes", ruta: "ajustes/" },
     ],
   },
   {
     rotulo: "Seguimiento",
     items: [
       { id: "metricas", nombre: "Métricas", icono: "metricas", ruta: "metricas/" },
+      { id: "reportes", nombre: "Reportes", icono: "descargar", ruta: "reportes/" },
+    ],
+  },
+  {
+    rotulo: "Sistema",
+    items: [
+      { id: "ajustes", nombre: "Ajustes", icono: "ajustes", ruta: "ajustes/" },
       { id: "usuarios", nombre: "Usuarios", icono: "usuarios", ruta: "usuarios/" },
     ],
   },
 ];
+
+// El símbolo de la marca (el arco y el punto), para la barra angosta y la
+// cabecera de la barra. Mismo trazo que Logo.astro.
+const simbolo = "M625.9,655.2c-3.1,3.1-6.5,5.5-10.2,7.4-3.8,1.9-7.8,2.8-12.3,2.8s-8.7-1.4-11.8-4.1c-3.1-2.7-5.5-7.5-7.2-14.2l-9.2-35.1c-5.8-22.4-14.4-39.6-25.8-51.7-11.4-12-26.4-18.1-44.8-18.1s-30.5,5.9-42.2,17.6-17.7,29.9-17.7,54.7,2.1,27.2,6.4,41c4.3,13.7,9.8,24.7,16.6,32.8-2.7,3.7-6,6.6-9.7,8.7-3.7,2-7.8,3.1-12.3,3.1-9.9,0-18.6-8.1-26.1-24.4-7.5-16.3-11.3-37.1-11.3-62.6s4.1-42.1,12.3-59c8.2-17,19.4-30.2,33.8-39.7,14.3-9.5,30.9-14.3,49.6-14.3,28.7,0,51.9,8.7,69.6,26.2,17.7,17.5,31.1,43.9,39.9,79.1l12.3,49.9ZM676.3,660.8c-8.2,0-15.1-2.6-20.7-7.9-5.6-5.3-8.4-12.1-8.4-20.6s2.8-15.9,8.4-21.1c5.6-5.3,12.5-7.9,20.7-7.9s15,2.6,20.5,7.9c5.5,5.3,8.2,12.3,8.2,21.1s-2.7,15.4-8.2,20.6c-5.5,5.3-12.3,7.9-20.5,7.9Z";
 ---
 <!doctype html>
 <html lang="es-MX">
@@ -64,48 +78,81 @@ const grupos = [
   </head>
   <body>
     <div class="app">
-      <div class="sb-velo" data-cierra-sb></div>
-      <aside class="sb" aria-label="Navegación del administrador">
-        <div class="sb-cabeza">
-          <a class="sb-logo" href={`${base}inicio/`} aria-label="Inicio del administrador">
-            <span class="sb-logo-completo"><Logo height={26} /></span>
-            <svg class="sb-logo-simbolo" width="30" height="26" viewBox="500 500 230 200" fill="var(--olive)" aria-hidden="true">
-              <path d="M625.9,655.2c-3.1,3.1-6.5,5.5-10.2,7.4-3.8,1.9-7.8,2.8-12.3,2.8s-8.7-1.4-11.8-4.1c-3.1-2.7-5.5-7.5-7.2-14.2l-9.2-35.1c-5.8-22.4-14.4-39.6-25.8-51.7-11.4-12-26.4-18.1-44.8-18.1s-30.5,5.9-42.2,17.6-17.7,29.9-17.7,54.7,2.1,27.2,6.4,41c4.3,13.7,9.8,24.7,16.6,32.8-2.7,3.7-6,6.6-9.7,8.7-3.7,2-7.8,3.1-12.3,3.1-9.9,0-18.6-8.1-26.1-24.4-7.5-16.3-11.3-37.1-11.3-62.6s4.1-42.1,12.3-59c8.2-17,19.4-30.2,33.8-39.7,14.3-9.5,30.9-14.3,49.6-14.3,28.7,0,51.9,8.7,69.6,26.2,17.7,17.5,31.1,43.9,39.9,79.1l12.3,49.9ZM676.3,660.8c-8.2,0-15.1-2.6-20.7-7.9-5.6-5.3-8.4-12.1-8.4-20.6s2.8-15.9,8.4-21.1c5.6-5.3,12.5-7.9,20.7-7.9s15,2.6,20.5,7.9c5.5,5.3,8.2,12.3,8.2,21.1s-2.7,15.4-8.2,20.6c-5.5,5.3-12.3,7.9-20.5,7.9Z"/>
-            </svg>
-          </a>
-        </div>
-        <nav class="sb-cuerpo">
-          {grupos.map((g) => (
-            <div class="sb-grupo">
-              <span class="sb-rotulo">{g.rotulo}</span>
-              {g.items.map((it) => (
-                <a
-                  class="sb-item"
-                  href={`${base}${it.ruta}`}
-                  data-nombre={it.nombre}
-                  aria-current={it.id === seccion ? "page" : undefined}
-                >
-                  <IconoAdmin name={it.icono} />
-                  <span>{it.nombre}</span>
-                  {it.cuenta && <span class="sb-cuenta" data-cuenta={it.cuenta} hidden></span>}
-                </a>
-              ))}
+      <div class="bl-fondo" data-cierra-cajon></div>
+      <aside class="bl" id="barra-lateral" aria-label="Navegación del administrador">
+        <a class="bl-marca" href={`${base}inicio/`} aria-label="Neucast · Panel de administración">
+          <span class="bl-simbolo" aria-hidden="true">
+            <svg viewBox="380 500 330 205" fill="var(--olive)"><path d={simbolo} /></svg>
+          </span>
+          <span class="bl-marca-txt">
+            <strong>Neucast</strong>
+            <small>Panel de administración</small>
+          </span>
+        </a>
+
+        <nav class="bl-nav" aria-label="Secciones del administrador" data-nav>
+          <div class="bl-grupo">
+            <div class="bl-items">
+              <a href={`${base}${inicio.ruta}`} aria-current={seccion === inicio.id ? "page" : undefined} data-globo={inicio.nombre} data-globo-solo="angosta">
+                <IconoAdmin name={inicio.icono} /><span class="et">{inicio.nombre}</span>
+              </a>
+            </div>
+          </div>
+          {grupos.map((g, i) => (
+            <div class="bl-grupo">
+              <button class="bl-grupo-h" type="button" data-grupo={g.rotulo} aria-expanded="true" aria-controls={`grupo-${i}`}>
+                <span>{g.rotulo}</span>
+                <IconoAdmin name="chevronAbajo" size={16} />
+              </button>
+              <div class="bl-items" id={`grupo-${i}`} data-tiene-activa={g.items.some((x) => x.id === seccion) ? "1" : undefined}>
+                {g.items.map((it) => (
+                  <a href={`${base}${it.ruta}`} aria-current={it.id === seccion ? "page" : undefined} data-globo={it.nombre} data-globo-solo="angosta">
+                    <IconoAdmin name={it.icono} /><span class="et">{it.nombre}</span>
+                    {it.punto && <span class="bl-punto" data-punto={it.punto} hidden></span>}
+                  </a>
+                ))}
+              </div>
             </div>
           ))}
         </nav>
-        <div class="sb-pie">
-          <button class="sb-plegar" type="button" data-plegar aria-label="Plegar la barra lateral">
-            <IconoAdmin name="plegar" />
-            <span>Plegar</span>
+
+        <div class="bl-pie" data-pie>
+          <button class="bl-usuario" type="button" data-cuenta aria-haspopup="menu" aria-expanded="false" aria-controls="ventana-cuenta" data-globo="Tu cuenta" data-globo-solo="angosta">
+            <span class="avatar" aria-hidden="true" data-avatar></span>
+            <span class="bl-usuario-txt">
+              <strong data-cuenta-nombre></strong>
+              <small data-cuenta-correo></small>
+            </span>
           </button>
+          <div class="bl-cuenta" id="ventana-cuenta" role="menu" data-ventana-cuenta hidden>
+            <div class="bl-cuenta-cabeza">
+              <span class="bl-cuenta-quien">
+                <strong data-cuenta-nombre></strong>
+                <small data-cuenta-correo></small>
+              </span>
+              <button class="bl-salir" type="button" data-salir aria-label="Cerrar sesión" data-globo="Cerrar sesión" data-globo-lado="arriba">
+                <IconoAdmin name="salir" size={19} />
+              </button>
+            </div>
+            <div class="bl-cuenta-menu">
+              <a role="menuitem" href={`${base}ajustes/`}><IconoAdmin name="ajustes" size={19} /><span>Ajustes</span></a>
+              <button role="menuitem" type="button" data-ver-stg><IconoAdmin name="externo" size={19} /><span>Ver el sitio de pruebas</span></button>
+            </div>
+          </div>
         </div>
+
+        <button class="bl-colapsar" type="button" data-colapsar>
+          <IconoAdmin name="chevronIzq" size={15} />
+        </button>
       </aside>
 
       <div class="principal">
         <header class="barra" data-barra>
-          <button class="boton boton--icono boton--texto barra-menu" type="button" data-abre-sb aria-label="Abrir el menú">
+          <button class="boton boton--icono boton--texto barra-menu" type="button" data-abre-cajon aria-label="Abrir el menú" aria-expanded="false" aria-controls="barra-lateral">
             <IconoAdmin name="menu" />
           </button>
+          <span class="barra-linea" aria-hidden="true"></span>
+          <a class="barra-marca" href={`${base}inicio/`} aria-label="Ir al inicio"><Logo height={22} /></a>
           <nav class="barra-migas" aria-label="Ubicación">
             {migas.map((m) => (
               <>
@@ -120,19 +167,6 @@ const grupos = [
               <span class="publicacion-punto"></span>
               <span class="publicacion-texto" data-publicacion-texto>Todo publicado</span>
               <button class="boton boton--primario" type="button" data-abre-modal="modal-publicar">Publicar</button>
-            </div>
-            <div class="desplegable" data-desplegable>
-              <button class="cuenta" type="button" aria-haspopup="menu" aria-expanded="false" data-desplegable-boton>
-                <span class="avatar" data-avatar>··</span>
-                <span class="cuenta-nombre" data-cuenta-nombre></span>
-                <IconoAdmin name="chevronAbajo" size={16} />
-              </button>
-              <div class="desplegable-menu" role="menu">
-                <div class="desplegable-cabeza"><b data-cuenta-nombre></b><span data-cuenta-correo></span></div>
-                <a class="desplegable-item" role="menuitem" href={`${base}usuarios/`}><IconoAdmin name="usuarios" size={16} />Mi cuenta</a>
-                <button class="desplegable-item" role="menuitem" type="button" data-ver-stg><IconoAdmin name="externo" size={16} />Ver el sitio de pruebas</button>
-                <button class="desplegable-item desplegable-item--peligro" role="menuitem" type="button" data-salir><IconoAdmin name="salir" size={16} />Cerrar sesión</button>
-              </div>
             </div>
           </div>
         </header>
@@ -168,30 +202,139 @@ const grupos = [
     <script>
       import { exigirSesion, cerrarSesion } from "../scripts/sesion.js";
       import { listar, publicar } from "../scripts/api.js";
-      import { cablearModales, cerrarModal, avisar, fechaRelativa, escapar } from "../scripts/ui.js";
+      import { cablearModales, cerrarModal, avisar, fechaRelativa, escapar, activarGlobos, ocultarGlobo, ESCRITORIO } from "../scripts/ui.js";
 
       const sesion = exigirSesion();
       const base = import.meta.env.BASE_URL;
       const html = document.documentElement;
+      const $ = (s) => document.querySelector(s);
 
       /* ---------- Cuenta ---------- */
       if (sesion) {
-        const iniciales = sesion.nombre.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase();
-        document.querySelector("[data-avatar]").textContent = iniciales;
+        $("[data-avatar]").textContent = (sesion.nombre || "?").trim()[0].toUpperCase();
         document.querySelectorAll("[data-cuenta-nombre]").forEach((e) => (e.textContent = sesion.nombre));
-        document.querySelector("[data-cuenta-correo]").textContent = sesion.correo;
+        document.querySelectorAll("[data-cuenta-correo]").forEach((e) => {
+          e.textContent = sesion.correo;
+          e.title = sesion.correo;
+        });
       }
-      document.querySelector("[data-salir]")?.addEventListener("click", () => {
+
+      // La ventana de la cuenta: anclada al botón, no un modal. Cierra con
+      // otro clic, fuera de ella o con Escape.
+      const botonCuenta = $("[data-cuenta]");
+      const ventana = $("[data-ventana-cuenta]");
+      const abrirCuenta = () => {
+        ventana.hidden = false;
+        botonCuenta.setAttribute("aria-expanded", "true");
+        requestAnimationFrame(() => ventana.classList.add("visible"));
+      };
+      const cerrarCuenta = () => {
+        if (ventana.hidden) return;
+        ventana.classList.remove("visible");
+        botonCuenta.setAttribute("aria-expanded", "false");
+        setTimeout(() => { if (!ventana.classList.contains("visible")) ventana.hidden = true; }, 170);
+      };
+      botonCuenta.addEventListener("click", (e) => {
+        e.stopPropagation();
+        ventana.hidden ? abrirCuenta() : cerrarCuenta();
+      });
+      ventana.addEventListener("click", (e) => e.stopPropagation());
+      document.addEventListener("click", cerrarCuenta);
+      $("[data-salir]").addEventListener("click", () => {
         cerrarSesion();
         location.href = base;
       });
-      document.querySelector("[data-ver-stg]")?.addEventListener("click", () => {
+      $("[data-ver-stg]").addEventListener("click", () => {
+        cerrarCuenta();
         window.open(import.meta.env.PUBLIC_STG || "http://localhost:4321/", "_blank", "noopener");
       });
 
-      /* ---------- Desplegables ---------- */
+      /* ---------- Ancha o angosta ----------
+         Lo decide quien la usa y se recuerda. El estado ya lo puso el script
+         de la cabeza antes de pintar, para que no parpadee. */
+      const colapsar = $("[data-colapsar]");
+      const rotularColapsar = () => {
+        const angosta = html.dataset.sb === "plegada";
+        colapsar.dataset.globo = angosta ? "Expandir la barra" : "Colapsar la barra";
+        colapsar.setAttribute("aria-label", colapsar.dataset.globo);
+        colapsar.setAttribute("aria-expanded", String(!angosta));
+      };
+      rotularColapsar();
+      colapsar.addEventListener("click", () => {
+        const angosta = html.dataset.sb !== "plegada";
+        if (angosta) html.dataset.sb = "plegada";
+        else delete html.dataset.sb;
+        try { localStorage.setItem("neucast-admin:sb", angosta ? "plegada" : "ancha"); } catch {}
+        rotularColapsar();
+        ocultarGlobo();
+        cerrarCuenta();
+      });
+
+      /* ---------- Grupos que se pliegan ----------
+         Se recuerda cuáles dejó cerrados. El de la sección abierta se fuerza
+         abierto: si no, entras a Listas y no ves dónde estás parado. */
+      let cerrados = new Set();
+      try { cerrados = new Set(JSON.parse(localStorage.getItem("neucast-admin:grupos") || "[]")); } catch {}
+      document.querySelectorAll("[data-grupo]").forEach((b) => {
+        const caja = document.getElementById(b.getAttribute("aria-controls"));
+        const abierto = !!caja.dataset.tieneActiva || !cerrados.has(b.dataset.grupo);
+        b.setAttribute("aria-expanded", String(abierto));
+        caja.classList.toggle("plegado", !abierto);
+        b.addEventListener("click", () => {
+          const estaba = b.getAttribute("aria-expanded") === "true";
+          b.setAttribute("aria-expanded", String(!estaba));
+          caja.classList.toggle("plegado", estaba);
+          estaba ? cerrados.add(b.dataset.grupo) : cerrados.delete(b.dataset.grupo);
+          try { localStorage.setItem("neucast-admin:grupos", JSON.stringify([...cerrados])); } catch {}
+        });
+      });
+
+      /* ---------- Orillas difuminadas ----------
+         Sustituyen a la barra de desplazamiento: el menú se desvanece del
+         lado donde todavía queda algo por ver. */
+      const nav = $("[data-nav]");
+      const revisarOrillas = () => {
+        const sobra = nav.scrollHeight - nav.clientHeight;
+        nav.classList.toggle("hay-arriba", nav.scrollTop > 4);
+        nav.classList.toggle("hay-abajo", sobra > 4 && nav.scrollTop < sobra - 4);
+      };
+      nav.addEventListener("scroll", revisarOrillas, { passive: true });
+      new ResizeObserver(revisarOrillas).observe(nav);
+      new MutationObserver(revisarOrillas).observe(nav, { subtree: true, attributes: true, attributeFilter: ["class", "hidden"] });
+      revisarOrillas();
+      // si la sección activa quedó fuera de la vista, se trae
+      const activa = nav.querySelector('[aria-current="page"]');
+      if (activa) requestAnimationFrame(() => activa.scrollIntoView({ block: "nearest" }));
+
+      /* ---------- El cajón (tableta y teléfono) ---------- */
+      const abreCajon = $("[data-abre-cajon]");
+      const abrirCajon = () => {
+        html.dataset.cajon = "abierto";
+        abreCajon.setAttribute("aria-expanded", "true");
+        $(".bl a, .bl button")?.focus({ preventScroll: true });
+      };
+      const cerrarCajon = () => {
+        if (html.dataset.cajon !== "abierto") return;
+        delete html.dataset.cajon;
+        abreCajon.setAttribute("aria-expanded", "false");
+      };
+      abreCajon.addEventListener("click", abrirCajon);
+      $("[data-cierra-cajon]").addEventListener("click", cerrarCajon);
+      nav.querySelectorAll("a").forEach((a) => a.addEventListener("click", cerrarCajon));
+      matchMedia(ESCRITORIO).addEventListener("change", cerrarCajon);
+      addEventListener("keydown", (e) => {
+        if (e.key !== "Escape") return;
+        cerrarCuenta();
+        cerrarCajon();
+      });
+
+      activarGlobos(document);
+
+      /* ---------- Desplegables de las pantallas (menús de fila) ---------- */
       document.querySelectorAll("[data-desplegable]").forEach((d) => {
         const b = d.querySelector("[data-desplegable-boton]");
+        if (!b || d.dataset.listo) return;
+        d.dataset.listo = "1";
         const alternar = (abrir) => {
           d.classList.toggle("abierto", abrir);
           b.setAttribute("aria-expanded", String(abrir));
@@ -206,34 +349,26 @@ const grupos = [
         addEventListener("keydown", (e) => e.key === "Escape" && alternar(false));
       });
 
-      /* ---------- Barra lateral ---------- */
-      document.querySelector("[data-plegar]")?.addEventListener("click", () => {
-        const plegada = html.dataset.sb !== "plegada";
-        if (plegada) html.dataset.sb = "plegada";
-        else delete html.dataset.sb;
-        try { localStorage.setItem("neucast-admin:sb", plegada ? "plegada" : "abierta"); } catch {}
-      });
-      const abrirSb = (abrir) => {
-        if (abrir) html.dataset.sbMovil = "abierta";
-        else delete html.dataset.sbMovil;
-      };
-      document.querySelector("[data-abre-sb]")?.addEventListener("click", () => abrirSb(true));
-      document.querySelector("[data-cierra-sb]")?.addEventListener("click", () => abrirSb(false));
-      addEventListener("keydown", (e) => e.key === "Escape" && abrirSb(false));
-
       /* ---------- La línea de la barra superior aparece con el scroll ---------- */
-      const barra = document.querySelector("[data-barra]");
+      const barra = $("[data-barra]");
       const marcarScroll = () => barra.classList.toggle("con-scroll", scrollY > 8);
       addEventListener("scroll", marcarScroll, { passive: true });
       marcarScroll();
 
-      /* ---------- Conteos de la barra lateral ---------- */
-      for (const el of document.querySelectorAll("[data-cuenta]")) {
-        listar(el.dataset.cuenta).then((lista) => {
-          el.textContent = lista.length;
-          el.hidden = false;
-        }).catch(() => {});
+      /* ---------- Pendientes en la barra ----------
+         Solo cuenta lo que pide una acción: los borradores por terminar. */
+      async function pintarPuntos() {
+        try {
+          const piezas = await listar("piezas");
+          const n = piezas.filter((p) => p.estado !== "publicada").length;
+          document.querySelectorAll('[data-punto="borradores"]').forEach((el) => {
+            el.textContent = n;
+            el.hidden = !n;
+          });
+        } catch {}
       }
+      pintarPuntos();
+      addEventListener("neucast:guardado", pintarPuntos);
 
       /* ---------- Estado de publicación ---------- */
       cablearModales();

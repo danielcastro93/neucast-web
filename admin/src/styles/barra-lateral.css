@@ -1,0 +1,289 @@
+/* ============================================
+   La barra lateral del administrador
+   Una sola pieza en las tres resoluciones, como la de Capital Trip:
+
+   · escritorio  barra fija, ancha o angosta a elección de quien la usa (la
+                 bolita del borde), y se recuerda
+   · tableta y   la misma barra convertida en cajón que entra por la
+     teléfono    izquierda, con el fondo difuminado
+
+   Escritorio no es tener ancho, es tener ratón: un iPad Pro en horizontal
+   mide 1366px, lo mismo que una laptop, y con la barra fija no le cabe el
+   contenido. `pointer: fine` distingue el cursor del dedo.
+   ============================================ */
+
+:root{
+  --bl-ancha:256px;
+  --bl-angosta:72px;
+  --bl-fondo:var(--ink);
+  --bl-txt:rgba(255,255,255,.94);
+  --bl-txt-2:rgba(255,255,255,.66);
+  --bl-txt-3:rgba(255,255,255,.42);
+  --bl-linea:rgba(255,255,255,.1);
+  --bl-hover:rgba(255,255,255,.07);
+  --bl-activa:rgba(255,255,255,.11);
+  --bl-foco:var(--sage);
+  --bl-acento:var(--olive-deep);
+}
+
+/* ---------- La barra (cajón por defecto) ---------- */
+.bl-fondo{
+  position:fixed;inset:0;z-index:60;
+  background:rgba(20,19,17,.45);
+  -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+  opacity:0;visibility:hidden;
+  transition:opacity .26s var(--ease),visibility 0s linear .26s;
+}
+html[data-cajon="abierto"] .bl-fondo{opacity:1;visibility:visible;transition-delay:0s;}
+
+.bl{
+  position:fixed;left:0;top:0;bottom:0;z-index:61;
+  display:flex;flex-direction:column;
+  width:min(300px,84vw);
+  padding:16px 12px;
+  background:var(--bl-fondo);color:var(--bl-txt);
+  overflow:hidden;
+  translate:-102% 0;
+  transition:translate .3s var(--ease);
+}
+html[data-cajon="abierto"] .bl{translate:0 0;}
+@media (prefers-reduced-motion:reduce){.bl,.bl-fondo{transition:none;}}
+
+/* ---------- Marca ---------- */
+.bl-marca{
+  display:flex;align-items:center;gap:12px;
+  flex:none;min-height:48px;padding:8px;margin-bottom:16px;border-radius:12px;
+  color:inherit;
+  transition:background-color .16s var(--ease);
+}
+@media (hover:hover){.bl-marca:hover{background:rgba(255,255,255,.06);}}
+.bl-marca:focus-visible{outline:2px solid var(--bl-foco);outline-offset:2px;}
+.bl-simbolo{
+  flex:none;width:36px;height:36px;border-radius:10px;
+  display:grid;place-items:center;
+  background:rgba(255,255,255,.08);
+}
+.bl-simbolo svg{width:26px;height:auto;display:block;}
+.bl-marca-txt{display:grid;min-width:0;}
+.bl-marca-txt strong{
+  font-size:15px;font-weight:700;letter-spacing:-.01em;color:#fff;line-height:1.25;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.bl-marca-txt small{
+  font-size:11.5px;color:var(--bl-txt-3);line-height:1.35;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+
+/* ---------- Navegación ----------
+   Solo la navegación se desplaza: la marca y la cuenta se quedan fijas.
+   Sin barra de desplazamiento: aun transparente, reservaba ancho y dejaba
+   una zanja al costado. En su lugar, el propio contenido se difumina en la
+   orilla donde todavía queda algo por ver. */
+.bl-nav{
+  flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;
+  margin-inline:-4px;padding-inline:4px;
+  scrollbar-width:none;-ms-overflow-style:none;
+}
+.bl-nav::-webkit-scrollbar{width:0;height:0;display:none;}
+.bl-nav.hay-abajo{
+  -webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 32px),transparent);
+  mask-image:linear-gradient(to bottom,#000 calc(100% - 32px),transparent);
+}
+.bl-nav.hay-arriba{
+  -webkit-mask-image:linear-gradient(to bottom,transparent,#000 32px);
+  mask-image:linear-gradient(to bottom,transparent,#000 32px);
+}
+.bl-nav.hay-arriba.hay-abajo{
+  -webkit-mask-image:linear-gradient(to bottom,transparent,#000 32px,#000 calc(100% - 32px),transparent);
+  mask-image:linear-gradient(to bottom,transparent,#000 32px,#000 calc(100% - 32px),transparent);
+}
+
+.bl-grupo + .bl-grupo{margin-top:16px;}
+
+.bl-grupo-h{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  width:100%;margin:0 0 4px;padding:8px 12px;border-radius:8px;
+  font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--bl-txt-3);
+  transition:color .16s var(--ease),background-color .16s var(--ease);
+}
+@media (hover:hover){.bl-grupo-h:hover{color:var(--bl-txt-2);background:rgba(255,255,255,.05);}}
+.bl-grupo-h:focus-visible{outline:2px solid var(--bl-foco);outline-offset:-2px;}
+.bl-grupo-h svg{width:16px;height:16px;flex:none;opacity:.7;transition:rotate .2s var(--ease);}
+.bl-grupo-h[aria-expanded="false"] svg{rotate:-90deg;}
+.bl-items.plegado{display:none;}
+@media (prefers-reduced-motion:reduce){.bl-grupo-h svg{transition:none;}}
+
+.bl-nav a{
+  position:relative;
+  display:flex;align-items:center;gap:12px;
+  padding:10px 12px;margin-bottom:4px;border-radius:10px;
+  color:var(--bl-txt-2);font-size:var(--fs-sm);font-weight:500;
+  white-space:nowrap;
+  transition:background-color .16s var(--ease),color .16s var(--ease);
+}
+.bl-nav a svg{width:20px;height:20px;flex:none;}
+@media (hover:hover){.bl-nav a:hover{background:var(--bl-hover);color:var(--bl-txt);}}
+.bl-nav a[aria-current="page"]{background:var(--bl-activa);color:#fff;font-weight:600;}
+.bl-nav a:focus-visible{outline:2px solid var(--bl-foco);outline-offset:-2px;}
+
+/* Contador de pendientes: solo lo que pide una acción */
+.bl-punto{
+  display:inline-block;flex:none;
+  min-width:18px;height:18px;padding:0 5px;margin-left:auto;
+  border-radius:999px;background:var(--olive);
+  color:#fff;font-size:11px;font-weight:700;line-height:18px;text-align:center;
+  font-variant-numeric:tabular-nums;
+}
+
+/* ---------- La cuenta ---------- */
+.bl-pie{
+  position:relative;flex:none;
+  margin-top:12px;padding-top:12px;border-top:1px solid var(--bl-linea);
+}
+.bl-usuario{
+  display:flex;align-items:center;gap:12px;width:100%;
+  padding:8px;border-radius:10px;text-align:left;color:var(--bl-txt);
+  transition:background-color .16s var(--ease);
+}
+@media (hover:hover){.bl-usuario:hover{background:var(--bl-hover);}}
+.bl-usuario:focus-visible{outline:2px solid var(--bl-foco);outline-offset:-2px;}
+.bl-usuario[aria-expanded="true"]{background:var(--bl-hover);}
+.avatar{
+  width:34px;height:34px;border-radius:50%;flex:none;
+  display:grid;place-items:center;
+  background:rgba(161,179,157,.2);color:var(--sage);
+  font-size:13px;font-weight:700;letter-spacing:.02em;
+}
+.bl-usuario-txt{display:grid;min-width:0;}
+.bl-usuario-txt strong{font-size:var(--fs-sm);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bl-usuario-txt small{font-size:11.5px;color:var(--bl-txt-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* La ventana de la cuenta: un menú anclado, no un modal a pantalla completa */
+.bl-cuenta{
+  position:absolute;left:0;right:0;bottom:calc(100% + 8px);z-index:5;
+  background:var(--white);color:var(--ink);
+  border:1px solid var(--borde);border-radius:14px;
+  box-shadow:0 12px 32px rgba(20,19,17,.28);
+  overflow:hidden;
+  opacity:0;translate:0 8px;pointer-events:none;
+  transition:opacity .16s var(--ease),translate .16s var(--ease);
+}
+.bl-cuenta.visible{opacity:1;translate:0 0;pointer-events:auto;}
+@media (prefers-reduced-motion:reduce){.bl-cuenta{transition:none;}}
+.bl-cuenta-cabeza{
+  display:flex;align-items:center;gap:12px;
+  padding:16px;border-bottom:1px solid var(--borde);
+}
+.bl-cuenta-quien{display:grid;gap:2px;min-width:0;flex:1;}
+.bl-cuenta-quien strong{font-size:var(--fs-sm);font-weight:700;}
+.bl-cuenta-quien small{font-size:var(--fs-xs);color:var(--ink-60);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+/* salir se marca en rojo al acercarse: es la única acción que termina la sesión */
+.bl-salir{
+  flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:9px;
+  color:var(--ink-60);transition:background-color .15s var(--ease),color .15s var(--ease);
+}
+.bl-salir svg{width:19px;height:19px;}
+@media (hover:hover){.bl-salir:hover{background:var(--peligro-suave);color:var(--peligro);}}
+.bl-salir:focus-visible{outline:2px solid var(--olive);outline-offset:1px;}
+.bl-cuenta-menu{display:grid;gap:2px;padding:8px;}
+.bl-cuenta-menu a,.bl-cuenta-menu button{
+  display:flex;align-items:center;gap:12px;width:100%;
+  min-height:44px;padding:0 12px;border-radius:10px;text-align:left;
+  color:var(--ink);font-size:var(--fs-sm);font-weight:500;
+  transition:background-color .14s var(--ease);
+}
+@media (hover:hover){.bl-cuenta-menu a:hover,.bl-cuenta-menu button:hover{background:var(--paper-soft);}}
+.bl-cuenta-menu a:focus-visible,.bl-cuenta-menu button:focus-visible{outline:2px solid var(--olive);outline-offset:-2px;}
+.bl-cuenta-menu svg{width:19px;height:19px;flex:none;color:var(--ink-60);}
+
+/* ---------- La bolita ----------
+   Vive en el borde, entre la barra oscura y el contenido claro: es el único
+   lugar donde el control pertenece a las dos cosas que separa. */
+.bl-colapsar{display:none;}
+
+/* ---------- El globo ----------
+   Uno solo, flotante en <body>. No puede ser un pseudo-elemento: la barra
+   necesita overflow para desplazarse y lo recortaría justo con la barra
+   angosta. Lo coloca mostrarGlobo() en scripts/ui.js. */
+.globo{
+  position:fixed;z-index:90;pointer-events:none;
+  max-width:240px;padding:8px 12px;border-radius:10px;
+  background:rgba(29,29,27,.96);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  color:#fff;font-size:var(--fs-sm);font-weight:500;line-height:1.35;white-space:nowrap;
+  opacity:0;scale:.96;
+  transition:opacity .14s var(--ease),scale .14s var(--ease);
+}
+.globo.visible{opacity:1;scale:1;}
+/* la puntita que lo ata al control que describe */
+.globo::after{content:"";position:absolute;border:6px solid transparent;}
+.globo[data-lado="derecha"]::after{left:-11px;top:50%;translate:0 -50%;border-right-color:rgba(29,29,27,.96);}
+.globo[data-lado="arriba"]::after{bottom:-11px;left:50%;translate:-50% 0;border-top-color:rgba(29,29,27,.96);}
+@media (prefers-reduced-motion:reduce){.globo{transition:none;}}
+
+/* ---------- La barra superior en tableta y teléfono ----------
+   Lo único que queda arriba: abrir el cajón y la marca. Sin el nombre de la
+   sección, que lo dice el título dos centímetros más abajo. */
+.barra-menu{display:grid;place-items:center;}
+.barra-migas{display:none;}
+.barra-linea{flex:none;width:1px;height:24px;background:var(--borde);}
+.barra-marca{display:flex;align-items:center;padding:4px 8px;border-radius:10px;transition:background-color .16s var(--ease);}
+.barra-marca svg{height:22px;width:auto;}
+@media (hover:hover){.barra-marca:hover{background:rgba(29,29,27,.05);}}
+
+/* ============================================
+   SOLO ESCRITORIO
+   ============================================ */
+@media (min-width:72em) and (hover:hover) and (pointer:fine){
+  .bl-fondo{display:none;}
+  .barra-menu,.barra-linea,.barra-marca{display:none !important;}
+  .barra-migas{display:flex;}
+
+  /* Cambia la DECLARACIÓN, no una variable: con `width: var(...)` y una
+     transición encima, el ancho se quedaba en 256 mientras la variable ya
+     decía 72. Y sin transición de ancho: cambia limpio y al instante. */
+  .app{padding-left:var(--bl-ancha);}
+  html[data-sb="plegada"] .app{padding-left:var(--bl-angosta);}
+
+  .bl{
+    width:var(--bl-ancha);
+    translate:0 0;transition:none;
+    overflow:visible; /* para que la bolita salga del borde */
+  }
+  html[data-sb="plegada"] .bl{width:var(--bl-angosta);}
+
+  .bl-colapsar{
+    position:absolute;right:-22px;bottom:96px;z-index:6;
+    display:grid;place-items:center;
+    width:44px;height:44px;padding:0;color:#fff;
+  }
+  /* lo que se ve es el círculo de 26; lo que se toca son los 44 del botón */
+  .bl-colapsar::after{
+    content:"";position:absolute;width:26px;height:26px;border-radius:50%;
+    background:var(--bl-acento);
+    box-shadow:0 2px 8px rgba(20,19,17,.35);
+    transition:background-color .16s var(--ease),scale .16s var(--ease);
+  }
+  .bl-colapsar:hover::after{background:var(--olive);scale:1.1;}
+  .bl-colapsar:focus-visible{outline:0;}
+  .bl-colapsar:focus-visible::after{outline:2px solid var(--white);outline-offset:2px;}
+  .bl-colapsar svg{position:relative;z-index:1;width:15px;height:15px;transition:rotate .24s var(--ease);}
+  @media (prefers-reduced-motion:reduce){.bl-colapsar::after,.bl-colapsar svg{transition:none;}}
+
+  /* ----- angosta ----- todo centrado; el nombre lo dice el globo */
+  html[data-sb="plegada"] .bl-marca{justify-content:center;padding-inline:0;}
+  html[data-sb="plegada"] .bl-marca-txt,
+  html[data-sb="plegada"] .bl-usuario-txt,
+  html[data-sb="plegada"] .bl-nav a .et,
+  html[data-sb="plegada"] .bl-grupo-h{display:none;}
+  html[data-sb="plegada"] .bl-nav a{justify-content:center;padding:12px 0;}
+  html[data-sb="plegada"] .bl-nav a .bl-punto{position:absolute;top:4px;right:10px;margin-left:0;}
+  /* los grupos ya no se anuncian con rótulo: se separan con una línea */
+  html[data-sb="plegada"] .bl-grupo + .bl-grupo{margin-top:12px;padding-top:12px;border-top:1px solid var(--bl-linea);}
+  html[data-sb="plegada"] .bl-items.plegado{display:block;}
+  html[data-sb="plegada"] .bl-usuario{justify-content:center;padding:8px 0;}
+  html[data-sb="plegada"] .bl-colapsar svg{rotate:180deg;}
+  /* con la barra angosta la ventana de la cuenta no cabe: sale al costado */
+  html[data-sb="plegada"] .bl-cuenta{left:calc(100% + 12px);right:auto;bottom:0;width:264px;}
+}
