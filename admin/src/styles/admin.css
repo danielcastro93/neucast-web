@@ -614,7 +614,8 @@ dialog.modal.modal--cerrando::backdrop{animation:veloSale .24s var(--ease-salida
   width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;
   color:var(--ink-40);transition:background .15s,color .15s;
 }
-.campo-clave .ojo svg{width:18px;height:18px;}
+.campo-clave .ojo span{display:flex;line-height:0;}
+.campo-clave .ojo svg{width:18px;height:18px;display:block;}
 @media (hover:hover){.campo-clave .ojo:hover{background:var(--paper-soft);color:var(--ink);}}
 .aviso-en-linea{
   display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:10px;
