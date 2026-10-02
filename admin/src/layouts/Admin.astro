@@ -72,6 +72,7 @@ const simbolo = "M625.9,655.2c-3.1,3.1-6.5,5.5-10.2,7.4-3.8,1.9-7.8,2.8-12.3,2.8
     <script is:inline>
       try {
         if (localStorage.getItem("neucast-admin:sb") === "plegada") document.documentElement.dataset.sb = "plegada";
+        if (localStorage.getItem("neucast-admin:bl") === "oscura") document.documentElement.dataset.bl = "oscura";
         // Sin sesión no se pinta nada: a entrar, y de regreso a esta pantalla.
         if (!sessionStorage.getItem("neucast-admin:sesion")) {
           location.replace("/?a=" + encodeURIComponent(location.pathname + location.search));
@@ -140,6 +141,7 @@ const simbolo = "M625.9,655.2c-3.1,3.1-6.5,5.5-10.2,7.4-3.8,1.9-7.8,2.8-12.3,2.8
             <div class="bl-cuenta-menu">
               <a role="menuitem" href={`${base}ajustes/`}><IconoAdmin name="ajustes" size={19} /><span>Ajustes</span></a>
               <button role="menuitem" type="button" data-ver-stg><IconoAdmin name="externo" size={19} /><span>Ver el sitio de pruebas</span></button>
+              <button role="menuitem" type="button" data-tema-barra><IconoAdmin name="tema" size={19} /><span data-tema-barra-texto>Barra oscura</span></button>
               <button role="menuitem" type="button" data-restablecer hidden><IconoAdmin name="refrescar" size={19} /><span>Restablecer la simulación</span></button>
             </div>
           </div>
@@ -269,6 +271,20 @@ const simbolo = "M625.9,655.2c-3.1,3.1-6.5,5.5-10.2,7.4-3.8,1.9-7.8,2.8-12.3,2.8
       $("[data-ver-stg]").addEventListener("click", () => {
         cerrarCuenta();
         window.open(import.meta.env.PUBLIC_STG || "http://localhost:4321/", "_blank", "noopener");
+      });
+
+      /* ---------- Tema de la barra: clara u oscura ---------- */
+      const temaBtn = $("[data-tema-barra]");
+      const rotularTema = () => {
+        $("[data-tema-barra-texto]").textContent = html.dataset.bl === "oscura" ? "Barra clara" : "Barra oscura";
+      };
+      rotularTema();
+      temaBtn.addEventListener("click", () => {
+        const oscura = html.dataset.bl !== "oscura";
+        if (oscura) html.dataset.bl = "oscura";
+        else delete html.dataset.bl;
+        try { localStorage.setItem("neucast-admin:bl", oscura ? "oscura" : "clara"); } catch {}
+        rotularTema();
       });
 
       /* ---------- Ancha o angosta ----------
