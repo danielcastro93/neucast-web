@@ -22,11 +22,11 @@ const { lineas = [], arriba = "var(--section-y)" } = Astro.props;
 <style>
   .dst{margin-top:var(--dst-arriba);text-align:center;--play:paused;}
   /* Más chica que el H1 de la página (52 px en escritorio) para no competir
-     con él: tope de 34 px, y 20 en teléfono. Admite frases largas: cada línea se reparte
+     con él: tope de 34 px, y 24 en teléfono. Admite frases largas: cada línea se reparte
      pareja en sus renglones. */
   .dst p{
     max-width:920px;margin-inline:auto;
-    font-size:clamp(20px,2.4vw,34px);line-height:1.3;
+    font-size:clamp(24px,2.4vw,34px);line-height:1.3;
     letter-spacing:-.015em;text-wrap:balance;
   }
   .dst span{display:block;margin-inline:auto;}
