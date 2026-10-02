@@ -71,7 +71,7 @@
   display:flex;align-items:flex-start;gap:14px;
   padding:30px 32px 0;
 }
-.seccion-cabeza .t-mini{margin-top:4px;line-height:1.45;max-width:62ch;}
+.seccion-cabeza .t-mini{margin-top:4px;line-height:1.45;}
 .seccion-n{
   flex:none;width:28px;height:28px;border-radius:50%;margin-top:-2px;
   display:grid;place-items:center;
@@ -80,10 +80,14 @@
 .seccion-cuerpo{display:flex;flex-direction:column;gap:30px;padding:28px 32px 32px;}
 
 .fila{display:grid;gap:24px;grid-template-columns:repeat(2,minmax(0,1fr));}
-.fila--arriba{align-items:start;}
 .separador{height:1px;background:var(--borde);margin-block:2px;}
 
 .campo-ayuda--arriba{margin-top:-2px;}
+/* la nota de una etiqueta va pegada a ella, no suelta en la otra orilla */
+.campo-etiqueta{justify-content:flex-start;}
+.campo-etiqueta > .campo-contador,.campo-etiqueta > .enlace-chico{margin-left:auto;}
+.etiqueta-nota{font-size:var(--t-subtitulo);font-weight:400;color:var(--etiqueta-3);}
+.etiqueta-nota::before{content:"·";margin-right:6px;}
 .campo-ayuda--alerta{color:var(--alerta);}
 .campo[data-error] .chips .chip{border-color:rgba(168,58,58,.5);}
 
@@ -139,41 +143,87 @@
 .filtros-categoria{display:grid;gap:24px;grid-template-columns:repeat(2,minmax(0,1fr));}
 .filtros-categoria .campo:has(input[name="extras"]){grid-column:1 / -1;}
 
-/* ---------- Acabados ---------- */
-.acabados{display:flex;flex-direction:column;gap:10px;}
-.acabado{display:grid;grid-template-columns:40px minmax(0,1.4fr) minmax(0,1fr) 40px;gap:10px;align-items:center;}
-.acabado-muestra{
-  width:40px;height:40px;border-radius:10px;
-  box-shadow:inset 0 0 0 1px rgba(0,0,0,.1);
-  transition:background .2s var(--ease);
+/* ---------- Acabados ----------
+   Cada acabado es una tarjetita: su nombre comercial arriba y, debajo, el
+   grupo de color se elige tocando el círculo. */
+.acabados{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px;}
+.acabado{
+  display:flex;flex-direction:column;gap:12px;padding:8px 12px 14px 4px;
+  border-radius:var(--r-3);background:var(--white);box-shadow:0 0 0 1px var(--borde);
+  transition:box-shadow .2s var(--ease);
 }
-.acabado-muestra--vacia{
-  background:repeating-linear-gradient(45deg,var(--paper) 0 6px,var(--white) 6px 12px);
+.acabado:focus-within{box-shadow:0 0 0 1.5px var(--olive),var(--anillo);}
+.acabado-cabeza{display:flex;align-items:center;gap:4px;}
+.acabado-cabeza .fila-lista-control{height:44px;padding-left:12px;font-weight:600;}
+.acabado-grupos{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding-left:12px;}
+.color{position:relative;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;cursor:pointer;}
+.color input{position:absolute;opacity:0;pointer-events:none;}
+.color-muestra{
+  width:22px;height:22px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12);
+  transition:transform .35s var(--resorte);
 }
+.color:has(input:checked){box-shadow:0 0 0 2px var(--white),0 0 0 3.5px var(--ink);}
+.color:has(input:checked) .color-muestra{transform:scale(1.08);}
+@media (hover:hover){.color:hover .color-muestra{transform:scale(1.15);}}
+.color:has(input:focus-visible){outline:2px solid var(--olive);outline-offset:4px;}
+.acabado-grupo-nombre{margin-left:4px;font-size:var(--t-subtitulo);font-weight:600;color:var(--etiqueta-2);}
+.campo[data-error] .acabado{box-shadow:0 0 0 1.5px rgba(179,58,58,.45);}
 .boton--agregar{align-self:flex-start;}
 
-/* ---------- Frases ---------- */
-.frases{display:flex;flex-direction:column;gap:10px;}
-.frase{display:flex;gap:10px;align-items:center;}
-.frase .control{flex:1;}
-.frase-n{
-  width:26px;height:26px;flex:none;border-radius:50%;
-  display:grid;place-items:center;
-  background:var(--paper-soft);font-size:12px;font-weight:600;color:var(--ink-40);font-variant-numeric:tabular-nums;
+/* ---------- Lista agrupada ----------
+   El patrón de la app de Ajustes: renglones de 52 con la etiqueta a la
+   izquierda, el dato a la derecha y una línea finísima entre renglones,
+   todo en una tarjeta blanca. Lo usan medidas, construcción, destacados,
+   mecanismo y cuidados. */
+.grupo-lista{
+  border-radius:var(--r-3);background:var(--white);overflow:hidden;
+  box-shadow:0 0 0 1px var(--borde);
 }
+.fila-lista{
+  position:relative;display:flex;align-items:center;gap:14px;
+  min-height:52px;padding:0 16px;background:var(--white);cursor:text;
+  transition:background .15s var(--ease);
+}
+.grupo-lista > .fila-lista + .fila-lista,
+.frases-en-lista > .fila-lista + .fila-lista,
+.grupo-lista[data-frases] > .fila-lista + .fila-lista{box-shadow:inset 0 1px 0 var(--borde);}
+.fila-lista:focus-within{background:#FAFAF8;}
+.fila-lista:focus-within::after{content:"";position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:0 3px 3px 0;background:var(--olive);}
+.fila-lista-etiqueta{flex:1;min-width:0;font-size:var(--t-cuerpo);color:var(--etiqueta);line-height:1.3;}
+.fila-lista-etiqueta--fija{flex:none;width:120px;color:var(--etiqueta-2);}
+.fila-lista-control{
+  flex:none;width:120px;height:50px;padding:0;border:0;background:transparent;
+  font:inherit;font-size:var(--t-cuerpo);color:var(--etiqueta);text-align:right;
+  font-variant-numeric:tabular-nums;
+}
+.fila-lista-control--izq{flex:1;width:auto;min-width:0;text-align:left;}
+.fila-lista-control::placeholder{color:var(--etiqueta-4);}
+.fila-lista-control:focus{outline:0;}
+.fila-lista-n{
+  flex:none;width:22px;height:22px;border-radius:50%;
+  display:grid;place-items:center;background:var(--relleno);
+  font-size:11.5px;font-weight:700;color:var(--etiqueta-3);font-variant-numeric:tabular-nums;
+}
+.fila-lista-quitar{
+  flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
+  color:var(--etiqueta-3);opacity:0;transition:opacity .15s,background .15s,color .15s;
+}
+.fila-lista:hover .fila-lista-quitar,.fila-lista:focus-within .fila-lista-quitar,.acabado .fila-lista-quitar{opacity:1;}
+@media (hover:none){.fila-lista-quitar{opacity:1;}}
+@media (hover:hover){.fila-lista-quitar:hover{background:var(--peligro-suave);color:var(--peligro);}}
+.grupo-lista-sub{
+  padding:14px 16px 8px;box-shadow:inset 0 1px 0 var(--borde);
+  font-size:var(--t-nota);font-weight:600;color:var(--etiqueta-3);background:var(--white);
+}
+.frases-en-lista > .fila-lista:first-child{box-shadow:none;}
+/* en dos columnas: la línea entre renglones la pone el hueco de 1px */
+.grupo-lista--dos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--borde);}
+.grupo-lista--dos > .fila-lista{box-shadow:none !important;}
+.grupo-lista--dos > .fila-lista:last-child:nth-child(odd){grid-column:1 / -1;}
 
-/* ---------- Medidas y construcción ---------- */
-.grupo-medidas + .grupo-medidas{margin-top:20px;}
-.grupo-rotulo{display:block;margin-bottom:10px;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-40);}
-.pares{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px 28px;}
-.pares--anchos{grid-template-columns:repeat(auto-fill,minmax(300px,1fr));}
-.par{
-  display:grid;grid-template-columns:minmax(0,1fr) 116px;align-items:center;gap:12px;
-  padding:4px 0;
-}
-.par--ancho{grid-template-columns:96px minmax(0,1fr);}
-.par-etiqueta{font-size:13px;color:var(--ink-60);line-height:1.3;}
-.par .control{height:42px;padding:0 14px;font-size:14px;border-radius:12px;}
+/* ---------- Medidas: grupos con su rótulo ---------- */
+.grupo-medidas + .grupo-medidas{margin-top:22px;}
+.grupo-rotulo{display:block;margin:0 0 8px 4px;font-size:var(--t-nota);font-weight:600;color:var(--etiqueta-3);}
 
 /* ---------- Galería ----------
    La principal ocupa dos por dos; las demás son miniaturas cuadradas que
@@ -347,11 +397,15 @@ body:has(.guardar) .avisos{bottom:96px;}
   .seccion-cabeza{padding:20px 18px 16px;gap:12px;}
   .seccion-cuerpo{padding:22px 18px;gap:24px;}
   .fila,.filtros-categoria,.opciones-estado{grid-template-columns:1fr;gap:22px;}
-  .acabado{grid-template-columns:40px minmax(0,1fr) 40px;grid-template-areas:"m n x" ". g g";row-gap:8px;}
-  .acabado-muestra{grid-area:m;}
-  .acabado [data-acabado-nombre]{grid-area:n;}
-  .acabado [data-acabado-grupo]{grid-area:g;}
-  .acabado [data-quitar-acabado]{grid-area:x;}
+  .acabados{grid-template-columns:1fr;}
+  .acabado-grupos{gap:6px;}
+  .color{width:28px;height:28px;}
+  .color-muestra{width:20px;height:20px;}
+  .acabado-grupo-nombre{flex-basis:100%;margin:2px 0 0 2px;}
+  .grupo-lista--dos{grid-template-columns:1fr;}
+  .grupo-lista--dos > .fila-lista:last-child:nth-child(odd){grid-column:auto;}
+  .fila-lista-etiqueta--fija{width:96px;}
+  .fila-lista-control{width:104px;}
   .boton--agregar{align-self:stretch;height:46px;}
   .galeria{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
   .foto--principal,.foto-agregar--primera{grid-column:span 3;grid-row:auto;aspect-ratio:4/3;}
@@ -363,9 +417,6 @@ body:has(.guardar) .avisos{bottom:96px;}
   .pasos-lista a.activo{padding-right:14px;}
   .pasos-lista li + li::before{width:10px;}
   .pasos-avance-barra{display:none;}
-  .pares,.pares--anchos{grid-template-columns:1fr;gap:8px;}
-  .par{grid-template-columns:minmax(0,1fr) 140px;}
-  .par--ancho{grid-template-columns:1fr;gap:6px;}
   .combina{grid-template-columns:1fr;}
   /* la barra: la nota arriba y dos acciones a todo el ancho */
   .guardar{flex-wrap:wrap;gap:10px;padding:12px 16px max(12px, env(safe-area-inset-bottom));}

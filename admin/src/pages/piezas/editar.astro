@@ -187,40 +187,44 @@ const secciones = [
             </div>
 
             <div class="campo">
-              <div class="campo-etiqueta"><span class="etiqueta">Destacados</span><span class="t-mini">hasta 3 frases cortas</span></div>
-              <div class="frases" data-frases="destacados"></div>
+              <div class="campo-etiqueta"><span class="etiqueta">Destacados</span><span class="etiqueta-nota">hasta 3 frases cortas</span></div>
+              <div class="grupo-lista" data-frases="destacados"></div>
               <p class="campo-ayuda">Se leen en el panel "Detalles del producto". El primero entra en la descripción que sale en Google.</p>
             </div>
 
             <div class="separador"></div>
 
             <div class="campo">
-              <div class="campo-etiqueta"><span class="etiqueta">Medidas</span><span class="t-mini">con su unidad</span></div>
+              <div class="campo-etiqueta"><span class="etiqueta">Medidas</span><span class="etiqueta-nota">con su unidad</span></div>
               <div data-medidas></div>
               <button class="enlace-chico enlace-chico--mas" type="button" data-mas-medidas hidden></button>
             </div>
 
             <div class="campo">
-              <div class="campo-etiqueta"><span class="etiqueta">Construcción</span><span class="t-mini">de qué está hecha cada parte</span></div>
-              <div class="pares pares--anchos" data-partes></div>
+              <div class="campo-etiqueta"><span class="etiqueta">Construcción</span><span class="etiqueta-nota">de qué está hecha cada parte</span></div>
+              <div class="grupo-lista grupo-lista--dos" data-partes></div>
               <button class="enlace-chico enlace-chico--mas" type="button" data-mas-construccion hidden></button>
               <p class="campo-ayuda">Las dos primeras con dato arman el recuadro "Materiales" bajo la foto de ambiente.</p>
             </div>
 
             <div class="separador"></div>
 
-            <div class="fila fila--arriba">
-              <div class="campo" data-bloque-mecanismo>
-                <div class="campo-etiqueta"><label for="mecanismo">Mecanismo</label><span class="t-mini">solo sillas</span></div>
-                <input class="control" id="mecanismo" name="mecanismo" type="text" placeholder="Ej. Synchro multiposiciones" />
-                <div class="frases" data-frases="ajustes"></div>
-                <p class="campo-ayuda">El nombre del mecanismo y, debajo, cada ajuste que permite.</p>
+            <div class="campo" data-bloque-mecanismo>
+              <div class="campo-etiqueta"><span class="etiqueta">Mecanismo</span><span class="etiqueta-nota">solo sillas</span></div>
+              <div class="grupo-lista">
+                <label class="fila-lista">
+                  <span class="fila-lista-etiqueta fila-lista-etiqueta--fija">Nombre</span>
+                  <input class="fila-lista-control fila-lista-control--izq" id="mecanismo" name="mecanismo" type="text" placeholder="Ej. Synchro multiposiciones" />
+                </label>
+                <div class="grupo-lista-sub">Ajustes que permite</div>
+                <div class="frases-en-lista" data-frases="ajustes"></div>
               </div>
-              <div class="campo">
-                <div class="campo-etiqueta"><span class="etiqueta">Cuidados</span></div>
-                <div class="frases" data-frases="cuidados"></div>
-                <p class="campo-ayuda">Cómo se limpia y se mantiene. Los dos primeros arman el recuadro "Cuidados".</p>
-              </div>
+            </div>
+
+            <div class="campo">
+              <div class="campo-etiqueta"><span class="etiqueta">Cuidados</span></div>
+              <div class="grupo-lista" data-frases="cuidados"></div>
+              <p class="campo-ayuda">Cómo se limpia y se mantiene. Los dos primeros arman el recuadro "Cuidados".</p>
             </div>
           </div>
         </section>
@@ -282,7 +286,7 @@ const secciones = [
             <div class="separador"></div>
 
             <div class="campo">
-              <div class="campo-etiqueta"><span class="etiqueta">Así sale en Google</span><span class="t-mini">se arma solo</span></div>
+              <div class="campo-etiqueta"><span class="etiqueta">Así sale en Google</span><span class="etiqueta-nota">se arma solo</span></div>
               <div class="google">
                 <span class="google-url" data-google-url>neucast.com.mx › muebles</span>
                 <span class="google-titulo" data-google-titulo>Tipo Nombre | Categoría | Neucast</span>
@@ -518,7 +522,7 @@ const secciones = [
           })
           .join("");
         return `<div class="campo" data-campo="${campo}">
-          <div class="campo-etiqueta"><span class="etiqueta">${etiquetas[campo] || f.nombre}${oblig ? '<span class="obligatorio">*</span>' : ""}</span>${multiple ? '<span class="t-mini">las que apliquen</span>' : !oblig ? `<button class="enlace-chico" type="button" data-quitar-radio="${campo}">Ninguno</button>` : ""}</div>
+          <div class="campo-etiqueta"><span class="etiqueta">${etiquetas[campo] || f.nombre}${oblig ? '<span class="obligatorio">*</span>' : ""}</span>${multiple ? '<span class="etiqueta-nota">las que apliquen</span>' : !oblig ? `<button class="enlace-chico" type="button" data-quitar-radio="${campo}">Ninguno</button>` : ""}</div>
           <div class="chips">${opciones}</div>
           <p class="campo-error" data-error></p>
         </div>`;
@@ -542,9 +546,9 @@ const secciones = [
       .map((g) => `
         <div class="grupo-medidas">
           <span class="grupo-rotulo">${escapar(g.nombre)}</span>
-          <div class="pares">${g.claves
+          <div class="grupo-lista grupo-lista--dos">${g.claves
             .filter((k) => listas.etiquetasMedida[k])
-            .map((k) => `<label class="par"><span class="par-etiqueta">${escapar(listas.etiquetasMedida[k])}</span><input class="control" data-medida="${k}" type="text" value="${escapar(actuales[k] || "")}" placeholder="Ej. ${escapar(EJEMPLO_MEDIDA[k] || "")}" /></label>`)
+            .map((k) => `<label class="fila-lista"><span class="fila-lista-etiqueta">${escapar(listas.etiquetasMedida[k])}</span><input class="fila-lista-control" data-medida="${k}" type="text" value="${escapar(actuales[k] || "")}" placeholder="${escapar(EJEMPLO_MEDIDA[k] || "")}" inputmode="text" /></label>`)
             .join("")}</div>
         </div>`)
       .join("");
@@ -561,7 +565,7 @@ const secciones = [
     const propias = CONSTRUCCION_POR_CATEGORIA[form.cat.value] || todasLas;
     const claves = todasLas.filter((k) => verTodaConstruccion || propias.includes(k) || actuales[k]);
     caja.innerHTML = claves
-      .map((k) => `<label class="par par--ancho"><span class="par-etiqueta">${escapar(listas.etiquetasConstruccion[k])}</span><input class="control" data-construccion="${k}" type="text" value="${escapar(actuales[k] || "")}" placeholder="Ej. ${escapar(EJEMPLO_CONSTRUCCION[k] || "")}" /></label>`)
+      .map((k) => `<label class="fila-lista"><span class="fila-lista-etiqueta fila-lista-etiqueta--fija">${escapar(listas.etiquetasConstruccion[k])}</span><input class="fila-lista-control fila-lista-control--izq" data-construccion="${k}" type="text" value="${escapar(actuales[k] || "")}" placeholder="Ej. ${escapar(EJEMPLO_CONSTRUCCION[k] || "")}" /></label>`)
       .join("");
     const ocultas = todasLas.length - claves.length;
     const mas = $("[data-mas-construccion]");
@@ -574,28 +578,27 @@ const secciones = [
     const caja = $("[data-acabados]");
     const filas = pieza.acabados.length ? pieza.acabados : [{ nombre: "", grupo: "" }];
     caja.innerHTML = filas
-      .map((a, i) => {
-        const hex = listas.gruposColor.find((g) => g.id === a.grupo)?.hex || "";
-        return `<div class="acabado" data-i="${i}">
-          <span class="acabado-muestra${hex ? "" : " acabado-muestra--vacia"}" style="${hex ? `background:${escapar(hex)}` : ""}" data-muestra></span>
-          <input class="control" type="text" data-acabado-nombre value="${escapar(a.nombre || "")}" placeholder="Ej. Plumbago" aria-label="Nombre comercial del acabado ${i + 1}" />
-          <select class="control" data-acabado-grupo aria-label="Grupo de color del acabado ${i + 1}">
-            <option value="">Grupo de color</option>
-            ${listas.gruposColor.map((g) => `<option value="${escapar(g.id)}" ${g.id === a.grupo ? "selected" : ""}>${escapar(g.nombre)}</option>`).join("")}
-          </select>
-          <button class="boton boton--icono boton--texto" type="button" data-quitar-acabado aria-label="Quitar este acabado">${X}</button>
-        </div>`;
-      })
+      .map((a, i) => `<div class="acabado" data-i="${i}">
+          <div class="acabado-cabeza">
+            <input class="fila-lista-control fila-lista-control--izq" type="text" data-acabado-nombre value="${escapar(a.nombre || "")}" placeholder="Nombre comercial, ej. Plumbago" aria-label="Nombre comercial del acabado ${i + 1}" />
+            <button class="fila-lista-quitar" type="button" data-quitar-acabado aria-label="Quitar este acabado">${X}</button>
+          </div>
+          <div class="acabado-grupos" role="radiogroup" aria-label="Grupo de color del acabado ${i + 1}">
+            ${listas.gruposColor.map((g) => `<label class="color" title="${escapar(g.nombre)}">
+              <input type="radio" name="grupo-${i}" value="${escapar(g.id)}" data-acabado-grupo ${g.id === a.grupo ? "checked" : ""} aria-label="${escapar(g.nombre)}" />
+              <span class="color-muestra" style="background:${escapar(g.hex)}"></span>
+            </label>`).join("")}
+            <span class="acabado-grupo-nombre" data-grupo-nombre>${escapar(listas.gruposColor.find((g) => g.id === a.grupo)?.nombre || "Elige su color")}</span>
+          </div>
+        </div>`)
       .join("");
     $$(".acabado", caja).forEach((fila) => {
       const i = +fila.dataset.i;
-      const sel = $("[data-acabado-grupo]", fila);
-      sel.addEventListener("change", () => {
-        const hex = listas.gruposColor.find((g) => g.id === sel.value)?.hex;
-        const m = $("[data-muestra]", fila);
-        m.style.background = hex || "";
-        m.classList.toggle("acabado-muestra--vacia", !hex);
-      });
+      $$("[data-acabado-grupo]", fila).forEach((r) =>
+        r.addEventListener("change", () => {
+          $("[data-grupo-nombre]", fila).textContent = listas.gruposColor.find((g) => g.id === r.value)?.nombre || "";
+        })
+      );
       $("[data-quitar-acabado]", fila).addEventListener("click", () => {
         pieza.acabados = leerAcabados().filter((_, j) => j !== i);
         pintarAcabados();
@@ -605,7 +608,7 @@ const secciones = [
   }
   const leerAcabados = () =>
     $$(".acabado")
-      .map((f) => ({ nombre: $("[data-acabado-nombre]", f).value.trim(), grupo: $("[data-acabado-grupo]", f).value }))
+      .map((f) => ({ nombre: $("[data-acabado-nombre]", f).value.trim(), grupo: $("[data-acabado-grupo]:checked", f)?.value || "" }))
       .filter((a) => a.nombre || a.grupo);
 
   /* ---------- Piezas que combinan ---------- */
@@ -673,10 +676,15 @@ const secciones = [
     const filas = [...valores];
     if (filas.length < max) filas.push("");
     caja.innerHTML = filas
-      .map((v, i) => `<div class="frase"><span class="frase-n">${i + 1}</span><input class="control" type="text" data-frase="${nombre}" value="${escapar(v)}" placeholder="${escapar(ejemplos[i] || "Ej. Otra frase corta")}" /><button class="boton boton--chico boton--icono boton--texto" type="button" data-quitar-frase aria-label="Quitar" ${v ? "" : "style='visibility:hidden'"}>${X}</button></div>`)
+      .map((v, i) => `<label class="fila-lista fila-lista--frase">
+        <span class="fila-lista-n">${i + 1}</span>
+        <input class="fila-lista-control fila-lista-control--izq" type="text" data-frase="${nombre}" value="${escapar(v)}" placeholder="${escapar(ejemplos[i] || "Ej. Otra frase corta")}" />
+        <button class="fila-lista-quitar" type="button" data-quitar-frase aria-label="Quitar" ${v ? "" : "hidden"}>${X}</button>
+      </label>`)
       .join("");
     $$("[data-quitar-frase]", caja).forEach((b, i) =>
-      b.addEventListener("click", () => {
+      b.addEventListener("click", (e) => {
+        e.preventDefault();
         pintarFrases(nombre, leerFrases(nombre).filter((_, j) => j !== i), max, ejemplos);
         marcarCambio();
       })
