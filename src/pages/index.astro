@@ -82,7 +82,7 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
           <p class="rotulo">{proyectoDestacado.espacio} · {proyectoDestacado.ciudad}</p>
           <h3 class="display t-h3 proj-name">{proyectoDestacado.nombre}</h3>
           <p class="proj-intro">{proyectoDestacado.resumen}</p>
-          <a class="proj-link label" href={`/proyectos/${proyectoDestacado.slug}/`}>
+          <a class="pill pill--ghost proj-link" href={`/proyectos/${proyectoDestacado.slug}/`}>
             Recorrer el proyecto <Fragment set:html={arrow} />
           </a>
         </figcaption>
@@ -208,13 +208,11 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
     .proj-caption :global(.rotulo){color:var(--olive-ink);}
     .proj-name{margin:6px 0 8px;}
     .proj-intro{font-size:14.5px;color:var(--ink-60);}
-    .proj-link{
-      display:flex;align-items:center;justify-content:center;gap:8px;
-      margin-top:16px;height:44px;border-radius:999px;
-      background:var(--ink);color:var(--white);
-      transition:background .25s var(--ease),gap .25s var(--ease);
-    }
-    @media (hover:hover){.proj-link:hover{background:#000;}}
+    /* Botón secundario en los dos tamaños, como los otros bloques de sección
+       del home ("Armar mi home office", "Conoce Neucast"): sobre blanco va de
+       contorno y sobre la foto, de vidrio. El alto es el de todas las .pill. */
+    .proj-link{margin-top:18px;align-self:flex-start;gap:8px;}
+    @media (hover:hover){.proj-link:hover{background:var(--ink);color:var(--white);border-color:var(--ink);}}
 
     @media (min-width:900px){
       /* el mismo oscuro que "La idea es simple": un solo oscuro en todo el home */
@@ -237,12 +235,12 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
       .proj-caption :global(.rotulo){color:#fff;}
       .proj-intro{max-width:560px;color:rgba(255,255,255,.9);}
       .proj-link{
-        display:inline-flex;height:auto;border-radius:0;
-        background:none;color:#fff;opacity:.9;
-        transition:gap .25s var(--ease),opacity .2s;
+        margin-top:22px;color:#fff;
+        background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.35);
+        -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
       }
       .proj-link::after{content:none;}
-      @media (hover:hover){.proj-link:hover{background:none;gap:12px;opacity:1;}}
+      @media (hover:hover){.proj-link:hover{background:rgba(255,255,255,.28);color:#fff;border-color:rgba(255,255,255,.5);}}
     }
     .proj-hint-dot{
       width:9px;height:9px;border-radius:50%;background:#fff;flex:none;
