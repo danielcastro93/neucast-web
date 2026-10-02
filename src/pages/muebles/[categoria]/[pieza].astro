@@ -702,10 +702,10 @@ const VENTANA_PUNTOS = 5;
 
     /* La foto va limpia: el pie que llevaba encima competía con ella y lo que
        decía se cuenta mejor en los apoyos de abajo. */
-    .pd-contexto-marco{margin:0 var(--gutter);}
+    .pd-contexto-marco{margin:0;}
     .pd-contexto-marco img{
       display:block;width:100%;aspect-ratio:4/3;object-fit:cover;
-      border-radius:var(--radius);background:var(--paper);
+      background:var(--paper);
     }
 
     /* ---------- los tres apoyos ---------- */
@@ -759,14 +759,12 @@ const VENTANA_PUNTOS = 5;
       .pd-apoyos::after{display:none;}
     }
     /* En pantalla ancha la foto se recuesta: a 4/3 se comía la página entera. */
+    /* de orilla a orilla y sin esquinas en todos los tamaños; en pantalla
+       ancha se recuesta para que no se coma la página */
     @media (min-width:760px){
-      .pd-contexto-marco{overflow:hidden;border-radius:var(--radius);}
-      .pd-contexto-marco img{aspect-ratio:16/9;border-radius:0;}
+      .pd-contexto-marco img{aspect-ratio:16/9;}
     }
-    /* desde 900 px, de orilla a orilla y sin esquinas, más recostada para
-       que no se coma la pantalla */
     @media (min-width:900px){
-      .pd-contexto-marco{margin:0;border-radius:0;}
       .pd-contexto-marco img{aspect-ratio:21/9;}
     }
 

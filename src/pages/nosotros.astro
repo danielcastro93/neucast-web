@@ -230,15 +230,11 @@ const pilares = [
     /* ---------- Cierre ---------- */
     .ns-cierre{
       position:relative;overflow:hidden;
-      border-radius:var(--radius);margin-inline:var(--gutter);
       --play:paused;
     }
     .ns-cierre.in-view{--play:running;}
-    /* desde 900 px de orilla a orilla y sin esquinas, como el cierre del
-       resto del sitio; en teléfono se queda como tarjeta */
-    @media (min-width:900px){
-      .ns-cierre{margin-inline:0;border-radius:0;}
-    }
+    /* de orilla a orilla y sin esquinas en todos los tamaños, como el
+       cierre del resto del sitio */
     .ns-cierre-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
     .ns-cierre-shade{position:absolute;inset:0;background:rgba(12,11,9,.58);}
     .ns-cierre-inner{

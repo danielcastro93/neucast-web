@@ -181,12 +181,10 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
        para "proyectos ya instalados": fondo arena, la foto dentro con su
        esquina redondeada y el texto debajo. De 900 para arriba el texto se
        monta sobre la foto, y ahí sí pide el velo oscuro. */
-    /* en teléfono, el mismo gris claro y liso de la tarjeta de home office
-       (30 de septiembre); antes fue gris más oscuro con grano */
-    .proj-stage{
-      position:relative;margin:0 var(--gutter);
-      border-radius:var(--radius);background:var(--paper-soft);padding:14px;
-    }
+    /* En teléfono también a todo lo ancho: la foto de orilla a orilla y el
+       texto debajo, sobre blanco y alineado con el resto de la página. Antes
+       fue una tarjeta gris con la foto adentro. */
+    .proj-stage{position:relative;margin:0;padding:0;}
     .proj-stage::before{display:none;}
     /* Los puntos van por encima del degradado del texto. La regla general de
        .grano le daba a la escena su propia capa (z-index 1) y el pie, que
@@ -196,11 +194,10 @@ const arrow = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-
     .proj-caption{z-index:1;}
     /* el radio va en la foto y no en su caja: la caja no puede recortar,
        porque las tarjetas de los puntos se salen de la imagen */
-    .proj-stage :global(.esc) > :global(img){border-radius:var(--radius-sm);}
     .proj-caption{
       position:relative;
       display:flex;flex-direction:column;
-      padding:14px 4px 4px;color:var(--ink);
+      padding:18px var(--gutter) 0;color:var(--ink);
     }
     /* Todo el bloque de texto lleva al proyecto, no solo la pastilla: en una
        tarjeta la gente toca el título o la descripción. El enlace estira una
