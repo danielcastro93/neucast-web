@@ -294,8 +294,8 @@ a.renglon:focus-visible{outline-offset:-3px;}
   dialog.modal[open]{animation:hojaSube .38s var(--ease);}
   dialog.modal.modal--cerrando{animation:hojaBaja .26s var(--ease-salida) forwards;}
   .modal-cabeza{padding:22px 18px 0;}
-  .modal-cuerpo{padding:18px 18px 0;max-height:calc(92vh - 200px);}
-  .modal-pie{flex-direction:column-reverse;align-items:stretch;padding:20px 18px calc(18px + env(safe-area-inset-bottom));}
+  .modal-cuerpo{padding:18px 18px 6px;max-height:calc(92vh - 200px);}
+  .modal-pie{flex-direction:column-reverse;align-items:stretch;padding:16px 18px calc(18px + env(safe-area-inset-bottom));}
   .modal-pie .boton{height:48px;width:100%;}
   .modal-pie .izquierda{margin:0;text-align:center;}
   .avisos{bottom:16px;}
