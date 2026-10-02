@@ -1,11 +1,12 @@
 // Documento de estrategia y mapa del sitio, en PDF, con la plantilla de las
 // fichas técnicas (logotipo, rótulos, A4).
 //
-//   node scripts/entregables/estrategia.mjs <carpeta-de-salida>
+//   node scripts/entregables/estrategia.mjs <carpeta-de-salida>            → para Mitch y Gabriela
+//   node scripts/entregables/estrategia.mjs <carpeta-de-salida> --completo → versión interna de Daniel
 //
-// Para quién: Mitch (SEO) y Gabriela (cliente). Explica a qué va el sitio,
-// cómo está pensado el recorrido hasta cotizar, qué páginas existen y cuáles
-// son plantillas que se repiten, qué SEO ya está resuelto y qué define SEO.
+// La versión para Mitch y Gabriela dice solo dos cosas: a qué va el sitio y
+// qué páginas tiene, con sus enlaces. La completa agrega lo de SEO, las
+// categorías de hoy y lo que sigue; es para Daniel.
 // Las direcciones apuntan a la vista previa, que es lo que se puede abrir hoy.
 import fs from "node:fs";
 import os from "node:os";
@@ -20,6 +21,7 @@ const CHROME =
     fs.existsSync(c)
   );
 const salida = process.argv[2];
+const completo = process.argv.includes("--completo");
 if (!salida || !CHROME) {
   console.error("Uso: node scripts/entregables/estrategia.mjs <carpeta-de-salida>  (necesita Chrome)");
   process.exit(1);
@@ -93,7 +95,9 @@ const portada = `
   <div class="portada-txt">
     <p class="rotulo" style="color:#48542B">neucast.com.mx</p>
     <h1 class="portada-ttl">Estrategia y mapa del sitio</h1>
-    <p class="portada-meta">A qué va el sitio, cómo está pensado el recorrido hasta cotizar y qué páginas existen.<br>Para Mitch (SEO) y para Gabriela. Preparado por Daniel Castro.</p>
+    <p class="portada-meta">${completo
+      ? "Versión interna: estrategia, mapa del sitio, SEO y lo que sigue.<br>Preparado por Daniel Castro."
+      : "A qué va el sitio, cómo está pensado el recorrido hasta cotizar y qué páginas existen.<br>Para Mitch y para Gabriela. Preparado por Daniel Castro."}</p>
   </div>
 </section>`;
 
@@ -140,7 +144,7 @@ const recorrido = `
       <li><b>"Mi proyecto"</b> funciona como un carrito sin pago. Vive en el navegador de la persona, no pide registro, y al final se convierte en un mensaje de WhatsApp o en un envío del formulario.</li>
       <li><b>Las fichas y los catálogos en PDF</b> se generan solos con una plantilla de Neucast. Nadie sube PDF a mano, así que nunca aparece la marca de un fabricante.</li>
       <li><b>Los textos de producto</b> se escriben para quien compra para una empresa: uso, resistencia y plazos, no decoración.</li>
-      <li><b>Los legales</b> (aviso de privacidad y términos) están en borrador y requieren revisión del abogado del cliente antes de publicar.</li>
+      ${completo ? `<li><b>Los legales</b> (aviso de privacidad y términos) están en borrador y requieren revisión del abogado del cliente antes de publicar.</li>` : ""}
     </ul>
   </div>`;
 
@@ -171,7 +175,7 @@ const mapa1 = `
     <thead><tr><th style="width:34mm">Sección</th><th style="width:40mm">Ruta</th><th>Qué hace</th><th style="width:16mm">Indexable</th></tr></thead>
     <tbody>${fijas.map(filaFija).join("")}</tbody>
   </table>
-  <div class="sec">
+  ${completo ? `<div class="sec">
     <h3 class="h2">Archivos que se generan solos</h3>
     <table>
       <tbody>
@@ -182,7 +186,7 @@ const mapa1 = `
         <tr><td class="b">Catálogos</td><td class="u">/catalogos/neucast-catalogo-{categoria}.pdf</td><td>Uno por categoría y el general.</td></tr>
       </tbody>
     </table>
-  </div>`;
+  </div>` : ""}`;
 
 const ejemploCat = categories[0];
 const ejemploPieza = piezas.find((p) => p.cat === ejemploCat.slug) || piezas[0];
@@ -201,7 +205,7 @@ const plantillas = `
       <tr><td class="b">Proyecto</td><td>${proyectos.length} páginas</td><td class="u">${enlace(`/proyectos/${ejemploProy.slug}/`)}</td><td>Apertura, introducción, capítulos con fotos, escenas con puntos sobre las piezas, piezas del proyecto y otros proyectos. Datos estructurados de artículo.</td></tr>
     </tbody>
   </table>
-  <div class="sec">
+  ${completo ? `<div class="sec">
     <h3 class="h2">Las ${categories.length} categorías de hoy</h3>
     <table>
       <thead><tr><th style="width:44mm">Categoría</th><th style="width:48mm">Ruta</th><th>Título que posiciona hoy</th></tr></thead>
@@ -210,7 +214,7 @@ const plantillas = `
         .join("")}</tbody>
     </table>
     <p class="nota">Las categorías, su orden y sus textos salen del administrador. Agregar una categoría crea su página, su catálogo en PDF y su lugar en el menú, el buscador y el mapa del sitio.</p>
-  </div>`;
+  </div>` : `<p class="nota">Las categorías, las piezas y los proyectos salen del administrador: agregar uno crea su página y su lugar en el menú, el buscador y el mapa del sitio.</p>`}`;
 
 const seo = `
   <div class="sec">
@@ -267,15 +271,15 @@ const siguiente = `
     </ul>
   </div>`;
 
-const cuerpo = [queEs, recorrido, mapa1, plantillas, seo, siguiente];
-const cabs = ["Para qué es el sitio", "El recorrido", "Mapa del sitio", "Plantillas", "SEO", "Lo que sigue"];
+const cuerpo = completo ? [queEs, recorrido, mapa1, plantillas, seo, siguiente] : [queEs, recorrido, mapa1, plantillas];
+const cabs = completo ? ["Para qué es el sitio", "El recorrido", "Mapa del sitio", "Plantillas", "SEO", "Lo que sigue"] : ["Para qué es el sitio", "El recorrido", "Mapa del sitio", "Plantillas"];
 const total = cuerpo.length + 1;
 const html = `<!doctype html><html lang="es-MX"><head><meta charset="utf-8"><title>Neucast · Estrategia y mapa del sitio</title>
 <style>${ESTILOS}${ESTILOS_DOC}</style></head><body>${portada}${cuerpo.map((c, i) => hoja(cabs[i], c, i + 2, total)).join("")}</body></html>`;
 
 const temporal = fs.mkdtempSync(path.join(os.tmpdir(), "neucast-estrategia-"));
 const htmlRuta = path.join(temporal, "estrategia.html");
-const pdfRuta = path.resolve(salida, "neucast-estrategia-y-mapa-del-sitio.pdf");
+const pdfRuta = path.resolve(salida, completo ? "neucast-estrategia-completa-interna.pdf" : "neucast-estrategia-y-mapa-del-sitio.pdf");
 fs.writeFileSync(htmlRuta, html);
 execFileSync(CHROME, ["--headless=new", "--disable-gpu", "--no-pdf-header-footer", "--allow-file-access-from-files", `--print-to-pdf=${pdfRuta}`, "file://" + htmlRuta], { stdio: "ignore" });
 fs.rmSync(temporal, { recursive: true, force: true });
