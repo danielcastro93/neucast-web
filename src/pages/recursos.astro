@@ -87,8 +87,8 @@ const schema = {
       )}
 
       <p class="rc-nota">
-        Cada pieza tiene además su ficha técnica, con plano y especificaciones, en su
-        propia página. <a href="/muebles/">Explorar las piezas</a>
+        ¿Buscas medidas y especificaciones? Están en la ficha técnica de cada pieza.
+        <a href="/muebles/">Explorar las piezas</a>
       </p>
     </div>
   </section>
@@ -131,14 +131,16 @@ const schema = {
     @media (hover:hover){.rc-cat:hover .rc-cat-foto img{transform:scale(1.04);}}
     .rc-cat-nombre{margin-top:12px;font-size:var(--fs-sm);font-weight:700;line-height:1.25;}
     .rc-cat-btn{margin-top:auto;width:100%;justify-content:center;gap:8px;padding:0 10px;}
-    .rc-cat-nombre{margin-bottom:14px;}
+    /* aire entre el nombre y el botón: a 14 px se leían pegados */
+    .rc-cat-nombre{margin-bottom:22px;}
     @media (max-width:639px){.rc-cat-btn{height:44px;}}
     /* en teléfonos angostos el texto necesita todo el ancho: el ícono se omite */
     @media (max-width:399px){.rc-cat-btn :global(svg){display:none;}}
     @media (hover:hover){.rc-cat:hover .rc-cat-btn{background:var(--ink);color:var(--white);border-color:var(--ink);}}
 
     .rc-nota{
-      margin-top:var(--section-y);padding-top:28px;border-top:1px solid var(--line);
+      /* sin línea: 100 px de aire la separan de los botones */
+      margin-top:100px;
       font-size:var(--fs-sm);color:var(--ink-60);
     }
     .rc-nota a{color:var(--ink);font-weight:600;text-decoration:underline;text-underline-offset:3px;white-space:nowrap;}
