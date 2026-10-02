@@ -64,6 +64,32 @@ suyas y las contraseñas nunca viajan en un JSON.
 | `PUBLIC_MEDIOS` | De dónde se cargan las fotos | `http://localhost:4321` |
 | `PUBLIC_STG` | El sitio de pruebas, para "Ver en pruebas" | `http://localhost:4321` |
 
+## La base de sistema
+
+El administrador se arma como una app de Apple y lleva encima la identidad
+de Neucast (Helvetica Neue, la tinta y el oliva). Los tokens están al
+principio de `src/styles/admin.css`:
+
+| Token | Equivale en Apple a | Uso |
+| --- | --- | --- |
+| `--t-titulo-grande` (34) | Large Title | El título de cada pantalla |
+| `--t-titulo-1` (28) | Title 1 | El estado principal de una tarjeta |
+| `--t-titulo-2` (22) | Title 2 | Títulos de modal |
+| `--t-titulo-3` (19) | Title 3 | Títulos de sección |
+| `--t-encabezado` (16) | Headline | Nombres en listas |
+| `--t-cuerpo` (15) | Body | Texto y campos |
+| `--t-llamada` (14) | Callout | Botones, chips, menús |
+| `--t-subtitulo` (13) | Subheadline | Segundas líneas |
+| `--t-nota` (12) | Footnote | Notas y fechas |
+| `--etiqueta` a `--etiqueta-4` | label a quaternaryLabel | La tinta en cuatro intensidades |
+| `--relleno`, `--relleno-2` | fill | Fondo de campos, chips y botones grises |
+| `--material*` + `--desenfoque` | materials | Barras y menús translúcidos |
+| `--r-1` a `--r-5` | radios concéntricos | Lo de dentro siempre más chico que lo de fuera |
+
+Campos rellenos sin contorno, botones en píldora, separadores finísimos y
+movimiento con resorte (`--resorte`) para todo lo que se presiona. Las
+reglas de teléfono están en `src/styles/componentes.css`.
+
 ## Reglas que el administrador aplica solas
 
 - Las listas cerradas (material, acabados, uso, respaldo, brazos, base,
