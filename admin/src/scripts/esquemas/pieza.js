@@ -5,7 +5,7 @@
 // formulario, la validación y la API.
 
 // Obligatorios para todas las piezas.
-export const OBLIGATORIOS = ["nombre", "slug", "tipo", "cat", "img", "alt", "resumen", "material", "colores", "entrega", "uso"];
+export const OBLIGATORIOS = ["nombre", "slug", "tipo", "cat", "img", "alt", "resumen", "material", "acabados", "entrega", "uso"];
 
 // Obligatorios según la categoría. La llave es el slug de la categoría.
 export const SEGUN_CATEGORIA = {
@@ -31,6 +31,62 @@ export const FILTROS_POR_CATEGORIA = {
   almacenamiento: ["uso", "extras"],
 };
 
+// Las medidas en grupos. Cada categoría enseña de entrada los grupos que le
+// tocan; los demás quedan detrás de "Más medidas". Un grupo con algún dato
+// capturado se enseña siempre.
+export const GRUPOS_MEDIDA = [
+  { id: "generales", nombre: "Generales", claves: ["alto", "ancho", "fondo", "largo", "diametro", "peso"] },
+  { id: "asiento", nombre: "Asiento y respaldo", claves: ["altoAsiento", "anchoAsiento", "fondoAsiento", "altoRespaldo", "brazoInterno", "brazoExterno", "cabecera"] },
+  { id: "cubierta", nombre: "Cubierta", claves: ["espesorCubierta", "alturaLibre"] },
+  { id: "capacidad", nombre: "Capacidad", claves: ["plazas", "personas", "puestos", "apilables", "carga"] },
+  { id: "guardado", nombre: "Guardado", claves: ["puertas", "gavetas", "entrepanos", "cargaEntrepano", "cargaGaveta"] },
+];
+export const MEDIDAS_POR_CATEGORIA = {
+  "sillas-ejecutivas": ["generales", "asiento", "capacidad"],
+  "sillas-operativas": ["generales", "asiento", "capacidad"],
+  cafeterias: ["generales", "asiento", "capacidad", "cubierta"],
+  "lounge-y-areas-comunes": ["generales", "asiento", "capacidad", "cubierta"],
+  exteriores: ["generales", "asiento", "capacidad", "cubierta"],
+  "salas-de-juntas": ["generales", "cubierta", "capacidad"],
+  escritorios: ["generales", "cubierta", "capacidad"],
+  almacenamiento: ["generales", "guardado"],
+};
+
+// Ejemplos para los placeholders. Son ejemplos de formato, no datos: nada de
+// esto se publica.
+export const EJEMPLO_MEDIDA = {
+  alto: "118 cm", ancho: "68 cm", fondo: "70 cm", largo: "240 cm", diametro: "120 cm", peso: "19 kg",
+  altoAsiento: "45 a 55 cm", anchoAsiento: "50 cm", fondoAsiento: "48 cm", altoRespaldo: "72 cm",
+  brazoInterno: "48 cm", brazoExterno: "68 cm", cabecera: "26 cm",
+  espesorCubierta: "25 mm", alturaLibre: "68 cm",
+  plazas: "3", personas: "8", puestos: "4", apilables: "6", carga: "130 kg",
+  puertas: "2", gavetas: "3", entrepanos: "4", cargaEntrepano: "30 kg", cargaGaveta: "25 kg",
+};
+
+// Qué partes de construcción tiene cada categoría.
+export const CONSTRUCCION_POR_CATEGORIA = {
+  "sillas-ejecutivas": ["tapiceria", "asiento", "estructura", "base", "ruedas"],
+  "sillas-operativas": ["tapiceria", "asiento", "estructura", "base", "ruedas"],
+  cafeterias: ["tapiceria", "asiento", "estructura", "base", "acabado"],
+  "lounge-y-areas-comunes": ["tapiceria", "armazon", "asiento", "suspension", "patas", "cubierta", "estructura", "base"],
+  exteriores: ["estructura", "asiento", "cubierta", "base", "acabado"],
+  "salas-de-juntas": ["cubierta", "estructura", "base", "acabado"],
+  escritorios: ["cubierta", "estructura", "base", "acabado"],
+  almacenamiento: ["estructura", "cubierta", "base", "acabado"],
+};
+export const EJEMPLO_CONSTRUCCION = {
+  tapiceria: "Malla sobre marco de nylon",
+  asiento: "Espuma inyectada de alta densidad",
+  armazon: "Madera de pino tratada",
+  estructura: "Acero con pintura electrostática",
+  cubierta: "Melamina de 25 mm",
+  suspension: "Cinchos elásticos",
+  base: "Aluminio pulido de cinco puntas",
+  patas: "Madera maciza de encino",
+  ruedas: "Ruedas de 60 mm para piso duro",
+  acabado: "Pintura electrostática negra",
+};
+
 // Medidas de texto (docs/administrador.md, apartado 4).
 export const MEDIDAS = {
   nombre: { min: 2, max: 40 },
@@ -49,7 +105,7 @@ export const ETIQUETAS = {
   alt: "el texto alternativo de la foto principal",
   resumen: "el párrafo descriptivo",
   material: "el material",
-  colores: "al menos un acabado",
+  acabados: "al menos un acabado",
   entrega: "la disponibilidad",
   uso: "el tipo de uso",
   respaldo: "el respaldo",
@@ -58,6 +114,9 @@ export const ETIQUETAS = {
   plazas: "las plazas",
 };
 
+// Cuántas piezas que combinan se pueden elegir (las que caben en el carrusel).
+export const MAX_COMBINA = 8;
+
 // Una pieza vacía, para dar de alta.
 export const piezaVacia = () => ({
   slug: "",
@@ -65,9 +124,13 @@ export const piezaVacia = () => ({
   tipo: "",
   cat: "",
   img: [],
+  alts: [],
   alt: "",
   nuevo: false,
   material: "",
+  // `acabados` guarda el nombre comercial y su grupo; `colores` (lo que filtra
+  // el sitio) se deriva de los grupos al guardar.
+  acabados: [],
   colores: [],
   entrega: "",
   uso: "",
@@ -77,6 +140,7 @@ export const piezaVacia = () => ({
   plazas: null,
   extras: [],
   espacios: [],
+  combina: [],
   ficha: { resumen: "", destacados: [], medidas: {}, construccion: {}, mecanismo: null, cuidados: [] },
   estado: "borrador",
 });

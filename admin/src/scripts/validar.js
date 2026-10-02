@@ -28,9 +28,17 @@ export function revisarMedida(campo, texto) {
   return null;
 }
 
+// Las piezas que vienen de antes solo traen `colores` (los grupos). Mientras
+// no tengan acabados con nombre comercial, sus grupos cuentan como acabados.
+export const acabadosDe = (pieza) =>
+  pieza.acabados?.length ? pieza.acabados : (pieza.colores || []).map((grupo) => ({ nombre: "", grupo }));
+
 export function validarPieza(pieza, listas) {
   const errores = {};
-  const valor = (campo) => (campo === "resumen" ? pieza.ficha?.resumen : pieza[campo]);
+  const valor = (campo) =>
+    campo === "resumen" ? pieza.ficha?.resumen
+    : campo === "acabados" ? acabadosDe(pieza).filter((a) => a.grupo)
+    : pieza[campo];
 
   for (const campo of OBLIGATORIOS) {
     if (vacio(valor(campo))) errores[campo] = `Falta ${ETIQUETAS[campo]}`;
@@ -56,7 +64,7 @@ export function validarPieza(pieza, listas) {
     const ids = (lista) => new Set((lista || []).map((o) => o.id));
     const deFiltro = (campo) => ids(listas.filtros.find((f) => f.campo === campo)?.opciones);
     if (pieza.material && !ids(listas.materiales).has(pieza.material)) errores.material = "Material fuera de la lista";
-    if ((pieza.colores || []).some((c) => !ids(listas.gruposColor).has(c))) errores.colores = "Hay un acabado fuera de la lista";
+    if ((pieza.acabados || []).some((a) => a.grupo && !ids(listas.gruposColor).has(a.grupo))) errores.acabados = "Hay un acabado con un grupo de color fuera de la lista";
     for (const campo of ["uso", "respaldo", "brazos", "base", "plazas", "entrega"]) {
       if (!vacio(pieza[campo]) && !deFiltro(campo).has(String(pieza[campo]))) errores[campo] = "Valor fuera de la lista";
     }

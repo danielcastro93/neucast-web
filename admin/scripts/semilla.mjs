@@ -37,6 +37,10 @@ escribir(
   "piezas",
   piezas.map((p) => ({
     ...p,
+    // el nombre comercial de cada acabado todavía no existe en el sitio: se
+    // captura en el administrador; mientras, cada grupo es un acabado sin nombre
+    acabados: (p.colores || []).map((grupo) => ({ nombre: "", grupo })),
+    combina: [],
     ficha: fichas[p.slug] || null,
     estado: "publicada",
     actualizado: AYER,

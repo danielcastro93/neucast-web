@@ -26,6 +26,17 @@
       "gris"
     ],
     "entrega": "10dias",
+    "acabados": [
+      {
+        "nombre": "",
+        "grupo": "negro"
+      },
+      {
+        "nombre": "",
+        "grupo": "gris"
+      }
+    ],
+    "combina": [],
     "ficha": {
       "destacados": [
         "Cabecera regulable en altura e inclinación",
@@ -103,6 +114,21 @@
       "gris"
     ],
     "entrega": "inmediata",
+    "acabados": [
+      {
+        "nombre": "",
+        "grupo": "azul"
+      },
+      {
+        "nombre": "",
+        "grupo": "negro"
+      },
+      {
+        "nombre": "",
+        "grupo": "gris"
+      }
+    ],
+    "combina": [],
     "ficha": {
       "destacados": [
         "Respaldo alto tapizado con soporte lumbar integrado",
@@ -174,6 +200,17 @@
       "cafe"
     ],
     "entrega": "pedido",
+    "acabados": [
+      {
+        "nombre": "",
+        "grupo": "negro"
+      },
+      {
+        "nombre": "",
+        "grupo": "cafe"
+      }
+    ],
+    "combina": [],
     "ficha": {
       "destacados": [
         "Piel genuina de grano corregido",
@@ -242,6 +279,17 @@
       "beige"
     ],
     "entrega": "10dias",
+    "acabados": [
+      {
+        "nombre": "",
+        "grupo": "negro"
+      },
+      {
+        "nombre": "",
+        "grupo": "beige"
+      }
+    ],
+    "combina": [],
     "ficha": {
       "destacados": [
         "Estructura cantilever de tubo de acero continuo",
@@ -306,6 +354,13 @@
       "negro"
     ],
     "entrega": "inmediata",
+    "acabados": [
+      {
+        "nombre": "",
+        "grupo": "negro"
+      }
+    ],
+    "combina": [],
     "ficha": {
       "destacados": [
         "Respaldo de malla transpirable con soporte lumbar fijo",
@@ -379,6 +434,17 @@
       "negro"
     ],
     "entrega": "inmediata",
+    "acabados": [
+      {
+        "nombre": "",
+        "grupo": "gris"
+      },
+      {
+        "nombre": "",
+        "grupo": "negro"
+      }
+    ],
+    "combina": [],
     "ficha": {
       "destacados": [
         "Respaldo de malla transpirable",
@@ -451,6 +517,21 @@
       "rojo"
     ],
     "entrega": "10dias",
+    "acabados": [
+      {
+        "nombre": "",
+        "grupo": "negro"
+      },
+      {
+        "nombre": "",
+        "grupo": "verde"
+      },
+      {
+        "nombre": "",
+        "grupo": "rojo"
+      }
+    ],
+    "combina": [],
     "ficha": {
       "destacados": [
         "Sin brazos, entra completa bajo el escritorio",
@@ -517,6 +598,17 @@
       "negro"
     ],
     "entrega": "pedido",
+    "acabados": [
+      {
+        "nombre": "",
+        "grupo": "cafe"
+      },
+      {
+        "nombre": "",
+        "grupo": "negro"
+      }
+    ],
+    "combina": [],
     "ficha": {
       "destacados": [
         "Cubierta de una pieza, sin junta a la vista",
@@ -574,6 +666,17 @@
       "blanco"
     ],
     "entrega": "pedido",
+    "acabados": [
+      {
+        "nombre": "",
+        "grupo": "beige"
+      },
+      {
+        "nombre": "",
+        "grupo": "blanco"
+      }
+    ],
+    "combina": [],
     "ficha": {
       "destacados": [
         "Doble pedestal, sin patas en las cabeceras",
@@ -629,6 +732,17 @@
       "gris"
     ],
     "entrega": "10dias",
+    "acabados": [
+      {
+        "nombre": "",
+        "grupo": "negro"
+      },
+      {
+        "nombre": "",
+        "grupo": "gris"
+      }
+    ],
+    "combina": [],
     "ficha": {
       "destacados": [
         "Cristal templado de 12 mm con canto pulido",
@@ -686,6 +800,17 @@
       "blanco"
     ],
     "entrega": "inmediata",
+    "acabados": [
+      {
+        "nombre": "",
+        "grupo": "beige"
+      },
+      {
+        "nombre": "",
+        "grupo": "blanco"
+      }
+    ],
+    "combina": [],
     "ficha": {
       "destacados": [
         "Pasacables en cubierta y canaleta bajo la superficie",
@@ -744,6 +869,17 @@
       "gris"
     ],
     "entrega": "10dias",
+    "acabados": [
+      {
+        "nombre": "",
+        "grupo": "cafe"
+      },
+      {
+        "nombre": "",
+        "grupo": "gris"
+      }
+    ],
+    "combina": [],
     "ficha": {
       "destacados": [
         "Retorno reversible: se arma a derecha o a izquierda",
@@ -801,6 +937,17 @@
       "gris"
     ],
     "entrega": "pedido",
+    "acabados": [
+      {
+        "nombre": "",
+        "grupo": "blanco"
+      },
+      {
+        "nombre": "",
+        "grupo": "gris"
+      }
+    ],
+    "combina": [],
     "ficha": {
       "destacados": [
         "Cuatro puestos sobre una estructura continua",
@@ -859,6 +1006,17 @@
       "beige"
     ],
     "entrega": "inmediata",
+    "acabados": [
+      {
+        "nombre": "",
+        "grupo": "blanco"
+      },
+      {
+        "nombre": "",
+        "grupo": "beige"
+      }
+    ],
+    "combina": [],
     "ficha": {
       "destacados": [
         "Concha de una pieza, sin juntas donde se acumule",
@@ -920,6 +1078,21 @@
       "negro"
     ],
     "entrega": "inmediata",
+    "acabados": [
+      {
+        "nombre": "",
+        "grupo": "verde"
+      },
+      {
+        "nombre": "",
+        "grupo": "azul"
+      },
+      {
+        "nombre": "",
+        "grupo": "negro"
+      }
+    ],
+    "combina": [],
     "ficha": {
       "destacados": [
         "Base de trineo: no raya ni se atora",
@@ -981,6 +1154,17 @@
       "rojo"
     ],
     "entrega": "10dias",
+    "acabados": [
+      {
+        "nombre": "",
+        "grupo": "negro"
+      },
+      {
+        "nombre": "",
+        "grupo": "rojo"
+      }
+    ],
+    "combina": [],
     "ficha": {
       "destacados": [
         "Aro reposapiés integrado a la estructura",
@@ -1040,6 +1224,17 @@
       "azul"
     ],
     "entrega": "pedido",
+    "acabados": [
+      {
+        "nombre": "",
+        "grupo": "gris"
+      },
+      {
+        "nombre": "",
+        "grupo": "azul"
+      }
+    ],
+    "combina": [],
     "ficha": {
       "destacados": [
         "Armazón de pino sólido secado en horno",
@@ -1098,6 +1293,17 @@
       "negro"
     ],
     "entrega": "10dias",
+    "acabados": [
+      {
+        "nombre": "",
+        "grupo": "cafe"
+      },
+      {
+        "nombre": "",
+        "grupo": "negro"
+      }
+    ],
+    "combina": [],
     "ficha": {
       "destacados": [
         "Eco-Leather de limpieza inmediata",
@@ -1156,6 +1362,17 @@
       "beige"
     ],
     "entrega": "10dias",
+    "acabados": [
+      {
+        "nombre": "",
+        "grupo": "verde"
+      },
+      {
+        "nombre": "",
+        "grupo": "beige"
+      }
+    ],
+    "combina": [],
     "ficha": {
       "destacados": [
         "Respaldo envolvente de una pieza",
@@ -1214,6 +1431,17 @@
       "negro"
     ],
     "entrega": "inmediata",
+    "acabados": [
+      {
+        "nombre": "",
+        "grupo": "beige"
+      },
+      {
+        "nombre": "",
+        "grupo": "negro"
+      }
+    ],
+    "combina": [],
     "ficha": {
       "destacados": [
         "Cubierta de madera maciza de 40 mm",
@@ -1267,6 +1495,17 @@
       "gris"
     ],
     "entrega": "pedido",
+    "acabados": [
+      {
+        "nombre": "",
+        "grupo": "negro"
+      },
+      {
+        "nombre": "",
+        "grupo": "gris"
+      }
+    ],
+    "combina": [],
     "ficha": {
       "destacados": [
         "Cuatro plazas sobre una sola estructura",
@@ -1327,6 +1566,17 @@
       "cafe"
     ],
     "entrega": "10dias",
+    "acabados": [
+      {
+        "nombre": "",
+        "grupo": "blanco"
+      },
+      {
+        "nombre": "",
+        "grupo": "cafe"
+      }
+    ],
+    "combina": [],
     "ficha": {
       "destacados": [
         "Cinco entrepaños graduables cada 32 mm",
@@ -1385,6 +1635,17 @@
       "blanco"
     ],
     "entrega": "pedido",
+    "acabados": [
+      {
+        "nombre": "",
+        "grupo": "cafe"
+      },
+      {
+        "nombre": "",
+        "grupo": "blanco"
+      }
+    ],
+    "combina": [],
     "ficha": {
       "destacados": [
         "Cuatro puertas con bisagra de cierre suave",
@@ -1444,6 +1705,17 @@
       "negro"
     ],
     "entrega": "inmediata",
+    "acabados": [
+      {
+        "nombre": "",
+        "grupo": "blanco"
+      },
+      {
+        "nombre": "",
+        "grupo": "negro"
+      }
+    ],
+    "combina": [],
     "ficha": {
       "destacados": [
         "Tres gavetas con corredera telescópica",
@@ -1507,6 +1779,17 @@
       "negro"
     ],
     "entrega": "10dias",
+    "acabados": [
+      {
+        "nombre": "",
+        "grupo": "verde"
+      },
+      {
+        "nombre": "",
+        "grupo": "negro"
+      }
+    ],
+    "combina": [],
     "ficha": {
       "destacados": [
         "Aluminio con tratamiento anticorrosivo",
@@ -1565,6 +1848,17 @@
       "beige"
     ],
     "entrega": "pedido",
+    "acabados": [
+      {
+        "nombre": "",
+        "grupo": "negro"
+      },
+      {
+        "nombre": "",
+        "grupo": "beige"
+      }
+    ],
+    "combina": [],
     "ficha": {
       "destacados": [
         "Cubierta perforada: el agua escurre sola",

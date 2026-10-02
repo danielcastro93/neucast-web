@@ -134,6 +134,25 @@ Forma de una pieza:
 }
 ```
 
+**Dos campos nuevos que trae el administrador** (2 de octubre de 2026). El
+sitio todavía no los lee; la API los guarda y los entrega igual:
+
+```js
+{
+  acabados: [{ nombre: "Plumbago", grupo: "azul" }], // nombre comercial y su grupo
+  combina: ["mesa-tempo", "silla-orbita"],           // piezas que combinan, en orden
+}
+```
+
+- `acabados` guarda el nombre comercial de cada tela o color junto con su
+  grupo de `gruposColor`. `colores` (lo que filtra el sitio) se sigue
+  entregando y es la lista de grupos sin repetir: el administrador la deriva
+  al guardar. Cuando la ficha enseñe los nombres comerciales, los lee de aquí.
+- `combina` es la selección manual de "Piezas que combinan" (hasta ocho, en
+  orden). Si viene vacía, el sitio sigue calculándolas solo: primero las de la
+  misma categoría y después el resto. Cuando se conecte, la ficha usa esta
+  lista si trae algo.
+
 Los valores de `entrega` hoy son `inmediata`, `10dias` y `pedido`. La lista
 manda: se lee de `filtros` en `catalogo.js`.
 

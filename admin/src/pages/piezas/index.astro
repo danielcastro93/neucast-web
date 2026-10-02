@@ -42,7 +42,7 @@ const base = import.meta.env.BASE_URL;
             <th class="col-oculta-movil">Acabados</th>
             <th class="col-oculta-movil"><button type="button" data-orden="entrega">Disponibilidad <IconoAdmin name="ordenar" size={12} /></button></th>
             <th>Estado</th>
-            <th class="col-oculta-movil"><button type="button" data-orden="actualizado">Cambiada <IconoAdmin name="ordenar" size={12} /></button></th>
+            <th class="col-oculta-movil col-ancha"><button type="button" data-orden="actualizado">Cambiada <IconoAdmin name="ordenar" size={12} /></button></th>
             <th class="col-acciones"></th>
           </tr>
         </thead>
@@ -55,7 +55,7 @@ const base = import.meta.env.BASE_URL;
               <td class="col-oculta-movil"><div class="hueso" style="width:70px;height:14px"></div></td>
               <td class="col-oculta-movil"><div class="hueso" style="width:90px;height:14px"></div></td>
               <td><div class="hueso" style="width:80px;height:26px;border-radius:999px"></div></td>
-              <td class="col-oculta-movil"><div class="hueso" style="width:60px;height:14px"></div></td>
+              <td class="col-oculta-movil col-ancha"><div class="hueso" style="width:60px;height:14px"></div></td>
               <td></td>
             </tr>
           ))}
@@ -113,12 +113,12 @@ const base = import.meta.env.BASE_URL;
     return `
       <tr data-slug="${escapar(p.slug)}" tabindex="0">
         <td class="col-foto"><div class="miniatura">${foto}</div></td>
-        <td class="celda-nombre"><b>${escapar(p.nombre)}</b><span>${escapar(p.tipo)}${p.nuevo ? ' · <span class="estado estado--nuevo" style="height:18px;padding:0 7px;font-size:11px">Nuevo</span>' : ""}</span></td>
+        <td class="celda-nombre"><b>${escapar(p.nombre)}${p.nuevo ? ' <span class="etiqueta-nuevo">Nuevo</span>' : ""}</b><span>${escapar(p.tipo)}</span></td>
         <td class="col-oculta-movil">${escapar(nombreCat(p.cat))}</td>
-        <td class="col-oculta-movil"><span style="display:inline-flex;gap:4px">${colores}</span></td>
+        <td class="col-oculta-movil"><span class="puntos-color">${colores}</span></td>
         <td class="col-oculta-movil">${escapar(nombreEntrega(p.entrega))}</td>
-        <td><span class="estado estado--${escapar(p.estado || "borrador")}">${p.estado === "publicada" ? "Publicada" : "Borrador"}</span></td>
-        <td class="col-oculta-movil t-mini">${escapar(fechaRelativa(p.actualizado))}</td>
+        <td class="celda-datos"><span class="estado estado--${escapar(p.estado || "borrador")}">${p.estado === "publicada" ? "Publicada" : "Borrador"}</span><span class="solo-movil t-mini">${escapar(nombreCat(p.cat))}</span></td>
+        <td class="col-oculta-movil col-ancha t-mini">${escapar(fechaRelativa(p.actualizado))}</td>
         <td class="col-acciones">
           <div class="desplegable menu-fila" data-desplegable>
             <button class="boton boton--chico boton--icono boton--texto" type="button" aria-label="Más acciones" aria-haspopup="menu" aria-expanded="false" data-desplegable-boton>

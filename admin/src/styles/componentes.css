@@ -230,12 +230,6 @@ a.renglon:focus-visible{outline-offset:-3px;}
   .pub-cabeza{grid-template-columns:1fr;padding:22px 18px 18px;}
   .pub-acciones{justify-content:stretch;}
   .tarjeta-pie .boton{flex:1;height:48px;}
-  /* el pie de los formularios: estado arriba, dos acciones a todo el ancho */
-  .pie-fijo{flex-wrap:wrap;gap:10px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));}
-  .pie-fijo-estado{flex:1 1 100%;margin:0;}
-  .pie-fijo [data-cancelar]{display:none;}
-  .pie-fijo .boton{flex:1;height:48px;}
-
   /* el camino se apila: cada paso en su renglón, unidos por la línea */
   .ruta{grid-template-columns:1fr;gap:0;margin:0 18px;padding:14px 0 16px;}
   .ruta-linea{width:2px;height:16px;margin-left:13px;}
@@ -256,7 +250,27 @@ a.renglon:focus-visible{outline-offset:-3px;}
   .herramientas select.control{flex:1 1 100%;max-width:none;width:100%;}
   .herramientas .segmentos{width:100%;}
   .herramientas .segmento{flex:1;height:38px;}
-  .tabla td{padding-block:14px;}
+  /* la tabla se vuelve lista de tarjetas: foto, nombre y tipo, estado y
+     menú; lo demás (categoría, acabados, fecha) cabe en el renglón de abajo */
+  .tabla thead{display:none;}
+  .tabla,.tabla tbody{display:block;}
+  .tabla tbody tr{
+    display:grid;grid-template-columns:64px minmax(0,1fr) auto;
+    grid-template-areas:"foto nombre menu" "foto datos datos";
+    column-gap:14px;row-gap:6px;align-items:center;
+    padding:16px 18px;border-bottom:1px solid var(--borde);
+  }
+  .tabla tbody tr:last-child{border-bottom:0;}
+  .tabla td{display:block;padding:0;border:0;}
+  .tabla td:first-child{padding-left:0;}
+  .tabla .col-foto{grid-area:foto;width:auto;align-self:start;}
+  .tabla .miniatura{width:64px;height:64px;}
+  .tabla .celda-nombre{grid-area:nombre;}
+  .tabla .col-acciones{grid-area:menu;width:auto;padding:0;}
+  .tabla .celda-datos{grid-area:datos;display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;}
+  .tabla .col-oculta-movil{display:none;}
+  .tabla .solo-movil{display:inline-flex;}
+  .tabla tbody tr[aria-hidden]{display:none;}
 
   /* 4. modales como hoja */
   dialog.modal,dialog.modal--ancho{
