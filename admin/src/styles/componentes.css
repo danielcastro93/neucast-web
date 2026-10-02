@@ -8,8 +8,8 @@
 /* ---------- Saludo ---------- */
 .saludo{
   display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;
-  column-gap:var(--space-5);row-gap:6px;
-  margin-bottom:var(--space-5);
+  column-gap:var(--space-5);row-gap:var(--esp-titulo-texto);
+  margin-bottom:var(--space-6);
 }
 .saludo-fecha{grid-column:1;font-size:var(--fs-xs);font-weight:600;color:var(--ink-40);letter-spacing:.01em;}
 .saludo .t-pantalla,.saludo .t-apoyo{grid-column:1;}
@@ -44,11 +44,11 @@
 .pub[data-estado="pendiente"] .pub-anillo{animation:vuelta 1.4s linear infinite;}
 @keyframes vuelta{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
 .pub[data-estado="pendiente"] .pub-anillo circle{opacity:1;}
-.pub-textos{display:flex;flex-direction:column;gap:4px;min-width:0;}
+.pub-textos{display:flex;flex-direction:column;gap:6px;min-width:0;}
 .pub-rotulo{font-size:var(--t-subtitulo);font-weight:600;color:var(--ok);}
 .pub[data-estado="pendiente"] .pub-rotulo{color:var(--olive-deep);}
 .pub-titulo{font-size:clamp(22px,2.2vw,var(--t-titulo-1));font-weight:700;letter-spacing:-.03em;line-height:1.15;}
-.pub-nota{margin-top:2px;font-size:var(--t-cuerpo);color:var(--etiqueta-2);line-height:1.5;}
+.pub-nota{margin-top:4px;font-size:var(--t-cuerpo);color:var(--etiqueta-2);line-height:1.5;}
 .pub-acciones{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;}
 
 /* el camino, en tres estaciones dentro de un panel gris */
@@ -121,10 +121,10 @@
 @media (hover:hover){.tira-celda:hover{background:#FBFBFA;}.tira-celda:hover dd{transform:translateX(2px);}}
 .tira dd{transition:transform .35s var(--resorte);}
 .tira-celda:focus-visible{outline-offset:-3px;}
-.tira dt{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:500;color:var(--ink-60);margin-bottom:10px;}
+.tira dt{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:500;color:var(--ink-60);margin-bottom:12px;}
 .tira dt svg{color:var(--ink-40);}
 .tira dd{margin:0;font-size:38px;font-weight:700;letter-spacing:-.04em;line-height:1.05;font-variant-numeric:tabular-nums;}
-.tira small{font-size:12px;color:var(--ink-40);}
+.tira small{margin-top:4px;font-size:12px;color:var(--ink-40);}
 .tira-celda--alerta dd{color:var(--alerta);}
 
 /* ---------- Cabecera de módulo y enlace ---------- */
@@ -147,14 +147,14 @@
 .lista-filas > li + li{border-top:1px solid var(--borde);}
 .renglon{
   display:flex;align-items:center;gap:16px;
-  padding:16px 26px;min-height:84px;
+  padding:var(--esp-renglon) 26px;min-height:88px;
   color:inherit;transition:background .2s var(--ease);
 }
 a.renglon:focus-visible{outline-offset:-3px;}
 @media (hover:hover){a.renglon:hover{background:rgba(29,29,27,.025);}a.renglon:hover .renglon-flecha{transform:translateX(3px);color:var(--ink);}}
 .lista-filas .miniatura{width:56px;height:56px;border-radius:14px;flex:none;}
 .miniatura-vacia{font-size:15px;font-weight:700;color:var(--ink-40);}
-.renglon-texto{flex:1;min-width:0;display:grid;gap:3px;}
+.renglon-texto{flex:1;min-width:0;display:grid;gap:5px;}
 .renglon-texto strong{font-size:15px;font-weight:600;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .renglon-texto small{font-size:13px;color:var(--ink-40);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .renglon-der{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:5px;}
@@ -271,8 +271,8 @@ a.renglon:focus-visible{outline-offset:-3px;}
   .tabla tbody tr{
     display:grid;grid-template-columns:64px minmax(0,1fr) auto;
     grid-template-areas:"foto nombre menu" "foto datos datos";
-    column-gap:14px;row-gap:6px;align-items:center;
-    padding:16px 18px;border-bottom:1px solid var(--borde);
+    column-gap:14px;row-gap:8px;align-items:center;
+    padding:var(--esp-renglon) 18px;border-bottom:1px solid var(--borde);
   }
   .tabla tbody tr:last-child{border-bottom:0;}
   .tabla td{display:block;padding:0;border:0;}

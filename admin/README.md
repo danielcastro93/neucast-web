@@ -86,6 +86,18 @@ principio de `src/styles/admin.css`:
 | `--material*` + `--desenfoque` | materials | Barras y menús translúcidos |
 | `--r-1` a `--r-5` | radios concéntricos | Lo de dentro siempre más chico que lo de fuera |
 
+**Ritmo de espaciado (regla base).** Nada se ve amontonado: de lo más
+pegado a lo más separado, siempre con estos tokens.
+
+| Token | Valor | Entre |
+| --- | --- | --- |
+| `--esp-titulo-texto` | 8 | un título y su bajada |
+| `--esp-etiqueta` | 12 | una etiqueta y su control; un control y su ayuda |
+| `--esp-nota-bloque` | 14 | una nota y el bloque que explica |
+| `--esp-chips` | 10 | chips, botones y opciones entre sí |
+| `--esp-campos` | 34 | un campo (o grupo de chips) y el siguiente |
+| `--esp-renglon` | 20 | arriba y abajo de cada renglón de tabla o lista |
+
 Campos rellenos sin contorno, botones en píldora, separadores finísimos y
 movimiento con resorte (`--resorte`) para todo lo que se presiona. Las
 reglas de teléfono están en `src/styles/componentes.css`.

@@ -34,6 +34,15 @@
   --material:rgba(255,255,255,.72);
   --material-fino:rgba(244,244,242,.72);
   --desenfoque:saturate(180%) blur(20px);
+  /* Ritmo de espaciado: la regla base para que nada se vea amontonado.
+     Siempre de lo más pegado (lo que se lee junto) a lo más separado
+     (bloques distintos). */
+  --esp-titulo-texto:8px;   /* un título y su bajada */
+  --esp-etiqueta:12px;      /* una etiqueta y su control; un control y su ayuda */
+  --esp-nota-bloque:14px;   /* una nota y el bloque que explica */
+  --esp-chips:10px;         /* entre chips, botones y opciones */
+  --esp-campos:34px;        /* entre un campo (o grupo de chips) y el siguiente */
+  --esp-renglon:20px;       /* arriba y abajo de cada renglón de tabla o lista */
 }
 
 :root{
@@ -150,8 +159,8 @@ body.no-scroll{position:fixed;width:100%;overflow:hidden;}
 /* ---------- Contenido ---------- */
 .contenido{flex:1;padding:var(--space-5) var(--space-6) var(--space-8);max-width:1320px;width:100%;}
 .contenido--angosto{max-width:980px;}
-.cabecera{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-5);margin-bottom:var(--space-5);flex-wrap:wrap;}
-.cabecera-textos{display:flex;flex-direction:column;gap:6px;min-width:0;}
+.cabecera{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-5);margin-bottom:var(--space-6);flex-wrap:wrap;}
+.cabecera-textos{display:flex;flex-direction:column;gap:var(--esp-titulo-texto);min-width:0;}
 .cabecera-acciones{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
 
 /* entrada suave de cada pantalla */
@@ -168,7 +177,7 @@ body.no-scroll{position:fixed;width:100%;overflow:hidden;}
   background:var(--tarjeta);border:0;border-radius:var(--radio);
   box-shadow:var(--sombra-1);
 }
-.tarjeta-cabeza{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 26px;border-bottom:1px solid var(--borde);}
+.tarjeta-cabeza{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:24px 26px;border-bottom:1px solid var(--borde);}
 .tarjeta-cuerpo{padding:26px;}
 .tarjeta-pie{padding:18px 26px;border-top:1px solid var(--borde);display:flex;align-items:center;gap:10px;justify-content:flex-end;}
 
@@ -222,7 +231,7 @@ body.no-scroll{position:fixed;width:100%;overflow:hidden;}
 /* ============================================
    Formularios
    ============================================ */
-.campo{display:flex;flex-direction:column;gap:8px;min-width:0;}
+.campo{display:flex;flex-direction:column;gap:var(--esp-etiqueta);min-width:0;}
 .campo-etiqueta{display:flex;align-items:baseline;justify-content:space-between;gap:12px;}
 .campo-etiqueta label,.campo-etiqueta .etiqueta{font-size:13.5px;font-weight:600;color:var(--ink);letter-spacing:-.005em;}
 .campo-etiqueta .obligatorio{color:var(--olive);margin-left:3px;}
@@ -258,7 +267,7 @@ select.control{
 .control--con-icono > svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--ink-40);pointer-events:none;}
 
 /* opciones de una lista cerrada: chips que se marcan */
-.chips{display:flex;flex-wrap:wrap;gap:8px;}
+.chips{display:flex;flex-wrap:wrap;gap:var(--esp-chips);}
 .chip{
   position:relative;display:inline-flex;align-items:center;gap:8px;
   height:38px;padding:0 16px;border-radius:999px;
@@ -313,7 +322,9 @@ select.control{
 .segmento[aria-pressed="true"]{background:var(--white);color:var(--ink);box-shadow:0 3px 8px rgba(0,0,0,.08),0 1px 1px rgba(0,0,0,.04);}
 .herramientas-derecha{margin-left:auto;display:flex;align-items:center;gap:10px;}
 
-.tabla-envoltura{overflow-x:auto;}
+/* sin desplazamiento propio: los menús ocultos de cada renglón lo volvían
+   desplazable y aparecía una barra vertical junto a la tabla */
+.tabla-envoltura{overflow:visible;}
 .tabla{width:100%;border-collapse:collapse;font-size:var(--fs-sm);}
 .tabla th{
   padding:14px 16px;text-align:left;white-space:nowrap;
@@ -326,7 +337,7 @@ select.control{
 .tabla th[aria-sort] button svg{opacity:1;}
 .tabla th[aria-sort="descending"] button svg{transform:rotate(180deg);}
 @media (hover:hover){.tabla th button:hover{color:var(--ink);}.tabla th button:hover svg{opacity:.5;}}
-.tabla td{padding:18px 16px;border-bottom:1px solid var(--borde);vertical-align:middle;}
+.tabla td{padding:var(--esp-renglon) 16px;border-bottom:1px solid var(--borde);vertical-align:middle;}
 .tabla td:first-child{padding-left:22px;}
 .tabla tbody tr{transition:background .2s var(--ease);cursor:pointer;}
 @media (hover:hover){.tabla tbody tr:hover{background:rgba(29,29,27,.025);}}
@@ -353,7 +364,7 @@ select.control{
 .solo-movil{display:none;}
 /* con la barra ancha, la fecha no cabe: es lo menos necesario para decidir */
 @media (max-width:1320px){.tabla .col-ancha{display:none;}}
-.celda-nombre span{display:block;font-size:13px;color:var(--ink-40);margin-top:2px;}
+.celda-nombre span{display:block;font-size:13px;color:var(--ink-40);margin-top:4px;}
 .tabla-pie{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 24px;border-top:1px solid var(--borde);font-size:13px;color:var(--ink-40);}
 
 /* etiquetas de estado */
@@ -418,7 +429,7 @@ dialog.modal.modal--cerrando::backdrop{animation:veloSale .24s var(--ease-salida
 }
 .modal-cabeza{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:30px 30px 0;}
 .modal-titulo{font-size:var(--t-titulo-2);font-weight:700;letter-spacing:-.025em;line-height:1.2;}
-.modal-texto{margin-top:8px;color:var(--ink-60);font-size:15px;line-height:1.55;}
+.modal-texto{margin-top:10px;color:var(--ink-60);font-size:15px;line-height:1.55;}
 .modal-texto:empty{display:none;}
 .modal-x{
   flex:none;width:32px;height:32px;margin:-4px -4px 0 0;border-radius:50%;
@@ -427,7 +438,7 @@ dialog.modal.modal--cerrando::backdrop{animation:veloSale .24s var(--ease-salida
 }
 .modal-x svg{width:16px;height:16px;}
 @media (hover:hover){.modal-x:hover{background:var(--relleno-2);color:var(--ink);}}
-.modal-cuerpo{padding:22px 30px 6px;display:flex;flex-direction:column;gap:var(--space-4);overflow-y:auto;max-height:calc(88vh - 180px);}
+.modal-cuerpo{padding:24px 30px 6px;display:flex;flex-direction:column;gap:22px;overflow-y:auto;max-height:calc(88vh - 180px);}
 .modal-pie{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:22px 30px 30px;}
 .modal-pie .izquierda{margin-right:auto;}
 
