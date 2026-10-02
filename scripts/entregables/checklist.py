@@ -34,6 +34,7 @@ FILAS = [
     ("Contenido", "Fotos de producto con fondo transparente (PNG o WebP)", "Las fotos van sobre un fondo gris; con el fondo blanco pegado se vería un cuadro.", "Gabriela"),
     ("Contenido", "Fotos de espacios instalados, por categoría", "Proyectos y bloques de ambiente. Hoy son fotos de muestra.", "Gabriela"),
     ("Contenido", "Fotos de home office con piezas de Neucast", "La sección de home office usa fotos de muestra mientras no haya propias.", "Gabriela"),
+    ("Contenido", "Lista definitiva de categorías de muebles", "Las ocho de hoy son de muestra. El cliente define cuáles vende; SEO valida nombres y direcciones.", "Gabriela y Mich"),
     ("Contenido", "Datos de cada pieza según la tabla de campos", "Nombre, tipo, categoría, foto, descripción, material, acabados, disponibilidad y tipo de uso son obligatorios; el resto según el tipo de mueble.", "Gabriela"),
     ("Contenido", "Catálogos propios por categoría, si los tienen (opcional)", "Si pasan un PDF propio, se descarga ese en lugar del generado.", "Gabriela"),
     ("Contenido", "Confirmar por escrito cuántas categorías y piezas van en la carga inicial", "Alcance acordado. La carga del resto del catálogo se cotiza aparte.", "Daniel y Gabriela"),
@@ -41,7 +42,7 @@ FILAS = [
     ("Decisiones", "¿Pueden enviar muestras de acabados?", "Si sí, se agrega una tarjeta de muestras antes del pie de página.", "Gabriela"),
     ("Decisiones", "¿Tienen modelos 3D o una foto por color de las piezas?", "Fase 2: ver la pieza en el espacio con la cámara y selector de acabados.", "Gabriela"),
     ("Accesos", "Acceso a Hostinger y al registro del dominio neucast.com.mx", "Para publicar el sitio y apuntar el dominio.", "Gabriela"),
-    ("Accesos", "Cuenta de Google de la empresa", "Para dar de alta Search Console y, si se decide, analítica.", "Gabriela y Mitch"),
+    ("Accesos", "Cuenta de Google de la empresa", "Para dar de alta Search Console y, si se decide, analítica.", "Gabriela y Mich"),
 ]
 
 wb = Workbook()
