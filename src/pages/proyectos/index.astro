@@ -1,4 +1,5 @@
 ---
+import Destacado from "../../components/Destacado.astro";
 import Base from "../../layouts/Base.astro";
 import Icon from "../../components/Icon.astro";
 import PageHero from "../../components/PageHero.astro";
@@ -29,12 +30,11 @@ const schema = {
   />
 
   <article class="py">
-    <div class="container">
-      <p class="py-intro display">
-        <span class="py-intro-a">Oficinas, cafeterías, recepciones y salas de juntas amuebladas en todo México.</span>
-        <span class="py-intro-b">Aquí está lo que pidió cada cliente, cómo se resolvió y qué piezas quedaron puestas.</span>
-      </p>
-    </div>
+    <Destacado
+      arriba="clamp(56px,8vw,112px)"
+      lineas={["Lo que pidió cada cliente", "y cómo lo resolvimos."]}
+    />
+
 
     <!-- ============ CUADRÍCULA ============ -->
     <div class="container">
@@ -67,16 +67,8 @@ const schema = {
   <style>
     /* sin relleno abajo: la separación con el footer la pone el footer */
     .py{padding-bottom:0;}
-    /* Entradilla de la página, no pie de la foto: en cuerpo chico y gris se
-       leía como el epígrafe de la imagen de arriba. */
-    .py-intro{
-      margin:clamp(30px,4vw,48px) 0 clamp(68px,9vw,124px);
-      font-size:var(--fs-h4);letter-spacing:-.005em;text-wrap:pretty;
-    }
-    /* Cada frase en su renglón: partida a la mitad se leía como un tropiezo. */
-    .py-intro span{display:block;}
-    .py-intro-b{color:var(--ink-40);}
-    @media (min-width:760px){.py-intro{max-width:88ch;}}
+    /* aire entre la frase destacada y la cuadrícula */
+    .py-grid,.py-vacio{margin-top:clamp(68px,9vw,124px);}
 
     .py-vacio{color:var(--ink-40);font-size:var(--fs-body-lg);}
 

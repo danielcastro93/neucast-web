@@ -5,6 +5,7 @@
 // "home-office" en `espacios`. Sets, ideas y fotos viven en
 // src/data/homeOffice.js. Se llega desde el menú de Muebles, el home, el
 // buscador y el footer.
+import Destacado from "../components/Destacado.astro";
 import Base from "../layouts/Base.astro";
 import Icon from "../components/Icon.astro";
 import PageHero from "../components/PageHero.astro";
@@ -40,12 +41,10 @@ const waEquipo = waLink("Hola, quiero cotizar mobiliario de home office para mi 
     size="h1"
   />
 
-  <div class="container">
-    <p class="ho-intro display">
-      <span>Sillas, escritorios y almacenamiento con la misma calidad que ponemos en un piso corporativo.</span>
-      <span class="ho-intro-b">Arma tu espacio pieza por pieza o empieza con un set.</span>
-    </p>
-  </div>
+  <Destacado
+    arriba="clamp(56px,8vw,112px)"
+    lineas={["La calidad de un piso corporativo,", "en el rincón de tu casa."]}
+  />
 
   <!-- ============ SETS ============ -->
   {sets.length > 0 && (
@@ -162,13 +161,6 @@ const waEquipo = waLink("Hola, quiero cotizar mobiliario de home office para mi 
   />
 
   <style>
-    .ho-intro{
-      margin:clamp(30px,4vw,48px) 0 0;
-      font-size:var(--fs-h4);letter-spacing:-.005em;text-wrap:pretty;
-    }
-    .ho-intro span{display:block;}
-    .ho-intro-b{color:var(--ink-40);}
-    @media (min-width:760px){.ho-intro{max-width:880px;}}
 
     .ho-sec{margin-top:var(--section-y);}
 

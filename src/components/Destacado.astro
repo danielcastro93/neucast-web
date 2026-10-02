@@ -1,0 +1,49 @@
+---
+// Frase destacada: texto grande y centrado, la primera línea en tinta y las
+// siguientes en gris, que se pinta al entrar en pantalla.
+//
+// Nació en el detalle de proyecto ("Un comedor que solo sirve para comer /
+// está apagado veintidós horas al día") y salió a componente cuando Daniel la
+// quiso también en home office, proyectos y Nosotros. Centrada también en
+// teléfono, como en el proyecto: es una frase de pausa, no un párrafo de
+// lectura.
+//
+// lineas: arreglo de frases cortas; cada una va en su renglón.
+const { lineas = [], arriba = "var(--section-y)" } = Astro.props;
+---
+<section class="container dst" data-dst style={`--dst-arriba:${arriba}`}>
+  <p class="display">
+    {lineas.map((l, i) => (
+      <span class:list={["paint-line", { "dst-b": i > 0 }]} style={`--i:${i}`}>{l}</span>
+    ))}
+  </p>
+</section>
+
+<style>
+  .dst{margin-top:var(--dst-arriba);text-align:center;--play:paused;}
+  .dst p{
+    max-width:820px;margin-inline:auto;
+    font-size:clamp(28px,4.2vw,46px);line-height:var(--lh-heading);
+    letter-spacing:-.015em;text-wrap:balance;
+  }
+  .dst span{display:block;margin-inline:auto;}
+  /* el fantasma es la misma línea del sitio, para que en claro no se lea
+     como texto apagado */
+  .dst .paint-line{--paint-fill:var(--ink);--paint-ghost:var(--line);}
+  .dst .dst-b{--paint-fill:var(--ink-40);color:var(--ink-40);}
+  .dst.pintando{--play:running;}
+</style>
+
+<script>
+  // Se pinta al entrar en pantalla, con el mismo --play que el hero del home.
+  const io = new IntersectionObserver(
+    (entradas) =>
+      entradas.forEach((e) => {
+        if (!e.isIntersecting) return;
+        e.target.classList.add("pintando");
+        io.unobserve(e.target);
+      }),
+    { threshold: 0.4 }
+  );
+  document.querySelectorAll("[data-dst]").forEach((d) => io.observe(d));
+</script>

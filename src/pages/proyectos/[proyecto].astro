@@ -1,4 +1,5 @@
 ---
+import Destacado from "../../components/Destacado.astro";
 import Base from "../../layouts/Base.astro";
 import EscenasCarrusel from "../../components/EscenasCarrusel.astro";
 import VisorGaleria from "../../components/VisorGaleria.astro";
@@ -126,13 +127,7 @@ const waMensaje = `Hola, vi el proyecto de ${proyecto.espacio.toLowerCase()} en 
           )}
 
           {b.tipo === "destacado" && (
-            <section class="container pr-destacado" data-pinta>
-              <p class="display">
-                {(Array.isArray(b.texto) ? b.texto : [b.texto]).map((l, i) => (
-                  <span class:list={["paint-line", { "pr-destacado-b": i > 0 }]} style={`--i:${i}`}>{l}</span>
-                ))}
-              </p>
-            </section>
+            <Destacado lineas={Array.isArray(b.texto) ? b.texto : [b.texto]} />
           )}
 
           {b.tipo === "imagen" && (
@@ -396,19 +391,7 @@ const waMensaje = `Hola, vi el proyecto de ${proyecto.espacio.toLowerCase()} en 
     /* ---------- destacado ----------
        Centrado y a dos tonos, como la entradilla del listado: es la frase que
        corta el relato, no un párrafo más. */
-    .pr-destacado{margin-top:var(--section-y);text-align:center;}
-    .pr-destacado p{
-      max-width:22ch;margin-inline:auto;
-      font-size:clamp(28px,4.2vw,46px);line-height:var(--lh-heading);
-      letter-spacing:-.015em;text-wrap:balance;
-    }
-    .pr-destacado span{display:block;margin-inline:auto;}
-    /* Se pinta al entrar en pantalla, como el hero del home. El fantasma es la
-       misma línea del sitio, para que en claro no se lea como texto apagado. */
-    .pr-destacado .paint-line{--paint-fill:var(--ink);--paint-ghost:var(--line);}
-    .pr-destacado .pr-destacado-b{--paint-fill:var(--ink-40);color:var(--ink-40);}
-    .pr-destacado{--play:paused;}
-    .pr-destacado.pintando{--play:running;}
+    /* la frase destacada vive en src/components/Destacado.astro */
 
     /* ---------- pares y escenas ---------- */
     .pr-duo{
@@ -469,18 +452,6 @@ const waMensaje = `Hola, vi el proyecto de ${proyecto.espacio.toLowerCase()} en 
   </style>
 
   <script>
-    // Los destacados se pintan al entrar en pantalla, con el mismo mecanismo de
-    // --play que el hero del home.
-    const ioPinta = new IntersectionObserver(
-      (entradas) =>
-        entradas.forEach((e) => {
-          if (!e.isIntersecting) return;
-          e.target.classList.add("pintando");
-          ioPinta.unobserve(e.target);
-        }),
-      { threshold: 0.4 }
-    );
-    document.querySelectorAll("[data-pinta]").forEach((d) => ioPinta.observe(d));
 
     // "Leer más" de la introducción. Misma animación de alto que el acordeón de
     // filtros, para que el sitio se mueva siempre igual.

@@ -1,4 +1,5 @@
 ---
+import Destacado from "../components/Destacado.astro";
 import Base from "../layouts/Base.astro";
 import Icon from "../components/Icon.astro";
 import WaButton from "../components/WaButton.astro";
@@ -110,6 +111,9 @@ const pilares = [
       </div>
     </div>
   </section>
+
+  <!-- ============ FRASE DESTACADA ============ -->
+  <Destacado lineas={["Un lugar bien amueblado", "cambia la forma en que se trabaja."]} />
 
   <!-- ============ LO QUE NOS DEFINE (video a un lado, texto al otro) ============ -->
   <section class="ns-define">
