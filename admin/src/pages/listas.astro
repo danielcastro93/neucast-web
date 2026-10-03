@@ -155,6 +155,7 @@ import "../styles/listas.css";
   import { abrirModal, cerrarModal, confirmar, avisar, escapar, ICONO_BASURA } from "../scripts/ui.js";
   import { limpiarSlug } from "../scripts/validar.js";
   import { idNuevo } from "../scripts/listas.js";
+  import { arrastrarFila } from "../scripts/ordenar.js";
 
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -315,10 +316,10 @@ import "../styles/listas.css";
 
       <div class="panel-bloque">
         <div class="opciones-cabeza">
-          <span class="grupo-rotulo">Opciones <span class="opciones-cuenta" data-cuenta></span></span>
+          <span class="grupo-rotulo">Opciones <span class="opciones-cuenta" data-total></span></span>
           ${l.opciones.length > 8 ? `<div class="control--con-icono opciones-buscar"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="9" cy="9" r="5.5"/><path d="M13.2 13.2 17 17"/></svg><input class="control" type="search" placeholder="Buscar en ${escapar(l.nombre.toLowerCase())}" value="${escapar(busqueda)}" data-buscar aria-label="Buscar opciones" /></div>` : ""}
         </div>
-        <ul class="grupo-lista opciones" data-opciones></ul>
+        <ul class="grupo-lista grupo-lista--ordenable opciones" data-opciones></ul>
         <button class="boton boton--suave mostrar-mas" type="button" data-mas hidden></button>
         <form class="agregar-opcion" data-agregar novalidate>
           ${l.color ? '<span class="agregar-color" style="background:#8A8A87"><input type="color" value="#8A8A87" data-color-nuevo aria-label="Color" /></span>' : ""}
@@ -346,12 +347,12 @@ import "../styles/listas.css";
     const l = laLista();
     const lista = filtradas(l);
     const visibles = lista.slice(0, mostradas);
-    $("[data-cuenta]").textContent = busqueda ? `· ${lista.length} de ${l.opciones.length}` : `· ${l.opciones.length}`;
+    $("[data-total]").textContent = busqueda ? `· ${lista.length} de ${l.opciones.length}` : `· ${l.opciones.length}`;
     $("[data-opciones]").innerHTML = visibles.length
       ? visibles.map(({ o, i }) => {
           const n = usanOpcion(l, o.id).length;
           return `<li class="fila-lista opcion-lista" data-i="${i}">
-            <span class="opcion-asa" data-asa ${busqueda ? 'hidden' : ""} aria-label="Arrastrar para ordenar" title="Arrastrar para ordenar"><svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><circle cx="7.5" cy="5.5" r="1.3"/><circle cx="12.5" cy="5.5" r="1.3"/><circle cx="7.5" cy="10" r="1.3"/><circle cx="12.5" cy="10" r="1.3"/><circle cx="7.5" cy="14.5" r="1.3"/><circle cx="12.5" cy="14.5" r="1.3"/></svg></span>
+            <span class="asa" data-asa ${busqueda ? 'hidden' : ""} aria-label="Arrastrar para ordenar" title="Arrastrar para ordenar"><svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><circle cx="7.5" cy="5.5" r="1.3"/><circle cx="12.5" cy="5.5" r="1.3"/><circle cx="7.5" cy="10" r="1.3"/><circle cx="12.5" cy="10" r="1.3"/><circle cx="7.5" cy="14.5" r="1.3"/><circle cx="12.5" cy="14.5" r="1.3"/></svg></span>
             ${l.color ? `<label class="opcion-color" style="background:${escapar(o.hex || "#ccc")}"><input type="color" value="${escapar(o.hex || "#cccccc")}" data-color aria-label="Color de ${escapar(o.nombre)}" /></label>` : ""}
             <input class="fila-lista-control fila-lista-control--izq" type="text" value="${escapar(o.nombre)}" data-nombre aria-label="Nombre de la opción" />
             <span class="opcion-uso${n ? "" : " opcion-uso--libre"}">${n ? `${n} ${n === 1 ? "pieza" : "piezas"}` : "sin usar"}</span>
@@ -498,55 +499,18 @@ import "../styles/listas.css";
     guardarListas(`Se quitó "${o.nombre}"`);
   }
 
-  // Ordenar arrastrando la asa, con ratón o con el dedo. La fila sigue al
-  // cursor y las demás se acomodan con animación. Se escucha en la ventana:
-  // mover la fila en el DOM le quita la captura del puntero.
+  // Ordenar arrastrando la asa (scripts/ordenar.js). Sin búsqueda la asa se
+  // ve y la tanda empieza en cero: los índices de la vista son los de la lista.
   function arrastrar(e, fila, l) {
-    if (e.button > 0) return;
-    e.preventDefault();
-    const caja = $("[data-opciones]");
-    const filas = () => $$(".opcion-lista", caja);
-    const desde = filas().indexOf(fila);
-    const y0 = e.clientY;
-    const base = fila.getBoundingClientRect().top;
-    fila.classList.add("arrastrando");
-    document.body.classList.add("ordenando");
-
-    // FLIP: las que cambian de lugar se deslizan en vez de saltar
-    const deslizar = (cambio) => {
-      const otras = filas().filter((f) => f !== fila);
-      const antes = new Map(otras.map((f) => [f, f.getBoundingClientRect().top]));
-      cambio();
-      otras.forEach((f) => {
-        const d = antes.get(f) - f.getBoundingClientRect().top;
-        if (!d) return;
-        f.animate([{ transform: `translateY(${d}px)` }, { transform: "none" }], { duration: 220, easing: "cubic-bezier(.2,.8,.2,1)" });
-      });
-    };
-    const mover = (ev) => {
-      const despues = filas().filter((f) => f !== fila).find((f) => ev.clientY < f.getBoundingClientRect().top + f.offsetHeight / 2) || null;
-      if (despues !== fila.nextElementSibling) deslizar(() => caja.insertBefore(fila, despues));
-      // la fila va pegada al dedo, aunque ya haya cambiado de lugar
-      const natural = fila.getBoundingClientRect().top - (parseFloat(fila.style.getPropertyValue("--dy")) || 0);
-      fila.style.setProperty("--dy", `${base + ev.clientY - y0 - natural}px`);
-    };
-    const soltar = () => {
-      removeEventListener("pointermove", mover);
-      removeEventListener("pointerup", soltar);
-      removeEventListener("pointercancel", soltar);
-      document.body.classList.remove("ordenando");
-      fila.style.removeProperty("--dy");
-      fila.classList.remove("arrastrando");
-      const hasta = filas().indexOf(fila);
-      if (hasta === desde) return;
-      const [o] = l.opciones.splice(desde, 1);
-      l.opciones.splice(hasta, 0, o);
-      pintarOpciones();
-      guardarListas("Orden guardado");
-    };
-    addEventListener("pointermove", mover);
-    addEventListener("pointerup", soltar);
-    addEventListener("pointercancel", soltar);
+    arrastrarFila(e, fila, {
+      selector: ".opcion-lista",
+      alSoltar: (desde, hasta) => {
+        const [o] = l.opciones.splice(desde, 1);
+        l.opciones.splice(hasta, 0, o);
+        pintarOpciones();
+        guardarListas("Orden guardado");
+      },
+    });
   }
 
   /* ============================================

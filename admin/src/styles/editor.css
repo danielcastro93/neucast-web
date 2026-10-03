@@ -475,3 +475,31 @@ body:has(.guardar) .avisos{bottom:96px;}
   .video-pieza-ficha{flex-wrap:wrap;}
   .video-pieza-ficha .boton{flex:1 1 100%;height:44px;}
 }
+
+/* ---------- Ficha técnica en tres bloques, como los paneles del sitio ---------- */
+.bloque-ficha{display:flex;flex-direction:column;gap:var(--esp-titulo-texto);margin-bottom:calc(var(--esp-etiqueta) * -1);}
+.bloque-ficha-titulo{margin:0;font-size:var(--t-titulo-3);font-weight:650;letter-spacing:-.01em;color:var(--etiqueta);}
+
+/* La leyenda del asterisco, bajo el título de la pieza */
+.leyenda-obligatorio{margin:var(--esp-titulo-texto) 0 0;font-size:var(--t-subtitulo);color:var(--etiqueta-3);}
+.leyenda-obligatorio .obligatorio{color:var(--olive);font-weight:700;}
+
+/* ---------- Filas que se ordenan arrastrando (scripts/ordenar.js) ---------- */
+.asa{
+  flex:none;width:30px;height:36px;display:grid;place-items:center;border-radius:8px;
+  color:var(--etiqueta-4);cursor:grab;touch-action:none;transition:color .15s,background .15s;
+}
+.asa:active{cursor:grabbing;}
+@media (hover:hover){.asa:hover{color:var(--etiqueta-2);background:var(--relleno);}}
+/* la fila levantada tiene que poder salir de la caja */
+.grupo-lista--ordenable{overflow:visible;}
+.grupo-lista--ordenable > .fila-lista:first-child{border-radius:var(--r-3) var(--r-3) 0 0;}
+.grupo-lista--ordenable > .fila-lista:last-child{border-radius:0 0 var(--r-3) var(--r-3);}
+.grupo-lista--ordenable > .fila-lista:only-child{border-radius:var(--r-3);}
+.grupo-lista--ordenable > .arrastrando{
+  position:relative;z-index:3;background:var(--white);border-radius:14px !important;
+  box-shadow:0 12px 32px rgba(0,0,0,.16),0 0 0 1px var(--borde) !important;
+  transform:translateY(var(--dy,0)) scale(1.02);transition:box-shadow .2s,transform 0s;
+}
+body.ordenando{cursor:grabbing;user-select:none;}
+body.ordenando *{cursor:grabbing !important;}

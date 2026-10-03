@@ -1,0 +1,229 @@
+---
+// Destacadas: las piezas del carrusel "Piezas destacadas" de la portada y su
+// orden. Qué piezas entran lo dice cada pieza (`destacada`, también desde su
+// editor); el orden se guarda aquí, en `ajustes.destacados`. Una pieza
+// marcada que no está en el orden sale al final. Se guarda solo.
+import Admin from "../layouts/Admin.astro";
+import IconoAdmin from "../components/IconoAdmin.astro";
+import Modal from "../components/Modal.astro";
+import "../styles/editor.css";
+---
+<Admin titulo="Destacadas" seccion="destacadas">
+  <div class="cabecera">
+    <div class="cabecera-textos">
+      <h1 class="t-pantalla">Destacadas</h1>
+      <p class="t-apoyo">Las piezas del carrusel "Piezas destacadas" de la portada, en el orden en que salen. Arrastra para acomodarlas.</p>
+    </div>
+    <div class="cabecera-acciones">
+      <button class="boton boton--primario" type="button" data-agregar><IconoAdmin name="mas" size={16} />Agregar piezas</button>
+    </div>
+  </div>
+
+  <section class="tarjeta destacadas">
+    <div class="destacadas-cabeza">
+      <span class="grupo-rotulo" data-total></span>
+      <span class="t-mini" data-aviso></span>
+    </div>
+    <ul class="grupo-lista grupo-lista--ordenable" data-lista></ul>
+    <div class="vacio" data-vacio hidden>
+      <IconoAdmin name="estrella" size={36} />
+      <b>Todavía no hay piezas destacadas</b>
+      <p>Mientras no haya, la portada no enseña el carrusel.</p>
+      <button class="boton boton--chico" type="button" data-agregar>Agregar piezas</button>
+    </div>
+  </section>
+
+  <Modal id="modal-agregar" titulo="Agregar a destacadas" texto="Se suman al final del carrusel; después las acomodas." ancho>
+    <div class="control--con-icono">
+      <IconoAdmin name="buscar" />
+      <input class="control" type="search" placeholder="Busca por nombre, tipo o categoría" data-buscar aria-label="Buscar piezas" />
+    </div>
+    <ul class="lista-filas lista-filas--compacta lista-filas--elegir" data-candidatas></ul>
+    <Fragment slot="pie">
+      <span class="izquierda t-mini" data-elegidas></span>
+      <button class="boton" type="button" data-cierra-modal>Cancelar</button>
+      <button class="boton boton--primario" type="button" data-sumar>Agregar</button>
+    </Fragment>
+  </Modal>
+</Admin>
+
+<script>
+  import { listar, guardar } from "../scripts/api.js";
+  import { medio } from "../scripts/medios.js";
+  import { abrirModal, cerrarModal, avisar, escapar } from "../scripts/ui.js";
+  import { arrastrarFila } from "../scripts/ordenar.js";
+
+  const $ = (s, el = document) => el.querySelector(s);
+  const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+  const base = import.meta.env.BASE_URL;
+  const sinAcentos = (t) => (t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  // con menos de cuatro el carrusel de la portada se ve a medias
+  const MINIMO = 4;
+
+  let piezas = [], categorias = [], ajustes = {};
+  let orden = []; // slugs de las destacadas, en orden
+  const nombreCat = (slug) => categorias.find((c) => c.slug === slug)?.name || slug;
+  const pieza = (slug) => piezas.find((p) => p.slug === slug);
+
+  function armarOrden() {
+    const marcadas = piezas.filter((p) => p.destacada).map((p) => p.slug);
+    const guardado = (ajustes.destacados || []).filter((s) => marcadas.includes(s));
+    orden = [...guardado, ...marcadas.filter((s) => !guardado.includes(s))];
+  }
+
+  function pintar() {
+    const caja = $("[data-lista]");
+    caja.innerHTML = orden
+      .map((slug, i) => {
+        const p = pieza(slug);
+        const borrador = p.estado !== "publicada";
+        return `<li class="fila-lista destacada" data-slug="${escapar(slug)}">
+          <span class="asa" data-asa aria-label="Arrastrar para ordenar" title="Arrastrar para ordenar"><svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><circle cx="7.5" cy="5.5" r="1.3"/><circle cx="12.5" cy="5.5" r="1.3"/><circle cx="7.5" cy="10" r="1.3"/><circle cx="12.5" cy="10" r="1.3"/><circle cx="7.5" cy="14.5" r="1.3"/><circle cx="12.5" cy="14.5" r="1.3"/></svg></span>
+          <span class="destacada-n">${i + 1}</span>
+          <span class="miniatura">${p.img?.[0] ? `<img src="${escapar(medio(p.img[0]))}" alt="" loading="lazy" draggable="false" />` : ""}</span>
+          <a class="destacada-texto" href="${base}piezas/editar/?slug=${encodeURIComponent(slug)}">
+            <strong>${escapar(p.nombre)}</strong>
+            <small>${escapar(p.tipo)} · ${escapar(nombreCat(p.cat))}</small>
+          </a>
+          ${borrador ? '<span class="estado estado--borrador" title="No sale en la portada hasta publicarla">Borrador</span>' : ""}
+          <button class="fila-lista-quitar destacada-quitar" type="button" data-quitar aria-label="Quitar ${escapar(p.nombre)} de destacadas" title="Quitar de destacadas"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 10h10"/></svg></button>
+        </li>`;
+      })
+      .join("");
+    $("[data-vacio]").hidden = orden.length > 0;
+    caja.hidden = !orden.length;
+    const publicadas = orden.filter((s) => pieza(s).estado === "publicada").length;
+    $("[data-total]").textContent = orden.length ? `${orden.length} ${orden.length === 1 ? "pieza" : "piezas"}` : "";
+    $("[data-aviso]").textContent = orden.length && publicadas < MINIMO
+      ? `Con ${publicadas} publicada${publicadas === 1 ? "" : "s"} el carrusel se ve a medias: conviene tener al menos ${MINIMO}.`
+      : "";
+
+    $$(".destacada", caja).forEach((fila) => {
+      $("[data-asa]", fila).addEventListener("pointerdown", (e) =>
+        arrastrarFila(e, fila, {
+          selector: ".destacada",
+          alSoltar: (desde, hasta) => {
+            const [s] = orden.splice(desde, 1);
+            orden.splice(hasta, 0, s);
+            pintar();
+            guardarOrden("Orden guardado");
+          },
+        })
+      );
+      $("[data-quitar]", fila).addEventListener("click", () => marcar([fila.dataset.slug], false));
+    });
+  }
+
+  /* ---------- Guardar ---------- */
+  let cola = Promise.resolve();
+  function guardarOrden(mensaje) {
+    cola = cola.then(async () => {
+      try {
+        ajustes = { ...ajustes, destacados: [...orden] };
+        await guardar("ajustes", ajustes);
+        dispatchEvent(new CustomEvent("neucast:guardado"));
+        if (mensaje) avisar(mensaje);
+      } catch (e) {
+        avisar(e.message || "No se pudo guardar", { tipo: "error" });
+      }
+    });
+    return cola;
+  }
+
+  // Entrar o salir de destacadas se guarda en la pieza; el orden, aquí.
+  async function marcar(slugs, valor) {
+    const fallidas = [];
+    for (const slug of slugs) {
+      const p = pieza(slug);
+      try {
+        const nueva = await guardar("piezas", { ...p, _original: p.slug, destacada: valor });
+        Object.assign(p, nueva);
+      } catch (e) {
+        fallidas.push(p.nombre);
+      }
+    }
+    const hechas = slugs.length - fallidas.length;
+    if (valor) orden.push(...slugs.filter((s) => pieza(s).destacada && !orden.includes(s)));
+    else orden = orden.filter((s) => pieza(s).destacada);
+    pintar();
+    await guardarOrden();
+    if (fallidas.length) avisar(`No se pudo cambiar: ${fallidas.join(", ")}. Revisa que tengan sus datos completos.`, { tipo: "error" });
+    else if (hechas) avisar(valor ? (hechas === 1 ? "Se agregó a destacadas" : `Se agregaron ${hechas} piezas`) : "Se quitó de destacadas");
+    dispatchEvent(new CustomEvent("neucast:guardado"));
+  }
+
+  /* ---------- Agregar ---------- */
+  let elegidas = [];
+  function pintarCandidatas() {
+    const t = sinAcentos($("[data-buscar]").value.trim());
+    const lista = piezas
+      .filter((p) => !p.destacada)
+      .filter((p) => !t || sinAcentos(`${p.nombre} ${p.tipo} ${nombreCat(p.cat)}`).includes(t))
+      .sort((a, b) => Number(b.estado === "publicada") - Number(a.estado === "publicada") || a.nombre.localeCompare(b.nombre, "es"));
+    $("[data-candidatas]").innerHTML = lista
+      .map((p) => {
+        const n = elegidas.indexOf(p.slug);
+        return `<li><label class="renglon renglon--elegir">
+          <input type="checkbox" value="${escapar(p.slug)}" ${n >= 0 ? "checked" : ""} />
+          <span class="elegir-marca" aria-hidden="true">${n >= 0 ? n + 1 : ""}</span>
+          <span class="miniatura">${p.img?.[0] ? `<img src="${escapar(medio(p.img[0]))}" alt="" loading="lazy" />` : ""}</span>
+          <span class="renglon-texto"><strong>${escapar(p.nombre)}</strong><small>${escapar(p.tipo)} · ${escapar(nombreCat(p.cat))}${p.estado !== "publicada" ? " · Borrador" : ""}</small></span>
+        </label></li>`;
+      })
+      .join("") || `<li class="renglon-mas">${t ? "Ninguna pieza coincide." : "Todas las piezas ya están en destacadas."}</li>`;
+    $("[data-elegidas]").textContent = elegidas.length ? `${elegidas.length} ${elegidas.length === 1 ? "elegida" : "elegidas"}` : "";
+    $("[data-sumar]").disabled = !elegidas.length;
+    $$("[data-candidatas] input").forEach((inp) =>
+      inp.addEventListener("change", () => {
+        elegidas = inp.checked ? [...elegidas, inp.value] : elegidas.filter((s) => s !== inp.value);
+        pintarCandidatas();
+      })
+    );
+  }
+  $$("[data-agregar]").forEach((b) =>
+    b.addEventListener("click", () => {
+      elegidas = [];
+      $("[data-buscar]").value = "";
+      pintarCandidatas();
+      abrirModal("modal-agregar");
+    })
+  );
+  $("[data-buscar]").addEventListener("input", pintarCandidatas);
+  $("[data-sumar]").addEventListener("click", async () => {
+    const slugs = [...elegidas];
+    cerrarModal("modal-agregar");
+    await marcar(slugs, true);
+  });
+
+  async function cargar() {
+    [piezas, categorias, ajustes] = await Promise.all([listar("piezas"), listar("categorias"), listar("ajustes")]);
+    armarOrden();
+    pintar();
+  }
+  cargar().catch((e) => avisar(e.message || "No se pudieron cargar las destacadas", { tipo: "error" }));
+</script>
+
+<style>
+  .destacadas{padding:26px 28px 30px;display:flex;flex-direction:column;gap:14px;}
+  .destacadas-cabeza{display:flex;align-items:baseline;justify-content:space-between;gap:16px;}
+  .destacadas-cabeza .grupo-rotulo{margin:0 0 0 4px;}
+  .destacadas-cabeza .t-mini{text-align:right;}
+  .destacadas :global(.destacada){gap:14px;min-height:76px;padding:10px 14px 10px 8px;cursor:default;}
+  .destacadas :global(.destacada-n){
+    flex:none;width:24px;text-align:center;font-size:var(--t-subtitulo);font-weight:700;
+    color:var(--etiqueta-3);font-variant-numeric:tabular-nums;
+  }
+  .destacadas :global(.destacada .miniatura){width:56px;height:56px;border-radius:14px;flex:none;}
+  .destacadas :global(.destacada-texto){flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;color:inherit;text-decoration:none;}
+  .destacadas :global(.destacada-texto strong){font-size:var(--t-cuerpo);font-weight:600;}
+  .destacadas :global(.destacada-texto small){font-size:var(--t-subtitulo);color:var(--etiqueta-3);}
+  @media (hover:hover){.destacadas :global(.destacada-texto:hover strong){text-decoration:underline;text-underline-offset:3px;}}
+  .destacadas :global(.destacada-quitar){opacity:1;}
+  @media (max-width:640px){
+    .destacadas{padding:20px 14px 22px;}
+    .destacadas-cabeza{flex-direction:column;align-items:flex-start;gap:6px;}
+    .destacadas-cabeza .t-mini{text-align:left;}
+    .destacadas :global(.destacada){gap:10px;padding:10px 10px 10px 4px;}
+    .destacadas :global(.destacada .miniatura){width:48px;height:48px;}
+  }
+</style>

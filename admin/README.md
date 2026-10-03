@@ -25,6 +25,7 @@ admin/
 │   │   ├── index.astro        entrar
 │   │   ├── inicio.astro       estado del sitio y accesos rápidos
 │   │   ├── piezas/            lista y edición de piezas
+│   │   ├── destacadas.astro   las piezas del carrusel de la portada y su orden
 │   │   └── listas.astro       listas configurables, medidas y partes: crecen a cualquier tipo de mueble
 │   ├── components/            Modal, IconoAdmin
 │   ├── scripts/
@@ -36,6 +37,7 @@ admin/
 │   │   ├── esquemas/pieza.js  los campos fijos de una pieza y sus medidas de texto
 │   │   ├── listas.js          cómo se leen las listas: dónde aparecen y dónde son obligatorias
 │   │   ├── medios.js          de dónde se cargan las fotos
+│   │   ├── ordenar.js         ordenar filas arrastrando su asa
 │   │   └── ui.js              avisos, modales, fechas
 │   └── styles/admin.css       lo propio del administrador, encima de compartido/global.css
 ```

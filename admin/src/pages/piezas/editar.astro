@@ -28,6 +28,7 @@ const secciones = [
         <span class="cabecera-rotulo" data-cabecera-rotulo>Nueva pieza</span>
         <h1 class="t-pantalla" data-cabecera-titulo>Nueva pieza</h1>
         <p class="t-apoyo" data-cabecera-nota>Se guarda como borrador hasta que tenga todo lo obligatorio.</p>
+        <p class="leyenda-obligatorio"><span class="obligatorio">*</span> Obligatorio para publicar. Lo demás es opcional y solo sale si tiene dato.</p>
       </div>
       <div class="cabecera-acciones">
         <a class="boton" href="#" target="_blank" rel="noopener" data-ver-pruebas hidden><IconoAdmin name="externo" size={16} />Ver en pruebas</a>
@@ -45,7 +46,7 @@ const secciones = [
           </li>
         ))}
       </ol>
-      <div class="pasos-avance" title="Datos obligatorios capturados">
+      <div class="pasos-avance" title="Obligatorios capturados">
         <span class="pasos-avance-barra"><span data-avance-barra></span></span>
         <span class="pasos-avance-cuenta" data-avance-cuenta>0 de 11</span>
       </div>
@@ -191,35 +192,21 @@ const secciones = [
             </div>
           </div>
           <div class="seccion-cuerpo">
+            <div class="bloque-ficha">
+              <h3 class="bloque-ficha-titulo">Detalles del producto</h3>
+              <p class="t-mini">Lo que se lee al abrir “Detalles del producto” en la ficha. El párrafo sale además en grande debajo de la galería.</p>
+            </div>
             <div class="campo" data-campo="resumen">
               <div class="campo-etiqueta"><label for="resumen">Párrafo descriptivo<span class="obligatorio">*</span></label><span class="campo-contador" data-contador="resumen"></span></div>
               <textarea class="control" id="resumen" name="resumen" rows="4" placeholder="Ej. Respaldo de malla tensada de una pieza, pensada para la jornada completa. El soporte lumbar se ajusta en altura sin herramienta."></textarea>
               <p class="campo-ayuda">Sale en grande debajo de la galería, antes de la foto de ambiente: la primera frase en negro y el resto en gris. Escríbelo para quien amuebla un espacio de trabajo: uso y resistencia, no decoración ni plazos.</p>
               <p class="campo-error" data-error></p>
             </div>
-
             <div class="campo">
-              <div class="campo-etiqueta"><span class="etiqueta">Destacados</span><span class="etiqueta-nota">hasta 3 frases cortas</span></div>
+              <div class="campo-etiqueta"><span class="etiqueta">Funciones principales</span><span class="etiqueta-nota">hasta 3 frases cortas</span></div>
               <div class="grupo-lista" data-frases="destacados"></div>
-              <p class="campo-ayuda">Se leen en el panel "Detalles del producto". El primero entra en la descripción que sale en Google.</p>
+              <p class="campo-ayuda">La primera entra también en la descripción que sale en Google.</p>
             </div>
-
-            <div class="separador"></div>
-
-            <div class="campo">
-              <div class="campo-etiqueta"><span class="etiqueta">Medidas</span><span class="etiqueta-nota">con su unidad</span></div>
-              <div data-medidas></div>
-              <button class="enlace-chico enlace-chico--mas" type="button" data-mas-medidas hidden></button>
-            </div>
-
-            <div class="campo">
-              <div class="campo-etiqueta"><span class="etiqueta">Construcción</span><span class="etiqueta-nota">de qué está hecha cada parte</span></div>
-              <div class="grupo-lista grupo-lista--dos" data-partes></div>
-              <button class="enlace-chico enlace-chico--mas" type="button" data-mas-construccion hidden></button>
-            </div>
-
-            <div class="separador"></div>
-
             <div class="campo" data-bloque-mecanismo>
               <div class="campo-etiqueta"><span class="etiqueta">Mecanismo</span><span class="etiqueta-nota">solo sillas</span></div>
               <div class="grupo-lista">
@@ -231,11 +218,30 @@ const secciones = [
                 <div class="frases-en-lista" data-frases="ajustes"></div>
               </div>
             </div>
-
+            <div class="separador"></div>
+            <div class="bloque-ficha">
+              <h3 class="bloque-ficha-titulo">Dimensiones</h3>
+              <p class="t-mini">Lo que se lee al abrir “Dimensiones”, con el croquis.</p>
+            </div>
+            <div class="campo">
+              <div class="campo-etiqueta"><span class="etiqueta">Medidas</span><span class="etiqueta-nota">con su unidad</span></div>
+              <div data-medidas></div>
+              <button class="enlace-chico enlace-chico--mas" type="button" data-mas-medidas hidden></button>
+            </div>
+            <div class="separador"></div>
+            <div class="bloque-ficha">
+              <h3 class="bloque-ficha-titulo">Materiales y cuidados</h3>
+              <p class="t-mini">Lo que se lee al abrir “Materiales y cuidados”, junto con los acabados.</p>
+            </div>
+            <div class="campo">
+              <div class="campo-etiqueta"><span class="etiqueta">Construcción</span><span class="etiqueta-nota">de qué está hecha cada parte</span></div>
+              <div class="grupo-lista grupo-lista--dos" data-partes></div>
+              <button class="enlace-chico enlace-chico--mas" type="button" data-mas-construccion hidden></button>
+            </div>
             <div class="campo">
               <div class="campo-etiqueta"><span class="etiqueta">Cuidados</span></div>
               <div class="grupo-lista" data-frases="cuidados"></div>
-              <p class="campo-ayuda">Cómo se limpia y se mantiene. Se lee en el panel "Materiales y cuidados".</p>
+              <p class="campo-ayuda">Cómo se limpia y se mantiene.</p>
             </div>
           </div>
         </section>

@@ -151,8 +151,9 @@ los guarda y los entrega con la pieza:
 El sitio ya lee `alts`, `ambiente`, `video` y los nombres de `acabados`
 (panel "Materiales y cuidados"); sin ellos sale como hoy. `destacada`
 sustituye a la lista `destacados` de `site.js`: la API la arma con las
-piezas publicadas que tengan `destacada: true`, en el orden en que se
-marcaron (después tendrá su pantalla para ordenarlas).
+piezas publicadas que tengan `destacada: true`, en el orden de
+`ajustes.destacados` (slugs, se acomoda en la pantalla Destacadas); las
+marcadas que no estén en ese orden van al final.
 
 Los tres recuadros bajo la foto de ambiente (Entrega e instalación,
 Materiales, Cuidados) son **textos generales, iguales en todas las piezas y
