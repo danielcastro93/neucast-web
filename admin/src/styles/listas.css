@@ -142,3 +142,13 @@
   .fila-lista-valor{max-width:52%;}
   .panel-pie{flex-direction:column;align-items:stretch;text-align:center;}
 }
+
+/* ---------- Teléfono: listas agrupadas sobre el fondo, como Ajustes de iOS ---------- */
+@media (max-width:640px){
+  .listas-panel{background:none;box-shadow:none;border:0;padding:0;gap:28px;}
+  .listas-panel .panel-cabeza{flex-direction:row;align-items:flex-start;padding:0 4px;}
+  .listas-panel .panel-cabeza .boton-renombrar{flex:none;width:40px;height:40px;padding:0;border-radius:50%;justify-content:center;}
+  .listas-panel .panel-cabeza .boton-renombrar{background:var(--white);color:var(--etiqueta);box-shadow:0 0 0 1px var(--borde);}
+  .listas-panel .panel-cabeza .boton-renombrar .boton-texto{display:none;}
+  .pestanas-caja{margin-bottom:var(--space-4);}
+}

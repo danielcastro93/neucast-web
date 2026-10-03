@@ -6,6 +6,13 @@ import { medio } from "./medios.js";
 import { escapar, fechaRelativa } from "./ui.js";
 
 const QUE = { piezas: "Pieza", categorias: "Categoría", proyectos: "Proyecto", ajustes: "Ajustes", "home-office": "Home office", listas: "Listas" };
+// Los registros únicos (listas, ajustes) se anotan con el nombre de la
+// colección: aquí llevan un nombre para leerse y su ícono en vez de una letra.
+const UNICOS = {
+  listas: { nombre: "Listas de opciones", ruta: "listas/", icono: '<path d="M7 6h9M7 10h9M7 14h9"/><circle cx="4" cy="6" r=".6"/><circle cx="4" cy="10" r=".6"/><circle cx="4" cy="14" r=".6"/>' },
+  ajustes: { nombre: "Destacadas y ajustes", ruta: "destacadas/", icono: '<path d="m10 3 2.1 4.4 4.8.6-3.5 3.3.9 4.7L10 13.7 5.7 16l.9-4.7L3.1 8l4.8-.6L10 3Z"/>' },
+  "home-office": { nombre: "Home office", ruta: null, icono: '<path d="M4 10.5 10 5l6 5.5"/><path d="M5.5 9.5V16h9V9.5"/>' },
+};
 const base = import.meta.env.BASE_URL;
 
 export async function estado() {
@@ -18,15 +25,18 @@ export async function estado() {
 // Una fila de cambio: miniatura (si es pieza), qué es, nombre y cuándo.
 export function filaCambio(c, porSlug) {
   const pieza = c.coleccion === "piezas" ? porSlug.get(c.id) : null;
-  const foto = pieza?.img?.[0] ? `<img src="${escapar(medio(pieza.img[0]))}" alt="" loading="lazy" />` : "";
-  const nombre = escapar(c.nombre || c.id);
-  const enlace = pieza && !c.borrado ? `${base}piezas/editar/?slug=${encodeURIComponent(c.id)}` : null;
+  const unico = !pieza && (c.id === c.coleccion || !c.id) ? UNICOS[c.coleccion] : null;
+  const foto = pieza?.img?.[0]
+    ? `<img src="${escapar(medio(pieza.img[0]))}" alt="" loading="lazy" />`
+    : unico ? `<span class="miniatura-vacia"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${unico.icono}</svg></span>` : "";
+  const nombre = escapar(unico?.nombre || c.nombre || c.id);
+  const enlace = pieza && !c.borrado ? `${base}piezas/editar/?slug=${encodeURIComponent(c.id)}` : unico?.ruta ? `${base}${unico.ruta}` : null;
   const accion = c.borrado ? "Se borra" : "Cambió";
   const cuerpo = `
     <span class="miniatura">${foto || `<span class="miniatura-vacia">${escapar((QUE[c.coleccion] || "?")[0])}</span>`}</span>
     <span class="renglon-texto">
       <strong class="${c.borrado ? "tachado" : ""}">${nombre}</strong>
-      <small>${escapar(QUE[c.coleccion] || c.coleccion)} · ${accion.toLowerCase()} ${escapar(fechaRelativa(c.fecha))}</small>
+      <small>${unico ? "" : `${escapar(QUE[c.coleccion] || c.coleccion)} · `}${unico ? accion : accion.toLowerCase()} ${escapar(fechaRelativa(c.fecha))}</small>
     </span>`;
   return enlace
     ? `<li><a class="renglon" href="${enlace}">${cuerpo}<svg class="renglon-flecha" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7.5 5 5 5-5 5"/></svg></a></li>`

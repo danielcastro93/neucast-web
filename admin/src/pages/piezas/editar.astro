@@ -25,10 +25,9 @@ const secciones = [
   <form class="editor" novalidate data-form>
     <div class="cabecera">
       <div class="cabecera-textos">
-        <span class="cabecera-rotulo" data-cabecera-rotulo>Nueva pieza</span>
         <h1 class="t-pantalla" data-cabecera-titulo>Nueva pieza</h1>
-        <p class="t-apoyo" data-cabecera-nota>Se guarda como borrador hasta que tenga todo lo obligatorio.</p>
-        <p class="leyenda-obligatorio"><span class="obligatorio">*</span> Obligatorio para publicar. Lo demás es opcional y solo sale si tiene dato.</p>
+        <p class="t-apoyo" data-cabecera-nota>Se guarda como borrador hasta tener lo obligatorio (<span class="obligatorio">*</span>).</p>
+        <p class="leyenda-obligatorio" data-leyenda hidden><span class="obligatorio">*</span> Obligatorio para publicar</p>
       </div>
       <div class="cabecera-acciones">
         <a class="boton" href="#" target="_blank" rel="noopener" data-ver-pruebas hidden><IconoAdmin name="externo" size={16} />Ver en pruebas</a>
@@ -478,11 +477,10 @@ const secciones = [
      ============================================ */
   function pintar() {
     const nueva = !original;
-    $("[data-cabecera-rotulo]").textContent = nueva ? "Nueva pieza" : pieza.tipo || "Pieza";
     $("[data-cabecera-titulo]").textContent = nueva ? "Nueva pieza" : pieza.nombre;
-    $("[data-cabecera-nota]").textContent = nueva
-      ? "Se guarda como borrador hasta que tenga todo lo obligatorio."
-      : `${pieza.estado === "publicada" ? "Publicada" : "Borrador"} · cambiada ${fechaRelativa(pieza.actualizado)}`;
+    // en una pieza nueva la nota ya explica el asterisco; en una existente va aparte
+    if (!nueva) $("[data-cabecera-nota]").textContent = `${pieza.estado === "publicada" ? "Publicada" : "Borrador"} · cambiada ${fechaRelativa(pieza.actualizado)}`;
+    $("[data-leyenda]").hidden = nueva;
     $("[data-miga-actual]").textContent = nueva ? "Nueva pieza" : pieza.nombre;
     document.title = `${nueva ? "Nueva pieza" : pieza.nombre} · Administrador de Neucast`;
     const ver = $("[data-ver-pruebas]");

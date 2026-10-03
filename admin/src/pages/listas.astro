@@ -18,13 +18,13 @@ import "../styles/editor.css";
 import "../styles/listas.css";
 ---
 <Admin titulo="Listas" seccion="listas">
-  <div class="cabecera">
+  <div class="cabecera cabecera--compacta">
     <div class="cabecera-textos">
       <h1 class="t-pantalla">Listas</h1>
-      <p class="t-apoyo">Todo lo que se elige o se mide en una pieza. Lo que cambies aquí aparece en todas las piezas y sale a pruebas al momento.</p>
+      <p class="t-apoyo">Todo lo que se elige o se mide en una pieza.<span class="no-telefono"> Lo que cambies aquí aparece en todas las piezas y sale a pruebas al momento.</span></p>
     </div>
     <div class="cabecera-acciones">
-      <button class="boton boton--primario" type="button" data-nueva-lista><IconoAdmin name="mas" size={16} />Nueva lista</button>
+      <button class="boton boton--primario" type="button" data-nueva-lista aria-label="Nueva lista"><IconoAdmin name="mas" size={16} /><span class="boton-texto">Nueva lista</span></button>
     </div>
   </div>
 
@@ -278,7 +278,7 @@ import "../styles/listas.css";
           <h2 class="t-seccion">${escapar(l.nombre)}</h2>
           <p class="t-mini">${escapar(l.nota || (l.seleccion === "varias" ? "En cada pieza se pueden elegir varias." : "En cada pieza se elige una."))}</p>
         </div>
-        <button class="boton boton--suave" type="button" data-cfg-nombre><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 3.5a2.1 2.1 0 0 1 3 3L7 16l-4 1 1-4 9.5-9.5Z"/></svg>Cambiar el nombre</button>
+        <button class="boton boton--suave boton-renombrar" type="button" data-cfg-nombre aria-label="Cambiar el nombre"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 3.5a2.1 2.1 0 0 1 3 3L7 16l-4 1 1-4 9.5-9.5Z"/></svg><span class="boton-texto">Cambiar el nombre</span></button>
       </header>
 
       <div class="panel-bloque">
@@ -578,7 +578,7 @@ import "../styles/listas.css";
           <h2 class="t-seccion">Medidas</h2>
           <p class="t-mini">Lo que se mide en una pieza, con su unidad. Cada categoría pide las suyas; las demás quedan a la mano en "Más medidas".</p>
         </div>
-        <button class="boton boton--primario" type="button" data-nueva-medida><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg>Nueva medida</button>
+        <button class="boton boton--primario boton-renombrar" type="button" data-nueva-medida aria-label="Nueva medida"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg><span class="boton-texto">Nueva medida</span></button>
       </header>
       ${listas.gruposMedida.map((g) => {
         const ms = listas.medidas.filter((m) => m.grupo === g.id);
@@ -663,7 +663,7 @@ import "../styles/listas.css";
           <h2 class="t-seccion">Partes de construcción</h2>
           <p class="t-mini">De qué está hecha cada parte de la pieza. Cada categoría pide las suyas.</p>
         </div>
-        <button class="boton boton--primario" type="button" data-nueva-parte><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg>Nueva parte</button>
+        <button class="boton boton--primario boton-renombrar" type="button" data-nueva-parte aria-label="Nueva parte"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg><span class="boton-texto">Nueva parte</span></button>
       </header>
       <div class="panel-bloque">
         <ul class="grupo-lista">${listas.partes.map((p) => `

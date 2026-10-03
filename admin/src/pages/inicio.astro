@@ -8,19 +8,18 @@ import IconoAdmin from "../components/IconoAdmin.astro";
 const base = import.meta.env.BASE_URL;
 
 const cifras = [
-  { id: "publicadas", rotulo: "Piezas publicadas", icono: "piezas", ruta: "piezas/" },
+  { id: "publicadas", rotulo: "Publicadas", icono: "piezas", ruta: "piezas/" },
   { id: "borradores", rotulo: "Borradores", icono: "paginas", ruta: "piezas/?estado=borrador" },
   { id: "categorias", rotulo: "Categorías", icono: "categorias", ruta: "categorias/" },
   { id: "proyectos", rotulo: "Proyectos", icono: "proyectos", ruta: "proyectos/" },
 ];
 ---
 <Admin titulo="Inicio" seccion="inicio">
-  <header class="saludo">
-    <p class="saludo-fecha" data-fecha></p>
+  <header class="saludo saludo--compacto">
     <h1 class="t-pantalla" data-saludo>Hola</h1>
     <p class="t-apoyo" data-resumen>&nbsp;</p>
     <div class="saludo-acciones">
-      <a class="boton boton--primario" href={`${base}piezas/editar/`}><IconoAdmin name="mas" size={16} />Nueva pieza</a>
+      <a class="boton boton--primario" href={`${base}piezas/editar/`} aria-label="Nueva pieza"><IconoAdmin name="mas" size={16} /><span class="boton-texto">Nueva pieza</span></a>
     </div>
   </header>
 
@@ -33,7 +32,6 @@ const cifras = [
         <span class="pub-icono-listo"><IconoAdmin name="check" size={26} /></span>
       </div>
       <div class="pub-textos">
-        <span class="pub-rotulo" data-pub-rotulo>Publicación</span>
         <h2 class="pub-titulo" id="pub-titulo" data-pub-titulo><span class="hueso" style="display:inline-block;width:260px;height:26px"></span></h2>
         <p class="pub-nota" data-pub-nota></p>
       </div>
@@ -107,8 +105,6 @@ const cifras = [
   const hora = ahora.getHours();
   const saludo = hora < 12 ? "Buenos días" : hora < 19 ? "Buenas tardes" : "Buenas noches";
   $("[data-saludo]").textContent = `${saludo}, ${sesion?.nombre?.split(" ")[0] || ""}`.trim();
-  const fecha = new Intl.DateTimeFormat("es-MX", { weekday: "long", day: "numeric", month: "long" }).format(ahora);
-  $("[data-fecha]").textContent = fecha.charAt(0).toUpperCase() + fecha.slice(1);
   $("[data-ver-pruebas]").href = import.meta.env.PUBLIC_STG || "http://localhost:4321/";
 
   /* ---------- Cifras que cuentan hasta su valor ---------- */
@@ -138,7 +134,6 @@ const cifras = [
     const n = p.pendientes.length;
     const caja = $("[data-pub]");
     caja.dataset.estado = n ? "pendiente" : "aldia";
-    $("[data-pub-rotulo]").textContent = n ? "En pruebas, sin publicar" : "Sitio al día";
     $("[data-pub-titulo]").textContent = n
       ? `${n} ${n === 1 ? "cambio espera" : "cambios esperan"} tu visto bueno`
       : "Todo está publicado";
