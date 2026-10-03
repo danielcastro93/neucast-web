@@ -485,6 +485,7 @@ body:has(.guardar) .avisos{bottom:96px;}
 .leyenda-obligatorio .obligatorio{color:var(--olive);font-weight:700;}
 
 /* ---------- Filas que se ordenan arrastrando (scripts/ordenar.js) ---------- */
+.fila-ordenable{gap:12px;padding-left:8px;cursor:default;}
 .asa{
   flex:none;width:30px;height:36px;display:grid;place-items:center;border-radius:8px;
   color:var(--etiqueta-4);cursor:grab;touch-action:none;transition:color .15s,background .15s;

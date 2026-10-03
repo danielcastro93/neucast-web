@@ -155,7 +155,7 @@ import "../styles/listas.css";
   import { abrirModal, cerrarModal, confirmar, avisar, escapar, ICONO_BASURA } from "../scripts/ui.js";
   import { limpiarSlug } from "../scripts/validar.js";
   import { idNuevo } from "../scripts/listas.js";
-  import { arrastrarFila } from "../scripts/ordenar.js";
+  import { filaOrdenable, cablearOrdenables } from "../scripts/ordenar.js";
 
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -351,13 +351,14 @@ import "../styles/listas.css";
     $("[data-opciones]").innerHTML = visibles.length
       ? visibles.map(({ o, i }) => {
           const n = usanOpcion(l, o.id).length;
-          return `<li class="fila-lista opcion-lista" data-i="${i}">
-            <span class="asa" data-asa ${busqueda ? 'hidden' : ""} aria-label="Arrastrar para ordenar" title="Arrastrar para ordenar"><svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><circle cx="7.5" cy="5.5" r="1.3"/><circle cx="12.5" cy="5.5" r="1.3"/><circle cx="7.5" cy="10" r="1.3"/><circle cx="12.5" cy="10" r="1.3"/><circle cx="7.5" cy="14.5" r="1.3"/><circle cx="12.5" cy="14.5" r="1.3"/></svg></span>
-            ${l.color ? `<label class="opcion-color" style="background:${escapar(o.hex || "#ccc")}"><input type="color" value="${escapar(o.hex || "#cccccc")}" data-color aria-label="Color de ${escapar(o.nombre)}" /></label>` : ""}
+          return filaOrdenable({
+            datos: `data-i="${i}"`,
+            sinAsa: !!busqueda,
+            quitar: `Quitar ${o.nombre}`,
+            contenido: `${l.color ? `<label class="opcion-color" style="background:${escapar(o.hex || "#ccc")}"><input type="color" value="${escapar(o.hex || "#cccccc")}" data-color aria-label="Color de ${escapar(o.nombre)}" /></label>` : ""}
             <input class="fila-lista-control fila-lista-control--izq" type="text" value="${escapar(o.nombre)}" data-nombre aria-label="Nombre de la opción" />
-            <span class="opcion-uso${n ? "" : " opcion-uso--libre"}">${n ? `${n} ${n === 1 ? "pieza" : "piezas"}` : "sin usar"}</span>
-            <button class="fila-lista-quitar" type="button" data-quitar aria-label="Quitar ${escapar(o.nombre)}">${ICONO_BASURA(17)}</button>
-          </li>`;
+            <span class="opcion-uso${n ? "" : " opcion-uso--libre"}">${n ? `${n} ${n === 1 ? "pieza" : "piezas"}` : "sin usar"}</span>`,
+          });
         }).join("")
       : `<li class="fila-lista opciones-vacia">${busqueda ? "Ninguna opción coincide." : "Todavía no hay opciones. Agrega la primera abajo."}</li>`;
     const resto = lista.length - visibles.length;
@@ -454,7 +455,18 @@ import "../styles/listas.css";
 
   function cablearOpciones() {
     const l = laLista();
-    $$(".opcion-lista").forEach((fila) => {
+    // asa y bote: el componente de scripts/ordenar.js. Sin búsqueda la asa se
+    // ve y la tanda empieza en cero: los índices de la vista son los de la lista.
+    cablearOrdenables($("[data-opciones]"), {
+      alSoltar: (desde, hasta) => {
+        const [o] = l.opciones.splice(desde, 1);
+        l.opciones.splice(hasta, 0, o);
+        pintarOpciones();
+        guardarListas("Orden guardado");
+      },
+      alQuitar: (_, fila) => quitarOpcion(l, +fila.dataset.i),
+    });
+    $$(".fila-ordenable", $("[data-opciones]")).forEach((fila) => {
       const i = +fila.dataset.i;
       const nombre = $("[data-nombre]", fila);
       nombre.addEventListener("blur", () => {
@@ -479,8 +491,6 @@ import "../styles/listas.css";
         l.opciones[i].hex = color.value.toUpperCase();
         guardarListas(`Se cambió el color de ${l.opciones[i].nombre}`);
       });
-      $("[data-quitar]", fila).addEventListener("click", () => quitarOpcion(l, i));
-      $("[data-asa]", fila).addEventListener("pointerdown", (e) => arrastrar(e, fila, l));
     });
   }
 
@@ -499,19 +509,6 @@ import "../styles/listas.css";
     guardarListas(`Se quitó "${o.nombre}"`);
   }
 
-  // Ordenar arrastrando la asa (scripts/ordenar.js). Sin búsqueda la asa se
-  // ve y la tanda empieza en cero: los índices de la vista son los de la lista.
-  function arrastrar(e, fila, l) {
-    arrastrarFila(e, fila, {
-      selector: ".opcion-lista",
-      alSoltar: (desde, hasta) => {
-        const [o] = l.opciones.splice(desde, 1);
-        l.opciones.splice(hasta, 0, o);
-        pintarOpciones();
-        guardarListas("Orden guardado");
-      },
-    });
-  }
 
   /* ============================================
      Elegir categorías (para listas, medidas y partes)

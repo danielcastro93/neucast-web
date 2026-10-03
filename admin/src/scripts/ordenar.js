@@ -1,3 +1,27 @@
+// La fila que se ordena arrastrando: la misma en Listas, Destacadas y las que
+// vengan. Asa a la izquierda, el contenido de cada pantalla en medio y el bote
+// a la derecha. Va dentro de un <ul class="grupo-lista grupo-lista--ordenable">.
+import { escapar, ICONO_BASURA } from "./ui.js";
+
+const ASA = '<svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><circle cx="7.5" cy="5.5" r="1.3"/><circle cx="12.5" cy="5.5" r="1.3"/><circle cx="7.5" cy="10" r="1.3"/><circle cx="12.5" cy="10" r="1.3"/><circle cx="7.5" cy="14.5" r="1.3"/><circle cx="12.5" cy="14.5" r="1.3"/></svg>';
+
+export const filaOrdenable = ({ datos = "", contenido, quitar, sinAsa = false }) =>
+  `<li class="fila-lista fila-ordenable" ${datos}>
+    <span class="asa" data-asa ${sinAsa ? "hidden" : ""} aria-label="Arrastrar para ordenar" title="Arrastrar para ordenar">${ASA}</span>
+    ${contenido}
+    <button class="fila-lista-quitar" type="button" data-quitar aria-label="${escapar(quitar)}" title="${escapar(quitar)}">${ICONO_BASURA(17)}</button>
+  </li>`;
+
+// Cablea una caja de filas ordenables: arrastrar con la asa y el bote.
+export function cablearOrdenables(caja, { alSoltar, alQuitar }) {
+  caja.querySelectorAll(":scope > .fila-ordenable").forEach((fila, i) => {
+    fila.querySelector("[data-asa]").addEventListener("pointerdown", (e) =>
+      arrastrarFila(e, fila, { selector: ".fila-ordenable", alSoltar })
+    );
+    fila.querySelector("[data-quitar]").addEventListener("click", () => alQuitar(i, fila));
+  });
+}
+
 // Ordenar filas arrastrando su asa, con ratón o con el dedo. La fila se
 // levanta, sigue al cursor y las demás se acomodan con animación (FLIP).
 // Se escucha en la ventana: mover la fila en el DOM le quitaría la captura
