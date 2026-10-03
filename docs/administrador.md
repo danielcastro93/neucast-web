@@ -221,10 +221,10 @@ sin plazos**: no se administran por pieza.
 Los valores de `entrega` hoy son `inmediata`, `10dias` y `pedido`. La lista
 manda: se lee de `filtros` en `catalogo.js`.
 
-**La dirección (`slug`) de una pieza publicada no cambia.** No hay
-redirecciones: la API rechaza un guardado que cambie el `slug` de una pieza
-cuyo estado guardado es `publicada` (el administrador ya lo bloquea). Mientras
-es borrador, sí se puede cambiar.
+**La dirección (`slug`) de una pieza publicada se puede cambiar**, pero el
+enlace anterior deja de funcionar: no hay redirecciones (decisión del 2 de
+octubre de 2026; el administrador lo avisa). Si después se quieren, la API
+guarda el `slug` viejo y responde con una 301 a la nueva, como WordPress.
 
 **El panel de filtros enseña solo los grupos que tienen piezas** en la página
 que se ve (`Catalogo.astro`): una lista nueva para una categoría no aparece en
