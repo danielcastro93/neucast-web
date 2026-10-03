@@ -467,7 +467,9 @@ const secciones = [
   }
 
   function llenarSelectores() {
-    for (const c of categorias) $("#cat").insertAdjacentHTML("beforeend", `<option value="${escapar(c.slug)}">${escapar(c.name)}</option>`);
+    // una categoría en borrador se puede elegir para ir preparando piezas,
+    // pero la pieza no se publica hasta que la categoría salga
+    for (const c of categorias) $("#cat").insertAdjacentHTML("beforeend", `<option value="${escapar(c.slug)}">${escapar(c.name)}${c.estado === "borrador" ? " · borrador" : ""}</option>`);
     for (const m of opciones(listas, "material")) $("#material").insertAdjacentHTML("beforeend", `<option value="${escapar(m.id)}">${escapar(m.nombre)}</option>`);
     for (const o of opciones(listas, "entrega")) $("#entrega").insertAdjacentHTML("beforeend", `<option value="${escapar(o.id)}">${escapar(o.nombre)}</option>`);
     $("[data-chips='espacios']").innerHTML = listas.espacios
@@ -525,8 +527,9 @@ const secciones = [
     pintarMedidas();
     pintarConstruccion();
     pintarSugerenciasTipo();
-    const silla = /sillas|cafeterias/.test(form.cat.value);
-    $("[data-bloque-mecanismo]").hidden = !!form.cat.value && !silla && !form.mecanismo.value;
+    // el mecanismo lo pide la categoría (Categorías → "Sus piezas llevan mecanismo")
+    const conMecanismo = !!categorias.find((c) => c.slug === form.cat.value)?.mecanismo;
+    $("[data-bloque-mecanismo]").hidden = !!form.cat.value && !conMecanismo && !form.mecanismo.value;
   }
 
   // Los tipos que ya existen, como atajos debajo del campo. No es un
@@ -1146,7 +1149,7 @@ const secciones = [
   const CON_OBLIGATORIOS = new Set([...Object.values(SECCION_DE), "clasificacion"]);
   function actualizarIndice(erroresMostrados) {
     const datos = leer();
-    const todos = validarPieza(datos, listas);
+    const todos = validarPieza(datos, listas, categorias);
     const conError = new Set(Object.keys(erroresMostrados || {}).map(seccionDe));
     const incompletas = new Set(Object.keys(todos).map(seccionDe));
     $$("[data-indice]").forEach((a) => {
@@ -1386,7 +1389,7 @@ const secciones = [
     datos.ficha = limpiarFicha(datos.ficha);
     if (forzarEstado) datos.estado = forzarEstado;
     if (datos.estado !== "borrador") {
-      const errores = validarPieza(datos, listas);
+      const errores = validarPieza(datos, listas, categorias);
       if (Object.keys(errores).length) {
         mostrarErrores(errores);
         const n = Object.keys(errores).length;

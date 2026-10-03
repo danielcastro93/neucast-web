@@ -35,8 +35,14 @@ export function revisarMedida(campo, texto) {
 export const acabadosDe = (pieza) =>
   pieza.acabados?.length ? pieza.acabados : (pieza.colores || []).map((grupo) => ({ nombre: "", grupo }));
 
-export function validarPieza(pieza, listas) {
+export function validarPieza(pieza, listas, categorias = null) {
   const errores = {};
+  // una pieza publicada necesita una categoría que exista y esté publicada
+  if (categorias && pieza.cat && pieza.estado === "publicada") {
+    const c = categorias.find((x) => x.slug === pieza.cat);
+    if (!c) errores.cat = "Esa categoría ya no existe";
+    else if (c.estado === "borrador") errores.cat = `"${c.name}" está en borrador: publica primero la categoría`;
+  }
   const valor = (campo) =>
     campo === "resumen" ? pieza.ficha?.resumen
     : campo === "acabados" ? acabadosDe(pieza).filter((a) => a.grupo)

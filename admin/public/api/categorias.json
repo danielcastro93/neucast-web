@@ -10,6 +10,8 @@
     "intro": "Respaldo alto o con cabecera, soporte lumbar y mecanismos para la jornada completa.",
     "orden": 1,
     "estado": "publicada",
+    "mecanismo": true,
+    "catalogoPropio": "",
     "actualizado": "2026-10-01T10:00:00.000Z"
   },
   {
@@ -23,6 +25,8 @@
     "intro": "Ergonomía real y materiales que resisten la rotación diaria de un piso de trabajo.",
     "orden": 2,
     "estado": "publicada",
+    "mecanismo": true,
+    "catalogoPropio": "",
     "actualizado": "2026-10-01T10:00:00.000Z"
   },
   {
@@ -36,6 +40,8 @@
     "intro": "Medidas que se ajustan a la sala, no al revés, y acabados que envejecen bien.",
     "orden": 3,
     "estado": "publicada",
+    "mecanismo": false,
+    "catalogoPropio": "",
     "actualizado": "2026-10-01T10:00:00.000Z"
   },
   {
@@ -49,6 +55,8 @@
     "intro": "Rectos, en L o bench, con paso de cables resuelto y credenzas que combinan.",
     "orden": 4,
     "estado": "publicada",
+    "mecanismo": false,
+    "catalogoPropio": "",
     "actualizado": "2026-10-01T10:00:00.000Z"
   },
   {
@@ -62,6 +70,8 @@
     "intro": "Piezas apilables y superficies que aguantan la rotación y la limpieza diaria.",
     "orden": 5,
     "estado": "publicada",
+    "mecanismo": true,
+    "catalogoPropio": "",
     "actualizado": "2026-10-01T10:00:00.000Z"
   },
   {
@@ -75,6 +85,8 @@
     "intro": "Sofás de una a cuatro plazas, sillones y mesas de apoyo para esperar y conversar.",
     "orden": 6,
     "estado": "publicada",
+    "mecanismo": false,
+    "catalogoPropio": "",
     "actualizado": "2026-10-01T10:00:00.000Z"
   },
   {
@@ -88,6 +100,8 @@
     "intro": "Libreros, credenzas y archiveros modulares que combinan con tus escritorios.",
     "orden": 7,
     "estado": "publicada",
+    "mecanismo": false,
+    "catalogoPropio": "",
     "actualizado": "2026-10-01T10:00:00.000Z"
   },
   {
@@ -101,6 +115,8 @@
     "intro": "Materiales pensados para el sol y la lluvia, con el mismo diseño de adentro.",
     "orden": 8,
     "estado": "publicada",
+    "mecanismo": false,
+    "catalogoPropio": "",
     "actualizado": "2026-10-01T10:00:00.000Z"
   }
 ]

@@ -41,5 +41,6 @@ export const categoriaVacia = () => ({
   title: "",
   desc: "",
   catalogoPropio: "", // un PDF propio del cliente; vacío = el que genera el sitio
+  mecanismo: false,   // sus piezas llevan mecanismo (sillas): la ficha lo pide
   estado: "borrador",
 });

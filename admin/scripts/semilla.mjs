@@ -52,7 +52,8 @@ escribir(
 
 escribir(
   "categorias",
-  categories.map((c, i) => ({ ...c, orden: i + 1, estado: "publicada", actualizado: AYER }))
+  // mecanismo: en las categorías de sillas la ficha pide el mecanismo
+  categories.map((c, i) => ({ ...c, orden: i + 1, estado: "publicada", mecanismo: /sillas|cafeterias/.test(c.slug), catalogoPropio: "", actualizado: AYER }))
 );
 
 // Las listas, como datos con sus reglas. Es lo que antes estaba fijo en el

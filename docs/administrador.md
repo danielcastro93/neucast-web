@@ -107,12 +107,15 @@ trae, además de lo de hoy (`slug`, `name`, `photo`, `alt`, `h1`, `title`,
   orden: 3,                  // el de los menús, el inicio y el buscador
   estado: "publicada",       // "borrador" no sale en el sitio (ni en menús ni en el mapa)
   catalogoPropio: "",        // ruta de un PDF del cliente; vacío = el generado
+  mecanismo: true,           // sus piezas llevan mecanismo (sillas): la ficha lo pide
 }
 ```
 
 - Todo es obligatorio para publicarla; las medidas de texto están en
   `admin/src/scripts/esquemas/categoria.js` (título de 30 a 65, descripción
   de 100 a 160).
+- Una pieza **no se publica** si su categoría no existe o está en borrador
+  (la API lo valida igual que el administrador).
 - **Si cambia su `slug`**, la API mueve sus piezas (`cat`) y las referencias
   en `listas` (`categorias` y `obligatoria` de listas, medidas y partes) en la
   misma operación. **No se borra** una categoría con piezas; al borrarla se

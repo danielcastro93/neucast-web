@@ -32,7 +32,7 @@ async function cargar(coleccion) {
     // Un registro único guardado antes de que la semilla creciera (por ejemplo
     // ajustes sin los textos de "Todos los muebles"): lo que falte sale de la
     // semilla, un nivel hacia adentro.
-    if (local && !Array.isArray(datos) && datos && typeof datos === "object") datos = completar(await semilla(coleccion), datos);
+    if (local && datos && typeof datos === "object") datos = completar(await semilla(coleccion), datos, CON_ID[coleccion]);
   } catch {
     datos = await semilla(coleccion);
   }
@@ -41,7 +41,16 @@ async function cargar(coleccion) {
 }
 
 const esObjeto = (v) => v && typeof v === "object" && !Array.isArray(v);
-function completar(base, local) {
+function completar(base, local, llave) {
+  // una lista de registros: cada uno toma de la semilla los campos que no
+  // tenga (una categoría guardada antes de que existiera `mecanismo`)
+  if (Array.isArray(local)) {
+    if (!llave || !Array.isArray(base)) return local;
+    return local.map((r) => {
+      const b = base.find((x) => String(x[llave]) === String(r[llave]));
+      return b ? { ...b, ...r } : r;
+    });
+  }
   const r = { ...base, ...local };
   for (const k of Object.keys(base)) if (esObjeto(base[k]) && esObjeto(local[k])) r[k] = { ...base[k], ...local[k] };
   return r;
@@ -89,7 +98,7 @@ export async function guardar(coleccion, registro) {
   const nuevo = { ...registro, actualizado: new Date().toISOString() };
 
   if (coleccion === "piezas") {
-    const errores = validarPieza(nuevo, await cargar("listas"));
+    const errores = validarPieza(nuevo, await cargar("listas"), await cargar("categorias"));
     // Se puede guardar un borrador incompleto; lo que no se puede es
     // publicar algo con obligatorios vacíos.
     if (nuevo.estado !== "borrador" && Object.keys(errores).length) {

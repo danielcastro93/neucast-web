@@ -148,13 +148,21 @@ const base = import.meta.env.BASE_URL;
               <p class="campo-ayuda" data-cfg-sistema></p>
             </div>
             <div class="campo">
-              <div class="campo-etiqueta"><span class="etiqueta">Medidas</span></div>
-              <div class="chips chips--envolver" data-cfg-medidas></div>
-              <p class="campo-ayuda">Las marcadas salen a la vista; las demás quedan a la mano en "Más medidas". Las que dicen "todas" se piden en todas las categorías.</p>
+              <div class="campo-etiqueta"><span class="etiqueta">Medidas</span><span class="campo-contador" data-cfg-medidas-n></span></div>
+              <p class="campo-ayuda campo-ayuda--arriba">Las encendidas salen a la vista al capturar una pieza; las demás quedan a la mano en "Más medidas".</p>
+              <div class="cfg-grupos" data-cfg-medidas></div>
             </div>
             <div class="campo">
-              <div class="campo-etiqueta"><span class="etiqueta">Partes de construcción</span></div>
-              <div class="chips chips--envolver" data-cfg-partes></div>
+              <div class="campo-etiqueta"><span class="etiqueta">Partes de construcción</span><span class="campo-contador" data-cfg-partes-n></span></div>
+              <p class="campo-ayuda campo-ayuda--arriba">De qué está hecha cada parte. Las encendidas se piden en la ficha de sus piezas.</p>
+              <div class="cfg-grupos" data-cfg-partes></div>
+            </div>
+            <div class="campo">
+              <label class="interruptor">
+                <input type="checkbox" name="mecanismo" />
+                <span class="interruptor-pista"></span>
+                <span class="interruptor-texto">Sus piezas llevan mecanismo<small>Para sillas: el nombre del mecanismo y sus ajustes salen en la ficha</small></span>
+              </label>
             </div>
           </div>
         </section>
@@ -250,6 +258,7 @@ const base = import.meta.env.BASE_URL;
     $$("[data-n]").forEach((n, i) => (n.textContent = TODOS ? i + 1 : i + 2));
     for (const c of CAMPOS) if (form[c]) form[c].value = cat[c] || "";
     $$("input[name='estado']").forEach((i) => (i.checked = i.value === (cat.estado || "borrador")));
+    form.mecanismo.checked = !!cat.mecanismo;
     leerCfg();
     pintarTodo();
   }
@@ -395,17 +404,35 @@ const base = import.meta.env.BASE_URL;
     const frase = sistema.join(", ").replace(/, ([^,]*)$/, " y $1");
     $("[data-cfg-sistema]").textContent = `${frase.charAt(0).toUpperCase()}${frase.slice(1)} se piden siempre, en todas las categorías.`;
 
-    const chip = (tipo, x, enTodas, marcado) => `<label class="chip"><input type="checkbox" data-${tipo}="${escapar(x.id)}" ${marcado ? "checked" : ""} ${enTodas ? "disabled" : ""} />${escapar(x.nombre)}${enTodas ? ' <small class="chip-nota">todas</small>' : ""}</label>`;
-    $("[data-cfg-medidas]").innerHTML = listas.medidas.map((m) => chip("medida", m, !m.categorias, !m.categorias || cfg.medidas.has(m.id))).join("");
-    $("[data-cfg-partes]").innerHTML = listas.partes.map((p) => chip("parte", p, !p.categorias, !p.categorias || cfg.partes.has(p.id))).join("");
+    // Medidas por grupo y partes: una fila por cada una, con su interruptor.
+    // Las que se piden en todas las categorías van aparte, encendidas y sin
+    // interruptor, para que no se confundan con lo que aquí se decide.
+    const filaCfg = (tipo, x, marcado) => `<li class="fila-lista cfg-fila cfg-fila--una">
+        <span class="fila-lista-etiqueta">${escapar(x.nombre)}${x.unidad !== undefined ? `<small class="fila-lista-sub">${x.unidad ? escapar(x.unidad) : "cuenta"}${x.rango ? " · rango" : ""}</small>` : x.ejemplo ? `<small class="fila-lista-sub">Ej. ${escapar(x.ejemplo)}</small>` : ""}</span>
+        <label class="interruptor interruptor--solo"><input type="checkbox" role="switch" data-${tipo}="${escapar(x.id)}" ${marcado ? "checked" : ""} aria-label="Se pide ${escapar(x.nombre)}" /><span class="interruptor-pista"></span></label>
+      </li>`;
+    const bloqueCfg = (titulo, filas) => filas.length ? `<div class="cfg-bloque"><span class="grupo-rotulo">${escapar(titulo)}</span><ul class="grupo-lista">${filas}</ul></div>` : "";
+    const siempre = (xs) => xs.length ? `<p class="t-mini cfg-siempre">En todas las categorías: ${xs.map((x) => escapar(x.nombre)).join(", ")}.</p>` : "";
+
+    const medTodas = listas.medidas.filter((m) => !m.categorias);
+    const medElegir = listas.medidas.filter((m) => m.categorias);
+    $("[data-cfg-medidas]").innerHTML = siempre(medTodas) + listas.gruposMedida.map((g) =>
+      bloqueCfg(g.nombre, medElegir.filter((m) => m.grupo === g.id).map((m) => filaCfg("medida", m, cfg.medidas.has(m.id))).join(""))
+    ).join("");
+    const parTodas = listas.partes.filter((p) => !p.categorias);
+    const parElegir = listas.partes.filter((p) => p.categorias);
+    $("[data-cfg-partes]").innerHTML = siempre(parTodas) + bloqueCfg("Elige cuáles se piden", parElegir.map((p) => filaCfg("parte", p, cfg.partes.has(p.id))).join(""));
+    const cuenta = (el, n, total) => (el.textContent = `${n} de ${total}`);
+    cuenta($("[data-cfg-medidas-n]"), medTodas.length + [...cfg.medidas].filter((id) => medElegir.some((m) => m.id === id)).length, listas.medidas.length);
+    cuenta($("[data-cfg-partes-n]"), parTodas.length + [...cfg.partes].filter((id) => parElegir.some((p) => p.id === id)).length, listas.partes.length);
 
     $$("[data-aparece]").forEach((i) => i.addEventListener("change", () => {
       i.checked ? cfg.aparece.add(i.dataset.aparece) : (cfg.aparece.delete(i.dataset.aparece), cfg.oblig.delete(i.dataset.aparece));
       pintarCfg();
     }));
     $$("[data-oblig]").forEach((i) => i.addEventListener("change", () => (i.checked ? cfg.oblig.add(i.dataset.oblig) : cfg.oblig.delete(i.dataset.oblig))));
-    $$("[data-medida]").forEach((i) => i.addEventListener("change", () => (i.checked ? cfg.medidas.add(i.dataset.medida) : cfg.medidas.delete(i.dataset.medida))));
-    $$("[data-parte]").forEach((i) => i.addEventListener("change", () => (i.checked ? cfg.partes.add(i.dataset.parte) : cfg.partes.delete(i.dataset.parte))));
+    $$("[data-medida]").forEach((i) => i.addEventListener("change", () => { i.checked ? cfg.medidas.add(i.dataset.medida) : cfg.medidas.delete(i.dataset.medida); pintarCfg(); }));
+    $$("[data-parte]").forEach((i) => i.addEventListener("change", () => { i.checked ? cfg.partes.add(i.dataset.parte) : cfg.partes.delete(i.dataset.parte); pintarCfg(); }));
   }
   // Escribe lo elegido en las listas con la dirección final de la categoría.
   function aplicarCfg(l, slug) {
@@ -488,6 +515,7 @@ const base = import.meta.env.BASE_URL;
     for (const c of CAMPOS) if (form[c]) datos[c] = form[c].value.trim().replace(/\s+/g, " ");
     datos.slug = limpiarSlug(datos.slug);
     datos.estado = form.querySelector("input[name='estado']:checked")?.value || "borrador";
+    datos.mecanismo = form.mecanismo.checked;
     return datos;
   }
   form.addEventListener("submit", async (e) => {
@@ -559,13 +587,15 @@ const base = import.meta.env.BASE_URL;
   :global(.cfg-fila){gap:18px;min-height:60px;padding-block:10px;cursor:default;}
   :global(.cfg-interruptor){flex:none;gap:10px;}
   :global(.cfg-rotulo){font-size:var(--t-subtitulo);color:var(--etiqueta-2);font-weight:500;}
-  :global(.chips--envolver){display:flex;flex-wrap:wrap;gap:var(--esp-chips);}
-  :global(.chip-nota){font-size:var(--t-nota);color:var(--etiqueta-3);font-weight:500;}
-  :global(.chip:has(input:disabled)){opacity:.75;cursor:default;}
+  :global(.cfg-grupos){display:flex;flex-direction:column;gap:22px;}
+  :global(.cfg-grupos:empty){display:none;}
+  :global(.cfg-bloque){display:flex;flex-direction:column;}
+  :global(.cfg-siempre){margin:0 0 -6px 4px;}
+  :global(.cfg-fila--una){min-height:56px;padding-block:8px;}
   :global(.catalogo-icono){flex:none;width:56px;height:56px;border-radius:12px;display:grid;place-items:center;background:var(--relleno);color:var(--etiqueta-2);}
   @media (max-width:640px){
-    :global(.cfg-fila){flex-wrap:wrap;gap:10px 16px;}
-    :global(.cfg-fila .fila-lista-etiqueta){flex:1 1 100%;}
+    :global(.cfg-fila:not(.cfg-fila--una)){flex-wrap:wrap;gap:10px 16px;}
+    :global(.cfg-fila:not(.cfg-fila--una) .fila-lista-etiqueta){flex:1 1 100%;}
     .foto-categoria :global(.foto-categoria-acciones .boton){flex:1;height:48px;}
   }
 </style>
