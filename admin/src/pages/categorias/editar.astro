@@ -7,8 +7,19 @@
 import Admin from "../../layouts/Admin.astro";
 import IconoAdmin from "../../components/IconoAdmin.astro";
 import Modal from "../../components/Modal.astro";
+import PasosEditor from "../../components/PasosEditor.astro";
 import "../../styles/editor.css";
 const base = import.meta.env.BASE_URL;
+
+// en el orden en que se da de alta; "Todos los muebles" esconde las suyas
+const secciones = [
+  { id: "identidad", nombre: "Identidad" },
+  { id: "foto", nombre: "Foto" },
+  { id: "pagina", nombre: "Página" },
+  { id: "google", nombre: "Google" },
+  { id: "piezas", nombre: "Sus piezas" },
+  { id: "publicacion", nombre: "Publicación" },
+];
 ---
 <Admin titulo="Categoría" seccion="categorias" migas={[{ nombre: "Categorías", ruta: "categorias/" }]} publicarAbajo={false}>
   <form class="editor" novalidate data-form>
@@ -21,6 +32,8 @@ const base = import.meta.env.BASE_URL;
         <a class="boton" href="#" target="_blank" rel="noopener" data-ver-pruebas hidden><IconoAdmin name="externo" size={16} />Ver en pruebas</a>
       </div>
     </div>
+
+    <PasosEditor secciones={secciones} etiqueta="Pasos para dar de alta la categoría" />
 
     <div class="formulario">
       <div class="formulario-secciones">
@@ -114,20 +127,23 @@ const base = import.meta.env.BASE_URL;
           </div>
           <div class="seccion-cuerpo">
             <div class="campo" data-campo="title">
-              <div class="campo-etiqueta"><label for="title">Título para Google<span class="obligatorio">*</span></label><span class="campo-contador" data-contador="title"></span></div>
-              <input class="control" id="title" name="title" type="text" placeholder="Ej. Sillas operativas y ergonómicas de oficina | Neucast" />
-              <p class="campo-ayuda">Termina en "| Neucast". Lo que pasa de 65 caracteres Google lo corta.</p>
+              <div class="campo-etiqueta"><label for="title">Title para Google<span class="obligatorio">*</span></label><span class="campo-contador" data-contador="title"></span></div>
+              <input class="control" id="title" name="title" type="text" placeholder="Ej. Botes de basura para oficina y áreas comunes | Neucast" />
+              <p class="campo-ayuda">Lo que es la categoría más "para oficina", y termina en "| Neucast". Lo que pasa de 65 caracteres Google lo corta.</p>
               <p class="campo-error" data-error></p>
             </div>
             <div class="campo" data-campo="desc">
-              <div class="campo-etiqueta"><label for="desc">Descripción para Google<span class="obligatorio">*</span></label><span class="campo-contador" data-contador="desc"></span></div>
-              <textarea class="control" id="desc" name="desc" rows="3" placeholder="Ej. Sillería operativa y ergonómica para jornada completa: respaldo de malla, altura regulable. Envío e instalación en todo México."></textarea>
+              <div class="campo-etiqueta"><label for="desc">Meta description para Google<span class="obligatorio">*</span></label><span class="campo-contador" data-contador="desc"></span></div>
+              <textarea class="control" id="desc" name="desc" rows="3" placeholder="Ej. Botes de basura y accesorios para oficina: acero, separación de residuos y tapas abatibles. Envío e instalación en todo México."></textarea>
+              <p class="campo-ayuda">Qué hay en la categoría y para qué sirve, con "Envío e instalación en todo México" al final. Google corta después de 160.</p>
               <p class="campo-error" data-error></p>
             </div>
             <div class="google" aria-hidden="true">
               <span class="google-url" data-google-url>neucast.com.mx › muebles</span>
-              <span class="google-titulo" data-google-titulo>Título | Neucast</span>
-              <span class="google-desc" data-google-desc>Descripción</span>
+              <small class="google-rotulo">Title para Google</small>
+                <span class="google-titulo" data-google-titulo>Título | Neucast</span>
+              <small class="google-rotulo">Meta description para Google</small>
+                <span class="google-desc" data-google-desc>Descripción</span>
             </div>
           </div>
         </section>
@@ -231,7 +247,12 @@ const base = import.meta.env.BASE_URL;
   import { abrirModal, cerrarModal, avisar, confirmar, escapar, fechaRelativa, ICONO_BASURA } from "../../scripts/ui.js";
   import { validarCategoria, limpiarSlug } from "../../scripts/validar.js";
   import { MEDIDAS_CATEGORIA, categoriaVacia } from "../../scripts/esquemas/categoria.js";
+  const SECCION_DE = { name: "identidad", slug: "identidad", photo: "foto", alt: "foto", h1: "pagina", intro: "pagina", title: "google", desc: "google" };
+  const seccionDe = (k) => SECCION_DE[k] || "identidad";
+  const CON_OBLIGATORIOS = new Set(["identidad", "foto", "pagina", "google"]);
   import { CONTROL_PROPIO } from "../../scripts/listas.js";
+  import { pintarAvance, seguirPasos, ocultarPasos } from "../../scripts/pasos.js";
+  import { OBLIGATORIOS_CATEGORIA, OBLIGATORIOS_TODOS } from "../../scripts/esquemas/categoria.js";
 
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -255,6 +276,7 @@ const base = import.meta.env.BASE_URL;
     else if (original) cat = { ...categoriaVacia(), ...(await obtener("categorias", original)) };
     // en "Todos los muebles" no hay identidad, ni piezas propias, ni estado
     $$("[data-solo-categoria]").forEach((s) => (s.hidden = TODOS));
+    if (TODOS) ocultarPasos(["identidad", "piezas", "publicacion"]);
     $$("[data-n]").forEach((n, i) => (n.textContent = TODOS ? i + 1 : i + 2));
     for (const c of CAMPOS) if (form[c]) form[c].value = cat[c] || "";
     $$("input[name='estado']").forEach((i) => (i.checked = i.value === (cat.estado || "borrador")));
@@ -297,6 +319,18 @@ const base = import.meta.env.BASE_URL;
     $("[data-google-desc]").textContent = form.desc.value.trim() || "La descripción que sale debajo del título.";
     const propuesta = limpiarSlug(form.name.value);
     $("[data-usar-nombre]").hidden = TODOS || !propuesta || limpiarSlug(form.slug.value) === propuesta;
+    actualizarAvance();
+  }
+  let erroresMostrados = {};
+  function actualizarAvance() {
+    const datos = leer();
+    pintarAvance({
+      requeridos: TODOS ? OBLIGATORIOS_TODOS : OBLIGATORIOS_CATEGORIA,
+      errores: validarCategoria(datos, { todos: TODOS }),
+      mostrados: erroresMostrados,
+      seccionDe,
+      conObligatorios: CON_OBLIGATORIOS,
+    });
   }
   let slugTocado = !!original;
   form.slug.addEventListener("input", () => (slugTocado = true));
@@ -364,6 +398,7 @@ const base = import.meta.env.BASE_URL;
     pintarFoto();
     quitarError("photo");
     marcarCambio();
+    actualizar();
   }
 
   /* ---------- Qué se pide en sus piezas ---------- */
@@ -495,10 +530,13 @@ const base = import.meta.env.BASE_URL;
   function quitarError(campo) {
     if (!campo) return;
     $(`[data-campo="${campo}"]`)?.removeAttribute("data-error");
+    delete erroresMostrados[campo];
   }
   function mostrarErrores(errores) {
+    erroresMostrados = errores;
     $$("[data-campo][data-error]").forEach((c) => c.removeAttribute("data-error"));
     for (const [campo, msg] of Object.entries(errores)) ponerError(campo, msg);
+    actualizarAvance();
     const primero = $("[data-campo][data-error]");
     primero?.scrollIntoView({ behavior: "smooth", block: "center" });
     primero?.querySelector("input,textarea")?.focus({ preventScroll: true });
@@ -575,7 +613,7 @@ const base = import.meta.env.BASE_URL;
   $$("[data-cancelar], [data-sale], .bl-nav a, .barra-migas a").forEach((a) => a.addEventListener("click", (e) => preguntar(e, a.href)));
   addEventListener("beforeunload", (e) => { if (hayCambios && !guardando) e.preventDefault(); });
 
-  cargar().catch((e) => avisar(e.message || "No se pudo cargar la categoría", { tipo: "error" }));
+  cargar().then(seguirPasos).catch((e) => avisar(e.message || "No se pudo cargar la categoría", { tipo: "error" }));
 </script>
 
 <style>
@@ -594,8 +632,11 @@ const base = import.meta.env.BASE_URL;
   :global(.cfg-fila--una){min-height:56px;padding-block:8px;}
   :global(.catalogo-icono){flex:none;width:56px;height:56px;border-radius:12px;display:grid;place-items:center;background:var(--relleno);color:var(--etiqueta-2);}
   @media (max-width:640px){
-    :global(.cfg-fila:not(.cfg-fila--una)){flex-wrap:wrap;gap:10px 16px;}
-    :global(.cfg-fila:not(.cfg-fila--una) .fila-lista-etiqueta){flex:1 1 100%;}
+    /* texto a la izquierda y los dos interruptores apilados a la derecha */
+    :global(.cfg-fila:not(.cfg-fila--una)){display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;column-gap:16px;row-gap:8px;align-items:center;padding-block:12px;}
+    :global(.cfg-fila:not(.cfg-fila--una) .fila-lista-etiqueta){grid-row:1 / span 2;}
+    :global(.cfg-fila:not(.cfg-fila--una) .cfg-interruptor){justify-content:space-between;width:132px;gap:8px;}
+    :global(.cfg-fila:not(.cfg-fila--una) .cfg-rotulo){order:0;}
     .foto-categoria :global(.foto-categoria-acciones .boton){flex:1;height:48px;}
   }
 </style>

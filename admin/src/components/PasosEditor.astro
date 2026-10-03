@@ -1,0 +1,24 @@
+---
+// La barra de pasos de un editor largo (pieza, categoría…): una pastilla por
+// sección, con palomita cuando sus obligatorios están, y el avance "N de M".
+// Va pegada bajo la barra de arriba; en teléfono las pastillas se deslizan.
+// Se cablea con scripts/pasos.js (seguir el scroll y pintar el avance).
+const { secciones, etiqueta = "Pasos" } = Astro.props;
+---
+<nav class="pasos-editor" aria-label={etiqueta} data-avance>
+  <ol class="pasos-lista">
+    {secciones.map((sec, i) => (
+      <li data-paso={sec.id}>
+        <a href={`#${sec.id}`} data-indice={sec.id}>
+          <span class="paso-n"><span class="paso-num">{i + 1}</span><svg class="paso-check" width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 10.5 4 4 8-9"/></svg></span>
+          <span class="paso-nombre">{sec.nombre}</span>
+        </a>
+      </li>
+    ))}
+  </ol>
+  <div class="pasos-avance" title="Obligatorios capturados">
+    <span class="pasos-avance-barra"><span data-avance-barra></span></span>
+    <span class="pasos-avance-cuenta" data-avance-cuenta></span>
+  </div>
+  <p class="pasos-nota" data-avance-nota hidden></p>
+</nav>

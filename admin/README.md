@@ -28,7 +28,7 @@ admin/
 │   │   ├── destacadas.astro   las piezas del carrusel de la portada y su orden
 │   │   ├── categorias/        lista (con Todos los muebles) y edición de categorías
 │   │   └── listas.astro       listas configurables, medidas y partes: crecen a cualquier tipo de mueble
-│   ├── components/            Modal, IconoAdmin
+│   ├── components/            Modal, IconoAdmin, PasosEditor
 │   ├── scripts/
 │   │   ├── api.js             la única cara de la API para las pantallas
 │   │   ├── api-simulada.js    hoy: JSON de semilla más localStorage
@@ -38,6 +38,7 @@ admin/
 │   │   ├── esquemas/pieza.js  los campos fijos de una pieza y sus medidas de texto
 │   │   ├── listas.js          cómo se leen las listas: dónde aparecen y dónde son obligatorias
 │   │   ├── medios.js          de dónde se cargan las fotos
+│   │   ├── pasos.js           la barra de pasos de los editores (avance y seguir el scroll)
 │   │   ├── ordenar.js         ordenar filas arrastrando su asa
 │   │   └── ui.js              avisos, modales, fechas
 │   └── styles/admin.css       lo propio del administrador, encima de compartido/global.css

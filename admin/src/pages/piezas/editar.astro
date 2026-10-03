@@ -9,6 +9,7 @@
 import Admin from "../../layouts/Admin.astro";
 import IconoAdmin from "../../components/IconoAdmin.astro";
 import Modal from "../../components/Modal.astro";
+import PasosEditor from "../../components/PasosEditor.astro";
 import "../../styles/editor.css";
 const base = import.meta.env.BASE_URL;
 
@@ -34,23 +35,7 @@ const secciones = [
       </div>
     </div>
 
-    <nav class="pasos-editor" aria-label="Pasos para dar de alta la pieza" data-avance>
-      <ol class="pasos-lista">
-        {secciones.map((sec, i) => (
-          <li>
-            <a href={`#${sec.id}`} data-indice={sec.id}>
-              <span class="paso-n"><span class="paso-num">{i + 1}</span><svg class="paso-check" width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 10.5 4 4 8-9"/></svg></span>
-              <span class="paso-nombre">{sec.nombre}</span>
-            </a>
-          </li>
-        ))}
-      </ol>
-      <div class="pasos-avance" title="Obligatorios capturados">
-        <span class="pasos-avance-barra"><span data-avance-barra></span></span>
-        <span class="pasos-avance-cuenta" data-avance-cuenta>0 de 11</span>
-      </div>
-      <p class="pasos-nota" data-avance-nota hidden></p>
-    </nav>
+    <PasosEditor secciones={secciones} etiqueta="Pasos para dar de alta la pieza" />
 
     <div class="formulario">
       <div class="formulario-secciones">
@@ -318,10 +303,12 @@ const secciones = [
               <div class="campo-etiqueta"><span class="etiqueta">Así sale en Google</span></div>
               <div class="google">
                 <span class="google-url" data-google-url>neucast.com.mx › muebles</span>
+                <small class="google-rotulo">Title para Google</small>
                 <span class="google-titulo" data-google-titulo>Tipo Nombre | Categoría | Neucast</span>
+                <small class="google-rotulo">Meta description para Google</small>
                 <span class="google-desc" data-google-desc>Tipo Nombre. Primer destacado. Disponibilidad. Envío e instalación en todo México.</span>
               </div>
-              <p class="campo-ayuda" data-google-nota>El título y la descripción salen de una fórmula con el tipo, el nombre, la categoría, el primer destacado y la disponibilidad. Así todo el catálogo queda parejo.</p>
+              <p class="campo-ayuda" data-google-nota>El title y la meta description salen de una fórmula con el tipo, el nombre, la categoría, el primer destacado y la disponibilidad. Así todo el catálogo queda parejo.</p>
             </div>
 
             <div class="consejo consejo--suave">
@@ -416,6 +403,7 @@ const secciones = [
   import { obtener, listar, guardar } from "../../scripts/api.js";
   import { medio } from "../../scripts/medios.js";
   import { validarPieza, revisarTexto, revisarMedida, proponerSlug, limpiarSlug, acabadosDe } from "../../scripts/validar.js";
+  import { pintarAvance, seguirPasos } from "../../scripts/pasos.js";
   import {
     piezaVacia, OBLIGATORIOS, MEDIDAS, MAX_COMBINA,
   } from "../../scripts/esquemas/pieza.js";
@@ -1150,24 +1138,9 @@ const secciones = [
   function actualizarIndice(erroresMostrados) {
     const datos = leer();
     const todos = validarPieza(datos, listas, categorias);
-    const conError = new Set(Object.keys(erroresMostrados || {}).map(seccionDe));
-    const incompletas = new Set(Object.keys(todos).map(seccionDe));
-    $$("[data-indice]").forEach((a) => {
-      const id = a.dataset.indice;
-      a.classList.toggle("con-error", conError.has(id));
-      a.classList.toggle("completa", CON_OBLIGATORIOS.has(id) && !conError.has(id) && !incompletas.has(id));
-    });
-
     // el avance: cuántos obligatorios (de todas y de la categoría) ya están
     const requeridos = [...OBLIGATORIOS, ...obligatoriasDe(listas, datos.cat).filter((id) => id !== "colores")];
-    const faltan = requeridos.filter((k) => todos[k]);
-    const hechos = requeridos.length - faltan.length;
-    $("[data-avance-cuenta]").textContent = `${hechos} de ${requeridos.length}`;
-    $("[data-avance-barra]").style.width = `${(hechos / requeridos.length) * 100}%`;
-    $("[data-avance]").classList.toggle("avance--lista", !faltan.length);
-    $("[data-avance-nota]").textContent = faltan.length
-      ? `Falta${faltan.length === 1 ? " un dato" : `n ${faltan.length} datos`}. Mientras, se puede guardar como borrador.`
-      : "Tiene todo lo obligatorio. Ya se puede publicar.";
+    pintarAvance({ requeridos, errores: todos, mostrados: erroresMostrados, seccionDe, conObligatorios: CON_OBLIGATORIOS });
   }
 
   function actualizarContadores() {
@@ -1338,41 +1311,7 @@ const secciones = [
       if (hayCambios && !guardando) e.preventDefault();
     });
 
-    // el índice sigue a la sección visible: la última cuyo inicio ya pasó
-    // del primer tercio de la pantalla (con secciones largas, la proporción
-    // visible no sirve: la de la ficha nunca pasa del 30 por ciento)
-    const secciones = $$(".seccion");
-    const seguir = () => {
-      const corte = innerHeight * 0.34;
-      let actual = secciones[0];
-      for (const sec of secciones) if (sec.getBoundingClientRect().top <= corte) actual = sec;
-      if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) actual = secciones.at(-1);
-      const indice = $(".pasos-lista");
-      let nueva = null;
-      $$("[data-indice]").forEach((a) => {
-        const es = a.dataset.indice === actual.id;
-        if (es && !a.classList.contains("activo")) nueva = a;
-        a.classList.toggle("activo", es);
-      });
-      // En teléfono la activa enseña su nombre y crece: se centra cuando ya
-      // tiene su ancho final, así la última nunca queda cortada.
-      if (nueva) requestAnimationFrame(() => centrarPaso(indice, nueva));
-    };
-    function centrarPaso(indice, a) {
-      if (indice.scrollWidth <= indice.clientWidth) return;
-      const caja = indice.getBoundingClientRect();
-      const r = a.getBoundingClientRect();
-      const centro = indice.scrollLeft + (r.left - caja.left) + r.width / 2 - caja.width / 2;
-      indice.scrollTo({ left: Math.max(0, Math.min(centro, indice.scrollWidth - indice.clientWidth)), behavior: "smooth" });
-    }
-    addEventListener("scroll", seguir, { passive: true });
-    seguir();
-    $$("[data-indice]").forEach((a) =>
-      a.addEventListener("click", (e) => {
-        e.preventDefault();
-        document.getElementById(a.dataset.indice)?.scrollIntoView({ behavior: "smooth", block: "start" });
-      })
-    );
+    seguirPasos();
 
     // Cmd/Ctrl + S guarda
     addEventListener("keydown", (e) => {
