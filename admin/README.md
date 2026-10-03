@@ -101,6 +101,7 @@ pegado a lo más separado, siempre con estos tokens.
 | `--esp-chips` | 10 | chips, botones y opciones entre sí |
 | `--esp-campos` | 34 | un campo (o grupo de chips) y el siguiente |
 | `--esp-renglon` | 20 | arriba y abajo de cada renglón de tabla o lista |
+| `--esp-pantalla-movil` | 40 | en teléfono, de la barra de arriba al título de cada pantalla |
 
 **Desplegables propios.** Ningún desplegable se ve como el del sistema:
 `scripts/desplegable.js` esconde cada `<select class="control">` y pone
