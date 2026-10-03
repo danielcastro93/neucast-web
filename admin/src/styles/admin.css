@@ -42,7 +42,7 @@
   --esp-nota-bloque:14px;   /* una nota y el bloque que explica */
   --esp-chips:10px;         /* entre chips, botones y opciones */
   --esp-campos:34px;        /* entre un campo (o grupo de chips) y el siguiente */
-  --esp-pantalla-movil:40px; /* en teléfono: de la barra de arriba al título de la pantalla */
+  --esp-pantalla-movil:32px; /* en teléfono: de la barra de arriba al título de la pantalla */
   --esp-renglon:20px;       /* arriba y abajo de cada renglón de tabla o lista */
 }
 
