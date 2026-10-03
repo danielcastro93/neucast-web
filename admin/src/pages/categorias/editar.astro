@@ -633,9 +633,12 @@ const secciones = [
   :global(.catalogo-icono){flex:none;width:56px;height:56px;border-radius:12px;display:grid;place-items:center;background:var(--relleno);color:var(--etiqueta-2);}
   @media (max-width:640px){
     /* texto a la izquierda y los dos interruptores apilados a la derecha */
-    :global(.cfg-fila:not(.cfg-fila--una)){display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;column-gap:16px;row-gap:8px;align-items:center;padding-block:12px;}
+    /* cada interruptor con su zona de toque de 44 px y aire entre los dos:
+       el dedo no alcanza a tocar ambos */
+    :global(.cfg-fila:not(.cfg-fila--una)){display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;column-gap:16px;row-gap:10px;align-items:center;padding-block:10px;}
     :global(.cfg-fila:not(.cfg-fila--una) .fila-lista-etiqueta){grid-row:1 / span 2;}
-    :global(.cfg-fila:not(.cfg-fila--una) .cfg-interruptor){justify-content:space-between;width:132px;gap:8px;}
+    :global(.cfg-fila:not(.cfg-fila--una) .cfg-interruptor){justify-content:space-between;width:140px;min-height:44px;padding:0 4px;gap:8px;border-radius:12px;}
+    :global(.cfg-fila:not(.cfg-fila--una) .cfg-interruptor:active){background:var(--relleno);}
     :global(.cfg-fila:not(.cfg-fila--una) .cfg-rotulo){order:0;}
     .foto-categoria :global(.foto-categoria-acciones .boton){flex:1;height:48px;}
   }
