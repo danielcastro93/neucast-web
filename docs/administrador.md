@@ -124,6 +124,9 @@ trae, además de lo de hoy (`slug`, `name`, `photo`, `alt`, `h1`, `title`,
   `listas` (es el mismo dato que en la pantalla Listas).
 - `catalogoPropio`: la API guarda el PDF en `public/catalogos/propios/` con el
   nombre del generado (`neucast-catalogo-{slug}.pdf`); el sitio ya lo prefiere.
+- **Al publicar, el servidor corre `npm run fichas` y `npm run catalogos`**
+  antes de `npm run build`: así una categoría nueva sale con su catálogo en
+  PDF y en /recursos/ desde la primera publicación, y cada pieza con su ficha.
 - **Todos los muebles** (`ajustes.todosLosMuebles`) usa los mismos textos:
   `photo`, `alt`, `h1`, `title`, `desc`, `intro`. Son los de /muebles/; el
   sitio ya los lee de `todosLosMuebles` en `site.js`.

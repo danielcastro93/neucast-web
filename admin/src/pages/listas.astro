@@ -190,7 +190,10 @@ import "../styles/listas.css";
      Datos y uso
      ============================================ */
   const laLista = () => listas.listas.find((l) => l.id === vista);
-  const nombreCat = (slug) => categorias.find((c) => c.slug === slug)?.name || slug;
+  const nombreCat = (slug) => {
+    const c = categorias.find((x) => x.slug === slug);
+    return c ? `${c.name}${c.estado === "borrador" ? " · borrador" : ""}` : slug;
+  };
   const resumenCats = (cats, vacio = "Ninguna") => {
     if (!cats) return "Todas las categorías";
     if (!cats.length) return vacio;

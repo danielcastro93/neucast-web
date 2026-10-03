@@ -16,8 +16,10 @@ const UNICOS = {
 const base = import.meta.env.BASE_URL;
 
 export async function estado() {
-  const [p, piezas] = await Promise.all([listar("publicacion"), listar("piezas").catch(() => [])]);
+  const [p, piezas, categorias] = await Promise.all([listar("publicacion"), listar("piezas").catch(() => []), listar("categorias").catch(() => [])]);
   const porSlug = new Map(piezas.map((x) => [x.slug, x]));
+  // las categorías también se enseñan con su foto y abren su editor
+  categorias.forEach((c) => porSlug.set(`categorias:${c.slug}`, c));
   const pendientes = (p.pendientes || []).slice().reverse();
   return { ...p, pendientes, porSlug };
 }
@@ -25,12 +27,17 @@ export async function estado() {
 // Una fila de cambio: miniatura (si es pieza), qué es, nombre y cuándo.
 export function filaCambio(c, porSlug) {
   const pieza = c.coleccion === "piezas" ? porSlug.get(c.id) : null;
-  const unico = !pieza && (c.id === c.coleccion || !c.id) ? UNICOS[c.coleccion] : null;
-  const foto = pieza?.img?.[0]
-    ? `<img src="${escapar(medio(pieza.img[0]))}" alt="" loading="lazy" />`
+  const categoria = c.coleccion === "categorias" ? porSlug.get(`categorias:${c.id}`) : null;
+  const unico = !pieza && !categoria && (c.id === c.coleccion || !c.id) ? UNICOS[c.coleccion] : null;
+  const imagen = pieza?.img?.[0] || categoria?.photo;
+  const foto = imagen
+    ? `<img src="${escapar(medio(imagen))}" alt="" loading="lazy" />`
     : unico ? `<span class="miniatura-vacia"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${unico.icono}</svg></span>` : "";
   const nombre = escapar(unico?.nombre || c.nombre || c.id);
-  const enlace = pieza && !c.borrado ? `${base}piezas/editar/?slug=${encodeURIComponent(c.id)}` : unico?.ruta ? `${base}${unico.ruta}` : null;
+  const enlace = c.borrado ? null
+    : pieza ? `${base}piezas/editar/?slug=${encodeURIComponent(c.id)}`
+    : categoria ? `${base}categorias/editar/?slug=${encodeURIComponent(c.id)}`
+    : unico?.ruta ? `${base}${unico.ruta}` : null;
   const accion = c.borrado ? "Se borra" : "Cambió";
   const cuerpo = `
     <span class="miniatura">${foto || `<span class="miniatura-vacia">${escapar((QUE[c.coleccion] || "?")[0])}</span>`}</span>

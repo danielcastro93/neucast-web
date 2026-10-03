@@ -161,7 +161,8 @@ const cifras = [
     cifra("publicadas", publicadas.length, `${publicadas.filter((p) => p.nuevo).length} marcadas como nuevas`);
     cifra("borradores", borradores, borradores ? "Por terminar" : "Nada por terminar");
     $('[data-cifra="borradores"]').classList.toggle("tira-celda--alerta", borradores > 0);
-    cifra("categorias", categorias.length, `${categorias.filter((c) => piezas.some((p) => p.cat === c.slug)).length} con piezas`);
+    const catsBorrador = categorias.filter((c) => c.estado === "borrador").length;
+    cifra("categorias", categorias.length, catsBorrador ? `${catsBorrador} en borrador` : `${categorias.filter((c) => piezas.some((p) => p.cat === c.slug)).length} con piezas`);
     cifra("proyectos", proyectos.length, `${proyectos.filter((p) => p.destacado).length} en el home`);
 
     const nombreCat = (slug) => categorias.find((c) => c.slug === slug)?.name || "";
