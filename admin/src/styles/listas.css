@@ -15,7 +15,9 @@
 .pestanas{
   --fade-izq:0px;--fade-der:0px;
   display:flex;align-items:center;gap:4px;overflow-x:auto;scrollbar-width:none;
-  padding:4px 2px 6px;margin:-4px -2px -6px;
+  /* aire en las puntas: la primera y la última pestaña nunca quedan pegadas
+     a la orilla (se cortaban su borde y su sombra) */
+  padding:4px 14px 6px;margin:-4px -14px -6px;scroll-padding-inline:14px;
   -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 var(--fade-izq),#000 calc(100% - var(--fade-der)),transparent 100%);
   mask-image:linear-gradient(90deg,transparent 0,#000 var(--fade-izq),#000 calc(100% - var(--fade-der)),transparent 100%);
   transition:--fade-izq .25s,--fade-der .25s;
