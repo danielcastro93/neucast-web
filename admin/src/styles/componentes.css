@@ -212,7 +212,7 @@ a.renglon:focus-visible{outline-offset:-3px;}
 @media not all and (min-width:72em) and (hover:hover) and (pointer:fine){
   .barra .publicacion{display:none;}
   .publicar-movil{
-    position:fixed;left:0;right:0;bottom:0;z-index:35;
+    position:fixed;left:0;right:0;bottom:var(--abajo,0px);z-index:35;
     display:flex;align-items:center;gap:12px;
     padding:12px 16px calc(12px + env(safe-area-inset-bottom));
     background:rgba(255,255,255,.92);
@@ -289,7 +289,7 @@ a.renglon:focus-visible{outline-offset:-3px;}
   /* 4. modales como hoja de Apple: suben desde abajo, llevan la barrita y
      se cierran deslizándolos hacia abajo (scripts/ui.js) */
   dialog.modal,dialog.modal--ancho{
-    width:100vw;max-width:100vw;max-height:94dvh;margin:auto 0 0;
+    width:100vw;max-width:100vw;max-height:calc(94dvh - var(--abajo,0px));margin:auto 0 var(--abajo,0px);
     border-radius:28px 28px 0 0;
     box-shadow:0 -10px 40px rgba(20,19,17,.18);
     touch-action:pan-y;
@@ -310,8 +310,8 @@ a.renglon:focus-visible{outline-offset:-3px;}
   .modal-titulo{font-size:var(--t-titulo-3);line-height:1.25;}
   .modal-texto{margin-top:12px;font-size:var(--t-llamada);}
   .modal-x{width:32px;height:32px;margin-top:-2px;}
-  .modal-cuerpo{padding:26px 22px 8px;gap:24px;max-height:calc(94dvh - 220px);}
-  .modal-pie{flex-direction:column-reverse;align-items:stretch;gap:10px;padding:22px 22px calc(22px + env(safe-area-inset-bottom));}
+  .modal-cuerpo{padding:26px 22px 8px;gap:24px;}
+  .modal-pie{flex-direction:column-reverse;align-items:stretch;gap:10px;padding:24px 22px calc(28px + env(safe-area-inset-bottom));}
   .modal-pie .boton{height:52px;width:100%;font-size:var(--t-cuerpo);}
   .modal-pie .izquierda{margin:0;text-align:center;}
   .avisos{bottom:16px;}
@@ -409,4 +409,20 @@ a.renglon:focus-visible{outline-offset:-3px;}
   .ruta{margin:0 14px 16px;padding:16px 2px 14px;}
   .ruta-paso small{white-space:normal;overflow:visible;line-height:1.3;}
   .tira dt{font-size:var(--t-subtitulo);margin-bottom:8px;}
+}
+
+/* ============================================
+   Barras de acciones ancladas abajo, como en una app: en teléfono y tableta
+   la barra de Guardar va fija al borde de la pantalla (no pegajosa dentro de
+   la página), por encima de lo que tape el navegador.
+   ============================================ */
+@media not all and (min-width:72em) and (hover:hover) and (pointer:fine){
+  form .guardar{
+    position:fixed;left:0;right:0;bottom:var(--abajo,0px);z-index:30;margin:0;
+    padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+  }
+  body:has(.guardar) .contenido{padding-bottom:calc(120px + env(safe-area-inset-bottom));}
+}
+@media (max-width:640px){
+  body:has(.guardar) .contenido{padding-bottom:calc(170px + env(safe-area-inset-bottom));}
 }

@@ -165,10 +165,14 @@ body.no-scroll{position:fixed;width:100%;overflow:hidden;}
 .cabecera-acciones{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
 
 /* entrada suave de cada pantalla */
-.contenido > *{animation:entraPantalla .4s var(--ease) both;}
+.contenido > *{animation:entraPantalla .4s var(--ease) backwards;} /* backwards: al terminar no deja transform, que atraparía lo fijo (barra de Guardar, hojas) */
 .contenido > *:nth-child(2){animation-delay:.05s;}
 .contenido > *:nth-child(3){animation-delay:.1s;}
 @keyframes entraPantalla{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+/* lo que lleva una barra fija adentro (el editor con su Guardar) solo aparece:
+   cualquier transform, aunque sea de una animación, atrapa a lo fijo */
+@keyframes aparece{from{opacity:0;}}
+.contenido > form{animation-name:aparece;}
 @media (prefers-reduced-motion:reduce){.contenido > *{animation:none;}}
 
 /* ============================================
@@ -265,7 +269,7 @@ select.control{
 }
 .control--con-icono{position:relative;}
 .control--con-icono .control{padding-left:44px;}
-.control--con-icono > svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--ink-40);pointer-events:none;}
+.control--con-icono > svg{position:absolute;z-index:1;left:16px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--ink-40);pointer-events:none;}
 
 /* ---------- Desplegable propio ----------
    Ningún desplegable se ve como el del sistema: el <select> se queda
@@ -582,3 +586,54 @@ dialog.modal.modal--cerrando::backdrop{animation:veloSale .24s var(--ease-salida
 /* En teléfono, todas las pantallas dejan el mismo aire entre la barra de
    arriba y su título. */
 @media (max-width:640px){.contenido{padding-top:var(--esp-pantalla-movil);}}
+
+/* ---------- Buscadores con cruz para borrar (scripts/buscador.js) ---------- */
+.buscador{position:relative;display:block;width:100%;min-width:0;}
+.buscador > .control{width:100%;padding-right:44px;}
+input[type=search].control::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none;display:none;}
+.buscador-borrar{
+  position:absolute;top:50%;right:12px;width:22px;height:22px;margin-top:-11px;border-radius:50%;
+  display:grid;place-items:center;background:rgba(60,60,67,.3);color:var(--white);
+  opacity:0;transform:scale(.6);pointer-events:none;
+  transition:opacity .15s,transform .25s var(--resorte),background .15s;
+}
+.buscador.con-texto .buscador-borrar{opacity:1;transform:none;pointer-events:auto;}
+@media (hover:hover){.buscador-borrar:hover{background:rgba(60,60,67,.5);}}
+/* zona de toque de 44 aunque el círculo mida 22 */
+.buscador-borrar::after{content:"";position:absolute;inset:-11px;}
+
+/* ---------- Desplegable en el teléfono: hoja desde abajo ---------- */
+.selector-velo{display:none;}
+@media (max-width:640px){
+  .selector.hoja .selector-velo{
+    display:block;position:fixed;inset:0;z-index:1000;
+    background:rgba(20,19,17,.32);opacity:0;pointer-events:none;transition:opacity .25s var(--ease);
+  }
+  .selector.hoja.abierto .selector-velo{opacity:1;pointer-events:auto;}
+  .selector.hoja .selector-menu{
+    position:fixed;left:8px;right:8px;top:auto;z-index:1001;
+    bottom:calc(8px + var(--abajo,0px) + env(safe-area-inset-bottom));
+    max-height:min(62dvh,520px);padding:6px 8px 10px;border-radius:24px;
+    background:var(--white);box-shadow:0 -6px 40px rgba(20,19,17,.22);
+    transform:translateY(40px);transform-origin:bottom center;
+    transition:opacity .2s var(--ease),transform .45s cubic-bezier(.32,.72,0,1),visibility 0s linear .25s;
+  }
+  .selector.hoja.abierto .selector-menu{transform:none;}
+  .selector.hoja .selector-menu[data-titulo]::before{
+    content:attr(data-titulo);display:block;position:sticky;top:-6px;z-index:1;
+    margin:-6px -8px 4px;padding:16px 18px 12px;
+    font-size:var(--t-subtitulo);font-weight:600;color:var(--etiqueta-3);text-align:center;
+    background:var(--white);border-bottom:1px solid var(--borde);
+  }
+  .selector.hoja .selector-opcion{min-height:52px;padding:12px 14px;font-size:var(--t-cuerpo);border-radius:14px;}
+}
+/* un botón secundario sobre el fondo gris de la pantalla (no en una tarjeta) va en blanco */
+.cabecera .boton--suave,.saludo .boton--suave{background:var(--white);box-shadow:0 0 0 1px var(--borde);}
+@media (hover:hover){.cabecera .boton--suave:hover,.saludo .boton--suave:hover{background:var(--white);box-shadow:0 0 0 1px var(--borde-fuerte),0 4px 14px rgba(0,0,0,.06);}}
+
+/* La caja de un modal es columna: cabeza y pie siempre a la vista, y lo que
+   no quepa se desplaza en el cuerpo. Así un botón nunca queda fuera de la
+   pantalla, por larga que sea la lista de adentro. */
+dialog.modal[open]{display:flex;flex-direction:column;}
+dialog.modal > .modal-asa,dialog.modal > .modal-cabeza,dialog.modal > .modal-pie{flex:none;}
+dialog.modal > .modal-cuerpo{flex:1 1 auto;min-height:0;max-height:none;overflow-y:auto;overscroll-behavior:contain;}

@@ -8,8 +8,13 @@
 // el botón se entera.
 const CHEVRON = '<svg class="selector-flecha" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const PALOMITA = '<svg class="selector-palomita" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 10.5 4 4 8-9"/></svg>';
+import { bloquear, soltar } from "@neucast/compartido/scripts/bloqueo-scroll.js";
+
 let abierto = null;
 let contador = 0;
+// En el teléfono el menú no cuelga del campo: sube como hoja desde abajo,
+// encima de todo (también dentro de otra hoja), con su velo y su título.
+const TELEFONO = matchMedia("(max-width: 640px)");
 
 export function mejorarDesplegables(scope = document) {
   scope.querySelectorAll("select.control:not([data-mejorado])").forEach(mejorar);
@@ -29,7 +34,7 @@ export function vigilarDesplegables() {
   document.addEventListener("click", (e) => {
     if (abierto && !abierto.envoltura.contains(e.target)) cerrar(abierto);
   });
-  addEventListener("resize", () => abierto && cerrar(abierto));
+  addEventListener("resize", () => abierto && !abierto.hoja && cerrar(abierto));
 }
 
 function mejorar(select) {
@@ -68,7 +73,15 @@ function mejorar(select) {
   menu.tabIndex = -1;
   envoltura.appendChild(menu);
 
-  const estado = { select, boton, menu, envoltura, activo: -1, busqueda: "", reloj: 0 };
+  const velo = document.createElement("div");
+  velo.className = "selector-velo";
+  velo.setAttribute("aria-hidden", "true");
+  envoltura.appendChild(velo);
+  const titulo = (etiqueta && etiqueta.textContent.replace("*", "").trim()) || select.getAttribute("aria-label") || "";
+  if (titulo) menu.dataset.titulo = titulo;
+
+  const estado = { select, boton, menu, envoltura, activo: -1, busqueda: "", reloj: 0, hoja: false };
+  velo.addEventListener("click", () => cerrar(estado, true));
 
   // Si el código cambia el valor, el botón se entera.
   const desc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, "value");
@@ -119,12 +132,15 @@ function pintarOpciones(s) {
 function abrir(s) {
   if (abierto && abierto !== s) cerrar(abierto);
   pintarOpciones(s);
+  s.hoja = TELEFONO.matches;
+  s.envoltura.classList.toggle("hoja", s.hoja);
+  if (s.hoja) bloquear();
   s.envoltura.classList.add("abierto");
   s.boton.setAttribute("aria-expanded", "true");
   // arriba si abajo no cabe
   const r = s.boton.getBoundingClientRect();
   const alto = Math.min(320, s.menu.scrollHeight + 12);
-  s.envoltura.classList.toggle("arriba", innerHeight - r.bottom < alto + 16 && r.top > alto + 16);
+  s.envoltura.classList.toggle("arriba", !s.hoja && innerHeight - r.bottom < alto + 16 && r.top > alto + 16);
   abierto = s;
   const i = opciones(s).findIndex((o) => o.selected);
   marcar(s, i >= 0 ? i : 0, true);
@@ -132,7 +148,9 @@ function abrir(s) {
 }
 
 function cerrar(s, devolverFoco = false) {
+  if (!s.envoltura.classList.contains("abierto")) return;
   s.envoltura.classList.remove("abierto");
+  if (s.hoja) soltar();
   s.boton.setAttribute("aria-expanded", "false");
   s.menu.removeAttribute("aria-activedescendant");
   if (abierto === s) abierto = null;

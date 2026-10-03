@@ -374,7 +374,11 @@ const secciones = [
   </Modal>
 
   <Modal id="modal-foto-detalle" titulo="Foto" ancho>
-    <div class="detalle-foto"><img data-detalle-img alt="" /></div>
+    <div class="detalle-foto">
+      <img data-detalle-img alt="" />
+      <!-- borrar va sobre la foto, en la esquina, como en Fotos de iOS -->
+      <button class="detalle-borrar" type="button" data-detalle-quitar aria-label="Eliminar esta foto" title="Eliminar esta foto"><IconoAdmin name="basura" size={18} /></button>
+    </div>
     <p class="consejo consejo--alerta" data-detalle-aviso hidden>Esta foto no tiene fondo transparente: sobre el gris del sitio se verá como un cuadro. Para la principal conviene un recorte en PNG o WebP.</p>
     <div class="campo">
       <div class="campo-etiqueta"><label for="detalle-alt">Texto alternativo</label></div>
@@ -382,7 +386,6 @@ const secciones = [
       <p class="campo-ayuda">Qué se ve en la foto, para quien no la ve y para Google.</p>
     </div>
     <Fragment slot="pie">
-      <button class="boton boton--texto boton--texto-peligro izquierda" type="button" data-detalle-quitar><IconoAdmin name="basura" size={16} />Eliminar foto</button>
       <button class="boton" type="button" data-detalle-principal>Hacer principal</button>
       <button class="boton boton--primario" type="button" data-detalle-listo>Listo</button>
     </Fragment>
@@ -417,7 +420,7 @@ const secciones = [
     piezaVacia, OBLIGATORIOS, MEDIDAS, MAX_COMBINA,
   } from "../../scripts/esquemas/pieza.js";
   import { opciones, nombreOpcion as nombreDe, listasDeChips, obligatoriasDe, medidasDe, partesDe, medida as medidaDe, esConteo, esObligatoria, CONTROL_PROPIO } from "../../scripts/listas.js";
-  import { abrirModal, cerrarModal, avisar, escapar, fechaRelativa, ICONO_BASURA } from "../../scripts/ui.js";
+  import { abrirModal, cerrarModal, avisar, confirmar, escapar, fechaRelativa, ICONO_BASURA } from "../../scripts/ui.js";
 
   const base = import.meta.env.BASE_URL;
   const SITIO = (import.meta.env.PUBLIC_STG || "http://localhost:4321").replace(/\/+$/, "");
@@ -909,10 +912,12 @@ const secciones = [
     mover(i, 0);
     avisar("Ahora es la foto principal. Revisa su texto alternativo.");
   });
-  $("[data-detalle-quitar]").addEventListener("click", () => {
+  $("[data-detalle-quitar]").addEventListener("click", async () => {
     const i = fotoAbierta;
     fotoAbierta = null;
     cerrarModal("modal-foto-detalle");
+    const ok = await confirmar({ titulo: i === 0 ? "Eliminar la foto principal" : "Eliminar esta foto", texto: i === 0 ? "La siguiente pasa a ser la principal. Revisa que sea un recorte con fondo transparente." : "Se quita de la galería de la pieza.", accion: "Eliminar", peligro: true });
+    if (!ok) return;
     pieza.img.splice(i, 1);
     pieza.alts.splice(i, 1);
     pintarGaleria();

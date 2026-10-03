@@ -108,6 +108,8 @@ html[data-cajon="abierto"] .bl{translate:0 0;}
    orilla donde todavía queda algo por ver. */
 .bl-nav{
   flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;
+  /* el scroll se queda en el menú: al llegar al tope no arrastra la página */
+  overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;
   margin-inline:-4px;padding-inline:4px;
   scrollbar-width:none;-ms-overflow-style:none;
 }

@@ -43,8 +43,15 @@ export function abrirModal(id) {
   d.classList.remove("modal--cerrando");
   d.showModal();
   bloquear();
-  const primero = d.querySelector("[autofocus], input, select, textarea, button:not([data-cierra-modal])");
-  primero?.focus({ preventScroll: true });
+  // En escritorio el foco va al primer campo; en el teléfono no, porque
+  // abriría el teclado encima de la hoja sin que nadie lo pidiera.
+  if (matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    const primero = d.querySelector("[autofocus], input, select, textarea, button:not([data-cierra-modal])");
+    primero?.focus({ preventScroll: true });
+  } else {
+    d.setAttribute("tabindex", "-1");
+    d.focus({ preventScroll: true });
+  }
 }
 
 export function cerrarModal(id) {
@@ -270,3 +277,18 @@ function deslizarParaCerrar(d) {
     })
   );
 }
+
+// Lo que tapa la parte de abajo de la pantalla (la barra del navegador en
+// algunos teléfonos, o el teclado): las hojas y las barras ancladas abajo
+// se suben esa medida para que nunca queden debajo. Va en --abajo.
+(function vigilarAbajo() {
+  const vv = window.visualViewport;
+  if (!vv) return;
+  const medir = () => {
+    const abajo = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
+    document.documentElement.style.setProperty("--abajo", `${abajo}px`);
+  };
+  vv.addEventListener("resize", medir);
+  vv.addEventListener("scroll", medir);
+  medir();
+})();

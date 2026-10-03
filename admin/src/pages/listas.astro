@@ -136,7 +136,7 @@ import "../styles/listas.css";
     <ul class="grupo-lista grupo-lista--ordenable" data-lista-grupos></ul>
     <form class="agregar-opcion" data-agregar-grupo novalidate>
       <input class="control" type="text" placeholder="Nuevo grupo, ej. Iluminación" autocomplete="off" data-grupo-nuevo aria-label="Nombre del grupo nuevo" />
-      <button class="boton boton--primario" type="submit">Agregar</button>
+      <button class="boton boton--suave" type="submit">Agregar</button>
     </form>
     <Fragment slot="pie">
       <button class="boton boton--primario" type="button" data-cierra-modal>Listo</button>
@@ -341,7 +341,7 @@ import "../styles/listas.css";
         <form class="agregar-opcion" data-agregar novalidate>
           ${l.color ? '<span class="agregar-color" style="background:#8A8A87"><input type="color" value="#8A8A87" data-color-nuevo aria-label="Color" /></span>' : ""}
           <input class="control" type="text" data-nombre-nuevo placeholder="${l.color ? "Nuevo grupo, ej. Naranja" : `Nueva opción de ${escapar(l.nombre.toLowerCase())}`}" autocomplete="off" aria-label="Nombre de la opción nueva" />
-          <button class="boton boton--primario" type="submit"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg>Agregar</button>
+          <button class="boton boton--suave" type="submit"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg>Agregar</button>
         </form>
         <p class="campo-error" data-error-nuevo hidden style="display:block"></p>
         <p class="t-mini panel-nota">Arrastra la asa para ordenar: así salen en la pieza y en los filtros del sitio. Para cambiar un nombre, tócalo. Una opción en uso no se puede quitar hasta cambiar las piezas que la usan.</p>
@@ -609,7 +609,7 @@ import "../styles/listas.css";
         </div>
         <div class="panel-cabeza-acciones">
           <button class="boton boton--suave boton-renombrar" type="button" data-grupos aria-label="Grupos de medidas"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><rect x="3" y="3.5" width="14" height="5" rx="1.5"/><rect x="3" y="11.5" width="14" height="5" rx="1.5"/></svg><span class="boton-texto">Grupos</span></button>
-          <button class="boton boton--primario boton-renombrar" type="button" data-nueva-medida aria-label="Nueva medida"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg><span class="boton-texto">Nueva medida</span></button>
+          <button class="boton boton--suave boton-renombrar" type="button" data-nueva-medida aria-label="Nueva medida"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg><span class="boton-texto">Nueva medida</span></button>
         </div>
       </header>
       ${listas.gruposMedida.map((g) => {
@@ -777,7 +777,7 @@ import "../styles/listas.css";
           <h2 class="t-seccion">Partes de construcción</h2>
           <p class="t-mini">De qué está hecha cada parte de la pieza. Cada categoría pide las suyas. Arrástralas para ordenarlas: así salen en la pieza y en la ficha.</p>
         </div>
-        <button class="boton boton--primario boton-renombrar" type="button" data-nueva-parte aria-label="Nueva parte"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg><span class="boton-texto">Nueva parte</span></button>
+        <button class="boton boton--suave boton-renombrar" type="button" data-nueva-parte aria-label="Nueva parte"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg><span class="boton-texto">Nueva parte</span></button>
       </header>
       <div class="panel-bloque">
         <ul class="grupo-lista grupo-lista--ordenable" data-partes>${listas.partes.map((p) => filaOrdenable({
