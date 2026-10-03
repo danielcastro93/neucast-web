@@ -121,3 +121,26 @@ export function validarCategoria(cat, { todos = false } = {}) {
   }
   return errores;
 }
+
+// Un bloque editorial. Para prenderlo necesita imagen, rótulo, título, botón
+// y destino; apagado se puede guardar a medias.
+export const ETIQUETAS_BLOQUE = { img: "la imagen", alt: "el texto alternativo", antetitulo: "el rótulo", titulo: "el título", cta: "el texto del botón", destino: "a dónde lleva" };
+export const MEDIDAS_BLOQUE = { antetitulo: { min: 3, max: 40 }, titulo: { min: 10, max: 60 }, cta: { min: 3, max: 30 }, alt: { min: 20, max: 160 } };
+export function validarBloque(b) {
+  const errores = {};
+  for (const campo of ["img", "alt", "antetitulo", "titulo", "cta"]) {
+    if (vacio((b[campo] || "").trim())) errores[campo] = `Falta ${ETIQUETAS_BLOQUE[campo]}`;
+  }
+  const d = b.destino || {};
+  if (!d.tipo || (d.tipo !== "proyectos" && vacio(d.valor))) errores.destino = "Falta a dónde lleva";
+  else if (d.tipo === "externo" && !/^https?:\/\/\S+$/.test(d.valor)) errores.destino = "La dirección externa empieza con https://";
+  for (const [campo, m] of Object.entries(MEDIDAS_BLOQUE)) {
+    const t = (b[campo] || "").trim();
+    if (!t || errores[campo]) continue;
+    const e = revisarTexto(t) || (t.length < m.min ? `Muy corto: ${t.length} de ${m.min} caracteres mínimos` : t.length > m.max ? `Muy largo: ${t.length} de ${m.max} caracteres máximos` : null);
+    if (e) errores[campo] = e;
+  }
+  return errores;
+}
+export const enlaceDeBloque = (d) =>
+  !d ? "" : d.tipo === "proyectos" ? "/proyectos/" : d.tipo === "proyecto" ? `/proyectos/${d.valor}/` : d.tipo === "categoria" ? `/muebles/${d.valor}/` : d.valor || "";

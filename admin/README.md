@@ -27,6 +27,7 @@ admin/
 │   │   ├── piezas/            lista y edición de piezas
 │   │   ├── destacadas.astro   las piezas del carrusel de la portada y su orden
 │   │   ├── categorias/        lista (con Todos los muebles) y edición de categorías
+│   │   ├── bloques/           las tarjetas editoriales del catálogo: lista y edición
 │   │   └── listas.astro       listas configurables, medidas y partes: crecen a cualquier tipo de mueble
 │   ├── components/            Modal, IconoAdmin, PasosEditor
 │   ├── scripts/

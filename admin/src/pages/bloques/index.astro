@@ -1,0 +1,184 @@
+---
+// Bloques: las tarjetas editoriales que se intercalan entre las piezas del
+// catálogo (tras la pieza 8 y tras la 20). Cada bloque dice dónde sale: en
+// /muebles/ ("Todos los muebles") y en qué categorías. En cada listado entran
+// los primeros dos prendidos que le toquen, en este orden.
+import Admin from "../../layouts/Admin.astro";
+import IconoAdmin from "../../components/IconoAdmin.astro";
+import "../../styles/editor.css";
+const base = import.meta.env.BASE_URL;
+---
+<Admin titulo="Bloques" seccion="bloques">
+  <div class="cabecera cabecera--compacta">
+    <div class="cabecera-textos">
+      <h1 class="t-pantalla">Bloques</h1>
+      <p class="t-apoyo">Las tarjetas que se intercalan entre las piezas del catálogo.<span class="no-telefono"> Salen hasta dos por listado, tras la pieza 8 y tras la 20, en este orden.</span></p>
+    </div>
+    <div class="cabecera-acciones">
+      <a class="boton boton--primario" href={`${base}bloques/editar/`} aria-label="Nuevo bloque"><IconoAdmin name="mas" size={16} /><span class="boton-texto">Nuevo bloque</span></a>
+    </div>
+  </div>
+
+  <section class="bloques">
+    <div class="bloques-cabeza">
+      <span class="grupo-rotulo" data-total></span>
+      <span class="t-mini no-telefono">Arrástralos para cambiar el orden</span>
+    </div>
+    <ul class="grupo-lista grupo-lista--ordenable" data-lista></ul>
+    <div class="vacio" data-vacio hidden>
+      <IconoAdmin name="bloques" size={36} />
+      <b>Todavía no hay bloques</b>
+      <p>Sin bloques, el catálogo enseña solo piezas.</p>
+      <a class="boton boton--chico" href={`${base}bloques/editar/`}>Nuevo bloque</a>
+    </div>
+    <div class="bloques-aviso" data-avisos hidden></div>
+  </section>
+</Admin>
+
+<script>
+  import { listar, guardar, borrar } from "../../scripts/api.js";
+  import { medio } from "../../scripts/medios.js";
+  import { avisar, confirmar, escapar } from "../../scripts/ui.js";
+  import { filaOrdenable, cablearOrdenables } from "../../scripts/ordenar.js";
+
+  const $ = (s, el = document) => el.querySelector(s);
+  const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+  const base = import.meta.env.BASE_URL;
+  let bloques = [], categorias = [];
+  const MAX = 2;
+
+  const nombreDonde = (slug) => (slug === "todos" ? "Todos los muebles" : categorias.find((c) => c.slug === slug)?.name || slug);
+  const resumenDonde = (donde) => {
+    if (!donde) return "En todo el catálogo";
+    if (!donde.length) return "En ningún listado";
+    const n = donde.map(nombreDonde);
+    return n.length <= 2 ? n.join(" y ") : `${n.slice(0, 2).join(", ")} y ${n.length - 2} más`;
+  };
+
+  function pintar() {
+    bloques.sort((a, b) => (a.orden ?? 99) - (b.orden ?? 99));
+    const caja = $("[data-lista]");
+    caja.innerHTML = bloques
+      .map((b) => filaOrdenable({
+        datos: `data-id="${escapar(b.id)}"`,
+        quitar: `Borrar ${b.titulo || "el bloque"}`,
+        contenido: `<a class="fila-abre bloque-fila" href="${base}bloques/editar/?id=${encodeURIComponent(b.id)}">
+          <span class="miniatura bloque-foto">${b.img ? `<img src="${escapar(medio(b.img))}" alt="" loading="lazy" draggable="false" />` : ""}</span>
+          <span class="bloque-texto">
+            <small class="bloque-ante">${escapar(b.antetitulo || "Sin rótulo")}</small>
+            <strong>${escapar(b.titulo || "Sin título")}</strong>
+            <small>${escapar(resumenDonde(b.donde))}</small>
+          </span>
+          <svg class="fila-lista-flecha" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 5 5 5-5 5"/></svg>
+        </a>
+        <label class="interruptor interruptor--solo bloque-activo" title="${b.activo ? "Prendido" : "Apagado"}">
+          <input type="checkbox" role="switch" data-activo="${escapar(b.id)}" ${b.activo ? "checked" : ""} aria-label="Prendido" />
+          <span class="interruptor-pista"></span>
+        </label>`,
+      }))
+      .join("");
+    $("[data-vacio]").hidden = bloques.length > 0;
+    caja.hidden = !bloques.length;
+    const prendidos = bloques.filter((b) => b.activo).length;
+    $("[data-total]").textContent = bloques.length ? `${bloques.length} ${bloques.length === 1 ? "bloque" : "bloques"} · ${prendidos} ${prendidos === 1 ? "prendido" : "prendidos"}` : "";
+    pintarAvisos();
+
+    cablearOrdenables(caja, {
+      alSoltar: (desde, hasta) => {
+        const [b] = bloques.splice(desde, 1);
+        bloques.splice(hasta, 0, b);
+        guardarOrden();
+      },
+      alQuitar: (i) => quitar(bloques[i]),
+    });
+    $$("[data-activo]").forEach((i) =>
+      i.addEventListener("change", async () => {
+        const b = bloques.find((x) => x.id === i.dataset.activo);
+        try {
+          Object.assign(b, await guardar("bloques", { ...b, _original: b.id, activo: i.checked }));
+          dispatchEvent(new CustomEvent("neucast:guardado"));
+          avisar(i.checked ? "Bloque prendido" : "Bloque apagado");
+          pintar();
+        } catch (e) {
+          i.checked = !i.checked;
+          avisar(e.message || "No se pudo cambiar", { tipo: "error" });
+        }
+      })
+    );
+  }
+
+  // En cada listado solo salen los primeros dos prendidos: si hay más, se avisa.
+  function pintarAvisos() {
+    const listados = ["todos", ...categorias.map((c) => c.slug)];
+    const sobran = listados
+      .map((l) => ({ l, n: bloques.filter((b) => b.activo && (!b.donde || b.donde.includes(l))).length }))
+      .filter((x) => x.n > MAX);
+    const caja = $("[data-avisos]");
+    caja.hidden = !sobran.length;
+    caja.innerHTML = sobran
+      .map((x) => `<p class="t-mini">En <b>${escapar(nombreDonde(x.l))}</b> hay ${x.n} prendidos: solo salen los primeros dos.</p>`)
+      .join("");
+  }
+
+  async function guardarOrden() {
+    const cambiados = bloques.map((b, i) => ({ b, orden: i + 1 })).filter(({ b, orden }) => b.orden !== orden);
+    cambiados.forEach(({ b, orden }) => (b.orden = orden));
+    pintar();
+    try {
+      for (const { b } of cambiados) await guardar("bloques", { ...b, _original: b.id });
+      dispatchEvent(new CustomEvent("neucast:guardado"));
+      avisar("Orden guardado");
+    } catch (e) {
+      avisar(e.message || "No se pudo guardar el orden", { tipo: "error" });
+    }
+  }
+
+  async function quitar(b) {
+    const ok = await confirmar({ titulo: `Borrar "${b.titulo || "el bloque"}"`, texto: "Desaparece del catálogo. Si solo quieres esconderlo, apágalo.", accion: "Borrar el bloque", peligro: true });
+    if (!ok) return;
+    try {
+      await borrar("bloques", b.id);
+      bloques = bloques.filter((x) => x !== b);
+      pintar();
+      dispatchEvent(new CustomEvent("neucast:guardado"));
+      avisar("Se borró el bloque");
+    } catch (e) {
+      avisar(e.message, { tipo: "error" });
+    }
+  }
+
+  async function cargar() {
+    [bloques, categorias] = await Promise.all([listar("bloques"), listar("categorias")]);
+    pintar();
+  }
+  cargar().catch((e) => avisar(e.message || "No se pudieron cargar los bloques", { tipo: "error" }));
+</script>
+
+<style>
+  .bloques{display:flex;flex-direction:column;gap:12px;}
+  .bloques-cabeza{display:flex;align-items:baseline;justify-content:space-between;gap:16px;}
+  .bloques-cabeza .grupo-rotulo{margin:0 0 0 4px;}
+  .bloques :global(.bloque-fila){display:flex;align-items:center;gap:14px;min-height:80px;color:inherit;text-decoration:none;}
+  .bloques :global(.fila-ordenable){padding-right:12px;gap:12px;}
+  .bloques :global(.bloque-foto){width:88px;height:56px;border-radius:12px;flex:none;}
+  .bloques :global(.bloque-foto img){object-fit:cover;padding:0;}
+  .bloques :global(.bloque-texto){flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+  .bloques :global(.bloque-texto strong){font-size:var(--t-cuerpo);font-weight:600;}
+  .bloques :global(.bloque-texto small){font-size:var(--t-subtitulo);color:var(--etiqueta-3);}
+  .bloques :global(.bloque-ante){text-transform:uppercase;letter-spacing:.08em;font-size:var(--t-nota) !important;font-weight:600;}
+  .bloques :global(.bloque-activo){flex:none;margin-left:4px;}
+  .bloques-aviso{padding:14px 18px;border-radius:14px;background:var(--alerta-suave);color:var(--alerta);}
+  .bloques-aviso .t-mini{color:inherit;}
+  @media (max-width:640px){
+    /* interruptor y bote apilados a la derecha: el texto se queda con el ancho */
+    .bloques :global(.fila-ordenable){display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-rows:auto auto;column-gap:10px;row-gap:4px;align-items:center;padding:10px 10px 10px 4px;}
+    .bloques :global(.fila-ordenable .asa){grid-column:1;grid-row:1 / span 2;}
+    .bloques :global(.bloque-fila){grid-column:2;grid-row:1 / span 2;gap:10px;min-height:64px;}
+    .bloques :global(.bloque-activo){grid-column:3;grid-row:1;margin:0;justify-self:center;}
+    .bloques :global(.fila-ordenable .fila-lista-quitar){grid-column:3;grid-row:2;justify-self:center;opacity:1;}
+    .bloques :global(.bloque-foto){width:60px;height:42px;}
+    .bloques :global(.bloque-fila .fila-lista-flecha){display:none;}
+    .bloques :global(.bloque-ante),.bloques :global(.bloque-texto > small:last-child){white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .bloques :global(.bloque-texto strong){display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  }
+</style>

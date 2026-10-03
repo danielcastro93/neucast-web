@@ -320,12 +320,19 @@ export const piezas = [
 //    aguanta solo.
 const POSICIONES_BLOQUE = [8, 20];
 
-// Solo para /muebles/, que es el único listado sin tema: ahí cualquier proyecto
-// es pertinente porque la página los cubre todos. El primero manda al listado
-// completo y el segundo a un proyecto concreto: uno prueba que hay oficio, el
-// otro enseña una pieza instalada.
-const bloquesGenerales = [
+// Los bloques, en una sola lista. Cada uno dice dónde sale (`donde`): "todos"
+// es /muebles/ y lo demás son slugs de categoría. En cada listado entran los
+// activos que le toquen, en este orden, hasta dos (regla 1).
+//
+// PARA EL ADMINISTRADOR: esta lista la alimenta la pantalla Bloques. Cada
+// bloque trae imagen, rótulo (antetitulo), título, texto del botón (cta), a
+// dónde lleva (enlace, ya resuelto por la API: un proyecto, una categoría o
+// una dirección externa) y si está prendido.
+export const bloques = [
   {
+    id: "proyectos",
+    activo: true,
+    donde: ["todos"],
     img: "/img/cta-sillones.jpg",
     alt: "Área común corporativa con sillones instalados por Neucast",
     antetitulo: "Trabajo terminado",
@@ -334,6 +341,10 @@ const bloquesGenerales = [
     cta: "Ver los proyectos",
   },
   {
+    id: "cafeteria-cdmx",
+    activo: true,
+    // también en Cafeterías: es un proyecto de esa categoría (regla 4)
+    donde: ["todos", "cafeterias"],
     img: "/img/proyecto-cafeteria.jpg",
     alt: "Cafetería corporativa amueblada por Neucast",
     antetitulo: "Proyecto · Ciudad de México",
@@ -341,29 +352,15 @@ const bloquesGenerales = [
     enlace: "/proyectos/cafeteria-corporativa-cdmx/",
     cta: "Recorrer el proyecto",
   },
-];
-
-// Una categoría solo lleva bloque si tenemos algo que de verdad sea de ella.
-// Las que faltan no llevan ninguno, a propósito.
-const bloquesPorCategoria = {
-  cafeterias: [
-    {
-      img: "/img/proyecto-cafeteria.jpg",
-      alt: "Cafetería corporativa amueblada por Neucast",
-      antetitulo: "Proyecto · Ciudad de México",
-      titulo: "Una cafetería para 300 personas",
-      enlace: "/proyectos/cafeteria-corporativa-cdmx/",
-      cta: "Recorrer el proyecto",
-    },
-  ],
   // Lounge se queda sin bloque a propósito: no hay un proyecto de esa categoría
   // todavía, y la regla es que sin material propio no va ninguno.
-};
+];
 
 // Devuelve los bloques que le tocan a un listado, ya colocados y ya filtrados
-// por la regla 3. `cat` en null significa el catálogo completo.
+// por la regla 3. `cat` en null significa el catálogo completo (/muebles/).
 export const bloquesPara = (cat, nPiezas) =>
-  (cat ? bloquesPorCategoria[cat] || [] : bloquesGenerales)
+  bloques
+    .filter((b) => b.activo !== false && (!b.donde || b.donde.includes(cat || "todos")))
     .slice(0, POSICIONES_BLOQUE.length)
     .map((b, i) => ({ ...b, tras: POSICIONES_BLOQUE[i] }))
     .filter((b) => nPiezas >= b.tras + 4);

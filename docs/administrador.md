@@ -131,6 +131,31 @@ trae, además de lo de hoy (`slug`, `name`, `photo`, `alt`, `h1`, `title`,
   `photo`, `alt`, `h1`, `title`, `desc`, `intro`. Son los de /muebles/; el
   sitio ya los lee de `todosLosMuebles` en `site.js`.
 
+**Bloques editoriales (pantalla Bloques, 2 de octubre de 2026).** Las
+tarjetas que se intercalan entre las piezas del catálogo (`bloques` en
+`catalogo.js`; las posiciones, tras la pieza 8 y tras la 20, no cambian):
+
+```js
+{
+  id: "cafeteria-cdmx",
+  activo: true,                        // apagado no sale en ningún listado
+  donde: ["todos", "cafeterias"],      // "todos" es /muebles/; null = en todo el catálogo
+  orden: 2,                            // en cada listado entran los primeros dos que le toquen
+  img, alt, antetitulo, titulo, cta,   // la tarjeta
+  destino: { tipo: "proyecto", valor: "cafeteria-corporativa-cdmx" },
+  //        tipo: "proyectos" (la lista), "categoria" (slug) o "externo" (https://…)
+  enlace: "/proyectos/cafeteria-corporativa-cdmx/", // lo que lee el sitio: la API lo deriva de `destino`
+}
+```
+
+- Para prenderlo hacen falta imagen, texto alternativo, rótulo, título, botón
+  y destino (medidas en `admin/src/scripts/validar.js`, `validarBloque`).
+- Un destino externo se abre en otra pestaña (`target="_blank"`): el sitio ya
+  lo hace cuando `enlace` empieza con `http`.
+- El sitio ya lee esta lista: `bloquesPara(cat, nPiezas)` toma los activos
+  cuyo `donde` incluya el listado, en orden, hasta dos, y aplica la regla de
+  "solo si queda una fila completa de piezas después".
+
 En el administrador, los datos de la empresa son **una pantalla de ajustes**
 (un solo registro), no una lista. Las categorías son su propia tabla.
 

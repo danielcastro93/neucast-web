@@ -6,11 +6,11 @@
 // Para volver a la semilla: localStorage.clear() en la consola, o el botón
 // "Restablecer la simulación" de la pantalla de inicio.
 import { ErrorApi } from "./api.js";
-import { validarPieza, validarCategoria } from "./validar.js";
+import { validarPieza, validarCategoria, validarBloque, enlaceDeBloque } from "./validar.js";
 
 const LLAVE = (c) => `neucast-admin:${c}`;
 const cache = new Map();
-const CON_ID = { piezas: "slug", categorias: "slug", proyectos: "slug", usuarios: "id" };
+const CON_ID = { piezas: "slug", categorias: "slug", proyectos: "slug", bloques: "id", usuarios: "id" };
 
 // Un retraso corto para que las pantallas se vean como con la API real: con
 // respuesta instantánea los estados de "guardando" nunca aparecen y después
@@ -118,6 +118,12 @@ export async function guardar(coleccion, registro) {
     }
     const repetida = datos.find((r) => r.slug === nuevo.slug && r.slug !== nuevo._original);
     if (repetida) throw new ErrorApi("Ya hay una categoría con esa dirección", { slug: "Ya existe otra categoría con esta dirección" });
+  }
+
+  if (coleccion === "bloques") {
+    const errores = validarBloque(nuevo);
+    if (nuevo.activo && Object.keys(errores).length) throw new ErrorApi("Faltan datos para prender el bloque", errores);
+    nuevo.enlace = enlaceDeBloque(nuevo.destino); // lo que lee el sitio
   }
 
   const original = nuevo._original ?? nuevo[llave];

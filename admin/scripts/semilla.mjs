@@ -14,7 +14,7 @@ const SALIDA = path.join(RAIZ, "public/api");
 
 const { site, categories, destacados, todosLosMuebles, descripcionMarca } =
   await import("../../sitio/src/data/site.js");
-const { piezas, filtros, materiales, gruposColor } =
+const { piezas, filtros, materiales, gruposColor, bloques } =
   await import("../../sitio/src/data/catalogo.js");
 const { fichas, etiquetasMedida, etiquetasConstruccion } = await import("../../sitio/src/data/fichas.js");
 const { proyectos } = await import("../../sitio/src/data/proyectos.js");
@@ -158,6 +158,21 @@ escribir("home-office", {
   sets: sets.map((s) => ({ ...s, piezas: s.piezas.map((x) => x.slug) })),
   ideas,
 });
+
+// Los bloques editoriales del catálogo. `destino` es lo que se elige en el
+// administrador; `enlace` es lo que el sitio lee (la API lo deriva).
+const destinoDe = (enlace) => {
+  if (enlace === "/proyectos/") return { tipo: "proyectos", valor: "" };
+  let m = enlace.match(/^\/proyectos\/([^/]+)\/$/);
+  if (m) return { tipo: "proyecto", valor: m[1] };
+  m = enlace.match(/^\/muebles\/([^/]+)\/$/);
+  if (m) return { tipo: "categoria", valor: m[1] };
+  return { tipo: "externo", valor: enlace };
+};
+escribir(
+  "bloques",
+  bloques.map((b, i) => ({ ...b, destino: destinoDe(b.enlace), orden: i + 1, actualizado: AYER }))
+);
 
 escribir("ajustes", {
   nombre: site.name,

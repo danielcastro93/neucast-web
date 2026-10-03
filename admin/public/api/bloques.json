@@ -1,0 +1,41 @@
+[
+  {
+    "id": "proyectos",
+    "activo": true,
+    "donde": [
+      "todos"
+    ],
+    "img": "/img/cta-sillones.jpg",
+    "alt": "Área común corporativa con sillones instalados por Neucast",
+    "antetitulo": "Trabajo terminado",
+    "titulo": "Oficinas que ya amueblamos completas",
+    "enlace": "/proyectos/",
+    "cta": "Ver los proyectos",
+    "destino": {
+      "tipo": "proyectos",
+      "valor": ""
+    },
+    "orden": 1,
+    "actualizado": "2026-10-01T10:00:00.000Z"
+  },
+  {
+    "id": "cafeteria-cdmx",
+    "activo": true,
+    "donde": [
+      "todos",
+      "cafeterias"
+    ],
+    "img": "/img/proyecto-cafeteria.jpg",
+    "alt": "Cafetería corporativa amueblada por Neucast",
+    "antetitulo": "Proyecto · Ciudad de México",
+    "titulo": "Una cafetería para 300 personas",
+    "enlace": "/proyectos/cafeteria-corporativa-cdmx/",
+    "cta": "Recorrer el proyecto",
+    "destino": {
+      "tipo": "proyecto",
+      "valor": "cafeteria-corporativa-cdmx"
+    },
+    "orden": 2,
+    "actualizado": "2026-10-01T10:00:00.000Z"
+  }
+]

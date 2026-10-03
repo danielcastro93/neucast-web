@@ -188,7 +188,7 @@ const bloquesVisibles = bloquesPara(catActiva, piezas.length);
           <>
             <PiezaCard pieza={pieza} />
             {bloquesVisibles.filter((b) => b.tras === i + 1).map((b) => (
-              <a class="mb-bloque" href={b.enlace} data-tras={b.tras}>
+              <a class="mb-bloque" href={b.enlace} data-tras={b.tras} target={/^https?:/.test(b.enlace) ? "_blank" : undefined} rel={/^https?:/.test(b.enlace) ? "noopener" : undefined}>
                 <img src={b.img} alt={b.alt} loading="lazy" />
                 <span class="mb-bloque-velo" aria-hidden="true"></span>
                 <span class="mb-bloque-txt">
@@ -417,7 +417,8 @@ const bloquesVisibles = bloquesPara(catActiva, piezas.length);
       display:flex;flex-direction:column;gap:4px;
       text-shadow:0 1px 18px rgba(0,0,0,.35);
     }
-    .mb-bloque-ante{font-size:var(--fs-sm);}
+    /* rótulo chico, como los demás overlines del sitio */
+    .mb-bloque-ante{font-size:var(--fs-2xs);}
     .mb-bloque-cta{
       display:inline-flex;align-items:center;gap:8px;margin-top:8px;
       font-size:var(--fs-xs);font-weight:600;letter-spacing:var(--track-label);

@@ -1,0 +1,440 @@
+---
+// Un bloque editorial: imagen, rótulo, título, botón, a dónde lleva (un
+// proyecto, la lista de proyectos, una categoría o una dirección externa),
+// dónde sale y si está prendido.
+import Admin from "../../layouts/Admin.astro";
+import IconoAdmin from "../../components/IconoAdmin.astro";
+import Modal from "../../components/Modal.astro";
+import "../../styles/editor.css";
+import "../../styles/listas.css";
+const base = import.meta.env.BASE_URL;
+---
+<Admin titulo="Bloque" seccion="bloques" migas={[{ nombre: "Bloques", ruta: "bloques/" }]} publicarAbajo={false}>
+  <form class="editor" novalidate data-form>
+    <div class="cabecera">
+      <div class="cabecera-textos">
+        <h1 class="t-pantalla" data-titulo-pantalla>Nuevo bloque</h1>
+        <p class="t-apoyo" data-nota-pantalla>Se guarda apagado hasta tener lo obligatorio (<span class="obligatorio">*</span>).</p>
+      </div>
+    </div>
+
+    <div class="formulario">
+      <div class="formulario-secciones">
+        <section class="tarjeta seccion" id="tarjeta">
+          <div class="seccion-cabeza">
+            <span class="seccion-n">1</span>
+            <div>
+              <h2 class="t-seccion">La tarjeta</h2>
+              <p class="t-mini">Lo que se ve entre las piezas: una foto grande con el texto encima.</p>
+            </div>
+          </div>
+          <div class="seccion-cuerpo">
+            <div class="campo" data-campo="img">
+              <div class="campo-etiqueta"><span class="etiqueta">Imagen<span class="obligatorio">*</span></span></div>
+              <div class="foto-categoria" data-foto></div>
+              <p class="campo-ayuda">Horizontal y de un espacio real: ocupa el lugar de dos piezas.</p>
+              <p class="campo-error" data-error></p>
+            </div>
+            <div class="campo" data-campo="alt">
+              <div class="campo-etiqueta"><label for="alt">Texto alternativo<span class="obligatorio">*</span></label><span class="campo-contador" data-contador="alt"></span></div>
+              <input class="control" id="alt" name="alt" type="text" placeholder="Ej. Cafetería corporativa amueblada por Neucast" />
+              <p class="campo-error" data-error></p>
+            </div>
+            <div class="fila">
+              <div class="campo" data-campo="antetitulo">
+                <div class="campo-etiqueta"><label for="antetitulo">Rótulo<span class="obligatorio">*</span></label><span class="campo-contador" data-contador="antetitulo"></span></div>
+                <input class="control" id="antetitulo" name="antetitulo" type="text" placeholder="Ej. Proyecto · Monterrey" />
+                <p class="campo-ayuda">La línea chica encima del título.</p>
+                <p class="campo-error" data-error></p>
+              </div>
+              <div class="campo" data-campo="cta">
+                <div class="campo-etiqueta"><label for="cta">Texto del botón<span class="obligatorio">*</span></label><span class="campo-contador" data-contador="cta"></span></div>
+                <input class="control" id="cta" name="cta" type="text" placeholder="Ej. Recorrer el proyecto" />
+                <p class="campo-error" data-error></p>
+              </div>
+            </div>
+            <div class="campo" data-campo="titulo">
+              <div class="campo-etiqueta"><label for="titulo">Título<span class="obligatorio">*</span></label><span class="campo-contador" data-contador="titulo"></span></div>
+              <input class="control" id="titulo" name="titulo" type="text" placeholder="Ej. Un piso operativo que crece de cuatro en cuatro" />
+              <p class="campo-error" data-error></p>
+            </div>
+            <div class="campo">
+              <div class="campo-etiqueta"><span class="etiqueta">Así se ve</span></div>
+              <a class="bloque-vista" data-vista href="#" tabindex="-1" aria-hidden="true">
+                <img data-vista-img alt="" hidden />
+                <span class="bloque-vista-velo"></span>
+                <span class="bloque-vista-txt">
+                  <span class="bloque-vista-ante" data-vista-ante>Rótulo</span>
+                  <span class="bloque-vista-titulo" data-vista-titulo>Título del bloque</span>
+                  <span class="bloque-vista-cta" data-vista-cta>Texto del botón →</span>
+                </span>
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <section class="tarjeta seccion" id="destino">
+          <div class="seccion-cabeza">
+            <span class="seccion-n">2</span>
+            <div>
+              <h2 class="t-seccion">A dónde lleva</h2>
+              <p class="t-mini">Lo que se abre al tocar la tarjeta.</p>
+            </div>
+          </div>
+          <div class="seccion-cuerpo">
+            <div class="campo" data-campo="destino">
+              <div class="campo-etiqueta"><label for="destino-tipo">Destino<span class="obligatorio">*</span></label></div>
+              <div class="fila">
+                <select class="control" id="destino-tipo" data-destino-tipo>
+                  <option value="proyecto">Un proyecto</option>
+                  <option value="proyectos">La lista de proyectos</option>
+                  <option value="categoria">Una categoría</option>
+                  <option value="externo">Una dirección externa</option>
+                </select>
+                <select class="control" data-destino-proyecto aria-label="Proyecto"></select>
+                <select class="control" data-destino-categoria aria-label="Categoría" hidden></select>
+                <input class="control mono" type="url" data-destino-externo placeholder="https://…" spellcheck="false" hidden />
+              </div>
+              <p class="campo-ayuda" data-destino-nota></p>
+              <p class="campo-error" data-error></p>
+            </div>
+          </div>
+        </section>
+
+        <section class="tarjeta seccion" id="donde">
+          <div class="seccion-cabeza">
+            <span class="seccion-n">3</span>
+            <div>
+              <h2 class="t-seccion">Dónde sale</h2>
+              <p class="t-mini">En cada listado entran hasta dos bloques prendidos, en el orden de la lista de Bloques.</p>
+            </div>
+          </div>
+          <div class="seccion-cuerpo">
+            <ul class="grupo-lista ajustes-lista">
+              <li class="fila-lista fila-lista--enlace" data-elegir-donde tabindex="0" role="button">
+                <span class="fila-lista-etiqueta">Listados</span>
+                <span class="fila-lista-valor" data-donde-texto></span>
+                <svg class="fila-lista-flecha" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 5 5 5-5 5"/></svg>
+              </li>
+              <li class="fila-lista">
+                <span class="fila-lista-etiqueta">Prendido<small class="fila-lista-sub">Apagado no sale en ningún listado; se queda guardado.</small></span>
+                <label class="interruptor interruptor--solo">
+                  <input type="checkbox" role="switch" name="activo" aria-label="Prendido" />
+                  <span class="interruptor-pista"></span>
+                </label>
+              </li>
+            </ul>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <div class="guardar" data-guardar-barra>
+      <span class="guardar-nota" data-pie-estado></span>
+      <a class="boton boton--texto" href={`${base}bloques/`} data-cancelar>Cancelar</a>
+      <button class="boton boton--primario" type="submit" data-guardar><IconoAdmin name="check" size={16} />Guardar</button>
+    </div>
+    <input type="file" accept="image/png,image/jpeg,image/webp" hidden data-archivo-foto />
+  </form>
+
+  <Modal id="modal-foto" titulo="Imagen del bloque" texto="Sube un archivo desde tu equipo o escribe la ruta de una foto que ya esté en el sitio.">
+    <button class="soltar" type="button" data-zona-foto>
+      <IconoAdmin name="subir" size={26} />
+      <b>Arrastra aquí la foto o haz clic para elegirla</b>
+      <span class="t-mini">JPG o WebP horizontal</span>
+    </button>
+    <div class="campo">
+      <div class="campo-etiqueta"><label for="ruta-foto">O la ruta en el sitio</label></div>
+      <input class="control mono" id="ruta-foto" type="text" placeholder="Ej. /img/proyecto-cafeteria.jpg" spellcheck="false" />
+    </div>
+    <Fragment slot="pie">
+      <button class="boton" type="button" data-cierra-modal>Cancelar</button>
+      <button class="boton boton--primario" type="button" data-usar-ruta>Usar la ruta</button>
+    </Fragment>
+  </Modal>
+
+  <Modal id="modal-categorias" titulo="Dónde sale">
+    <label class="interruptor" data-todas-caja>
+      <input type="checkbox" data-todas />
+      <span class="interruptor-pista"></span>
+      <span class="interruptor-texto">En todo el catálogo<small>Incluye las categorías que se creen después</small></span>
+    </label>
+    <ul class="grupo-lista lista-casillas" data-casillas></ul>
+    <Fragment slot="pie">
+      <button class="boton" type="button" data-cierra-modal>Cancelar</button>
+      <button class="boton boton--primario" type="button" data-categorias-listo>Listo</button>
+    </Fragment>
+  </Modal>
+</Admin>
+
+<script>
+  import { listar, obtener, guardar } from "../../scripts/api.js";
+  import { medio } from "../../scripts/medios.js";
+  import { abrirModal, cerrarModal, avisar, confirmar, escapar, fechaRelativa } from "../../scripts/ui.js";
+  import { validarBloque, MEDIDAS_BLOQUE, limpiarSlug } from "../../scripts/validar.js";
+
+  const $ = (s, el = document) => el.querySelector(s);
+  const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+  const base = import.meta.env.BASE_URL;
+  const form = $("[data-form]");
+  const original = new URLSearchParams(location.search).get("id");
+  const CAMPOS = ["alt", "antetitulo", "titulo", "cta"];
+
+  let bloque = { id: "", img: "", alt: "", antetitulo: "", titulo: "", cta: "", destino: { tipo: "proyecto", valor: "" }, donde: ["todos"], activo: false };
+  let bloques = [], categorias = [], proyectos = [];
+  let hayCambios = false, guardando = false;
+
+  const nombreDonde = (slug) => (slug === "todos" ? "Todos los muebles" : categorias.find((c) => c.slug === slug)?.name || slug);
+  const resumenDonde = (donde) => {
+    if (!donde) return "En todo el catálogo";
+    if (!donde.length) return "Ninguno: elige al menos uno";
+    const n = donde.map(nombreDonde);
+    return n.length <= 3 ? n.join(", ") : `${n.slice(0, 2).join(", ")} y ${n.length - 2} más`;
+  };
+
+  async function cargar() {
+    [bloques, categorias, proyectos] = await Promise.all([listar("bloques"), listar("categorias"), listar("proyectos")]);
+    if (original) bloque = { ...bloque, ...(await obtener("bloques", original)) };
+    $("[data-destino-proyecto]").innerHTML = '<option value="" hidden>Elige el proyecto</option>' + proyectos.map((p) => `<option value="${escapar(p.slug)}">${escapar(p.nombre)}</option>`).join("");
+    $("[data-destino-categoria]").innerHTML = '<option value="" hidden>Elige la categoría</option>' + categorias.map((c) => `<option value="${escapar(c.slug)}">${escapar(c.name)}</option>`).join("");
+    for (const c of CAMPOS) form[c].value = bloque[c] || "";
+    form.activo.checked = !!bloque.activo;
+    const d = bloque.destino || {};
+    $("[data-destino-tipo]").value = d.tipo || "proyecto";
+    if (d.tipo === "proyecto") $("[data-destino-proyecto]").value = d.valor || "";
+    if (d.tipo === "categoria") $("[data-destino-categoria]").value = d.valor || "";
+    if (d.tipo === "externo") $("[data-destino-externo]").value = d.valor || "";
+    pintarTodo();
+  }
+
+  function pintarTodo() {
+    const titulo = !original ? "Nuevo bloque" : bloque.titulo || "Bloque";
+    $("[data-titulo-pantalla]").textContent = titulo;
+    $("[data-miga-actual]").textContent = titulo;
+    document.title = `${titulo} · Administrador de Neucast`;
+    if (original) $("[data-nota-pantalla]").textContent = `${bloque.activo ? "Prendido" : "Apagado"} · cambiado ${fechaRelativa(bloque.actualizado)}`;
+    pintarFoto();
+    pintarDestino();
+    $("[data-donde-texto]").textContent = resumenDonde(bloque.donde);
+    actualizar();
+  }
+
+  function actualizar() {
+    for (const [campo, m] of Object.entries(MEDIDAS_BLOQUE)) {
+      const el = $(`[data-contador="${campo}"]`);
+      const n = form[campo].value.trim().length;
+      el.textContent = n ? `${n} / ${m.max}` : `${m.min} a ${m.max}`;
+      el.classList.toggle("fuera", !!n && (n < m.min || n > m.max));
+    }
+    // la vista: la tarjeta como sale en el catálogo
+    $("[data-vista-ante]").textContent = form.antetitulo.value.trim() || "Rótulo";
+    $("[data-vista-titulo]").textContent = form.titulo.value.trim() || "Título del bloque";
+    $("[data-vista-cta]").textContent = `${form.cta.value.trim() || "Texto del botón"} →`;
+    const img = $("[data-vista-img]");
+    img.hidden = !bloque.img;
+    if (bloque.img) img.src = medio(bloque.img);
+  }
+  form.addEventListener("input", (e) => { marcarCambio(); actualizar(); quitarError(e.target.name); });
+  form.addEventListener("change", marcarCambio);
+
+  /* ---------- Imagen ---------- */
+  function pintarFoto() {
+    const caja = $("[data-foto]");
+    caja.innerHTML = bloque.img
+      ? `<div class="foto-categoria-marco"><img src="${escapar(medio(bloque.img))}" alt="" /></div>
+         <div class="foto-categoria-acciones"><button class="boton boton--suave" type="button" data-cambiar-foto>Cambiar imagen</button></div>`
+      : `<button class="foto-agregar foto-agregar--primera foto-categoria-vacia" type="button" data-cambiar-foto>
+          <span class="foto-agregar-icono"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg></span>
+          <b>Agregar la imagen</b>
+        </button>`;
+    $("[data-cambiar-foto]", caja).addEventListener("click", () => { $("#ruta-foto").value = ""; abrirModal("modal-foto"); });
+  }
+  const archivoFoto = $("[data-archivo-foto]");
+  const zona = $("[data-zona-foto]");
+  zona.addEventListener("click", () => archivoFoto.click());
+  zona.addEventListener("dragover", (e) => { e.preventDefault(); zona.classList.add("sobre"); });
+  zona.addEventListener("dragleave", () => zona.classList.remove("sobre"));
+  zona.addEventListener("drop", (e) => { e.preventDefault(); zona.classList.remove("sobre"); usarArchivo(e.dataTransfer.files[0]); });
+  archivoFoto.addEventListener("change", () => { usarArchivo(archivoFoto.files[0]); archivoFoto.value = ""; });
+  $("[data-usar-ruta]").addEventListener("click", () => {
+    const ruta = $("#ruta-foto").value.trim();
+    if (!ruta) return $("#ruta-foto").focus();
+    ponerFoto(ruta.startsWith("/") || /^https?:/.test(ruta) ? ruta : `/${ruta}`);
+  });
+  // En la simulación la imagen se guarda achicada; la API real la recibe como archivo.
+  function usarArchivo(f) {
+    if (!f || !f.type.startsWith("image/")) return avisar("Ese archivo no es una foto", { tipo: "error" });
+    const img = new Image();
+    const url = URL.createObjectURL(f);
+    img.onload = () => {
+      const k = Math.min(1, 1400 / Math.max(img.width, img.height));
+      const c = document.createElement("canvas");
+      c.width = Math.round(img.width * k);
+      c.height = Math.round(img.height * k);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      ponerFoto(c.toDataURL("image/jpeg", 0.82));
+    };
+    img.onerror = () => avisar(`No se pudo leer ${f.name}`, { tipo: "error" });
+    img.src = url;
+  }
+  function ponerFoto(ruta) {
+    bloque.img = ruta;
+    cerrarModal("modal-foto");
+    pintarFoto();
+    quitarError("img");
+    marcarCambio();
+    actualizar();
+  }
+
+  /* ---------- Destino ---------- */
+  const NOTA_DESTINO = {
+    proyecto: "Abre la página de ese proyecto.",
+    proyectos: "Abre /proyectos/, con todos los proyectos.",
+    categoria: "Abre esa categoría del catálogo.",
+    externo: "Se abre en otra pestaña. Sirve para una campaña o una publicidad.",
+  };
+  function pintarDestino() {
+    const tipo = $("[data-destino-tipo]").value;
+    $("[data-destino-proyecto]").hidden = tipo !== "proyecto";
+    $("[data-destino-categoria]").hidden = tipo !== "categoria";
+    $("[data-destino-externo]").hidden = tipo !== "externo";
+    // los selects mejorados viven en una envoltura: se esconde la envoltura
+    $$("[data-destino-proyecto], [data-destino-categoria]").forEach((s) => (s.closest(".selector") || s).hidden = s.hidden);
+    $("[data-destino-nota]").textContent = NOTA_DESTINO[tipo];
+  }
+  $("[data-destino-tipo]").addEventListener("change", () => { pintarDestino(); quitarError("destino"); });
+  $$("[data-destino-proyecto], [data-destino-categoria], [data-destino-externo]").forEach((el) => el.addEventListener("change", () => quitarError("destino")));
+  function leerDestino() {
+    const tipo = $("[data-destino-tipo]").value;
+    const valor = tipo === "proyecto" ? $("[data-destino-proyecto]").value : tipo === "categoria" ? $("[data-destino-categoria]").value : tipo === "externo" ? $("[data-destino-externo]").value.trim() : "";
+    return { tipo, valor };
+  }
+
+  /* ---------- Dónde sale ---------- */
+  let alElegir = null;
+  function elegirDonde() {
+    const todas = $("[data-todas]");
+    todas.checked = bloque.donde === null;
+    const opciones = [{ slug: "todos", name: "Todos los muebles (/muebles/)" }, ...categorias];
+    $("[data-casillas]").innerHTML = opciones
+      .map((c) => `<li><label class="fila-lista casilla">
+        <input type="checkbox" value="${escapar(c.slug)}" ${bloque.donde === null || (bloque.donde || []).includes(c.slug) ? "checked" : ""} />
+        <span class="casilla-marca" aria-hidden="true"></span>
+        <span class="fila-lista-etiqueta">${escapar(c.name)}${c.estado === "borrador" ? '<small class="fila-lista-sub">En borrador</small>' : ""}</span>
+      </label></li>`)
+      .join("");
+    const sincronizar = () => $("[data-casillas]").classList.toggle("bloqueada", todas.checked);
+    todas.onchange = () => { if (todas.checked) $$("[data-casillas] input").forEach((i) => (i.checked = true)); sincronizar(); };
+    sincronizar();
+    alElegir = () => {
+      bloque.donde = todas.checked ? null : $$("[data-casillas] input:checked").map((i) => i.value);
+      $("[data-donde-texto]").textContent = resumenDonde(bloque.donde);
+      marcarCambio();
+    };
+    abrirModal("modal-categorias");
+  }
+  $("[data-categorias-listo]").addEventListener("click", () => { alElegir?.(); cerrarModal("modal-categorias"); });
+  const filaDonde = $("[data-elegir-donde]");
+  filaDonde.addEventListener("click", elegirDonde);
+  filaDonde.addEventListener("keydown", (e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), elegirDonde()));
+
+  /* ---------- Errores y guardar ---------- */
+  function ponerError(campo, msg) {
+    const c = $(`[data-campo="${campo}"]`);
+    if (!c) return;
+    c.setAttribute("data-error", "");
+    $(".campo-error", c).textContent = msg;
+  }
+  function quitarError(campo) { if (campo) $(`[data-campo="${campo}"]`)?.removeAttribute("data-error"); }
+  function mostrarErrores(errores) {
+    $$("[data-campo][data-error]").forEach((c) => c.removeAttribute("data-error"));
+    for (const [campo, msg] of Object.entries(errores)) ponerError(campo, msg);
+    const primero = $("[data-campo][data-error]");
+    primero?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+  function marcarCambio() {
+    hayCambios = true;
+    $("[data-pie-estado]").textContent = "Cambios sin guardar";
+    $("[data-guardar-barra]").classList.add("guardar--pendiente");
+  }
+  function leer() {
+    const datos = { ...bloque };
+    for (const c of CAMPOS) datos[c] = form[c].value.trim().replace(/\s+/g, " ");
+    datos.destino = leerDestino();
+    datos.activo = form.activo.checked;
+    return datos;
+  }
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (guardando) return;
+    const datos = leer();
+    const errores = validarBloque(datos);
+    if (datos.activo && Object.keys(errores).length) {
+      mostrarErrores(errores);
+      return avisar(`Faltan datos para prenderlo: ${Object.values(errores)[0]}`, { tipo: "error" });
+    }
+    if (datos.donde && !datos.donde.length && datos.activo) return avisar("Elige en qué listados sale", { tipo: "error" });
+    guardando = true;
+    $("[data-guardar]").disabled = true;
+    try {
+      if (!original) {
+        datos.id = idUnico(datos.titulo || "bloque");
+        datos.orden = Math.max(0, ...bloques.map((b) => b.orden || 0)) + 1;
+      }
+      bloque = await guardar("bloques", { ...datos, _original: original || undefined });
+      hayCambios = false;
+      dispatchEvent(new CustomEvent("neucast:guardado"));
+      avisar(datos.activo ? "Bloque guardado y prendido" : "Bloque guardado, apagado");
+      if (!original) { location.replace(`${base}bloques/editar/?id=${encodeURIComponent(bloque.id)}`); return; }
+      $("[data-pie-estado]").textContent = "";
+      $("[data-guardar-barra]").classList.remove("guardar--pendiente");
+      pintarTodo();
+    } catch (err) {
+      if (err.campos && Object.keys(err.campos).length) mostrarErrores(err.campos);
+      avisar(err.message || "No se pudo guardar", { tipo: "error" });
+    } finally {
+      guardando = false;
+      $("[data-guardar]").disabled = false;
+    }
+  });
+  function idUnico(texto) {
+    const raiz = limpiarSlug(texto).slice(0, 40) || "bloque";
+    let id = raiz;
+    for (let n = 2; bloques.some((b) => b.id === id); n++) id = `${raiz}-${n}`;
+    return id;
+  }
+
+  const preguntar = async (e, href) => {
+    if (!hayCambios) return;
+    e.preventDefault();
+    if (await confirmar({ titulo: "Tienes cambios sin guardar", texto: "Si sales ahora se pierden.", accion: "Salir sin guardar", peligro: true })) { hayCambios = false; location.href = href; }
+  };
+  $$("[data-cancelar], .bl-nav a, .barra-migas a").forEach((a) => a.addEventListener("click", (e) => preguntar(e, a.href)));
+  addEventListener("beforeunload", (e) => { if (hayCambios && !guardando) e.preventDefault(); });
+
+  cargar().catch((e) => avisar(e.message || "No se pudo cargar el bloque", { tipo: "error" }));
+</script>
+
+<style>
+  .foto-categoria{display:flex;flex-direction:column;gap:12px;}
+  .foto-categoria :global(.foto-categoria-marco){aspect-ratio:16/9;border-radius:var(--r-3);overflow:hidden;background:var(--relleno);box-shadow:0 0 0 1px var(--borde);max-width:560px;}
+  .foto-categoria :global(.foto-categoria-marco img){width:100%;height:100%;object-fit:cover;}
+  .foto-categoria :global(.foto-categoria-vacia){aspect-ratio:16/9;max-width:560px;width:100%;}
+  .foto-categoria :global(.foto-categoria-acciones){display:flex;gap:10px;}
+  /* la tarjeta como en el catálogo: foto, velo y texto encima */
+  .bloque-vista{
+    position:relative;display:block;aspect-ratio:2/1;max-width:560px;border-radius:var(--r-3);overflow:hidden;
+    background:var(--cemento-suave);color:var(--white);text-decoration:none;pointer-events:none;
+  }
+  .bloque-vista img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+  .bloque-vista-velo{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.62),rgba(0,0,0,.08) 60%,transparent);}
+  .bloque-vista-txt{position:absolute;inset:auto 0 0 0;padding:22px;display:flex;flex-direction:column;gap:4px;text-shadow:0 1px 18px rgba(0,0,0,.35);}
+  .bloque-vista-ante{font-size:var(--t-nota);font-weight:600;letter-spacing:.14em;text-transform:uppercase;opacity:.9;}
+  .bloque-vista-titulo{font-size:clamp(20px,2.4vw,26px);font-weight:600;letter-spacing:-.02em;line-height:1.15;}
+  .bloque-vista-cta{margin-top:8px;font-size:var(--t-llamada);font-weight:600;}
+  @media (max-width:640px){
+    .foto-categoria :global(.foto-categoria-acciones .boton){flex:1;height:48px;}
+    .bloque-vista-txt{padding:16px;}
+  }
+</style>
