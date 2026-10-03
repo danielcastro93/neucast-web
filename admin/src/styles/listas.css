@@ -66,7 +66,6 @@
 .grupo-lista > li + li > .fila-lista,.grupo-lista > li + li.fila-lista,.grupo-lista > .fila-lista + .fila-lista{box-shadow:inset 0 1px 0 var(--borde);}
 .fila-lista-valor{flex:none;max-width:55%;text-align:right;font-size:var(--t-cuerpo);line-height:1.3;color:var(--etiqueta-2);}
 .fila-lista-valor--corto{max-width:40%;}
-.fila-lista-sub{display:block;margin-top:2px;font-size:var(--t-nota);color:var(--etiqueta-3);}
 .fila-lista-flecha{flex:none;color:var(--etiqueta-3);transition:transform .25s var(--resorte);}
 .fila-lista--enlace{cursor:pointer;}
 @media (hover:hover){.fila-lista--enlace:hover{background:#FAFAF8;}.fila-lista--enlace:hover .fila-lista-flecha{transform:translateX(2px);}}
@@ -154,13 +153,6 @@
 }
 
 /* ---------- Medidas y partes: fila ordenable con su ficha en medio ---------- */
-.fila-abre{
-  flex:1;min-width:0;align-self:stretch;display:flex;align-items:center;gap:14px;
-  padding:0;border:0;background:none;font:inherit;color:inherit;text-align:left;cursor:pointer;
-}
-.fila-abre .fila-lista-flecha{transition:transform .25s var(--resorte);}
-@media (hover:hover){.fila-abre:hover .fila-lista-flecha{transform:translateX(2px);}.fila-abre:hover .fila-lista-etiqueta{color:var(--etiqueta);}}
-.fila-abre:focus-visible{outline:0;box-shadow:inset 0 0 0 2px var(--olive);border-radius:10px;}
 .panel-cabeza-acciones{display:flex;align-items:center;gap:10px;flex:none;}
 .panel-vacio{padding:14px 4px 0;}
 #modal-grupos .agregar-opcion{margin-top:var(--esp-nota-bloque);}

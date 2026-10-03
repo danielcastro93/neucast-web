@@ -61,9 +61,16 @@ export const waLink = (msg) =>
 // la de sillas ejecutivas hacía que el menú pareciera tener dos veces la misma
 // categoría. Esta toma es del piso completo, con escritorios, sillas, guardado
 // y lounge en el mismo encuadre.
+// La página /muebles/ y la tarjeta "Todos los muebles" de los menús. Tiene los
+// mismos textos que una categoría y se edita en el administrador, en
+// Categorías, como la primera de la lista.
 export const todosLosMuebles = {
   photo: "/img/cats/todos-los-muebles.jpg",
   alt: "Piso de oficina con escritorios, sillería, guardado y área lounge",
+  h1: "Muebles de oficina",
+  title: "Catálogo de muebles para oficina | Neucast",
+  desc: "Sillas ejecutivas y operativas, escritorios, mesas de juntas, cafeterías y áreas comunes. Mobiliario corporativo con envío e instalación en todo México.",
+  intro: "Desde una silla suelta hasta el equipamiento completo de un piso de oficinas.",
 };
 
 export const categories = [

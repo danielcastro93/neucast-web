@@ -1,0 +1,571 @@
+---
+// Una categoría: su nombre y dirección, la foto de los menús, los textos de
+// su página, cómo sale en Google, qué se pide en sus piezas y si se publica.
+//
+// Con ?slug=todos edita "Todos los muebles" (/muebles/): los mismos textos y
+// la foto, sin nombre ni dirección; se guarda en los ajustes.
+import Admin from "../../layouts/Admin.astro";
+import IconoAdmin from "../../components/IconoAdmin.astro";
+import Modal from "../../components/Modal.astro";
+import "../../styles/editor.css";
+const base = import.meta.env.BASE_URL;
+---
+<Admin titulo="Categoría" seccion="categorias" migas={[{ nombre: "Categorías", ruta: "categorias/" }]} publicarAbajo={false}>
+  <form class="editor" novalidate data-form>
+    <div class="cabecera">
+      <div class="cabecera-textos">
+        <h1 class="t-pantalla" data-titulo-pantalla>Nueva categoría</h1>
+        <p class="t-apoyo" data-nota-pantalla>Se guarda como borrador hasta tener lo obligatorio (<span class="obligatorio">*</span>).</p>
+      </div>
+      <div class="cabecera-acciones">
+        <a class="boton" href="#" target="_blank" rel="noopener" data-ver-pruebas hidden><IconoAdmin name="externo" size={16} />Ver en pruebas</a>
+      </div>
+    </div>
+
+    <div class="formulario">
+      <div class="formulario-secciones">
+        <!-- ============ Identidad ============ -->
+        <section class="tarjeta seccion" id="identidad" data-solo-categoria>
+          <div class="seccion-cabeza">
+            <span class="seccion-n">1</span>
+            <div>
+              <h2 class="t-seccion">Identidad</h2>
+              <p class="t-mini">Cómo se llama en los menús y cuál es su dirección.</p>
+            </div>
+          </div>
+          <div class="seccion-cuerpo">
+            <div class="fila">
+              <div class="campo" data-campo="name">
+                <div class="campo-etiqueta"><label for="name">Nombre<span class="obligatorio">*</span></label><span class="campo-contador" data-contador="name"></span></div>
+                <input class="control" id="name" name="name" type="text" placeholder="Ej. Botes y accesorios" autocomplete="off" />
+                <p class="campo-ayuda">Corto: sale en los menús, en la tarjeta del inicio y en el buscador.</p>
+                <p class="campo-error" data-error></p>
+              </div>
+              <div class="campo" data-campo="slug">
+                <div class="campo-etiqueta">
+                  <label for="slug">Dirección<span class="obligatorio">*</span></label>
+                  <button class="enlace-chico" type="button" data-usar-nombre hidden>Usar el nombre</button>
+                </div>
+                <input class="control mono" id="slug" name="slug" type="text" placeholder="Ej. botes-y-accesorios" spellcheck="false" autocomplete="off" />
+                <p class="direccion" data-direccion></p>
+                <p class="campo-ayuda" data-ayuda-slug>Se escribe sola con el nombre. Minúsculas, sin acentos, con guiones.</p>
+                <p class="campo-error" data-error></p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ Foto ============ -->
+        <section class="tarjeta seccion" id="foto">
+          <div class="seccion-cabeza">
+            <span class="seccion-n" data-n>2</span>
+            <div>
+              <h2 class="t-seccion">Foto</h2>
+              <p class="t-mini">La de la tarjeta en el inicio, los menús y el buscador. Una foto de ambiente, horizontal.</p>
+            </div>
+          </div>
+          <div class="seccion-cuerpo">
+            <div class="campo" data-campo="photo">
+              <div class="campo-etiqueta"><span class="etiqueta">Foto<span class="obligatorio">*</span></span></div>
+              <div class="foto-categoria" data-foto></div>
+              <p class="campo-error" data-error></p>
+            </div>
+            <div class="campo" data-campo="alt">
+              <div class="campo-etiqueta"><label for="alt">Texto alternativo<span class="obligatorio">*</span></label><span class="campo-contador" data-contador="alt"></span></div>
+              <input class="control" id="alt" name="alt" type="text" placeholder="Ej. Sala de juntas con mesa y sillería corporativa" />
+              <p class="campo-ayuda">Qué se ve en la foto, para quien no la ve y para Google.</p>
+              <p class="campo-error" data-error></p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ Página ============ -->
+        <section class="tarjeta seccion" id="pagina">
+          <div class="seccion-cabeza">
+            <span class="seccion-n" data-n>3</span>
+            <div>
+              <h2 class="t-seccion">Página</h2>
+              <p class="t-mini">Lo primero que se lee al entrar, arriba de las piezas.</p>
+            </div>
+          </div>
+          <div class="seccion-cuerpo">
+            <div class="campo" data-campo="h1">
+              <div class="campo-etiqueta"><label for="h1">Título de la página<span class="obligatorio">*</span></label><span class="campo-contador" data-contador="h1"></span></div>
+              <input class="control" id="h1" name="h1" type="text" placeholder="Ej. Sillas operativas y ergonómicas" />
+              <p class="campo-ayuda">Puede ser más descriptivo que el nombre: es el título que lee Google en la página.</p>
+              <p class="campo-error" data-error></p>
+            </div>
+            <div class="campo" data-campo="intro">
+              <div class="campo-etiqueta"><label for="intro">Texto de entrada<span class="obligatorio">*</span></label><span class="campo-contador" data-contador="intro"></span></div>
+              <textarea class="control" id="intro" name="intro" rows="3" placeholder="Ej. Ergonomía real y materiales que resisten la rotación diaria de un piso de trabajo."></textarea>
+              <p class="campo-error" data-error></p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ Google ============ -->
+        <section class="tarjeta seccion" id="google">
+          <div class="seccion-cabeza">
+            <span class="seccion-n" data-n>4</span>
+            <div>
+              <h2 class="t-seccion">Así sale en Google</h2>
+              <p class="t-mini">Cada categoría posiciona por sus propias palabras: estos dos textos son solo suyos.</p>
+            </div>
+          </div>
+          <div class="seccion-cuerpo">
+            <div class="campo" data-campo="title">
+              <div class="campo-etiqueta"><label for="title">Título para Google<span class="obligatorio">*</span></label><span class="campo-contador" data-contador="title"></span></div>
+              <input class="control" id="title" name="title" type="text" placeholder="Ej. Sillas operativas y ergonómicas de oficina | Neucast" />
+              <p class="campo-ayuda">Termina en "| Neucast". Lo que pasa de 65 caracteres Google lo corta.</p>
+              <p class="campo-error" data-error></p>
+            </div>
+            <div class="campo" data-campo="desc">
+              <div class="campo-etiqueta"><label for="desc">Descripción para Google<span class="obligatorio">*</span></label><span class="campo-contador" data-contador="desc"></span></div>
+              <textarea class="control" id="desc" name="desc" rows="3" placeholder="Ej. Sillería operativa y ergonómica para jornada completa: respaldo de malla, altura regulable. Envío e instalación en todo México."></textarea>
+              <p class="campo-error" data-error></p>
+            </div>
+            <div class="google" aria-hidden="true">
+              <span class="google-url" data-google-url>neucast.com.mx › muebles</span>
+              <span class="google-titulo" data-google-titulo>Título | Neucast</span>
+              <span class="google-desc" data-google-desc>Descripción</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ Sus piezas ============ -->
+        <section class="tarjeta seccion" id="piezas" data-solo-categoria>
+          <div class="seccion-cabeza">
+            <span class="seccion-n" data-n>5</span>
+            <div>
+              <h2 class="t-seccion">Qué se pide en sus piezas</h2>
+              <p class="t-mini">Las listas, medidas y partes que salen al dar de alta una pieza de esta categoría. Es lo mismo que se ajusta en <a class="enlace" href={`${base}listas/`} data-sale>Listas</a>, visto desde aquí.</p>
+            </div>
+          </div>
+          <div class="seccion-cuerpo">
+            <div class="campo">
+              <div class="campo-etiqueta"><span class="etiqueta">Listas de opciones</span></div>
+              <ul class="grupo-lista" data-cfg-listas></ul>
+              <p class="campo-ayuda" data-cfg-sistema></p>
+            </div>
+            <div class="campo">
+              <div class="campo-etiqueta"><span class="etiqueta">Medidas</span></div>
+              <div class="chips chips--envolver" data-cfg-medidas></div>
+              <p class="campo-ayuda">Las marcadas salen a la vista; las demás quedan a la mano en "Más medidas". Las que dicen "todas" se piden en todas las categorías.</p>
+            </div>
+            <div class="campo">
+              <div class="campo-etiqueta"><span class="etiqueta">Partes de construcción</span></div>
+              <div class="chips chips--envolver" data-cfg-partes></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ Publicación ============ -->
+        <section class="tarjeta seccion" id="publicacion" data-solo-categoria>
+          <div class="seccion-cabeza">
+            <span class="seccion-n" data-n>6</span>
+            <div>
+              <h2 class="t-seccion">Publicación</h2>
+              <p class="t-mini">Si ya sale en el sitio y qué catálogo en PDF se descarga.</p>
+            </div>
+          </div>
+          <div class="seccion-cuerpo">
+            <div class="opciones-estado" data-campo="estado">
+              <label class="opcion">
+                <input type="radio" name="estado" value="borrador" />
+                <span class="opcion-marca"></span>
+                <span class="opcion-texto"><b>Borrador</b><small>No sale en el sitio ni en los menús, aunque tenga piezas.</small></span>
+              </label>
+              <label class="opcion">
+                <input type="radio" name="estado" value="publicada" />
+                <span class="opcion-marca"></span>
+                <span class="opcion-texto"><b>Publicada</b><small>Sale en los menús, el inicio y el buscador. Pide todos los obligatorios.</small></span>
+              </label>
+            </div>
+            <div class="campo">
+              <div class="campo-etiqueta"><span class="etiqueta">Catálogo en PDF</span></div>
+              <div data-catalogo></div>
+              <p class="campo-ayuda">Se genera solo con la plantilla de Neucast y las piezas publicadas de la categoría. Si el cliente tiene uno propio, súbelo y se descarga ese en su lugar.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <div class="guardar" data-guardar-barra>
+      <span class="guardar-nota" data-pie-estado></span>
+      <a class="boton boton--texto" href={`${base}categorias/`} data-cancelar>Cancelar</a>
+      <button class="boton boton--primario" type="submit" data-guardar><IconoAdmin name="check" size={16} />Guardar</button>
+    </div>
+    <input type="file" accept="image/png,image/jpeg,image/webp" hidden data-archivo-foto />
+    <input type="file" accept="application/pdf" hidden data-archivo-pdf />
+  </form>
+
+  <Modal id="modal-foto" titulo="Foto de la categoría" texto="Sube un archivo desde tu equipo o escribe la ruta de una foto que ya esté en el sitio.">
+    <button class="soltar" type="button" data-zona-foto>
+      <IconoAdmin name="subir" size={26} />
+      <b>Arrastra aquí la foto o haz clic para elegirla</b>
+      <span class="t-mini">JPG o WebP horizontal, de un espacio real</span>
+    </button>
+    <div class="campo">
+      <div class="campo-etiqueta"><label for="ruta-foto">O la ruta en el sitio</label></div>
+      <input class="control mono" id="ruta-foto" type="text" placeholder="Ej. /img/cats/salas-de-juntas.jpg" spellcheck="false" />
+    </div>
+    <Fragment slot="pie">
+      <button class="boton" type="button" data-cierra-modal>Cancelar</button>
+      <button class="boton boton--primario" type="button" data-usar-ruta>Usar la ruta</button>
+    </Fragment>
+  </Modal>
+</Admin>
+
+<script>
+  import { listar, obtener, guardar } from "../../scripts/api.js";
+  import { medio } from "../../scripts/medios.js";
+  import { abrirModal, cerrarModal, avisar, confirmar, escapar, fechaRelativa, ICONO_BASURA } from "../../scripts/ui.js";
+  import { validarCategoria, limpiarSlug } from "../../scripts/validar.js";
+  import { MEDIDAS_CATEGORIA, categoriaVacia } from "../../scripts/esquemas/categoria.js";
+  import { CONTROL_PROPIO } from "../../scripts/listas.js";
+
+  const $ = (s, el = document) => el.querySelector(s);
+  const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+  const base = import.meta.env.BASE_URL;
+  const STG = (import.meta.env.PUBLIC_STG || "http://localhost:4321/").replace(/\/+$/, "");
+  const form = $("[data-form]");
+  const original = new URLSearchParams(location.search).get("slug");
+  const TODOS = original === "todos";
+  const CAMPOS = ["name", "slug", "alt", "h1", "intro", "title", "desc"];
+
+  let cat = categoriaVacia();
+  let categorias = [], listas = null, piezas = [], ajustes = {};
+  let hayCambios = false, guardando = false;
+  // qué se pide en sus piezas: se edita aquí y se guarda en Listas al guardar
+  let cfg = { aparece: new Set(), oblig: new Set(), medidas: new Set(), partes: new Set() };
+
+  /* ---------- Cargar ---------- */
+  async function cargar() {
+    [categorias, listas, piezas, ajustes] = await Promise.all([listar("categorias"), listar("listas"), listar("piezas"), listar("ajustes")]);
+    if (TODOS) cat = { ...categoriaVacia(), ...(ajustes.todosLosMuebles || {}), estado: "publicada" };
+    else if (original) cat = { ...categoriaVacia(), ...(await obtener("categorias", original)) };
+    // en "Todos los muebles" no hay identidad, ni piezas propias, ni estado
+    $$("[data-solo-categoria]").forEach((s) => (s.hidden = TODOS));
+    $$("[data-n]").forEach((n, i) => (n.textContent = TODOS ? i + 1 : i + 2));
+    for (const c of CAMPOS) if (form[c]) form[c].value = cat[c] || "";
+    $$("input[name='estado']").forEach((i) => (i.checked = i.value === (cat.estado || "borrador")));
+    leerCfg();
+    pintarTodo();
+  }
+
+  function pintarTodo() {
+    const nueva = !original;
+    const titulo = TODOS ? "Todos los muebles" : nueva ? "Nueva categoría" : cat.name;
+    $("[data-titulo-pantalla]").textContent = titulo;
+    $("[data-miga-actual]").textContent = titulo;
+    document.title = `${titulo} · Administrador de Neucast`;
+    if (TODOS) $("[data-nota-pantalla]").textContent = "La página /muebles/ con todo el catálogo, y su tarjeta en los menús.";
+    else if (!nueva) $("[data-nota-pantalla]").textContent = `${cat.estado === "publicada" ? "Publicada" : "Borrador"} · cambiada ${fechaRelativa(cat.actualizado)}`;
+    const ver = $("[data-ver-pruebas]");
+    ver.hidden = nueva || (!TODOS && cat.estado !== "publicada");
+    ver.href = `${STG}/muebles/${TODOS ? "" : `${cat.slug}/`}`;
+    if (original && !TODOS && cat.estado === "publicada") $("[data-ayuda-slug]").textContent = "Ya está publicada: si la cambias, el enlace anterior deja de funcionar. Sus piezas se mueven solas.";
+    pintarFoto();
+    pintarCfg();
+    pintarCatalogo();
+    actualizar();
+  }
+
+  /* ---------- Contadores, dirección y vista de Google ---------- */
+  function actualizar() {
+    for (const [campo, m] of Object.entries(MEDIDAS_CATEGORIA)) {
+      const el = $(`[data-contador="${campo}"]`);
+      if (!el || !form[campo]) continue;
+      const n = form[campo].value.trim().length;
+      el.textContent = n ? `${n} / ${m.max}` : `${m.min} a ${m.max}`;
+      el.classList.toggle("fuera", !!n && (n < m.min || n > m.max));
+    }
+    const slug = limpiarSlug(form.slug.value) || "…";
+    $("[data-direccion]").textContent = `neucast.com.mx/muebles/${slug}/`;
+    $("[data-google-url]").textContent = TODOS ? "neucast.com.mx › muebles" : `neucast.com.mx › muebles › ${slug}`;
+    $("[data-google-titulo]").textContent = form.title.value.trim() || "Título para Google | Neucast";
+    $("[data-google-desc]").textContent = form.desc.value.trim() || "La descripción que sale debajo del título.";
+    const propuesta = limpiarSlug(form.name.value);
+    $("[data-usar-nombre]").hidden = TODOS || !propuesta || limpiarSlug(form.slug.value) === propuesta;
+  }
+  let slugTocado = !!original;
+  form.slug.addEventListener("input", () => (slugTocado = true));
+  form.name.addEventListener("input", () => { if (!slugTocado) form.slug.value = limpiarSlug(form.name.value); });
+  form.slug.addEventListener("blur", () => { form.slug.value = limpiarSlug(form.slug.value); actualizar(); });
+  $("[data-usar-nombre]").addEventListener("click", () => {
+    form.slug.value = limpiarSlug(form.name.value);
+    slugTocado = !!original;
+    marcarCambio();
+    actualizar();
+  });
+  form.addEventListener("input", (e) => { marcarCambio(); actualizar(); quitarError(e.target.name); });
+  form.addEventListener("change", marcarCambio);
+
+  /* ---------- Foto ---------- */
+  function pintarFoto() {
+    const caja = $("[data-foto]");
+    caja.innerHTML = cat.photo
+      ? `<div class="foto-categoria-marco"><img src="${escapar(medio(cat.photo))}" alt="" /></div>
+         <div class="foto-categoria-acciones">
+           <button class="boton boton--suave" type="button" data-cambiar-foto>Cambiar foto</button>
+         </div>`
+      : `<button class="foto-agregar foto-agregar--primera foto-categoria-vacia" type="button" data-cambiar-foto>
+          <span class="foto-agregar-icono"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg></span>
+          <b>Agregar la foto</b>
+        </button>`;
+    $("[data-cambiar-foto]", caja).addEventListener("click", () => {
+      $("#ruta-foto").value = "";
+      abrirModal("modal-foto");
+    });
+  }
+  const archivoFoto = $("[data-archivo-foto]");
+  const zona = $("[data-zona-foto]");
+  zona.addEventListener("click", () => archivoFoto.click());
+  zona.addEventListener("dragover", (e) => { e.preventDefault(); zona.classList.add("sobre"); });
+  zona.addEventListener("dragleave", () => zona.classList.remove("sobre"));
+  zona.addEventListener("drop", (e) => { e.preventDefault(); zona.classList.remove("sobre"); usarArchivo(e.dataTransfer.files[0]); });
+  archivoFoto.addEventListener("change", () => { usarArchivo(archivoFoto.files[0]); archivoFoto.value = ""; });
+  $("[data-usar-ruta]").addEventListener("click", () => {
+    const ruta = $("#ruta-foto").value.trim();
+    if (!ruta) return $("#ruta-foto").focus();
+    ponerFoto(ruta.startsWith("/") || /^https?:/.test(ruta) ? ruta : `/${ruta}`);
+  });
+  // En la simulación la foto se guarda achicada como data URL; la API real la
+  // recibe como archivo.
+  function usarArchivo(f) {
+    if (!f || !f.type.startsWith("image/")) return avisar("Ese archivo no es una foto", { tipo: "error" });
+    const img = new Image();
+    const url = URL.createObjectURL(f);
+    img.onload = () => {
+      const k = Math.min(1, 1400 / Math.max(img.width, img.height));
+      const c = document.createElement("canvas");
+      c.width = Math.round(img.width * k);
+      c.height = Math.round(img.height * k);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      ponerFoto(c.toDataURL("image/jpeg", 0.82));
+    };
+    img.onerror = () => avisar(`No se pudo leer ${f.name}`, { tipo: "error" });
+    img.src = url;
+  }
+  function ponerFoto(ruta) {
+    cat.photo = ruta;
+    cerrarModal("modal-foto");
+    pintarFoto();
+    quitarError("photo");
+    marcarCambio();
+  }
+
+  /* ---------- Qué se pide en sus piezas ---------- */
+  const slugActual = () => original && !TODOS ? original : null;
+  function leerCfg() {
+    const s = slugActual();
+    const tiene = (arr) => !!s && Array.isArray(arr) && arr.includes(s);
+    cfg = {
+      aparece: new Set(listas.listas.filter((l) => !l.sistema && tiene(l.categorias)).map((l) => l.id)),
+      oblig: new Set(listas.listas.filter((l) => !l.sistema && l.obligatoria !== "todas" && tiene(l.obligatoria)).map((l) => l.id)),
+      medidas: new Set(listas.medidas.filter((m) => tiene(m.categorias)).map((m) => m.id)),
+      partes: new Set(listas.partes.filter((p) => tiene(p.categorias)).map((p) => p.id)),
+    };
+  }
+  function pintarCfg() {
+    if (TODOS) return;
+    const propias = listas.listas.filter((l) => !l.sistema && !CONTROL_PROPIO.has(l.id));
+    $("[data-cfg-listas]").innerHTML = propias.map((l) => {
+      const enTodas = !l.categorias;
+      const aparece = enTodas || cfg.aparece.has(l.id);
+      const obligTodas = l.obligatoria === "todas";
+      const oblig = obligTodas || cfg.oblig.has(l.id);
+      return `<li class="fila-lista cfg-fila">
+        <span class="fila-lista-etiqueta">${escapar(l.nombre)}${enTodas ? '<small class="fila-lista-sub">En todas las categorías</small>' : ""}</span>
+        <label class="interruptor cfg-interruptor">
+          <span class="interruptor-texto cfg-rotulo">Se pide</span>
+          <input type="checkbox" role="switch" data-aparece="${escapar(l.id)}" ${aparece ? "checked" : ""} ${enTodas ? "disabled" : ""} />
+          <span class="interruptor-pista"></span>
+        </label>
+        <label class="interruptor cfg-interruptor">
+          <span class="interruptor-texto cfg-rotulo">Obligatoria</span>
+          <input type="checkbox" role="switch" data-oblig="${escapar(l.id)}" ${oblig ? "checked" : ""} ${obligTodas || !aparece ? "disabled" : ""} />
+          <span class="interruptor-pista"></span>
+        </label>
+      </li>`;
+    }).join("") || '<li class="fila-lista">Todavía no hay listas propias.</li>';
+    const sistema = listas.listas.filter((l) => l.sistema).map((l) => l.nombre.toLowerCase());
+    const frase = sistema.join(", ").replace(/, ([^,]*)$/, " y $1");
+    $("[data-cfg-sistema]").textContent = `${frase.charAt(0).toUpperCase()}${frase.slice(1)} se piden siempre, en todas las categorías.`;
+
+    const chip = (tipo, x, enTodas, marcado) => `<label class="chip"><input type="checkbox" data-${tipo}="${escapar(x.id)}" ${marcado ? "checked" : ""} ${enTodas ? "disabled" : ""} />${escapar(x.nombre)}${enTodas ? ' <small class="chip-nota">todas</small>' : ""}</label>`;
+    $("[data-cfg-medidas]").innerHTML = listas.medidas.map((m) => chip("medida", m, !m.categorias, !m.categorias || cfg.medidas.has(m.id))).join("");
+    $("[data-cfg-partes]").innerHTML = listas.partes.map((p) => chip("parte", p, !p.categorias, !p.categorias || cfg.partes.has(p.id))).join("");
+
+    $$("[data-aparece]").forEach((i) => i.addEventListener("change", () => {
+      i.checked ? cfg.aparece.add(i.dataset.aparece) : (cfg.aparece.delete(i.dataset.aparece), cfg.oblig.delete(i.dataset.aparece));
+      pintarCfg();
+    }));
+    $$("[data-oblig]").forEach((i) => i.addEventListener("change", () => (i.checked ? cfg.oblig.add(i.dataset.oblig) : cfg.oblig.delete(i.dataset.oblig))));
+    $$("[data-medida]").forEach((i) => i.addEventListener("change", () => (i.checked ? cfg.medidas.add(i.dataset.medida) : cfg.medidas.delete(i.dataset.medida))));
+    $$("[data-parte]").forEach((i) => i.addEventListener("change", () => (i.checked ? cfg.partes.add(i.dataset.parte) : cfg.partes.delete(i.dataset.parte))));
+  }
+  // Escribe lo elegido en las listas con la dirección final de la categoría.
+  function aplicarCfg(l, slug) {
+    const poner = (arr, si) => {
+      if (!Array.isArray(arr)) return arr; // null o "todas": no se toca
+      const sin = arr.filter((c) => c !== slug && c !== original);
+      return si ? [...sin, slug] : sin;
+    };
+    l.listas.forEach((x) => {
+      if (x.sistema) return;
+      x.categorias = poner(x.categorias, cfg.aparece.has(x.id));
+      x.obligatoria = poner(x.obligatoria, cfg.aparece.has(x.id) && cfg.oblig.has(x.id));
+    });
+    l.medidas.forEach((m) => (m.categorias = poner(m.categorias, cfg.medidas.has(m.id))));
+    l.partes.forEach((p) => (p.categorias = poner(p.categorias, cfg.partes.has(p.id))));
+    return l;
+  }
+
+  /* ---------- Catálogo en PDF ---------- */
+  const archivoPdf = $("[data-archivo-pdf]");
+  function pintarCatalogo() {
+    if (TODOS) return;
+    const caja = $("[data-catalogo]");
+    const propio = cat.catalogoPropio;
+    caja.innerHTML = propio
+      ? `<div class="video-pieza-ficha catalogo-ficha">
+          <span class="catalogo-icono"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"/><path d="M14 3v5h5"/></svg></span>
+          <div class="video-pieza-datos"><b>${escapar(cat.catalogoNombre || propio.split("/").pop())}</b><span class="t-mini">Catálogo propio: se descarga este</span></div>
+          <button class="boton boton--texto-peligro boton--chico" type="button" data-quitar-pdf>${ICONO_BASURA(15)}Quitar</button>
+        </div>`
+      : `<button class="boton boton--suave boton--agregar" type="button" data-subir-pdf><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13V4M6.5 7.5 10 4l3.5 3.5M4 16h12"/></svg><span>Subir catálogo propio</span></button>`;
+    $("[data-subir-pdf]", caja)?.addEventListener("click", () => archivoPdf.click());
+    $("[data-quitar-pdf]", caja)?.addEventListener("click", () => {
+      cat.catalogoPropio = "";
+      delete cat.catalogoNombre;
+      pintarCatalogo();
+      marcarCambio();
+    });
+  }
+  // En la simulación el PDF vive en esta sesión; la API real lo guarda en
+  // public/catalogos/propios/ con el nombre del generado (ver sitio/src/data/pdfs.js).
+  archivoPdf.addEventListener("change", () => {
+    const f = archivoPdf.files[0];
+    archivoPdf.value = "";
+    if (!f || f.type !== "application/pdf") return avisar("Ese archivo no es un PDF", { tipo: "error" });
+    cat.catalogoPropio = URL.createObjectURL(f);
+    cat.catalogoNombre = f.name;
+    pintarCatalogo();
+    marcarCambio();
+  });
+
+  /* ---------- Errores ---------- */
+  function ponerError(campo, msg) {
+    const c = $(`[data-campo="${campo}"]`);
+    if (!c) return;
+    c.setAttribute("data-error", "");
+    const p = $(".campo-error", c);
+    if (p) p.textContent = msg;
+  }
+  function quitarError(campo) {
+    if (!campo) return;
+    $(`[data-campo="${campo}"]`)?.removeAttribute("data-error");
+  }
+  function mostrarErrores(errores) {
+    $$("[data-campo][data-error]").forEach((c) => c.removeAttribute("data-error"));
+    for (const [campo, msg] of Object.entries(errores)) ponerError(campo, msg);
+    const primero = $("[data-campo][data-error]");
+    primero?.scrollIntoView({ behavior: "smooth", block: "center" });
+    primero?.querySelector("input,textarea")?.focus({ preventScroll: true });
+  }
+
+  /* ---------- Guardar ---------- */
+  function marcarCambio() {
+    hayCambios = true;
+    $("[data-pie-estado]").textContent = "Cambios sin guardar";
+    $("[data-guardar-barra]").classList.add("guardar--pendiente");
+  }
+  function leer() {
+    const datos = { ...cat };
+    for (const c of CAMPOS) if (form[c]) datos[c] = form[c].value.trim().replace(/\s+/g, " ");
+    datos.slug = limpiarSlug(datos.slug);
+    datos.estado = form.querySelector("input[name='estado']:checked")?.value || "borrador";
+    return datos;
+  }
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (guardando) return;
+    const datos = leer();
+    if (datos.catalogoPropio?.startsWith("blob:")) {
+      // un archivo de esta sesión no sobrevive a la simulación
+      avisar("El PDF se queda en esta sesión: con la API real se sube y se guarda", { tipo: "alerta" });
+    }
+    const errores = validarCategoria(datos, { todos: TODOS });
+    const publicar = TODOS || datos.estado === "publicada";
+    if (!TODOS && (!datos.name || !datos.slug)) return mostrarErrores({ ...(datos.name ? {} : { name: errores.name || "Falta el nombre" }), ...(datos.slug ? {} : { slug: "Falta la dirección" }) });
+    if (publicar && Object.keys(errores).length) {
+      mostrarErrores(errores);
+      return avisar(`Faltan datos para ${TODOS ? "guardar" : "publicarla"}: ${Object.values(errores)[0]}`, { tipo: "error" });
+    }
+    guardando = true;
+    $("[data-guardar]").disabled = true;
+    try {
+      if (TODOS) {
+        const { slug, name, estado, catalogoPropio, catalogoNombre, ...textos } = datos;
+        ajustes = await guardar("ajustes", { ...ajustes, todosLosMuebles: { photo: textos.photo, alt: textos.alt, h1: textos.h1, title: textos.title, desc: textos.desc, intro: textos.intro } });
+      } else {
+        if (!original) datos.orden = Math.max(0, ...categorias.map((c) => c.orden || 0)) + 1;
+        cat = await guardar("categorias", { ...datos, _original: original || undefined });
+        // lo que se pide en sus piezas, ya con la dirección final
+        const frescas = await listar("listas");
+        await guardar("listas", aplicarCfg(frescas, cat.slug));
+      }
+      hayCambios = false;
+      dispatchEvent(new CustomEvent("neucast:guardado"));
+      avisar(TODOS ? "Se guardó Todos los muebles" : datos.estado === "publicada" ? `${datos.name} se guardó y pasó a pruebas` : `${datos.name} se guardó como borrador`);
+      if (!TODOS && original !== cat.slug) {
+        location.replace(`${base}categorias/editar/?slug=${encodeURIComponent(cat.slug)}`);
+        return;
+      }
+      $("[data-pie-estado]").textContent = "";
+      $("[data-guardar-barra]").classList.remove("guardar--pendiente");
+      pintarTodo();
+    } catch (err) {
+      if (err.campos && Object.keys(err.campos).length) mostrarErrores(err.campos);
+      avisar(err.message || "No se pudo guardar", { tipo: "error" });
+    } finally {
+      guardando = false;
+      $("[data-guardar]").disabled = false;
+    }
+  });
+
+  // Salir con cambios sin guardar
+  const preguntar = async (e, href) => {
+    if (!hayCambios) return;
+    e.preventDefault();
+    const ok = await confirmar({ titulo: "Tienes cambios sin guardar", texto: "Si sales ahora se pierden.", accion: "Salir sin guardar", peligro: true });
+    if (ok) { hayCambios = false; location.href = href; }
+  };
+  $$("[data-cancelar], [data-sale], .bl-nav a, .barra-migas a").forEach((a) => a.addEventListener("click", (e) => preguntar(e, a.href)));
+  addEventListener("beforeunload", (e) => { if (hayCambios && !guardando) e.preventDefault(); });
+
+  cargar().catch((e) => avisar(e.message || "No se pudo cargar la categoría", { tipo: "error" }));
+</script>
+
+<style>
+  .foto-categoria{display:flex;flex-direction:column;gap:12px;}
+  .foto-categoria :global(.foto-categoria-marco){aspect-ratio:16/9;border-radius:var(--r-3);overflow:hidden;background:var(--relleno);box-shadow:0 0 0 1px var(--borde);max-width:560px;}
+  .foto-categoria :global(.foto-categoria-marco img){width:100%;height:100%;object-fit:cover;}
+  .foto-categoria :global(.foto-categoria-vacia){aspect-ratio:16/9;max-width:560px;width:100%;}
+  .foto-categoria :global(.foto-categoria-acciones){display:flex;gap:10px;}
+  :global(.cfg-fila){gap:18px;min-height:60px;padding-block:10px;cursor:default;}
+  :global(.cfg-interruptor){flex:none;gap:10px;}
+  :global(.cfg-rotulo){font-size:var(--t-subtitulo);color:var(--etiqueta-2);font-weight:500;}
+  :global(.chips--envolver){display:flex;flex-wrap:wrap;gap:var(--esp-chips);}
+  :global(.chip-nota){font-size:var(--t-nota);color:var(--etiqueta-3);font-weight:500;}
+  :global(.chip:has(input:disabled)){opacity:.75;cursor:default;}
+  :global(.catalogo-icono){flex:none;width:56px;height:56px;border-radius:12px;display:grid;place-items:center;background:var(--relleno);color:var(--etiqueta-2);}
+  @media (max-width:640px){
+    :global(.cfg-fila){flex-wrap:wrap;gap:10px 16px;}
+    :global(.cfg-fila .fila-lista-etiqueta){flex:1 1 100%;}
+    .foto-categoria :global(.foto-categoria-acciones .boton){flex:1;height:48px;}
+  }
+</style>

@@ -98,6 +98,33 @@ Lo usa el encabezado, el pie, los botones de WhatsApp y el esquema
 | `organizacion` | El JSON-LD de `Organization` | real, falta `LocalBusiness` |
 | `waLink(mensaje)` | Arma el enlace de WhatsApp con el mensaje ya escrito | |
 
+**Categorías (pantalla Categorías, 2 de octubre de 2026).** Cada categoría
+trae, además de lo de hoy (`slug`, `name`, `photo`, `alt`, `h1`, `title`,
+`desc`, `intro`):
+
+```js
+{
+  orden: 3,                  // el de los menús, el inicio y el buscador
+  estado: "publicada",       // "borrador" no sale en el sitio (ni en menús ni en el mapa)
+  catalogoPropio: "",        // ruta de un PDF del cliente; vacío = el generado
+}
+```
+
+- Todo es obligatorio para publicarla; las medidas de texto están en
+  `admin/src/scripts/esquemas/categoria.js` (título de 30 a 65, descripción
+  de 100 a 160).
+- **Si cambia su `slug`**, la API mueve sus piezas (`cat`) y las referencias
+  en `listas` (`categorias` y `obligatoria` de listas, medidas y partes) en la
+  misma operación. **No se borra** una categoría con piezas; al borrarla se
+  quita de `listas`.
+- Lo que se pide en sus piezas se edita desde la categoría y se guarda en
+  `listas` (es el mismo dato que en la pantalla Listas).
+- `catalogoPropio`: la API guarda el PDF en `public/catalogos/propios/` con el
+  nombre del generado (`neucast-catalogo-{slug}.pdf`); el sitio ya lo prefiere.
+- **Todos los muebles** (`ajustes.todosLosMuebles`) usa los mismos textos:
+  `photo`, `alt`, `h1`, `title`, `desc`, `intro`. Son los de /muebles/; el
+  sitio ya los lee de `todosLosMuebles` en `site.js`.
+
 En el administrador, los datos de la empresa son **una pantalla de ajustes**
 (un solo registro), no una lista. Las categorías son su propia tabla.
 

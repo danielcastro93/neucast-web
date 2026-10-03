@@ -1,0 +1,144 @@
+---
+// Categorías: las secciones del catálogo (/muebles/{categoria}/), en el orden
+// en que salen en los menús, el inicio y el buscador. Arriba, fija, "Todos los
+// muebles", que es la página /muebles/ y se edita con los mismos textos.
+import Admin from "../../layouts/Admin.astro";
+import IconoAdmin from "../../components/IconoAdmin.astro";
+import "../../styles/editor.css";
+const base = import.meta.env.BASE_URL;
+---
+<Admin titulo="Categorías" seccion="categorias">
+  <div class="cabecera cabecera--compacta">
+    <div class="cabecera-textos">
+      <h1 class="t-pantalla">Categorías</h1>
+      <p class="t-apoyo" data-resumen>Cargando…</p>
+    </div>
+    <div class="cabecera-acciones">
+      <a class="boton boton--primario" href={`${base}categorias/editar/`} aria-label="Nueva categoría"><IconoAdmin name="mas" size={16} /><span class="boton-texto">Nueva categoría</span></a>
+    </div>
+  </div>
+
+  <section class="categorias">
+    <ul class="grupo-lista" data-todos></ul>
+    <div class="categorias-cabeza">
+      <span class="grupo-rotulo" data-total></span>
+      <span class="t-mini no-telefono">Arrástralas para cambiar el orden de los menús</span>
+    </div>
+    <ul class="grupo-lista grupo-lista--ordenable" data-lista></ul>
+  </section>
+</Admin>
+
+<script>
+  import { listar, guardar, borrar } from "../../scripts/api.js";
+  import { medio } from "../../scripts/medios.js";
+  import { avisar, confirmar, escapar } from "../../scripts/ui.js";
+  import { filaOrdenable, cablearOrdenables } from "../../scripts/ordenar.js";
+
+  const $ = (s, el = document) => el.querySelector(s);
+  const base = import.meta.env.BASE_URL;
+  let categorias = [], piezas = [], ajustes = {};
+
+  const FLECHA = '<svg class="fila-lista-flecha" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 5 5 5-5 5"/></svg>';
+  const foto = (ruta) => `<span class="miniatura categoria-foto">${ruta ? `<img src="${escapar(medio(ruta))}" alt="" loading="lazy" draggable="false" />` : ""}</span>`;
+  const cuantas = (slug) => piezas.filter((p) => p.cat === slug).length;
+
+  function pintar() {
+    const todos = ajustes.todosLosMuebles || {};
+    $("[data-todos]").innerHTML = `<li><a class="fila-lista fila-lista--enlace categoria-fila" href="${base}categorias/editar/?slug=todos">
+      ${foto(todos.photo)}
+      <span class="categoria-texto"><strong>Todos los muebles</strong><small>/muebles/ · ${piezas.length} piezas</small></span>
+      ${FLECHA}
+    </a></li>`;
+
+    categorias.sort((a, b) => (a.orden ?? 99) - (b.orden ?? 99));
+    const caja = $("[data-lista]");
+    caja.innerHTML = categorias
+      .map((c) => {
+        const n = cuantas(c.slug);
+        return filaOrdenable({
+          datos: `data-slug="${escapar(c.slug)}"`,
+          quitar: `Borrar ${c.name}`,
+          contenido: `<a class="fila-abre categoria-fila" href="${base}categorias/editar/?slug=${encodeURIComponent(c.slug)}">
+            ${foto(c.photo)}
+            <span class="categoria-texto"><strong>${escapar(c.name)}</strong><small>${n} ${n === 1 ? "pieza" : "piezas"}</small></span>
+            ${c.estado === "borrador" ? '<span class="estado estado--borrador">Borrador</span>' : ""}
+            ${FLECHA}
+          </a>`,
+        });
+      })
+      .join("");
+    $("[data-total]").textContent = `${categorias.length} ${categorias.length === 1 ? "categoría" : "categorías"}`;
+    const publicadas = categorias.filter((c) => c.estado !== "borrador").length;
+    $("[data-resumen]").textContent = `${publicadas} ${publicadas === 1 ? "publicada" : "publicadas"}${categorias.length - publicadas ? ` · ${categorias.length - publicadas} en borrador` : ""}`;
+
+    cablearOrdenables(caja, {
+      alSoltar: (desde, hasta) => {
+        const [c] = categorias.splice(desde, 1);
+        categorias.splice(hasta, 0, c);
+        guardarOrden();
+      },
+      alQuitar: (i) => quitar(categorias[i]),
+    });
+  }
+
+  // El orden se guarda en cada categoría (`orden`); solo las que cambiaron.
+  async function guardarOrden() {
+    const cambiadas = categorias.map((c, i) => ({ c, orden: i + 1 })).filter(({ c, orden }) => c.orden !== orden);
+    cambiadas.forEach(({ c, orden }) => (c.orden = orden));
+    pintar();
+    try {
+      for (const { c } of cambiadas) await guardar("categorias", { ...c, _original: c.slug });
+      dispatchEvent(new CustomEvent("neucast:guardado"));
+      avisar("Orden guardado");
+    } catch (e) {
+      avisar(e.message || "No se pudo guardar el orden", { tipo: "error" });
+    }
+  }
+
+  async function quitar(c) {
+    const n = cuantas(c.slug);
+    if (n) {
+      await confirmar({ titulo: `"${c.name}" tiene piezas`, texto: `Tiene ${n} ${n === 1 ? "pieza" : "piezas"}. Muévelas a otra categoría desde su editor y después podrás borrarla.`, accion: "Entendido" });
+      return;
+    }
+    const ok = await confirmar({
+      titulo: `Borrar ${c.name}`,
+      texto: "Desaparece su página, su lugar en los menús y su catálogo en PDF. Si solo quieres esconderla, pásala a borrador.",
+      accion: "Borrar la categoría",
+      peligro: true,
+    });
+    if (!ok) return;
+    try {
+      await borrar("categorias", c.slug);
+      categorias = categorias.filter((x) => x !== c);
+      pintar();
+      dispatchEvent(new CustomEvent("neucast:guardado"));
+      avisar(`Se borró ${c.name}`);
+    } catch (e) {
+      avisar(e.message, { tipo: "error" });
+    }
+  }
+
+  async function cargar() {
+    [categorias, piezas, ajustes] = await Promise.all([listar("categorias"), listar("piezas"), listar("ajustes")]);
+    pintar();
+  }
+  cargar().catch((e) => avisar(e.message || "No se pudieron cargar las categorías", { tipo: "error" }));
+</script>
+
+<style>
+  .categorias{display:flex;flex-direction:column;gap:12px;}
+  .categorias-cabeza{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-top:22px;}
+  .categorias-cabeza .grupo-rotulo{margin:0 0 0 4px;}
+  .categorias :global(.categoria-fila){display:flex;align-items:center;gap:14px;min-height:76px;color:inherit;text-decoration:none;}
+  .categorias :global(.fila-ordenable){padding-right:12px;}
+  .categorias :global(.categoria-foto){width:64px;height:48px;border-radius:12px;flex:none;}
+  .categorias :global(.categoria-foto img){object-fit:cover;padding:0;}
+  .categorias :global(.categoria-texto){flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+  .categorias :global(.categoria-texto strong){font-size:var(--t-cuerpo);font-weight:600;}
+  .categorias :global(.categoria-texto small){font-size:var(--t-subtitulo);color:var(--etiqueta-3);}
+  @media (max-width:640px){
+    .categorias :global(.categoria-foto){width:52px;height:40px;}
+    .categorias :global(.categoria-fila){gap:12px;min-height:68px;}
+  }
+</style>

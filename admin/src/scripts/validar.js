@@ -5,6 +5,7 @@
 // captura, no seguridad.
 import { OBLIGATORIOS, MEDIDAS, ETIQUETAS } from "./esquemas/pieza.js";
 import { aplica, esObligatoria } from "./listas.js";
+import { OBLIGATORIOS_CATEGORIA, OBLIGATORIOS_TODOS, MEDIDAS_CATEGORIA, ETIQUETAS_CATEGORIA } from "./esquemas/categoria.js";
 
 // Lo que no puede ir en ningún texto del sitio (regla 1 y regla 3).
 const PROHIBIDAS = /\b(fabricante|fabricamos|comercializadora|distribuidor|mayorista|proveedor)\b/i;
@@ -95,4 +96,22 @@ export function limpiarSlug(texto) {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+// Una categoría, o "Todos los muebles" con `{ todos: true }`.
+export function validarCategoria(cat, { todos = false } = {}) {
+  const errores = {};
+  for (const campo of todos ? OBLIGATORIOS_TODOS : OBLIGATORIOS_CATEGORIA) {
+    if (vacio(typeof cat[campo] === "string" ? cat[campo].trim() : cat[campo])) errores[campo] = `Falta ${ETIQUETAS_CATEGORIA[campo]}`;
+  }
+  if (!todos && cat.slug && !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(cat.slug)) {
+    errores.slug = "Solo minúsculas, números y guiones, sin acentos";
+  }
+  for (const [campo, m] of Object.entries(MEDIDAS_CATEGORIA)) {
+    const t = (cat[campo] || "").trim();
+    if (!t || errores[campo]) continue;
+    const e = revisarTexto(t) || (t.length < m.min ? `Muy corto: ${t.length} de ${m.min} caracteres mínimos` : t.length > m.max ? `Muy largo: ${t.length} de ${m.max} caracteres máximos` : null);
+    if (e) errores[campo] = e;
+  }
+  return errores;
 }

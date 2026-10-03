@@ -6,7 +6,7 @@
 // Para volver a la semilla: localStorage.clear() en la consola, o el botón
 // "Restablecer la simulación" de la pantalla de inicio.
 import { ErrorApi } from "./api.js";
-import { validarPieza } from "./validar.js";
+import { validarPieza, validarCategoria } from "./validar.js";
 
 const LLAVE = (c) => `neucast-admin:${c}`;
 const cache = new Map();
@@ -29,11 +29,22 @@ async function cargar(coleccion) {
   try {
     const local = localStorage.getItem(LLAVE(coleccion));
     datos = local ? JSON.parse(local) : await semilla(coleccion);
+    // Un registro único guardado antes de que la semilla creciera (por ejemplo
+    // ajustes sin los textos de "Todos los muebles"): lo que falte sale de la
+    // semilla, un nivel hacia adentro.
+    if (local && !Array.isArray(datos) && datos && typeof datos === "object") datos = completar(await semilla(coleccion), datos);
   } catch {
     datos = await semilla(coleccion);
   }
   cache.set(coleccion, datos);
   return datos;
+}
+
+const esObjeto = (v) => v && typeof v === "object" && !Array.isArray(v);
+function completar(base, local) {
+  const r = { ...base, ...local };
+  for (const k of Object.keys(base)) if (esObjeto(base[k]) && esObjeto(local[k])) r[k] = { ...base[k], ...local[k] };
+  return r;
 }
 
 function persistir(coleccion, datos) {
@@ -91,14 +102,43 @@ export async function guardar(coleccion, registro) {
     }
   }
 
+  if (coleccion === "categorias") {
+    const errores = validarCategoria(nuevo);
+    if (nuevo.estado !== "borrador" && Object.keys(errores).length) {
+      throw new ErrorApi("Faltan datos para publicar la categoría", errores);
+    }
+    const repetida = datos.find((r) => r.slug === nuevo.slug && r.slug !== nuevo._original);
+    if (repetida) throw new ErrorApi("Ya hay una categoría con esa dirección", { slug: "Ya existe otra categoría con esta dirección" });
+  }
+
   const original = nuevo._original ?? nuevo[llave];
   delete nuevo._original;
   const i = datos.findIndex((r) => String(r[llave]) === String(original));
   if (i >= 0) datos[i] = nuevo;
   else datos.push(nuevo);
   persistir(coleccion, datos);
+  // Si una categoría cambia de dirección, sus piezas y las listas que la
+  // nombran se van con ella (la API real hace lo mismo en una transacción).
+  if (coleccion === "categorias" && i >= 0 && original !== nuevo.slug) await moverCategoria(original, nuevo.slug);
   await anotarPendiente(coleccion, nuevo[llave], nuevo.nombre || nuevo.name);
   return copia(nuevo);
+}
+
+// `a` vacío: la categoría se borró y solo se quita de las listas.
+async function moverCategoria(de, a) {
+  const piezas = await cargar("piezas");
+  let n = 0;
+  piezas.forEach((p) => { if (p.cat === de) { p.cat = a; n++; } });
+  if (n) persistir("piezas", piezas);
+  const listas = await cargar("listas");
+  const cambiar = (arr) => (Array.isArray(arr) ? (a ? arr.map((c) => (c === de ? a : c)) : arr.filter((c) => c !== de)) : arr);
+  for (const grupo of [listas.listas, listas.medidas, listas.partes]) {
+    grupo.forEach((x) => {
+      x.categorias = cambiar(x.categorias);
+      if ("obligatoria" in x) x.obligatoria = cambiar(x.obligatoria);
+    });
+  }
+  persistir("listas", listas);
 }
 
 export async function borrar(coleccion, id) {
@@ -107,7 +147,12 @@ export async function borrar(coleccion, id) {
   const llave = CON_ID[coleccion];
   const registro = datos.find((r) => String(r[llave]) === String(id));
   if (!registro) throw new ErrorApi("No existe ese registro", {}, 404);
+  if (coleccion === "categorias") {
+    const suyas = (await cargar("piezas")).filter((p) => p.cat === registro.slug);
+    if (suyas.length) throw new ErrorApi(`La categoría tiene ${suyas.length} ${suyas.length === 1 ? "pieza" : "piezas"}: muévelas a otra antes de borrarla`, {}, 409);
+  }
   persistir(coleccion, datos.filter((r) => r !== registro));
+  if (coleccion === "categorias") await moverCategoria(registro.slug, null);
   await anotarPendiente(coleccion, id, registro.nombre || registro.name, true);
   return { ok: true };
 }

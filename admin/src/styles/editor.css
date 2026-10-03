@@ -541,3 +541,15 @@ body.ordenando *{cursor:grabbing !important;}
   .seccion-cabeza > div{display:contents;}
   .seccion-cabeza .t-mini{grid-column:1 / -1;margin:0;}
 }
+
+/* el contenido de una fila ordenable que abre su ficha (medidas, partes, categorías) */
+.fila-abre{
+  flex:1;min-width:0;align-self:stretch;display:flex;align-items:center;gap:14px;
+  padding:0;border:0;background:none;font:inherit;color:inherit;text-align:left;cursor:pointer;
+}
+.fila-abre .fila-lista-flecha{transition:transform .25s var(--resorte);}
+@media (hover:hover){.fila-abre:hover .fila-lista-flecha{transform:translateX(2px);}.fila-abre:hover .fila-lista-etiqueta{color:var(--etiqueta);}}
+.fila-abre:focus-visible{outline:0;box-shadow:inset 0 0 0 2px var(--olive);border-radius:10px;}
+
+/* segunda línea gris debajo de la etiqueta de una fila */
+.fila-lista-sub{display:block;margin-top:2px;font-size:var(--t-nota);color:var(--etiqueta-3);}
