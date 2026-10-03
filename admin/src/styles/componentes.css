@@ -348,3 +348,42 @@ a.renglon:focus-visible{outline-offset:-3px;}
   .paginador-paginas{grid-column:1 / -1;grid-row:1;justify-content:center;}
   .paginador-boton{min-width:40px;height:40px;}
 }
+
+/* ============================================
+   Listados en teléfono: cabecera compacta y filtros en hoja
+   ============================================ */
+.no-telefono{display:inline;}
+.solo-telefono{display:none;}
+.herramientas-filtros{display:contents;}
+.boton-filtros{display:none;}
+@media (max-width:640px){
+  .no-telefono{display:none;}
+  .solo-telefono{display:inline;}
+  /* título y un + redondo en la misma línea, como en Apple */
+  .cabecera--compacta{flex-direction:row;align-items:flex-start;flex-wrap:nowrap;gap:16px;margin-bottom:var(--space-5);}
+  .cabecera--compacta .cabecera-acciones{width:auto;flex:none;}
+  .cabecera--compacta .cabecera-acciones .boton{flex:none;width:44px;height:44px;padding:0;border-radius:50%;justify-content:center;}
+  .cabecera--compacta .boton-texto{display:none;}
+  /* buscador y botón de filtros */
+  .herramientas{grid-template-columns:minmax(0,1fr) auto;}
+  .boton-filtros{
+    position:relative;display:grid;place-items:center;width:44px;height:44px;border-radius:14px;
+    background:var(--relleno);color:var(--etiqueta);transition:background .2s,color .2s,transform .2s var(--resorte);
+  }
+  .boton-filtros:active{transform:scale(.94);}
+  .boton-filtros.activo{background:var(--ink);color:var(--white);}
+  .boton-filtros-n{
+    position:absolute;top:-5px;right:-5px;min-width:19px;height:19px;padding:0 5px;border-radius:999px;
+    display:grid;place-items:center;background:var(--olive);color:var(--white);
+    font-size:11px;font-weight:700;box-shadow:0 0 0 2px var(--white);
+  }
+  [data-filtros-hoja] .herramientas-filtros{display:flex;flex-direction:column;gap:16px;}
+  [data-filtros-hoja] .control,[data-filtros-hoja] .selector-boton{height:50px;}
+  [data-filtros-hoja] .segmentos{width:100%;}
+  [data-filtros-hoja] .segmento{flex:1;height:40px;}
+}
+.rotulo-hoja{display:none;}
+@media (max-width:640px){
+  [data-filtros-hoja] .rotulo-hoja{display:block;margin:6px 0 -6px 4px;font-size:var(--t-subtitulo);font-weight:600;color:var(--etiqueta-2);}
+  [data-filtros-hoja] .rotulo-hoja:first-child{margin-top:0;}
+}

@@ -3,16 +3,17 @@
 // entrar a editar. Las filas las pinta el navegador con lo que responde la API.
 import Admin from "../../layouts/Admin.astro";
 import IconoAdmin from "../../components/IconoAdmin.astro";
+import Modal from "../../components/Modal.astro";
 const base = import.meta.env.BASE_URL;
 ---
 <Admin titulo="Piezas" seccion="piezas">
-  <div class="cabecera">
+  <div class="cabecera cabecera--compacta">
     <div class="cabecera-textos">
       <h1 class="t-pantalla">Piezas</h1>
       <p class="t-apoyo" data-resumen>Cargando el catálogo…</p>
     </div>
     <div class="cabecera-acciones">
-      <a class="boton boton--primario" href={`${base}piezas/editar/`}><IconoAdmin name="mas" size={16} />Nueva pieza</a>
+      <a class="boton boton--primario" href={`${base}piezas/editar/`} aria-label="Nueva pieza"><IconoAdmin name="mas" size={16} /><span class="boton-texto">Nueva pieza</span></a>
     </div>
   </div>
 
@@ -22,13 +23,22 @@ const base = import.meta.env.BASE_URL;
         <IconoAdmin name="buscar" />
         <input class="control" type="search" placeholder="Buscar por nombre, tipo o dirección" data-buscar aria-label="Buscar piezas" />
       </div>
+      <!-- en teléfono la categoría y el estado se van a una hoja -->
+      <button class="boton-filtros" type="button" data-abre-filtros aria-label="Filtros">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3.5 6h13M6 10h8M8.5 14h3"/></svg>
+        <span class="boton-filtros-n" data-filtros-n hidden></span>
+      </button>
+      <div class="herramientas-filtros" data-filtros>
+      <span class="rotulo-hoja">Categoría</span>
       <select class="control" data-categoria aria-label="Categoría">
         <option value="">Todas las categorías</option>
       </select>
+      <span class="rotulo-hoja">Estado</span>
       <div class="segmentos" role="group" aria-label="Estado" data-estados>
         <button class="segmento" type="button" data-estado="" aria-pressed="true">Todas</button>
         <button class="segmento" type="button" data-estado="publicada" aria-pressed="false">Publicadas</button>
         <button class="segmento" type="button" data-estado="borrador" aria-pressed="false">Borradores</button>
+      </div>
       </div>
     </div>
 
@@ -81,13 +91,20 @@ const base = import.meta.env.BASE_URL;
       </div>
     </div>
   </div>
+  <Modal id="modal-filtros" titulo="Filtros">
+    <div data-filtros-hoja></div>
+    <Fragment slot="pie">
+      <button class="boton boton--texto izquierda" type="button" data-quitar-filtros>Quitar filtros</button>
+      <button class="boton boton--primario" type="button" data-cierra-modal data-ver-filtradas>Ver piezas</button>
+    </Fragment>
+  </Modal>
 </Admin>
 
 <script>
   import { listar, guardar, borrar } from "../../scripts/api.js";
   import { medio } from "../../scripts/medios.js";
   import { opciones, nombreOpcion } from "../../scripts/listas.js";
-  import { confirmar, avisar, fechaRelativa, escapar } from "../../scripts/ui.js";
+  import { confirmar, avisar, fechaRelativa, escapar, abrirModal } from "../../scripts/ui.js";
 
   const base = import.meta.env.BASE_URL;
   const $ = (s, el = document) => el.querySelector(s);
@@ -159,6 +176,13 @@ const base = import.meta.env.BASE_URL;
 
   function pintar() {
     const lista = filtradas();
+    // la hoja de filtros del teléfono: cuántos hay puestos y cuántas piezas salen
+    const puestos = Number(!!filtro.cat) + Number(!!filtro.estado);
+    $("[data-filtros-n]").hidden = !puestos;
+    $("[data-filtros-n]").textContent = puestos;
+    $("[data-abre-filtros]").classList.toggle("activo", puestos > 0);
+    $("[data-ver-filtradas]").textContent = `Ver ${miles(lista.length)} ${lista.length === 1 ? "pieza" : "piezas"}`;
+    $("[data-quitar-filtros]").hidden = !puestos;
     const total = lista.length;
     const paginas = Math.max(1, Math.ceil(total / porPagina));
     pagina = Math.min(pagina, paginas);
@@ -299,7 +323,7 @@ const base = import.meta.env.BASE_URL;
       for (const c of categorias) sel.insertAdjacentHTML("beforeend", `<option value="${escapar(c.slug)}">${escapar(c.name)}</option>`);
     }
     const publicadas = piezas.filter((p) => p.estado === "publicada").length;
-    $("[data-resumen]").textContent = `${piezas.length} piezas en ${categorias.length} categorías · ${publicadas} publicadas, ${piezas.length - publicadas} en borrador`;
+    $("[data-resumen]").innerHTML = `${miles(piezas.length)} piezas<span class="no-telefono"> en ${categorias.length} categorías · ${miles(publicadas)} publicadas,</span><span class="solo-telefono"> ·</span> ${miles(piezas.length - publicadas)} en borrador`;
     pintar();
   }
 
@@ -325,6 +349,25 @@ const base = import.meta.env.BASE_URL;
   $("[data-limpiar]").addEventListener("click", () => {
     filtro.texto = ""; filtro.cat = ""; filtro.estado = ""; pagina = 1;
     $("[data-buscar]").value = ""; $("[data-categoria]").value = "";
+    document.querySelectorAll("[data-estados] .segmento").forEach((s) => s.setAttribute("aria-pressed", String(!s.dataset.estado)));
+    pintar();
+  });
+
+  // En teléfono la categoría y el estado viven en una hoja; en escritorio,
+  // junto al buscador. Son los mismos controles: solo cambian de lugar.
+  const TELEFONO = matchMedia("(max-width: 640px)");
+  const acomodarFiltros = () => {
+    const filtros = $("[data-filtros]");
+    const destino = TELEFONO.matches ? $("[data-filtros-hoja]") : $(".herramientas");
+    if (filtros.parentElement !== destino) destino.appendChild(filtros);
+    $("[data-buscar]").placeholder = TELEFONO.matches ? "Buscar piezas" : "Buscar por nombre, tipo o dirección";
+  };
+  acomodarFiltros();
+  TELEFONO.addEventListener("change", acomodarFiltros);
+  $("[data-abre-filtros]").addEventListener("click", () => abrirModal("modal-filtros"));
+  $("[data-quitar-filtros]").addEventListener("click", () => {
+    filtro.cat = ""; filtro.estado = ""; pagina = 1;
+    $("[data-categoria]").value = "";
     document.querySelectorAll("[data-estados] .segmento").forEach((s) => s.setAttribute("aria-pressed", String(!s.dataset.estado)));
     pintar();
   });

@@ -9,13 +9,13 @@ import Modal from "../components/Modal.astro";
 import "../styles/editor.css";
 ---
 <Admin titulo="Destacadas" seccion="destacadas">
-  <div class="cabecera">
+  <div class="cabecera cabecera--compacta">
     <div class="cabecera-textos">
       <h1 class="t-pantalla">Destacadas</h1>
       <p class="t-apoyo">Las piezas del carrusel "Piezas destacadas" de la portada, en el orden en que salen. Arrastra para acomodarlas.</p>
     </div>
     <div class="cabecera-acciones">
-      <button class="boton boton--primario" type="button" data-agregar><IconoAdmin name="mas" size={16} />Agregar piezas</button>
+      <button class="boton boton--primario" type="button" data-agregar aria-label="Agregar piezas"><IconoAdmin name="mas" size={16} /><span class="boton-texto">Agregar piezas</span></button>
     </div>
   </div>
 
