@@ -1338,15 +1338,23 @@ const secciones = [
       for (const sec of secciones) if (sec.getBoundingClientRect().top <= corte) actual = sec;
       if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) actual = secciones.at(-1);
       const indice = $(".pasos-lista");
+      let nueva = null;
       $$("[data-indice]").forEach((a) => {
         const es = a.dataset.indice === actual.id;
-        if (es && !a.classList.contains("activo") && indice.scrollWidth > indice.clientWidth) {
-          // en teléfono las pastillas se deslizan para que la activa se vea
-          indice.scrollTo({ left: a.offsetLeft - 16, behavior: "smooth" });
-        }
+        if (es && !a.classList.contains("activo")) nueva = a;
         a.classList.toggle("activo", es);
       });
+      // En teléfono la activa enseña su nombre y crece: se centra cuando ya
+      // tiene su ancho final, así la última nunca queda cortada.
+      if (nueva) requestAnimationFrame(() => centrarPaso(indice, nueva));
     };
+    function centrarPaso(indice, a) {
+      if (indice.scrollWidth <= indice.clientWidth) return;
+      const caja = indice.getBoundingClientRect();
+      const r = a.getBoundingClientRect();
+      const centro = indice.scrollLeft + (r.left - caja.left) + r.width / 2 - caja.width / 2;
+      indice.scrollTo({ left: Math.max(0, Math.min(centro, indice.scrollWidth - indice.clientWidth)), behavior: "smooth" });
+    }
     addEventListener("scroll", seguir, { passive: true });
     seguir();
     $$("[data-indice]").forEach((a) =>
