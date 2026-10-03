@@ -286,21 +286,37 @@ a.renglon:focus-visible{outline-offset:-3px;}
   .tabla .solo-movil{display:inline-flex;}
   .tabla tbody tr[aria-hidden]{display:none;}
 
-  /* 4. modales como hoja */
+  /* 4. modales como hoja de Apple: suben desde abajo, llevan la barrita y
+     se cierran deslizándolos hacia abajo (scripts/ui.js) */
   dialog.modal,dialog.modal--ancho{
-    width:100vw;max-width:100vw;max-height:92vh;margin:auto 0 0;
-    border-radius:20px 20px 0 0;
+    width:100vw;max-width:100vw;max-height:94dvh;margin:auto 0 0;
+    border-radius:28px 28px 0 0;
+    box-shadow:0 -10px 40px rgba(20,19,17,.18);
+    touch-action:pan-y;
   }
-  dialog.modal[open]{animation:hojaSube .38s var(--ease);}
-  dialog.modal.modal--cerrando{animation:hojaBaja .26s var(--ease-salida) forwards;}
-  .modal-cabeza{padding:22px 18px 0;}
-  .modal-cuerpo{padding:18px 18px 6px;max-height:calc(92vh - 200px);}
-  .modal-pie{flex-direction:column-reverse;align-items:stretch;padding:16px 18px calc(18px + env(safe-area-inset-bottom));}
-  .modal-pie .boton{height:48px;width:100%;}
+  dialog.modal::backdrop{opacity:var(--velo,1);}
+  dialog.modal[open]{animation:hojaSube .5s cubic-bezier(.32,.72,0,1);}
+  dialog.modal.modal--cerrando{animation:hojaBaja .3s cubic-bezier(.32,.72,0,1) forwards;}
+  dialog.modal.arrastrando-hoja{animation:none;transition:none;}
+  dialog.modal.soltando-hoja{transition:transform .45s cubic-bezier(.32,.72,0,1);}
+  .modal-asa{
+    display:block;width:100%;height:26px;position:relative;cursor:grab;touch-action:none;
+  }
+  .modal-asa::before{
+    content:"";position:absolute;left:50%;top:8px;width:38px;height:5px;margin-left:-19px;
+    border-radius:999px;background:rgba(60,60,67,.3);
+  }
+  .modal-cabeza{padding:6px 22px 0;gap:14px;touch-action:none;}
+  .modal-titulo{font-size:var(--t-titulo-3);line-height:1.25;}
+  .modal-texto{margin-top:12px;font-size:var(--t-llamada);}
+  .modal-x{width:32px;height:32px;margin-top:-2px;}
+  .modal-cuerpo{padding:26px 22px 8px;gap:24px;max-height:calc(94dvh - 220px);}
+  .modal-pie{flex-direction:column-reverse;align-items:stretch;gap:10px;padding:22px 22px calc(22px + env(safe-area-inset-bottom));}
+  .modal-pie .boton{height:52px;width:100%;font-size:var(--t-cuerpo);}
   .modal-pie .izquierda{margin:0;text-align:center;}
   .avisos{bottom:16px;}
 }
-@keyframes hojaSube{from{transform:translateY(100%);}to{transform:none;}}
+@keyframes hojaSube{from{transform:translateY(100%);}}
 @keyframes hojaBaja{to{transform:translateY(100%);}}
 
 /* ============================================

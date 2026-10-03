@@ -180,6 +180,7 @@
    todo en una tarjeta blanca. Lo usan medidas, construcción, destacados,
    mecanismo y cuidados. */
 .grupo-lista{
+  list-style:none;margin:0;padding:0;
   border-radius:var(--r-3);background:var(--white);overflow:hidden;
   box-shadow:0 0 0 1px var(--borde);
 }
@@ -474,6 +475,7 @@ body:has(.guardar) .avisos{bottom:96px;}
   .ambiente{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
   .video-pieza-ficha{flex-wrap:wrap;}
   .video-pieza-ficha .boton{flex:1 1 100%;height:44px;}
+  .video-pieza > .boton{width:100%;height:48px;justify-content:center;}
 }
 
 /* ---------- Ficha técnica en tres bloques, como los paneles del sitio ---------- */

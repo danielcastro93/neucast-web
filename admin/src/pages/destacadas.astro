@@ -19,7 +19,7 @@ import "../styles/editor.css";
     </div>
   </div>
 
-  <section class="tarjeta destacadas">
+  <section class="destacadas">
     <div class="destacadas-cabeza">
       <span class="grupo-rotulo" data-total></span>
       <span class="t-mini" data-aviso></span>
@@ -84,7 +84,7 @@ import "../styles/editor.css";
           <span class="miniatura">${p.img?.[0] ? `<img src="${escapar(medio(p.img[0]))}" alt="" loading="lazy" draggable="false" />` : ""}</span>
           <a class="destacada-texto" href="${base}piezas/editar/?slug=${encodeURIComponent(slug)}">
             <strong>${escapar(p.nombre)}</strong>
-            <small>${escapar(p.tipo)} · ${escapar(nombreCat(p.cat))}</small>
+            <small>${escapar(p.tipo)}<span class="destacada-cat"> · ${escapar(nombreCat(p.cat))}</span></small>
           </a>
           ${borrador ? '<span class="estado estado--borrador" title="No sale en la portada hasta publicarla">Borrador</span>' : ""}`,
         });
@@ -199,7 +199,7 @@ import "../styles/editor.css";
 </script>
 
 <style>
-  .destacadas{padding:26px 28px 30px;display:flex;flex-direction:column;gap:14px;}
+  .destacadas{display:flex;flex-direction:column;gap:12px;}
   .destacadas-cabeza{display:flex;align-items:baseline;justify-content:space-between;gap:16px;}
   .destacadas-cabeza .grupo-rotulo{margin:0 0 0 4px;}
   .destacadas-cabeza .t-mini{text-align:right;}
@@ -214,7 +214,8 @@ import "../styles/editor.css";
   .destacadas :global(.destacada-texto small){font-size:var(--t-subtitulo);color:var(--etiqueta-3);}
   @media (hover:hover){.destacadas :global(.destacada-texto:hover strong){text-decoration:underline;text-underline-offset:3px;}}
   @media (max-width:640px){
-    .destacadas{padding:20px 14px 22px;}
+    .destacadas :global(.destacada-cat){display:none;}
+    .destacadas :global(.destacada-n){width:16px;}
     .destacadas-cabeza{flex-direction:column;align-items:flex-start;gap:6px;}
     .destacadas-cabeza .t-mini{text-align:left;}
     .destacadas :global(.fila-ordenable .miniatura){width:44px;height:44px;}

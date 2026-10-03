@@ -63,7 +63,6 @@
 
 /* filas de ajustes */
 .grupo-lista > li{list-style:none;}
-.grupo-lista{list-style:none;margin:0;padding:0;}
 .grupo-lista > li + li > .fila-lista,.grupo-lista > li + li.fila-lista,.grupo-lista > .fila-lista + .fila-lista{box-shadow:inset 0 1px 0 var(--borde);}
 .fila-lista-valor{flex:none;max-width:55%;text-align:right;font-size:var(--t-cuerpo);line-height:1.3;color:var(--etiqueta-2);}
 .fila-lista-valor--corto{max-width:40%;}

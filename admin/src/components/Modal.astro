@@ -9,6 +9,8 @@ import IconoAdmin from "./IconoAdmin.astro";
 const { id, titulo, texto, ancho = false } = Astro.props;
 ---
 <dialog class:list={["modal", { "modal--ancho": ancho }]} id={id} aria-labelledby={`${id}-titulo`}>
+  <!-- la barrita de la hoja en teléfono: se arrastra hacia abajo para cerrar -->
+  <span class="modal-asa" aria-hidden="true"></span>
   <div class="modal-cabeza">
     <div>
       <h2 class="modal-titulo" id={`${id}-titulo`} data-titulo>{titulo}</h2>

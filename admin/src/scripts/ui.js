@@ -53,7 +53,9 @@ export function cerrarModal(id) {
   const fin = () => {
     if (!d.open) return;
     d.close();
-    d.classList.remove("modal--cerrando");
+    d.classList.remove("modal--cerrando", "soltando-hoja");
+    d.style.removeProperty("transform");
+    d.style.removeProperty("--velo");
     soltar();
   };
   if (quieto.matches) return fin();
@@ -103,6 +105,7 @@ export function cablearModales() {
         cerrarModal(d.id);
       }
     });
+    deslizarParaCerrar(d);
     d.querySelectorAll("[data-cierra-modal]").forEach((b) =>
       b.addEventListener("click", () => {
         d.dispatchEvent(new CustomEvent("cancelar"));
@@ -219,3 +222,51 @@ addEventListener("scroll", ocultarGlobo, { passive: true, capture: true });
 // IconoAdmin): relleno, como el de Apple.
 export const ICONO_BASURA = (t = 16) =>
   `<svg width="${t}" height="${t}" viewBox="0 0 20 20" aria-hidden="true"><path stroke="none" fill="currentColor" d="M8.6 2.5h2.8c.66 0 1.2.54 1.2 1.2v.8h3.15a.85.85 0 0 1 0 1.7H4.25a.85.85 0 0 1 0-1.7H7.4v-.8c0-.66.54-1.2 1.2-1.2Z"/><path stroke="none" fill="currentColor" fill-rule="evenodd" d="M5.3 7.4h9.4l-.66 8.36A1.9 1.9 0 0 1 12.15 17.5h-4.3a1.9 1.9 0 0 1-1.9-1.74L5.3 7.4Zm3.05 1.9a.65.65 0 0 0-.65.65v4.6a.65.65 0 0 0 1.3 0v-4.6a.65.65 0 0 0-.65-.65Zm3.3 0a.65.65 0 0 0-.65.65v4.6a.65.65 0 0 0 1.3 0v-4.6a.65.65 0 0 0-.65-.65Z"/></svg>`;
+
+// En teléfono los modales son hojas: se arrastran de la barrita o de la
+// cabeza hacia abajo; si bajan lo suficiente (o con un jalón rápido) se
+// cierran, si no regresan a su lugar con un rebote.
+const HOJA = matchMedia("(max-width: 640px)");
+function deslizarParaCerrar(d) {
+  const agarres = d.querySelectorAll(".modal-asa, .modal-cabeza");
+  agarres.forEach((el) =>
+    el.addEventListener("pointerdown", (e) => {
+      if (!HOJA.matches || e.button > 0 || e.target.closest("button, a, input")) return;
+      const y0 = e.clientY;
+      let ultimo = { y: y0, t: performance.now() };
+      let velocidad = 0;
+      let dy = 0;
+      d.classList.remove("soltando-hoja");
+      d.classList.add("arrastrando-hoja");
+      const alto = d.offsetHeight;
+      const mover = (ev) => {
+        const crudo = ev.clientY - y0;
+        // hacia arriba se resiste, como en iOS
+        dy = crudo > 0 ? crudo : -Math.sqrt(-crudo) * 2;
+        d.style.transform = `translateY(${dy}px)`;
+        d.style.setProperty("--velo", String(Math.max(0, 1 - Math.max(0, dy) / alto)));
+        const ahora = performance.now();
+        velocidad = (ev.clientY - ultimo.y) / Math.max(1, ahora - ultimo.t);
+        ultimo = { y: ev.clientY, t: ahora };
+      };
+      const soltarHoja = () => {
+        removeEventListener("pointermove", mover);
+        removeEventListener("pointerup", soltarHoja);
+        removeEventListener("pointercancel", soltarHoja);
+        d.classList.remove("arrastrando-hoja");
+        if (dy > Math.min(160, alto * 0.3) || (dy > 60 && velocidad > 0.6)) {
+          d.dispatchEvent(new CustomEvent("cancelar"));
+          cerrarModal(d.id);
+        } else {
+          d.classList.add("soltando-hoja");
+          d.style.transform = "";
+          d.style.removeProperty("--velo");
+          setTimeout(() => d.classList.remove("soltando-hoja"), 460);
+        }
+      };
+      addEventListener("pointermove", mover);
+      addEventListener("pointerup", soltarHoja);
+      addEventListener("pointercancel", soltarHoja);
+    })
+  );
+}

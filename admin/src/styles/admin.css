@@ -475,7 +475,8 @@ dialog.modal.modal--cerrando::backdrop{animation:veloSale .24s var(--ease-salida
 }
 .modal-cabeza{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:30px 30px 0;}
 .modal-titulo{font-size:var(--t-titulo-2);font-weight:700;letter-spacing:-.025em;line-height:1.2;}
-.modal-texto{margin-top:10px;color:var(--ink-60);font-size:15px;line-height:1.55;}
+.modal-texto{margin-top:14px;color:var(--ink-60);font-size:15px;line-height:1.55;}
+.modal-asa{display:none;}
 .modal-texto:empty{display:none;}
 .modal-x{
   flex:none;width:32px;height:32px;margin:-4px -4px 0 0;border-radius:50%;
@@ -484,7 +485,7 @@ dialog.modal.modal--cerrando::backdrop{animation:veloSale .24s var(--ease-salida
 }
 .modal-x svg{width:16px;height:16px;}
 @media (hover:hover){.modal-x:hover{background:var(--relleno-2);color:var(--ink);}}
-.modal-cuerpo{padding:24px 30px 6px;display:flex;flex-direction:column;gap:22px;overflow-y:auto;max-height:calc(88vh - 180px);}
+.modal-cuerpo{padding:28px 30px 6px;display:flex;flex-direction:column;gap:22px;overflow-y:auto;max-height:calc(88vh - 180px);}
 .modal-pie{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:22px 30px 30px;}
 .modal-pie .izquierda{margin-right:auto;}
 
