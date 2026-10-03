@@ -111,10 +111,18 @@ const secciones = [
             </div>
           </div>
           <div class="seccion-cuerpo">
-            <div class="consejo">
-              <IconoAdmin name="foto" size={18} />
-              <p><b>Recortes con fondo transparente</b> (PNG o WebP) para la principal: el sitio pone el mueble sobre un gris suave y con fondo blanco se vería un cuadro. Las de ambiente pueden ser JPG. Toca una foto para describirla; arrastra para cambiar el orden.</p>
-            </div>
+            <details class="consejo consejo--plegable">
+              <summary>
+                <IconoAdmin name="foto" size={18} />
+                <b>Cómo deben ser las fotos</b>
+                <svg class="consejo-flecha" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 7.5 5 5 5-5"/></svg>
+              </summary>
+              <ul class="consejo-lista">
+                <li><b>La principal, recorte con fondo transparente</b> (PNG o WebP): el sitio pone el mueble sobre un gris suave y con fondo blanco se vería un cuadro.</li>
+                <li>Las de ambiente pueden ser JPG.</li>
+                <li>Toca una foto para describirla; arrástrala para cambiar el orden.</li>
+              </ul>
+            </details>
             <div class="campo" data-campo="img">
               <div class="campo-etiqueta"><span class="etiqueta">Galería<span class="obligatorio">*</span></span><span class="campo-contador" data-fotos-cuenta></span></div>
               <div class="galeria" data-galeria></div>

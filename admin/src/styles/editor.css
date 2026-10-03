@@ -506,3 +506,17 @@ body:has(.guardar) .avisos{bottom:96px;}
 }
 body.ordenando{cursor:grabbing;user-select:none;}
 body.ordenando *{cursor:grabbing !important;}
+
+/* ---------- Consejo plegable: una línea cerrado, el detalle al abrirlo ---------- */
+.consejo--plegable{display:block;padding:0;}
+.consejo--plegable summary{
+  display:flex;align-items:center;gap:12px;padding:13px 16px;cursor:pointer;list-style:none;
+  border-radius:16px;font-size:var(--t-llamada);
+}
+.consejo--plegable summary::-webkit-details-marker{display:none;}
+.consejo--plegable summary svg{margin-top:0;}
+.consejo-flecha{margin-left:auto;opacity:.7;transition:transform .3s var(--resorte);}
+.consejo--plegable[open] .consejo-flecha{transform:rotate(180deg);}
+.consejo--plegable summary:focus-visible{outline:2px solid var(--olive);outline-offset:-2px;}
+.consejo-lista{margin:0;padding:0 18px 16px 46px;display:flex;flex-direction:column;gap:6px;animation:entraPantalla .25s var(--ease);}
+.consejo-lista li{list-style:disc;}
