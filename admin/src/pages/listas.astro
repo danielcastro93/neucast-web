@@ -131,6 +131,18 @@ import "../styles/listas.css";
     </Fragment>
   </Modal>
 
+  <!-- Grupos de medidas: crear, renombrar, ordenar y quitar los vacíos -->
+  <Modal id="modal-grupos" titulo="Grupos de medidas" texto="Ordenan las medidas en la pieza y en la ficha. Toca un nombre para cambiarlo; un grupo con medidas no se puede quitar.">
+    <ul class="grupo-lista grupo-lista--ordenable" data-lista-grupos></ul>
+    <form class="agregar-opcion" data-agregar-grupo novalidate>
+      <input class="control" type="text" placeholder="Nuevo grupo, ej. Iluminación" autocomplete="off" data-grupo-nuevo aria-label="Nombre del grupo nuevo" />
+      <button class="boton boton--primario" type="submit">Agregar</button>
+    </form>
+    <Fragment slot="pie">
+      <button class="boton boton--primario" type="button" data-cierra-modal>Listo</button>
+    </Fragment>
+  </Modal>
+
   <!-- Parte de construcción: alta y edición -->
   <Modal id="modal-parte" titulo="Parte de construcción">
     <div class="campo">
@@ -575,32 +587,62 @@ import "../styles/listas.css";
   /* ============================================
      Medidas
      ============================================ */
+  // Una fila de medida o de parte: el componente ordenable con un botón que
+  // abre su ficha en medio.
+  const contenidoFila = (atributo, id, nombre, extra, cats) => `<button class="fila-abre" type="button" ${atributo}="${escapar(id)}">
+      <span class="fila-lista-etiqueta">${escapar(nombre)}</span>
+      ${extra}
+      <span class="fila-lista-valor fila-lista-valor--corto">${escapar(resumenCats(cats))}</span>
+      <svg class="fila-lista-flecha" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 5 5 5-5 5"/></svg>
+    </button>`;
+
   function pintarMedidas() {
     const panel = $("[data-panel]");
+    // las que tengan un grupo que ya no existe van al primero
+    const ids = new Set(listas.gruposMedida.map((g) => g.id));
+    listas.medidas.forEach((m) => { if (!ids.has(m.grupo)) m.grupo = listas.gruposMedida[0]?.id; });
     panel.innerHTML = `
       <header class="panel-cabeza">
         <div>
           <h2 class="t-seccion">Medidas</h2>
-          <p class="t-mini">Lo que se mide en una pieza, con su unidad. Cada categoría pide las suyas; las demás quedan a la mano en "Más medidas".</p>
+          <p class="t-mini">Lo que se mide en una pieza, con su unidad. Cada categoría pide las suyas; las demás quedan a la mano en "Más medidas". Arrástralas para ordenarlas dentro de su grupo.</p>
         </div>
-        <button class="boton boton--primario boton-renombrar" type="button" data-nueva-medida aria-label="Nueva medida"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg><span class="boton-texto">Nueva medida</span></button>
+        <div class="panel-cabeza-acciones">
+          <button class="boton boton--suave boton-renombrar" type="button" data-grupos aria-label="Grupos de medidas"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><rect x="3" y="3.5" width="14" height="5" rx="1.5"/><rect x="3" y="11.5" width="14" height="5" rx="1.5"/></svg><span class="boton-texto">Grupos</span></button>
+          <button class="boton boton--primario boton-renombrar" type="button" data-nueva-medida aria-label="Nueva medida"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg><span class="boton-texto">Nueva medida</span></button>
+        </div>
       </header>
       ${listas.gruposMedida.map((g) => {
         const ms = listas.medidas.filter((m) => m.grupo === g.id);
-        if (!ms.length) return "";
         return `<div class="panel-bloque">
           <span class="grupo-rotulo">${escapar(g.nombre)}</span>
-          <ul class="grupo-lista">${ms.map((m) => `
-            <li><button class="fila-lista fila-lista--enlace fila-boton" type="button" data-medida="${escapar(m.id)}">
-              <span class="fila-lista-etiqueta">${escapar(m.nombre)}</span>
-              <span class="pastilla">${m.unidad ? escapar(m.unidad) : "cuenta"}${m.rango ? " · rango" : ""}</span>
-              <span class="fila-lista-valor fila-lista-valor--corto">${escapar(resumenCats(m.categorias))}</span>
-              <svg class="fila-lista-flecha" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 5 5 5-5 5"/></svg>
-            </button></li>`).join("")}</ul>
+          ${ms.length
+            ? `<ul class="grupo-lista grupo-lista--ordenable" data-grupo-medidas="${escapar(g.id)}">${ms.map((m) => filaOrdenable({
+                datos: `data-id="${escapar(m.id)}"`,
+                quitar: `Quitar ${m.nombre}`,
+                contenido: contenidoFila("data-medida", m.id, m.nombre, `<span class="pastilla">${m.unidad ? escapar(m.unidad) : "cuenta"}${m.rango ? " · rango" : ""}</span>`, m.categorias),
+              })).join("")}</ul>`
+            : '<p class="t-mini panel-vacio">Sin medidas todavía. Al crear una, elige este grupo.</p>'}
         </div>`;
       }).join("")}`;
     $$("[data-medida]").forEach((b) => b.addEventListener("click", () => editarMedida(b.dataset.medida)));
     $("[data-nueva-medida]").addEventListener("click", () => editarMedida(null));
+    $("[data-grupos]").addEventListener("click", abrirGrupos);
+    $$("[data-grupo-medidas]").forEach((ul) => {
+      const delGrupo = () => listas.medidas.filter((m) => m.grupo === ul.dataset.grupoMedidas);
+      cablearOrdenables(ul, {
+        alSoltar: (desde, hasta) => {
+          const orden = delGrupo();
+          const [m] = orden.splice(desde, 1);
+          orden.splice(hasta, 0, m);
+          // el arreglo completo queda grupo por grupo, cada uno en su orden
+          listas.medidas = listas.gruposMedida.flatMap((g) => (g.id === ul.dataset.grupoMedidas ? orden : listas.medidas.filter((x) => x.grupo === g.id)));
+          pintarMedidas();
+          guardarListas("Orden guardado");
+        },
+        alQuitar: (i) => quitarMedida(delGrupo()[i]),
+      });
+    });
   }
 
   let medidaAbierta = null, medidaCats = null;
@@ -644,10 +686,12 @@ import "../styles/listas.css";
     pintar();
     guardarListas(medidaAbierta ? `Se guardó "${nombre}"` : `Se agregó la medida "${nombre}"`);
   });
-  $("[data-medida-quitar]").addEventListener("click", async () => {
-    const m = medidaAbierta;
-    const usan = usanMedida(m.id);
+  $("[data-medida-quitar]").addEventListener("click", () => {
     cerrarModal("modal-medida");
+    quitarMedida(medidaAbierta);
+  });
+  async function quitarMedida(m) {
+    const usan = usanMedida(m.id);
     if (usan.length) {
       await confirmar({ titulo: `"${m.nombre}" está en uso`, texto: `La tienen ${usan.length} ${usan.length === 1 ? "pieza" : "piezas"}: ${nombresDe(usan)}. Bórrala de esas fichas y después podrás quitarla.`, accion: "Entendido" });
       return;
@@ -656,6 +700,70 @@ import "../styles/listas.css";
     listas.medidas = listas.medidas.filter((x) => x !== m);
     pintar();
     guardarListas(`Se quitó "${m.nombre}"`);
+  }
+
+  /* ---------- Grupos de medidas ---------- */
+  function abrirGrupos() {
+    pintarGrupos();
+    abrirModal("modal-grupos");
+  }
+  function pintarGrupos() {
+    const ul = $("[data-lista-grupos]");
+    ul.innerHTML = listas.gruposMedida.map((g) => {
+      const n = listas.medidas.filter((m) => m.grupo === g.id).length;
+      return filaOrdenable({
+        datos: `data-id="${escapar(g.id)}"`,
+        quitar: `Quitar el grupo ${g.nombre}`,
+        contenido: `<input class="fila-lista-control fila-lista-control--izq" type="text" value="${escapar(g.nombre)}" data-grupo-nombre aria-label="Nombre del grupo" />
+          <span class="opcion-uso${n ? "" : " opcion-uso--libre"}">${n ? `${n} ${n === 1 ? "medida" : "medidas"}` : "vacío"}</span>`,
+      });
+    }).join("");
+    cablearOrdenables(ul, {
+      alSoltar: (desde, hasta) => {
+        const [g] = listas.gruposMedida.splice(desde, 1);
+        listas.gruposMedida.splice(hasta, 0, g);
+        pintarGrupos();
+        pintarMedidas();
+        guardarListas("Orden guardado");
+      },
+      alQuitar: async (i) => {
+        const g = listas.gruposMedida[i];
+        const n = listas.medidas.filter((m) => m.grupo === g.id).length;
+        if (n) return avisar(`"${g.nombre}" tiene ${n} ${n === 1 ? "medida" : "medidas"}: muévelas a otro grupo antes de quitarlo`, { tipo: "alerta" });
+        if (listas.gruposMedida.length === 1) return avisar("Tiene que quedar al menos un grupo", { tipo: "alerta" });
+        listas.gruposMedida.splice(i, 1);
+        pintarGrupos();
+        pintarMedidas();
+        guardarListas(`Se quitó el grupo "${g.nombre}"`);
+      },
+    });
+    $$("[data-grupo-nombre]", ul).forEach((inp, i) => {
+      inp.addEventListener("blur", () => {
+        const g = listas.gruposMedida[i];
+        const v = inp.value.trim().replace(/\s+/g, " ");
+        if (!v || v === g.nombre) return (inp.value = g.nombre);
+        if (listas.gruposMedida.some((x) => x !== g && sinAcentos(x.nombre) === sinAcentos(v))) {
+          avisar("Ya hay un grupo con ese nombre", { tipo: "alerta" });
+          return (inp.value = g.nombre);
+        }
+        g.nombre = v;
+        pintarMedidas();
+        guardarListas(`El grupo ahora se llama "${v}"`);
+      });
+      inp.addEventListener("keydown", (e) => e.key === "Enter" && (e.preventDefault(), inp.blur()));
+    });
+  }
+  $("[data-agregar-grupo]").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const campo = $("[data-grupo-nuevo]");
+    const nombre = campo.value.trim().replace(/\s+/g, " ");
+    if (!nombre) return campo.focus();
+    if (listas.gruposMedida.some((g) => sinAcentos(g.nombre) === sinAcentos(nombre))) return avisar("Ya hay un grupo con ese nombre", { tipo: "alerta" });
+    listas.gruposMedida.push({ id: idNuevo(nombre, listas.gruposMedida, limpiarSlug), nombre });
+    campo.value = "";
+    pintarGrupos();
+    pintarMedidas();
+    guardarListas(`Se agregó el grupo "${nombre}"`);
   });
 
   /* ============================================
@@ -667,20 +775,28 @@ import "../styles/listas.css";
       <header class="panel-cabeza">
         <div>
           <h2 class="t-seccion">Partes de construcción</h2>
-          <p class="t-mini">De qué está hecha cada parte de la pieza. Cada categoría pide las suyas.</p>
+          <p class="t-mini">De qué está hecha cada parte de la pieza. Cada categoría pide las suyas. Arrástralas para ordenarlas: así salen en la pieza y en la ficha.</p>
         </div>
         <button class="boton boton--primario boton-renombrar" type="button" data-nueva-parte aria-label="Nueva parte"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg><span class="boton-texto">Nueva parte</span></button>
       </header>
       <div class="panel-bloque">
-        <ul class="grupo-lista">${listas.partes.map((p) => `
-          <li><button class="fila-lista fila-lista--enlace fila-boton" type="button" data-parte="${escapar(p.id)}">
-            <span class="fila-lista-etiqueta">${escapar(p.nombre)}</span>
-            <span class="fila-lista-valor fila-lista-valor--corto">${escapar(resumenCats(p.categorias))}</span>
-            <svg class="fila-lista-flecha" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 5 5 5-5 5"/></svg>
-          </button></li>`).join("")}</ul>
+        <ul class="grupo-lista grupo-lista--ordenable" data-partes>${listas.partes.map((p) => filaOrdenable({
+          datos: `data-id="${escapar(p.id)}"`,
+          quitar: `Quitar ${p.nombre}`,
+          contenido: contenidoFila("data-parte", p.id, p.nombre, "", p.categorias),
+        })).join("")}</ul>
       </div>`;
     $$("[data-parte]").forEach((b) => b.addEventListener("click", () => editarParte(b.dataset.parte)));
     $("[data-nueva-parte]").addEventListener("click", () => editarParte(null));
+    cablearOrdenables($("[data-partes]"), {
+      alSoltar: (desde, hasta) => {
+        const [p] = listas.partes.splice(desde, 1);
+        listas.partes.splice(hasta, 0, p);
+        pintarPartes();
+        guardarListas("Orden guardado");
+      },
+      alQuitar: (i) => quitarParte(listas.partes[i]),
+    });
   }
 
   let parteAbierta = null, parteCats = null;
@@ -718,10 +834,12 @@ import "../styles/listas.css";
     pintar();
     guardarListas(parteAbierta ? `Se guardó "${nombre}"` : `Se agregó la parte "${nombre}"`);
   });
-  $("[data-parte-quitar]").addEventListener("click", async () => {
-    const p = parteAbierta;
-    const usan = usanParte(p.id);
+  $("[data-parte-quitar]").addEventListener("click", () => {
     cerrarModal("modal-parte");
+    quitarParte(parteAbierta);
+  });
+  async function quitarParte(p) {
+    const usan = usanParte(p.id);
     if (usan.length) {
       await confirmar({ titulo: `"${p.nombre}" está en uso`, texto: `La tienen ${usan.length} ${usan.length === 1 ? "pieza" : "piezas"}: ${nombresDe(usan)}. Bórrala de esas fichas y después podrás quitarla.`, accion: "Entendido" });
       return;
@@ -730,7 +848,7 @@ import "../styles/listas.css";
     listas.partes = listas.partes.filter((x) => x !== p);
     pintar();
     guardarListas(`Se quitó "${p.nombre}"`);
-  });
+  }
 
   /* ---------- Cambiar el nombre (el id no cambia: las piezas la siguen encontrando) ---------- */
   function renombrar() {

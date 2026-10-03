@@ -5,6 +5,10 @@
 #
 # El sitio real se publica en Hostinger subiendo la carpeta sitio/dist/ tal cual sale
 # de `npm run build`, sin el paso de preview.
+#
+# El administrador va en la misma vista previa, en /admin/, con su API simulada
+# (los datos de prueba viven en el navegador de cada quien). Toma las fotos de
+# la vista previa del sitio.
 name: Vista previa
 
 on:
@@ -36,6 +40,14 @@ jobs:
       - name: Ajustar para la subcarpeta de Pages
         working-directory: sitio
         run: node scripts/preparar-preview.mjs "/${{ github.event.repository.name }}"
+      - name: Compilar el administrador para la vista previa
+        run: npm run build:admin
+        env:
+          ADMIN_BASE: /${{ github.event.repository.name }}/admin/
+          PUBLIC_MEDIOS: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+          PUBLIC_STG: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+      - name: Meter el administrador en /admin/
+        run: cp -R admin/dist sitio/dist/admin
       - uses: actions/upload-pages-artifact@v3
         with:
           path: sitio/dist
