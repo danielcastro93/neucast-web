@@ -300,7 +300,9 @@
   position:relative;aspect-ratio:4/3;max-height:52vh;width:100%;border-radius:var(--r-3);overflow:hidden;
   background:var(--cemento-suave);display:grid;place-items:center;
 }
-.detalle-foto img{width:100%;height:100%;object-fit:cover;}
+/* la foto llena la caja desde sus cuatro orillas: así queda centrada siempre,
+   aunque la caja lleve más cosas encima (el botón de borrar) */
+.detalle-foto img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;}
 .detalle-foto img.recorte{object-fit:contain;padding:24px;}
 .detalle-borrar{
   position:absolute;top:12px;right:12px;width:40px;height:40px;border-radius:50%;
