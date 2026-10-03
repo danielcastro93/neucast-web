@@ -84,6 +84,11 @@ export async function guardar(coleccion, registro) {
     if (nuevo.estado !== "borrador" && Object.keys(errores).length) {
       throw new ErrorApi("Faltan datos para publicar la pieza", errores);
     }
+    // la dirección de una pieza publicada no cambia (no hay redirecciones)
+    const antes = nuevo._original && datos.find((r) => r.slug === nuevo._original);
+    if (antes && antes.estado === "publicada" && nuevo.slug !== antes.slug) {
+      throw new ErrorApi("La dirección de una pieza publicada no se cambia", { slug: "Queda fija desde que la pieza se publica" });
+    }
     const repetido = datos.find((r) => r.slug === nuevo.slug && r._original !== nuevo._original);
     const original = nuevo._original;
     if (repetido && repetido.slug !== original) {

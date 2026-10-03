@@ -1235,9 +1235,17 @@ const secciones = [
     // del tipo y el nombre (la cambiaste a mano, o es una pieza que ya existe
     // y le cambiaste el nombre).
     const botonProponer = $("[data-proponer-slug]");
+    // Una pieza publicada no cambia de dirección: Google y quien tenga el
+    // enlace la siguen encontrando. Mientras es borrador, sí se puede.
+    const fija = !!original && pieza.estado === "publicada";
+    if (fija) {
+      form.slug.readOnly = true;
+      form.slug.classList.add("control--fijo");
+      $("[data-ayuda-slug]").textContent = "Queda fija desde que la pieza se publica, para que su enlace no se rompa.";
+    }
     const revisarProponer = () => {
       const propuesta = proponerSlug(form.tipo.value, form.nombre.value);
-      botonProponer.hidden = !propuesta || limpiarSlug(form.slug.value) === propuesta;
+      botonProponer.hidden = fija || !propuesta || limpiarSlug(form.slug.value) === propuesta;
       botonProponer.title = propuesta ? `Cambia la dirección a ${propuesta}` : "";
     };
     const proponer = () => {
@@ -1257,7 +1265,7 @@ const secciones = [
       marcarCambio();
     });
     form.slug.addEventListener("blur", () => { form.slug.value = limpiarSlug(form.slug.value); actualizarTodo(); });
-    if (original) $("[data-ayuda-slug]").textContent = "Cambiarla rompe la dirección publicada: hay que redirigir la anterior.";
+    if (original && !fija) $("[data-ayuda-slug]").textContent = "Se puede cambiar mientras sea borrador; al publicarse queda fija.";
 
     form.cat.addEventListener("change", () => {
       pieza = { ...pieza, ...leer() };

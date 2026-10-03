@@ -23,6 +23,7 @@ const POR_TANDA = 20;
 // Los tres tipos de grupo se pintaban con tres bloques de markup casi iguales.
 // Aquí quedan en una sola lista: `muestra` marca los que llevan punto de color
 // y `cols` cuántas columnas usa su rejilla de opciones.
+const tieneValor = (v) => (Array.isArray(v) ? v.length > 0 : v != null && v !== "");
 const grupos = [
   {
     campo: "color",
@@ -33,7 +34,11 @@ const grupos = [
   },
   { campo: "material", nombre: "Material", cols: 2, opciones: materiales },
   ...filtros.map((g) => ({ ...g, cols: 2 })),
-].filter((g) => filtrosFijos[g.campo] !== false);
+].filter((g) => filtrosFijos[g.campo] !== false)
+  // cada página enseña solo los grupos que tienen piezas suyas: "Plazas" no
+  // sale en sillas ni una lista nueva de botes en escritorios
+  .filter((g) => !piezas.length || piezas.some((p) => tieneValor(g.campo === "color" ? p.colores : p[g.campo])));
+const camposVisibles = new Set(grupos.map((g) => g.campo));
 // qué bloques van y dónde lo decide el catálogo, no cada página: las reglas
 // están escritas junto a los datos, en src/data/catalogo.js
 const bloquesVisibles = bloquesPara(catActiva, piezas.length);
@@ -165,10 +170,10 @@ const bloquesVisibles = bloquesPara(catActiva, piezas.length);
       </button>
 
       <div class="mb-rapidos rail rail-mask" role="group" aria-label="Filtros rápidos">
-        <button class="mb-chip" type="button" data-panel-abre="color">Color</button>
-        <button class="mb-chip" type="button" data-panel-abre="material">Material</button>
-        <button class="mb-chip" type="button" data-panel-abre="uso">Tipo de uso</button>
-        <button class="mb-chip" type="button" data-panel-abre="entrega">Disponibilidad</button>
+        {camposVisibles.has("color") && <button class="mb-chip" type="button" data-panel-abre="color">Color</button>}
+        {camposVisibles.has("material") && <button class="mb-chip" type="button" data-panel-abre="material">Material</button>}
+        {camposVisibles.has("uso") && <button class="mb-chip" type="button" data-panel-abre="uso">Tipo de uso</button>}
+        {camposVisibles.has("entrega") && <button class="mb-chip" type="button" data-panel-abre="entrega">Disponibilidad</button>}
       </div>
 
       <p class="mb-cuenta" role="status"><span id="cuenta">{piezas.length}</span> piezas</p>

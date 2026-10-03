@@ -221,6 +221,15 @@ sin plazos**: no se administran por pieza.
 Los valores de `entrega` hoy son `inmediata`, `10dias` y `pedido`. La lista
 manda: se lee de `filtros` en `catalogo.js`.
 
+**La dirección (`slug`) de una pieza publicada no cambia.** No hay
+redirecciones: la API rechaza un guardado que cambie el `slug` de una pieza
+cuyo estado guardado es `publicada` (el administrador ya lo bloquea). Mientras
+es borrador, sí se puede cambiar.
+
+**El panel de filtros enseña solo los grupos que tienen piezas** en la página
+que se ve (`Catalogo.astro`): una lista nueva para una categoría no aparece en
+las demás.
+
 **Los campos de filtro son los que hacen funcionar el panel de filtros.** No son
 libres: cada uno solo acepta los valores declarados en `filtros`. Si la API
 manda un valor que no está en la lista, la pieza deja de aparecer al filtrar por

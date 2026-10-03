@@ -90,6 +90,11 @@ import "../styles/listas.css";
       <input class="control" id="medida-nombre" type="text" placeholder="Ej. Capacidad" autocomplete="off" data-medida-nombre />
       <p class="campo-error" data-medida-error hidden style="display:block"></p>
     </div>
+    <div class="campo">
+      <div class="campo-etiqueta"><label for="medida-ejemplo">Ejemplo</label></div>
+      <input class="control" id="medida-ejemplo" type="text" placeholder="Ej. 40" autocomplete="off" data-medida-ejemplo />
+      <p class="campo-ayuda">Sale en gris dentro del campo de la pieza, como pista.</p>
+    </div>
     <div class="fila">
       <div class="campo">
         <div class="campo-etiqueta"><label for="medida-unidad">Unidad</label></div>
@@ -605,6 +610,7 @@ import "../styles/listas.css";
     medidaCats = m ? m.categorias : null;
     $("#modal-medida [data-titulo]").textContent = m ? m.nombre : "Nueva medida";
     $("[data-medida-nombre]").value = m?.nombre || "";
+    $("[data-medida-ejemplo]").value = m?.ejemplo || "";
     $("[data-medida-error]").hidden = true;
     $("[data-medida-grupo]").innerHTML = listas.gruposMedida.map((g) => `<option value="${escapar(g.id)}">${escapar(g.nombre)}</option>`).join("");
     $("[data-medida-grupo]").value = m?.grupo || listas.gruposMedida[0].id;
@@ -631,9 +637,9 @@ import "../styles/listas.css";
     if (listas.medidas.some((x) => x !== medidaAbierta && sinAcentos(x.nombre) === sinAcentos(nombre))) {
       error.textContent = "Ya hay una medida con ese nombre."; error.hidden = false; return;
     }
-    const datos = { nombre, unidad: $("[data-medida-unidad]").value, grupo: $("[data-medida-grupo]").value, rango: $("[data-medida-rango]").checked, categorias: medidaCats };
+    const datos = { nombre, ejemplo: $("[data-medida-ejemplo]").value.trim(), unidad: $("[data-medida-unidad]").value, grupo: $("[data-medida-grupo]").value, rango: $("[data-medida-rango]").checked, categorias: medidaCats };
     if (medidaAbierta) Object.assign(medidaAbierta, datos);
-    else listas.medidas.push({ id: idNuevo(nombre, listas.medidas, limpiarSlug), ejemplo: "", ...datos });
+    else listas.medidas.push({ id: idNuevo(nombre, listas.medidas, limpiarSlug), ...datos });
     cerrarModal("modal-medida");
     pintar();
     guardarListas(medidaAbierta ? `Se guardó "${nombre}"` : `Se agregó la medida "${nombre}"`);
